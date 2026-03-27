@@ -1,4 +1,4 @@
-# ft_transcendence: Music Streaming Platform Roadmap
+# Flacky: Music Streaming Platform Roadmap
 
 **Duration:** 1.5 Months (6 Weeks)
 **Team Size:** 4 Members (2 Core Developers + 2 Project Management/QA roles to meet subject requirements)
