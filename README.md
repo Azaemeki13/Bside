@@ -1,163 +1,129 @@
-# Flacky: Music Streaming Platform Roadmap
+# Flacky: Music Streaming Platform (Rust Architecture)
 
-**Duration:** 1.5 Months (6 Weeks)
-**Team Size:** 4 Members (3 Core Developers + 1 Project Management/QA role)
+**Duration:** 6 Weeks
+**Team Size:** 4 Members (3 Core Developers + 1 QA/PM)
 **Target:** 14 Points
 
 ---
 
-## 🎯 Module Point Breakdown (14 Points Total)
-
-### The Web Core (3 Points)
-- **[Major - 2pts]** Use a framework for frontend (React/Vue) and backend (Go).
-- **[Minor - 1pt]** Use an ORM (e.g., GORM) for the database.
-
-### The Music Features (4 Points)
-- **[Major - 2pts]** Recommendation system using Machine Learning (Collaborative filtering via Python).
-- **[Minor - 1pt]** File upload and management system (AWS S3 / MinIO integration).
-- **[Minor - 1pt]** Advanced search functionality (SQL `ILIKE` / Full-Text Search).
-
-### The Social & User Features (6 Points)
-- **[Major - 2pts]** User interaction (Real-time Chat, Friends system, Online status).
-- **[Major - 2pts]** Standard user management (Avatars, profiles, settings).
-- **[Major - 2pts]** Advanced analytics dashboard (Interactive track data visualization).
-
-### The Polish (1 Point)
-- **[Minor - 1pt]** Remote authentication (OAuth 2.0 via 42 API or Google).
-
----
-
-## 👥 Team Repartition
+## 👥 Team Repartition (Balanced Loadout)
 
 | Member | Role | Responsibilities |
 | :--- | :--- | :--- |
-| **Developer 1** | **Backend Engine** | Go API, PostgreSQL schemas, WebSockets Hub, Python ML microservice, Docker & DevOps. |
-| **Developer 2** | **Frontend UI & Social** | App Routing, CSS Framework (Tailwind), Auth UI, Profile UI, Chat UI, Search UI, Accessibility. |
-| **Developer 3** | **Frontend Media & State** | Global State (Redux/Pinia), Howler.js audio engine, S3 Upload logic, WebSocket client, Chart.js logic. |
-| **Dummy 1** | **Product Owner / QA** | Documentation (`README.md`), Privacy Policy, Terms of Service, E2E Testing. |
+| **Developer 1** | **Rust Engine & ML** | Rust API (Axum), WebSocket Hub logic, Python FastAPI (ML Recommender). |
+| **Developer 2** | **UI, DB & DevOps** | PostgreSQL schema design (`.sql` migrations), Docker Compose, NGINX proxy, React/Vue visual layouts, CSS (Tailwind). |
+| **Developer 3** | **Client Engine** | Global State (Redux/Pinia), Audio streaming (`Howler.js`), API integration, WS Client logic. |
+| **Dummy 1** | **PM / QA** | Documentation (`README.md`), Privacy Policy, E2E Testing. |
 
 ---
 
 ## 🚀 6-Week Sprint Protocol
 
-### Week 1: The Foundation (Infrastructure & Schemas)
-**Goal:** Both developers can run the app locally, and the database is ready.
+### Week 1: Foundation & The Contract
+**Goal:** The DB is running, and the Rust server answers a basic HTTP ping.
 
-**Developer 1 (Backend):**
-- [ ] Write `docker-compose.yml` for PostgreSQL, PgAdmin, and Go.
-- [ ] Initialize Go project and configure ORM.
-- [ ] Design and migrate database schemas (`Users`, `Tracks`, `Playlists`, `Interactions`).
-- [ ] Setup base HTTP router (Gin/Fiber).
+**Developer 1 (Rust Engine):**
+- [ ] Initialize Cargo workspace (`axum`, `tokio`, `sqlx`).
+- [ ] Set up the basic HTTP router and CORS.
+- [ ] Connect Rust to the PostgreSQL port provided by Dev 2.
 
-**Developer 2 (UI & Social):**
-- [ ] Initialize React/Vue frontend (Vite).
-- [ ] Setup UI component library (Tailwind/MUI) and App Routing.
-- [ ] Create Figma wireframes for core views.
+**Developer 2 (UI, DB, DevOps):**
+- [ ] Write `docker-compose.yml` (Postgres, Adminer).
+- [ ] Write `.sql` migration files (`Users`, `Tracks`, `Playlists`).
+- [ ] Initialize Frontend framework and setup basic routing.
 
-**Developer 3 (Media & State):**
-- [ ] Setup Global State Management (Redux, Zustand, or Pinia).
-- [ ] Setup Axios/Fetch interceptors for API calls.
-- [ ] Build the empty shell of the Audio Player pinned to the viewport bottom.
+**Developer 3 (Client Engine):**
+- [ ] Setup Global State store.
+- [ ] Build the Audio Player component shell (no logic yet).
 
 ---
 
 ### Week 2: Core Hardware (Uploads, Auth, & Streaming)
-**Goal:** A user can log in, securely upload an audio file, and stream it back.
+**Goal:** Secure audio upload to S3 and playback.
 
-**Developer 1 (Backend):**
-- [ ] Build standard JWT Auth endpoints (Register/Login).
+**Developer 1 (Rust Engine):**
+- [ ] Implement JWT Auth logic in Rust.
 - [ ] Implement OAuth 2.0 flow.
-- [ ] Build AWS S3 Pre-Signed URL generator.
-- [ ] Build track metadata `POST` endpoint to save S3 links to PostgreSQL.
+- [ ] Implement AWS S3 Pre-Signed URL generation using `aws-sdk-s3`.
+- [ ] Build `POST /tracks` endpoint using SQLx.
 
-**Developer 2 (UI & Social):**
+**Developer 2 (UI, DB, DevOps):**
 - [ ] Build Auth UI (Login/Register forms).
-- [ ] Build the visual layout for the Drag-and-Drop file upload component.
+- [ ] Build the Drag-and-Drop upload visual component.
 
-**Developer 3 (Media & State):**
-- [ ] Implement the upload logic (requests Pre-Signed URL $\to$ `PUT` to S3).
-- [ ] Implement `Howler.js` (or native Audio) to play the S3 stream.
-- [ ] Wire up Play/Pause controls and the progress bar to the Audio Player state.
+**Developer 3 (Client Engine):**
+- [ ] Write the logic to request the Pre-Signed URL and `PUT` to S3.
+- [ ] Implement `Howler.js` to stream the S3 URL.
 
 ---
 
 ### Week 3: The Memory Bank (Profiles, Playlists, & Search)
-**Goal:** Users can manage their identity and organize their music.
+**Goal:** Users can manage data and organize music.
 
-**Developer 1 (Backend):**
-- [ ] Build User Management endpoints (Update avatar, username).
-- [ ] Build Playlist CRUD operations.
-- [ ] Build Advanced Search endpoint (querying tracks/artists).
+**Developer 1 (Rust Engine):**
+- [ ] Build Playlist CRUD operations in Rust.
+- [ ] Build Advanced Search endpoint (`ILIKE` queries via SQLx).
 
-**Developer 2 (UI & Social):**
+**Developer 2 (UI, DB, DevOps):**
 - [ ] Build User Profile and Settings UI.
-- [ ] Build Playlist layout and Global Search bar visual components.
+- [ ] Build Playlist layout and Search bar UI.
 
-**Developer 3 (Media & State):**
-- [ ] Connect Profile/Search components to backend APIs.
-- [ ] Integrate the audio queue logic (auto-play next song in playlist).
-
-*🚨 **MID-SPRINT SECURITY CHECK:** Ensure audio streams smoothly and DB saves correctly before moving to WebSockets.*
+**Developer 3 (Client Engine):**
+- [ ] Connect Profile/Search components to Rust APIs.
+- [ ] Implement the audio queue logic (auto-play next song).
 
 ---
 
 ### Week 4: The Network (Real-Time Chat & Interactions)
-**Goal:** Satisfy the 42 "User Interaction" real-time requirements.
+**Goal:** Satisfy the 42 User Interaction requirements using Rust WebSockets.
 
-**Developer 1 (Backend):**
-- [ ] Set up Go WebSocket Hub.
-- [ ] Implement Friends system (Send/Accept requests).
-- [ ] Implement real-time direct messaging routing.
-- [ ] Broadcast "User Online/Offline" status.
+**Developer 1 (Rust Engine):**
+- [ ] Set up WebSocket route in Axum (`axum::extract::ws`).
+- [ ] Build an async state manager (e.g., `Arc<Mutex<HashMap>>`) to track connected users.
+- [ ] Route live messages and broadcast Online/Offline status.
 
-**Developer 2 (UI & Social):**
-- [ ] Build Friends List UI with online/offline indicators.
-- [ ] Build real-time Chat Window layout and message bubbles.
+**Developer 2 (UI, DB, DevOps):**
+- [ ] Build Friends List UI and Chat Window layout.
+- [ ] Update DB schema if necessary for Chat Histories.
 
-**Developer 3 (Media & State):**
-- [ ] Connect Frontend WebSocket client (Socket.io or native).
-- [ ] Wire up the state to send/receive messages dynamically.
-- [ ] Listen for and dispatch "Online/Offline" state changes.
+**Developer 3 (Client Engine):**
+- [ ] Connect Frontend WebSocket client.
+- [ ] Wire up state to send/receive messages dynamically.
 
 ---
 
-### Week 5: The Intelligence (Machine Learning & Analytics)
-**Goal:** Hit the final major modules for the 14-point threshold.
+### Week 5: The Intelligence (Python ML & Analytics)
+**Goal:** Hit the AI requirement (2 points).
 
-**Developer 1 (Backend):**
-- [ ] Write Go endpoint to aggregate play counts and likes.
-- [ ] Initialize Python FastAPI microservice.
+**Developer 1 (Rust Engine):**
+- [ ] Temporarily pivot to Python: Initialize FastAPI.
 - [ ] Write Collaborative Filtering algorithm (`scikit-learn`) reading from Postgres.
-- [ ] Expose `/recommendations/{user_id}` endpoint.
+- [ ] Ensure Rust API tracks "Play (>30s)" events via SQLx.
 
-**Developer 2 (UI & Social):**
+**Developer 2 (UI, DB, DevOps):**
+- [ ] Write `Dockerfile`s for the React app, Rust backend, and Python service.
 - [ ] Build Analytics Dashboard grid layout.
-- [ ] Build "For You" homepage layout.
 
-**Developer 3 (Media & State):**
-- [ ] Ensure player fires "Play (>30s)" and "Like" events to the backend DB.
-- [ ] Integrate charting library (Chart.js / Recharts) and map backend data to charts.
-- [ ] Connect the "For You" page to the Python ML recommendations API.
+**Developer 3 (Client Engine):**
+- [ ] Integrate charting library (Chart.js) with backend analytics endpoints.
+- [ ] Connect the "For You" page to the Python ML API.
 
 ---
 
-### Week 6: The Polish (DevOps, QA, & Documentation)
-**Goal:** Make the project evaluate-ready according to 42's strict rules.
+### Week 6: The Polish & Deployment
+**Goal:** Evaluate-ready according to 42 rules.
 
-**Developer 1 (Backend):**
-- [ ] Finalize all `Dockerfile`s (Go, Python, NGINX, Postgres).
-- [ ] Configure NGINX reverse proxy (`/api` $\to$ Go, `/ml` $\to$ Python, `/` $\to$ React).
-- [ ] Test single-command launch (`docker compose up --build`).
+**Developer 1 (Rust Engine):**
+- [ ] Hunt down any `.unwrap()` panics in Rust and handle errors gracefully.
+- [ ] Test WebSocket load limits.
 
-**Developer 2 (UI & Social):**
-- [ ] Run Accessibility (a11y) audits.
-- [ ] Fix responsive design issues (mobile/tablet views).
+**Developer 2 (UI, DB, DevOps):**
+- [ ] Configure NGINX reverse proxy (`/api` $\to$ Rust, `/ml` $\to$ Python, `/` $\to$ React).
+- [ ] Test the full `docker compose up --build` pipeline.
+- [ ] Run Accessibility audits on the UI.
 
-**Developer 3 (Media & State):**
-- [ ] Clean up console warnings/errors.
-- [ ] Optimize state re-renders (memoization).
+**Developer 3 (Client Engine):**
+- [ ] Clean up console warnings and optimize React/Vue re-renders.
 
-**Dummy 1 (PM/QA):**
-- [ ] Write the massive `README.md` detailing the 14 points and team roles.
-- [ ] Draft mandatory Privacy Policy and Terms of Service.
-- [ ] Conduct end-to-end user testing.
+**Dummy 1:**
+- [ ] Finalize `README.md`, Privacy Policy, and E2E Testing.
