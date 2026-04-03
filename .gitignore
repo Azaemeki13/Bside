@@ -1,0 +1,42 @@
+# =========================
+# 1. SECRETS (CRITICAL)
+# =========================
+.env
+*.pem
+*.key
+
+# =========================
+# 2. RUST BACKEND
+# =========================
+/back/target/
+**/*.rs.bk
+
+# Note: We DO NOT ignore Cargo.lock for binary projects. 
+
+# =========================
+# 3. FRONTEND (React/Node)
+# =========================
+/front/node_modules/
+/front/dist/
+/front/build/
+/front/.next/
+npm-debug.log
+yarn-error.log
+
+# =========================
+# 4. PYTHON ML ENGINE
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+/ml_engine/venv/
+/ml_engine/.env
+
+# =========================
+# 5. OS & EDITOR JUNK
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
