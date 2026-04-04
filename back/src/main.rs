@@ -1,12 +1,15 @@
 mod models;
 mod handlers;
-use axum::{routing::{get, post}, Router, response::Json, extract::State,};
-// use serde::{Serialize, Deserialize};
-use sqlx::{postgres::PgPoolOptions, PgPool};
+use axum::{routing::{get, post}, Router };
+use sqlx::{postgres::PgPoolOptions};
 use std::env;
-use crate::models::PingResponse;
 use crate::models::User;
 use crate::models::UserPayload;
+use crate::models::Song;
+use crate::models::SongPayload;
+use crate::handlers::{ping_handler, create_user_handler, get_all_users_handler, get_all_users_by_id_handler, create_song_handler};
+
+
 #[tokio::main]
 async fn main()
 {
@@ -22,7 +25,9 @@ async fn main()
 
     let app: Router = Router::new()
         .route("/ping", get(ping_handler))
-        .route("/users", post(create_user_handler))
+        .route("/users", post(create_user_handler).get(get_all_users_handler))
+        .route("/songs", post(create_song_handler))
+        .route("/users/{id}", get(get_all_users_by_id_handler))
         .with_state(pool);
     let listener_addr = "0.0.0.0:8080";
     println!("Flacky engine starting on http://{}", listener_addr);
@@ -35,26 +40,4 @@ async fn main()
 
 }
 
-async fn ping_handler(State(_pool): State<PgPool>) -> Json<PingResponse> 
-{
-    let response = PingResponse
-    {
-        status: "success".to_string(),
-        message: "Rust Engine is online".to_string(),
 
-    };
-    Json(response)
-}
-#[axum::debug_handler]
-async fn create_user_handler(State(pool): State<PgPool>,
-    axum::extract::Json(payload): axum::extract::Json<UserPayload>,) -> Result<Json<User>, axum::http::StatusCode>
-{
-    let user = sqlx::query_as::<_, User>
-        ("INSERT INTO users (username) VALUES ($1) RETURNING id, username, created_at")
-        .bind(payload.username)
-        .fetch_one(&pool)
-        .await
-        .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;
-    Ok (Json(user))
-
-}
