@@ -23,18 +23,18 @@
 **Goal:** The DB is running, and the Rust server answers a basic HTTP ping.
 
 **Developer 1 (Rust Engine):**
-- [ ] Initialize Cargo workspace (`axum`, `tokio`, `sqlx`).
-- [ ] Set up the basic HTTP router and CORS.
-- [ ] Connect Rust to the PostgreSQL port provided by Dev 2.
+- [x] Initialize Cargo workspace (`axum`, `tokio`, `sqlx`).
+- [x] Set up the basic HTTP router and CORS.
+- [x] Connect Rust to the PostgreSQL port provided by Dev 2.
 
 **Developer 2 (UI, DB, DevOps):**
-- [ ] Write `docker-compose.yml` (Postgres, Adminer).
-- [ ] Write `.sql` migration files (`Users`, `Tracks`, `Playlists`).
-- [ ] Initialize Frontend framework and setup basic routing.
+- [ ] Write `docker-compose.yml` (Postgres DONE, Adminer TODO).
+- [ ] Write `.sql` migration files (`Users` DONE, `Tracks` DONE, `Playlists`).
+- [ ] Initialize Frontend framework and setup basic routing. TODO
 
 **Developer 3 (Client Engine):**
-- [ ] Setup Global State store.
-- [ ] Build the Audio Player component shell (no logic yet).
+- [ ] Setup Global State store. TODO
+- [ ] Build the Audio Player component shell (no logic yet). TODO
 
 ---
 
@@ -127,3 +127,7 @@
 
 **Dummy 1:**
 - [ ] Finalize `README.md`, Privacy Policy, and E2E Testing.
+
+**Nice to have**:
+- Playlist also show amount of songs in them, + total time of listening.
+- Playlists also have ml features ? :D
