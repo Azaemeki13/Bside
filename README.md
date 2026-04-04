@@ -127,3 +127,7 @@
 
 **Dummy 1:**
 - [ ] Finalize `README.md`, Privacy Policy, and E2E Testing.
+
+**Nice to have**:
+- Playlist also show amount of songs in them, + total time of listening.
+- Playlists also have ml features ? :D
