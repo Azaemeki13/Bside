@@ -42,7 +42,7 @@
 **Goal:** Secure audio upload to S3 and playback.
 
 **Developer 1 (Rust Engine):**
-- [ ] Implement JWT Auth logic in Rust.
+- [x] Implement JWT Auth logic in Rust.
 - [ ] Implement OAuth 2.0 flow.
 - [ ] Implement AWS S3 Pre-Signed URL generation using `aws-sdk-s3`.
 - [ ] Build `POST /tracks` endpoint using SQLx.
