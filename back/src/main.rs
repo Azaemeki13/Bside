@@ -1,13 +1,15 @@
 mod auth;
 mod handlers;
 mod models;
+use crate::auth::Claims;
 use crate::handlers::{
     add_song_to_playlist_handler, create_playlist_handler, create_song_handler,
     create_user_handler, get_all_users_handler, get_playlist_by_id_handler, get_user_by_id_handler,
-    google_login_handler, ping_handler,
+    google_callback_handler, google_login_handler, ping_handler,
 };
 use crate::models::AppState;
-use crate::models::Claims;
+use crate::models::AuthRequest;
+use crate::models::GoogleUserProfile;
 use crate::models::Playlist;
 use crate::models::PlaylistPayload;
 use crate::models::PlaylistResponse;
@@ -20,15 +22,10 @@ use axum::{
     http::Method,
     routing::{get, post},
 };
-use oauth2::basic::BasicClient;
-use oauth2::reqwest;
-use oauth2::{AuthUrl, ClientId, ClientSecret, Scope, TokenResponse, TokenUrl};
+use oauth2::{AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl, basic::BasicClient};
 use sqlx::postgres::PgPoolOptions;
 use std::env;
-use std::sync::arc;
 use tower_http::cors::{Any, CorsLayer};
-use url::url;
-
 #[tokio::main]
 async fn main() {
     dotenvy::dotenv().expect("Failed to read .env file");
@@ -43,8 +40,8 @@ async fn main() {
 
     let client_id = env::var("OAUTH_ID").expect("OAUTH_ID must be set.");
     let client_pw = env::var("OAUTH_PW").expect("OAUTH_PW must be set.");
-    let auth_uri = env::var("G_AUTH_URI").expect("G_AUTH_URI must be set.");
-    let token_uri = env::var("G_TOKEN_URI").expect("G_TOKEN_URI must be set.");
+    let auth_uri = env::var("G_AUTH_URL").expect("G_AUTH_URI must be set.");
+    let token_uri = env::var("G_TOKEN_URL").expect("G_TOKEN_URI must be set.");
     let redirect_url = env::var("OAUTH_URL").expect("OAUTH_URL must be set.");
 
     let client = BasicClient::new(ClientId::new(client_id))
@@ -66,6 +63,7 @@ async fn main() {
 
     let app: Router = Router::new()
         .route("/auth/google/login", get(google_login_handler))
+        .route("/auth/google/callback", get(google_callback_handler))
         .route("/ping", get(ping_handler))
         .route(
             "/users",

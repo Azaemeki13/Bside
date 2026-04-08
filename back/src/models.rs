@@ -1,3 +1,5 @@
+use oauth2::{EndpointNotSet, EndpointSet, basic::BasicClient};
+
 #[derive(serde::Serialize, sqlx::FromRow)]
 pub struct User {
     pub id: uuid::Uuid,
@@ -52,9 +54,32 @@ pub struct PlaylistResponse {
     pub songs: serde_json::Value,
 }
 
+pub type AppClient = BasicClient<
+    EndpointSet,    // HasAuthUrl
+    EndpointNotSet, // HasDeviceAuthUrl
+    EndpointNotSet, // HasIntrospectionUrl
+    EndpointNotSet, // HasRevocationUrl
+    EndpointSet,    // HasTokenUrl
+>;
+
 #[derive(Clone)]
 pub struct AppState {
     pub db: sqlx::PgPool,
-    pub oauth_client: BasicClient,
-    pub http_client: rewest::Client,
+    pub oauth_client: AppClient,
+    pub http_client: reqwest::Client,
+}
+
+#[derive(serde::Deserialize)]
+pub struct AuthRequest {
+    pub code: String,
+    pub state: String,
+}
+
+#[derive(serde::Deserialize, Debug)]
+pub struct GoogleUserProfile {
+    pub id: String,
+    pub email: String,
+    pub verified_email: bool,
+    pub name: String,
+    pub picture: String,
 }

@@ -5,12 +5,12 @@ edition = "2024"
 
 [dependencies]
 axum = { version = "0.8.8", features = ["macros"] }
-jsonwebtoken = "10.3.0"
+jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
 axum-extra = "0.12.5"
 chrono = { version = "0.4.44", features = ["serde"] }
 dotenvy = "0.15.7"
-oauth2 = "5.0.0"
-reqwest = "0.13.2"
+oauth2 = { version = "5.0.0", features = ["reqwest"] }
+reqwest = { version = "0.12", features = ["json"] }
 aws-sdk-s3 = "1.128.0"
 aws-config = "1.8.15"
 serde = { version = "1.0.228", features = ["derive"] }
