@@ -63,6 +63,7 @@
 
 **Developer 1 (Rust Engine):**
 - [ ] Build Relational POST (artists albums, collabs all interconnected XDXDXDXDXDXD).
+- [ ] Best practices to apply according to git.
 - [ ] CLI Tool to buld load songs from a directory
 - [ ] Build Playlist CRUD operations in Rust.
 - [ ] Metadata Aggregation. Playlist response also includes total_duration and song_count.
