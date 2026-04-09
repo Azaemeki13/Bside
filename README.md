@@ -1,4 +1,4 @@
-# Flacky: Music Streaming Platform (Rust Architecture)
+# Bside: Music Streaming Platform (Rust Architecture)
 
 **Duration:** 6 Weeks
 **Team Size:** 4 Members (3 Core Developers + 1 QA/PM)
