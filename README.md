@@ -62,7 +62,9 @@
 **Goal:** Users can manage data and organize music.
 
 **Developer 1 (Rust Engine):**
+- [ ] Build Relational POST (artists albums, collabs all interconnected XDXDXDXDXDXD).
 - [ ] Build Playlist CRUD operations in Rust.
+- [ ] Metadata Aggregation. Playlist response also includes total_duration and song_count.
 - [ ] Build Advanced Search endpoint (`ILIKE` queries via SQLx).
 
 **Developer 2 (UI, DB, DevOps):**
