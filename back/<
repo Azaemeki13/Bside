@@ -1,6 +1,6 @@
 use crate::{
-    AppState, AuthRequest, BSideError, Claims, GoogleUserProfile, Playlist, PlaylistPayload,
-    PlaylistResponse, PlaylistSongItem, Song, SongPayload, SongResponse, User, UserPayload,
+    AppState, AuthRequest, Claims, GoogleUserProfile, Playlist, PlaylistPayload,
+    PlaylistResponse, Song, SongPayload, SongResponse, User, UserPayload, BSideError, PlaylistSongItem
 };
 use aws_sdk_s3::presigning::PresigningConfig;
 use axum::{
@@ -69,7 +69,7 @@ pub async fn create_song_handler(
     let song_uid = Uuid::new_v4();
     let s3_key = format!("{}/{}.{}", claims.sub, song_uid, payload.format);
     let expires_in = PresigningConfig::expires_in(Duration::from_secs(300))
-        .map_err(|e| BSideError::S3Error(format!("Presigning config failure: {e}")))?;
+        .map_err(|e| BSideError::S3Error(format!("Presigning config failure: {}", e)))?;
     let presigned_request = state
         .aws_client
         .put_object()
@@ -78,7 +78,7 @@ pub async fn create_song_handler(
         .content_type(format!("audio/{}", payload.format))
         .presigned(expires_in)
         .await
-        .map_err(|e| BSideError::S3Error(format!("Presigning config failure: {e}")))?;
+        .map_err(|e| BSideError::S3Error(format!("Presigning config failure: {}", e)))?;
     let upload_url = presigned_request.uri().to_string();
     let mut tx = state.db.begin().await?;
     let song = sqlx::query_as!
@@ -90,42 +90,31 @@ pub async fn create_song_handler(
     sqlx::query!(
         "INSERT INTO song_artists (song_id, artist_id, is_primary) VALUES ($1, $2, true)",
         song_uid,
-        payload.primary_artist_id
-    )
-    .execute(&mut *tx)
-    .await?;
+        payload.primary_artist_id)
+        .execute(& mut *tx)
+        .await?;
     tx.commit().await?;
 
     let response = SongResponse {
-        song,
-        upload_url,
+        song: song,
+        upload_url: upload_url,
     };
     Ok(Json(response))
 }
 
 pub async fn verify_song_handler(
     State(state): State<AppState>,
-    claims: Claims,
+    _claims: Claims,
     axum::extract::Path(song_id): axum::extract::Path<Uuid>,
 ) -> Result<axum::Json<serde_json::Value>, BSideError> {
-    let song = sqlx::query!("SELECT audio_url, album_id FROM songs WHERE id = $1", song_id)
+    let s3_key = sqlx::query_scalar!("SELECT audio_url FROM songs WHERE id = $1", song_id)
         .fetch_one(&state.db)
         .await?;
-    let is_owner = sqlx::query_scalar!(
-        "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND artist_id = $2)",
-        song.album_id, claims.sub)
-        .fetch_one(&state.db)
-        .await?
-        .unwrap_or(false);
-    if !is_owner
-    {
-        return Err(BSideError::UnauthorizedProfile);
-    }
     let get_request = state
         .aws_client
         .get_object()
         .bucket("bside-tracks")
-        .key(&song.audio_url)
+        .key(&s3_key)
         .range("bytes=0-31")
         .send()
         .await
@@ -143,7 +132,7 @@ pub async fn verify_song_handler(
             .aws_client
             .delete_object()
             .bucket("bside-tracks")
-            .key(&song.audio_url)
+            .key(&s3_key)
             .send()
             .await;
         let _ = sqlx::query!("DELETE FROM songs WHERE id = $1", song_id)
@@ -151,10 +140,7 @@ pub async fn verify_song_handler(
             .await?;
         return Err(BSideError::PayloadTooLarge);
     }
-    let body = get_request
-        .body
-        .collect()
-        .await
+    let body = get_request.body.collect().await
         .map_err(|e| BSideError::S3Error(format!("Streaming Error: {}", e)))?;
     let bytes = body.into_bytes();
     if bytes.len() < 4 || (&bytes[..4] != b"fLaC" && &bytes[..4] != b"RIFF") {
@@ -162,7 +148,7 @@ pub async fn verify_song_handler(
             .aws_client
             .delete_object()
             .bucket("bside-tracks")
-            .key(&song.audio_url)
+            .key(&s3_key)
             .send()
             .await;
         let _ = sqlx::query!("DELETE FROM songs WHERE id = $1", song_id)
@@ -227,7 +213,7 @@ pub async fn add_song_to_playlist_handler(
 pub async fn get_playlist_by_id_handler(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    _claims: Claims,
+    claims: Claims,
 ) -> Result<Json<PlaylistResponse>, BSideError> {
     let playlist = sqlx::query_as!(
         PlaylistResponse,

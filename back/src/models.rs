@@ -17,8 +17,8 @@ pub struct UserPayload {
 #[derive(serde::Serialize, sqlx::FromRow)]
 pub struct Song {
     pub id: uuid::Uuid,
+    pub album_id: uuid::Uuid,
     pub title: String,
-    pub artist: String,
     pub duration_seconds: i32,
     pub audio_url: String,
     pub status: String,
@@ -29,7 +29,8 @@ pub struct Song {
 #[derive(serde::Deserialize)]
 pub struct SongPayload {
     pub title: String,
-    pub artist: String,
+    pub primary_artist_id: uuid::Uuid,
+    pub album_id: uuid::Uuid,
     pub duration_seconds: i32,
     pub format: String,
     pub ml_features: Option<serde_json::Value>,
@@ -44,23 +45,31 @@ pub struct SongResponse {
 #[derive(serde::Serialize, sqlx::FromRow)]
 pub struct Playlist {
     pub id: uuid::Uuid,
-    pub name: String,
+    pub title: String,
     pub owner_id: uuid::Uuid,
+    pub is_public: bool,
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(serde::Deserialize)]
 pub struct PlaylistPayload {
-    pub name: String,
-    pub owner_id: uuid::Uuid,
+    pub title: String,
 }
 
 #[derive(serde::Serialize)]
 pub struct PlaylistResponse {
     pub id: uuid::Uuid,
-    pub name: String,
+    pub title: String,
     pub owner_id: uuid::Uuid,
-    pub songs: serde_json::Value,
+    pub songs: sqlx::types::Json<Vec<PlaylistSongItem>>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct PlaylistSongItem {
+    pub id: uuid::Uuid,
+    pub title: String,
+    pub artist: String,
+    pub duration_seconds: i32,
 }
 
 pub type AppClient = BasicClient<

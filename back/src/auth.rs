@@ -1,4 +1,4 @@
-use crate::AppState;
+use crate::{AppState, BSideError};
 use axum::{
     extract::{FromRef, FromRequestParts},
     http::{StatusCode, request::Parts},
@@ -14,24 +14,25 @@ pub struct Claims {
     pub exp: usize,
 }
 
-pub fn create_jwt(user_id: uuid::Uuid) -> Result<String, StatusCode> {
-    let expiration = chrono::Utc::now()
+pub fn create_jwt(user_id: uuid::Uuid) -> Result<String, BSideError> {
+    let expiration = usize::try_from(chrono::Utc::now()
         .checked_add_signed(chrono::Duration::hours(24))
         .expect("Valid timestamp")
-        .timestamp() as usize;
+        .timestamp());
 
     let claims = Claims {
         sub: user_id,
-        exp: expiration,
+        exp: expiration?,
     };
     let secret = std::env::var("JWT_SECRET").expect("JWT secret must be set");
 
-    encode(
+    let token = encode(
         &Header::default(),
         &claims,
         &EncodingKey::from_secret(secret.as_bytes()),
     )
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
+    .map_err(|e| BSideError::AuthError(format!("JWT enconding failed: {e}")))?;
+    Ok(token)
 }
 
 impl<S> FromRequestParts<S> for Claims
@@ -48,7 +49,7 @@ where
             .and_then(|h| h.to_str().ok())
             .and_then(|h| h.strip_prefix("Bearer "));
         let token = auth_header.ok_or(StatusCode::UNAUTHORIZED)?;
-        let token_data = decode::<Claims>(
+        let token_data = decode::<Self>(
             token,
             &DecodingKey::from_secret(app_state.jwt.expose_secret().as_bytes()),
             &Validation::default(),

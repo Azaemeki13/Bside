@@ -1,7 +1,13 @@
+#![deny(clippy::unwrap_used)]
+#![warn(clippy::pedantic)]
+#![warn(clippy::nursery)]
+
 mod auth;
+mod error;
 mod handlers;
 mod models;
 use crate::auth::Claims;
+use crate::error::BSideError;
 use crate::handlers::{
     add_song_to_playlist_handler, create_playlist_handler, create_song_handler,
     create_user_handler, get_all_users_handler, get_playlist_by_id_handler, get_user_by_id_handler,
@@ -13,6 +19,7 @@ use crate::models::GoogleUserProfile;
 use crate::models::Playlist;
 use crate::models::PlaylistPayload;
 use crate::models::PlaylistResponse;
+use crate::models::PlaylistSongItem;
 use crate::models::Song;
 use crate::models::SongPayload;
 use crate::models::SongResponse;
@@ -64,7 +71,7 @@ async fn main() {
         oauth_client: client,
         http_client: reqwest::Client::new(),
         jwt: Arc::new(secrecy::SecretBox::new(jwt_secret.into())),
-        aws_client: aws_client,
+        aws_client,
     };
 
     let cors = CorsLayer::new()

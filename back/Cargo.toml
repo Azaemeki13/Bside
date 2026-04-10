@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 axum = { version = "0.8.8", features = ["macros"] }
 secrecy = {version = "0.10.3" }
+thiserror = "1.0"
 jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
 axum-extra = "0.12.5"
 chrono = { version = "0.4.44", features = ["serde"] }
@@ -20,3 +21,4 @@ sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio-rustls", "uui
 tokio = { version = "1.51.0", features = ["full"] }
 tower-http = { version = "0.6.8", features = ["cors", "trace"] }
 uuid = { version = "1.23.0", features = ["serde", "v4"] }
+tracing = "0.1.44"
