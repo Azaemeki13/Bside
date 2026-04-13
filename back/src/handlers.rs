@@ -1,6 +1,7 @@
 use crate::{
-    AppState, AuthRequest, BSideError, Claims, GoogleUserProfile, Playlist, PlaylistPayload,
-    PlaylistResponse, PlaylistSongItem, Song, SongPayload, SongResponse, User, UserPayload,
+    AlbumPayload, AlbumResponse, AppState, AuthRequest, BSideError, Claims, GoogleUserProfile,
+    Playlist, PlaylistPayload, PlaylistResponse, PlaylistSongItem, Song, SongPayload, SongResponse,
+    User, UserPayload,
 };
 use aws_sdk_s3::presigning::PresigningConfig;
 use axum::{
@@ -32,6 +33,20 @@ pub async fn create_user_handler(
     Ok(Json(user))
 }
 
+pub async fn get_me_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    ) -> Result<Json<User>, BSideError> {
+    let result = sqlx::query_as!(
+        User,
+        r#"SELECT id, username, created_at as "created_at!" FROM users WHERE id = $1"#,
+        claims.sub)
+        .fetch_optional(&state.db)
+        .await?
+        .ok_or(BSideError::UserNotFound)?;
+    Ok(Json(result))
+}
+
 pub async fn get_all_users_handler(
     State(state): State<AppState>,
     _claims: Claims,
@@ -58,6 +73,46 @@ pub async fn get_user_by_id_handler(
     Ok(Json(user))
 }
 
+pub async fn create_album_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    axum::extract::Json(payload): axum::extract::Json<AlbumPayload>,
+) -> Result<Json<AlbumResponse>, BSideError> {
+    let trimmed_title = payload.title.trim();
+    if trimmed_title.is_empty() {
+        return Err(BSideError::BadRequest(
+            "Album title cannot be empty !".to_string(),
+        ));
+    }
+    if trimmed_title.len() > 100 {
+        return Err(BSideError::BadRequest(
+            "Album title cannot be more than 100 chars!".to_string(),
+        ));
+    }
+    let result = sqlx::query_scalar!(
+        r#"
+        INSERT INTO albums (title, owner_id)
+        VALUES ($1, $2)
+        RETURNING id
+        "#,
+        trimmed_title,
+        claims.sub
+    )
+    .fetch_one(&state.db)
+    .await;
+    match result {
+        Ok(album_id) => Ok(Json(AlbumResponse {
+            id: album_id,
+            title: trimmed_title.to_string(),
+            message: "Album create successfully".to_string(),
+        })),
+        Err(sqlx::Error::Database(db_err)) if db_err.is_unique_violation() => Err(
+            BSideError::Conflict("You already have an album with this title!".to_string()),
+        ),
+        Err(e) => Err(BSideError::SqlxError(e)),
+    }
+}
+
 pub async fn create_song_handler(
     State(state): State<AppState>,
     claims: Claims,
@@ -65,6 +120,16 @@ pub async fn create_song_handler(
 ) -> Result<Json<SongResponse>, BSideError> {
     if !matches!(payload.format.as_str(), "wav" | "flac") {
         return Err(BSideError::InvalidFormat);
+    }
+    let is_owner = sqlx::query_scalar!(
+        "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND owner_id = $2)",
+        payload.album_id,
+        claims.sub
+    )
+    .fetch_one(&state.db)
+    .await?;
+    if !is_owner.unwrap_or(false) {
+        return Err(BSideError::UnauthorizedProfile);
     }
     let song_uid = Uuid::new_v4();
     let s3_key = format!("{}/{}.{}", claims.sub, song_uid, payload.format);
@@ -78,29 +143,25 @@ pub async fn create_song_handler(
         .content_type(format!("audio/{}", payload.format))
         .presigned(expires_in)
         .await
-        .map_err(|e| BSideError::S3Error(format!("Presigning config failure: {e}")))?;
+        .map_err(|e| BSideError::S3Error(format!("Presigning request failure: {e}")))?;
     let upload_url = presigned_request.uri().to_string();
-    let mut tx = state.db.begin().await?;
-    let song = sqlx::query_as!
-        (Song, r#"INSERT INTO songs (id, title, album_id, duration_seconds, audio_url,status, ml_features) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, title, album_id, duration_seconds, audio_url, status, ml_features, created_at as "created_at!" "#
-         ,song_uid, payload.title, payload.album_id, payload.duration_seconds, s3_key,
-        "Pending", payload.ml_features)
-        .fetch_one(&mut *tx)
-        .await?;
-    sqlx::query!(
-        "INSERT INTO song_artists (song_id, artist_id, is_primary) VALUES ($1, $2, true)",
+    let song = sqlx::query_as!(
+        Song,
+        r#"
+        INSERT INTO songs (id, title, album_id, duration_seconds, audio_url, status, ml_features) 
+        VALUES ($1, $2, $3, $4, $5, 'Pending'::song_status, $6::jsonb) 
+        RETURNING id, title, album_id, duration_seconds, audio_url, status::text as "status!", ml_features, created_at as "created_at!" 
+        "#,
         song_uid,
-        payload.primary_artist_id
+        payload.title,
+        payload.album_id,
+        payload.duration_seconds,
+        s3_key,
+        payload.ml_features
     )
-    .execute(&mut *tx)
+    .fetch_one(&state.db)
     .await?;
-    tx.commit().await?;
-
-    let response = SongResponse {
-        song,
-        upload_url,
-    };
-    Ok(Json(response))
+    Ok(Json(SongResponse { song, upload_url }))
 }
 
 pub async fn verify_song_handler(
@@ -108,17 +169,21 @@ pub async fn verify_song_handler(
     claims: Claims,
     axum::extract::Path(song_id): axum::extract::Path<Uuid>,
 ) -> Result<axum::Json<serde_json::Value>, BSideError> {
-    let song = sqlx::query!("SELECT audio_url, album_id FROM songs WHERE id = $1", song_id)
-        .fetch_one(&state.db)
-        .await?;
+    let song = sqlx::query!(
+        "SELECT audio_url, album_id FROM songs WHERE id = $1",
+        song_id
+    )
+    .fetch_one(&state.db)
+    .await?;
     let is_owner = sqlx::query_scalar!(
-        "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND artist_id = $2)",
-        song.album_id, claims.sub)
-        .fetch_one(&state.db)
-        .await?
-        .unwrap_or(false);
-    if !is_owner
-    {
+        "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND owner_id = $2)",
+        song.album_id,
+        claims.sub
+    )
+    .fetch_one(&state.db)
+    .await?
+    .unwrap_or(false);
+    if !is_owner {
         return Err(BSideError::UnauthorizedProfile);
     }
     let get_request = state
@@ -133,7 +198,7 @@ pub async fn verify_song_handler(
             if e.to_string().contains("NoSuchKey") {
                 BSideError::NotFound
             } else {
-                BSideError::S3Error(format!("S3 Fetch Error: {}", e))
+                BSideError::S3Error(format!("S3 Fetch Error: {e}"))
             }
         })?;
     let content_length = get_request.content_length().unwrap_or(0);
@@ -155,7 +220,10 @@ pub async fn verify_song_handler(
         .body
         .collect()
         .await
-        .map_err(|e| BSideError::S3Error(format!("Streaming Error: {}", e)))?;
+        .map_err(|e| {
+            tracing::error!("S3 Body Collection Error: {:?}" ,e);
+            BSideError::S3Error(format!("Streaming Error: {e}"))
+        })?;
     let bytes = body.into_bytes();
     if bytes.len() < 4 || (&bytes[..4] != b"fLaC" && &bytes[..4] != b"RIFF") {
         let _ = state
@@ -170,7 +238,7 @@ pub async fn verify_song_handler(
             .await?;
         return Err(BSideError::InvalidFormat);
     }
-    let _response = sqlx::query!("UPDATE songs SET status = 'Ready' WHERE id = $1", song_id)
+    let _response = sqlx::query!("UPDATE songs SET status = 'Ready'::song_status WHERE id = $1", song_id)
         .execute(&state.db)
         .await?;
     Ok(axum::Json(serde_json::json!({"status": "verified"})))
@@ -240,13 +308,13 @@ pub async fn get_playlist_by_id_handler(
                 (SELECT json_agg(json_build_object(
                     'id', s.id,
                     'title', s.title,
-                    'artist', ap.name,
+                    'artist', u.username, -- The new path to the artist's name
                     'duration_seconds', s.duration_seconds
                 ) ORDER BY ps.position)
                  FROM playlist_songs ps
                  JOIN songs s ON ps.song_id = s.id
-                 JOIN song_artists sa ON s.id = sa.song_id AND sa.is_primary = true
-                 JOIN artist_profiles ap ON sa.artist_id = ap.id
+                 JOIN albums a ON s.album_id = a.id
+                 JOIN users u ON a.owner_id = u.id
                  WHERE ps.playlist_id = p.id
                 ), '[]'
             ) as "songs!: sqlx::types::Json<Vec<PlaylistSongItem>>"
@@ -258,6 +326,7 @@ pub async fn get_playlist_by_id_handler(
     .fetch_optional(&state.db)
     .await?
     .ok_or(BSideError::NotFound)?;
+
     Ok(Json(playlist))
 }
 
@@ -283,7 +352,7 @@ pub async fn google_callback_handler(
         .exchange_code(code)
         .request_async(&state.http_client)
         .await
-        .map_err(|e| BSideError::AuthError(format!("OAuth exchange failed: {}", e)))?;
+        .map_err(|e| BSideError::AuthError(format!("OAuth exchange failed: {e}")))?;
 
     let access_token = token_result.access_token().secret();
     let profile_response = state
@@ -296,22 +365,22 @@ pub async fn google_callback_handler(
     let existing_user = sqlx::query!("SELECT id from users WHERE email = $1", profile.email)
         .fetch_optional(&state.db)
         .await?;
-    let user_id = match existing_user {
-        Some(record) => record.id,
-        None => {
-            println!("New user, inserting into database...");
-            let new_id = uuid::Uuid::new_v4();
-            sqlx::query!(
-                "INSERT into users (id, email, username) VALUES ($1, $2, $3)",
-                new_id,
-                profile.email,
-                profile.name
-            )
-            .execute(&state.db)
-            .await?;
-            new_id
-        }
+    let user_id = if let Some(record) = existing_user {
+        record.id
+    } else {
+        println!("New use, inserting into database...");
+        let new_id = uuid::Uuid::new_v4();
+        sqlx::query!(
+            "INSERT into users (id, email, username) VALUES ($1, $2, $3)",
+            new_id,
+            profile.email,
+            profile.name
+        )
+        .execute(&state.db)
+        .await?;
+        new_id
     };
     let jwt = crate::auth::create_jwt(user_id)?;
-    Ok(format!("Welcome to Bside !  Your official JWT is {}", jwt))
+    let redirect_url = format!("http://localhost:8081?token={jwt}");
+    Ok(Redirect::to(&redirect_url))
 }

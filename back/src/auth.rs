@@ -15,10 +15,12 @@ pub struct Claims {
 }
 
 pub fn create_jwt(user_id: uuid::Uuid) -> Result<String, BSideError> {
-    let expiration = usize::try_from(chrono::Utc::now()
-        .checked_add_signed(chrono::Duration::hours(24))
-        .expect("Valid timestamp")
-        .timestamp());
+    let expiration = usize::try_from(
+        chrono::Utc::now()
+            .checked_add_signed(chrono::Duration::hours(24))
+            .expect("Valid timestamp")
+            .timestamp(),
+    );
 
     let claims = Claims {
         sub: user_id,

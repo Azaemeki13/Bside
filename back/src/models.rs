@@ -52,6 +52,18 @@ pub struct Playlist {
 }
 
 #[derive(serde::Deserialize)]
+pub struct AlbumPayload {
+    pub title: String,
+}
+
+#[derive(serde::Serialize)]
+pub struct AlbumResponse {
+    pub id: uuid::Uuid,
+    pub title: String,
+    pub message: String,
+}
+
+#[derive(serde::Deserialize)]
 pub struct PlaylistPayload {
     pub title: String,
 }

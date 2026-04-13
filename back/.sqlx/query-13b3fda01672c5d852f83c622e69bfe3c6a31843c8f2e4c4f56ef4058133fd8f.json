@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT \n            p.id, \n            p.title,\n            p.owner_id,\n            COALESCE(\n                (SELECT json_agg(json_build_object(\n                    'id', s.id,\n                    'title', s.title,\n                    'artist', u.username, -- The new path to the artist's name\n                    'duration_seconds', s.duration_seconds\n                ) ORDER BY ps.position)\n                 FROM playlist_songs ps\n                 JOIN songs s ON ps.song_id = s.id\n                 JOIN albums a ON s.album_id = a.id\n                 JOIN users u ON a.owner_id = u.id\n                 WHERE ps.playlist_id = p.id\n                ), '[]'\n            ) as \"songs!: sqlx::types::Json<Vec<PlaylistSongItem>>\"\n        FROM playlists p\n        WHERE p.id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "owner_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "songs!: sqlx::types::Json<Vec<PlaylistSongItem>>",
+        "type_info": "Json"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "13b3fda01672c5d852f83c622e69bfe3c6a31843c8f2e4c4f56ef4058133fd8f"
+}
