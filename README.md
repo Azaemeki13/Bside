@@ -62,8 +62,8 @@
 **Goal:** Users can manage data and organize music.
 
 **Developer 1 (Rust Engine):**
-- [x] Build Relational POST (artists albums, collabs all interconnected XDXDXDXDXDXD). (to verify)
-- [x] Best practices to apply according to git. (to finish)
+- [x] Build Relational POST (artists albums, collabs all interconnected).
+- [x] Best practices to apply according to git.
 - [ ] CLI Tool to buld load songs from a directory
 - [ ] Build Playlist CRUD operations in Rust.
 - [ ] Metadata Aggregation. Playlist response also includes total_duration and song_count.
