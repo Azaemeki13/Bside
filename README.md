@@ -137,11 +137,12 @@
 **Nice to have**:
 - Playlist also show amount of songs in them, + total time of listening.
 - Playlists also have ml features ? :D
-
+- 
 **CRUD Status:**
 
-Entity,Create,Read,Update,Delete
-User,✅,✅,⏳,⏳
-Album,✅,⏳,⏳,⏳
-Playlist,✅,✅,✅,✅
-Song,✅,⏳,✅ (Verify),❌
+| Entity | Create | Read | Update | Delete |
+| :--- | :---: | :---: | :---: | :---: |
+| **User** | ✅ | ✅ | ⏳ | ⏳ |
+| **Album** | ✅ | ⏳ | ⏳ | ⏳ |
+| **Playlist** | ✅ | ✅ | ✅ | ✅ |
+| **Song** | ✅ | ⏳ | ✅ (Verify) | ❌ |
