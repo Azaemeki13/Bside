@@ -10,20 +10,21 @@ use crate::auth::Claims;
 use crate::error::BSideError;
 use crate::handlers::{
     add_song_to_playlist_handler, create_album_handler, create_playlist_handler,
-    create_song_handler, create_user_handler, get_all_users_handler, get_playlist_by_id_handler,
-    get_user_by_id_handler, google_callback_handler, google_login_handler, ping_handler,
-    verify_song_handler, get_me_handler,
+    create_song_handler, create_user_handler, delete_playlist_handler, get_all_users_handler,
+    get_me_handler, get_playlist_by_id_handler, get_user_by_id_handler, google_callback_handler,
+    google_login_handler, ping_handler, remove_song_from_pl, update_playlist_handler,
+    verify_song_handler,
 };
 use crate::models::{
-    AlbumPayload, AlbumResponse, AppState, AuthRequest, GoogleUserProfile, Playlist,
-    PlaylistPayload, PlaylistResponse, PlaylistSongItem, Song, SongPayload, SongResponse, User,
-    UserPayload,
+    AddSongResponse, AlbumPayload, AlbumResponse, AppState, AuthRequest, GoogleUserProfile,
+    Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, Song, SongPayload,
+    SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 
 use axum::{
     Router,
     http::Method,
-    routing::{get, post, put},
+    routing::{delete, get, post, put},
 };
 use oauth2::{AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl, basic::BasicClient};
 use sqlx::postgres::PgPoolOptions;
@@ -34,8 +35,8 @@ use tower_http::cors::{Any, CorsLayer};
 #[tokio::main]
 async fn main() {
     //tracing_subscriber::fmt()
-      //  .with_max_level(tracing::Level::DEBUG)
-        //.init(); WHEN DOING DEBUGING
+    //  .with_max_level(tracing::Level::DEBUG)
+    //.init(); WHEN DOING DEBUGING
     dotenvy::dotenv().expect("Failed to read .env file");
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
 
@@ -80,14 +81,29 @@ async fn main() {
         .route("/auth/google/login", get(google_login_handler))
         .route("/auth/google/callback", get(google_callback_handler))
         .route("/ping", get(ping_handler))
-        .route("/users", post(create_user_handler).get(get_all_users_handler))
+        .route(
+            "/users",
+            post(create_user_handler).get(get_all_users_handler),
+        )
         .route("/users/me", get(get_me_handler))
         .route("/albums", post(create_album_handler))
         .route("/songs", post(create_song_handler))
         .route("/songs/{song_id}/verify", put(verify_song_handler))
         .route("/playlists", post(create_playlist_handler))
-        .route("/playlists/{id}", get(get_playlist_by_id_handler))
-        .route("/playlists/{playlist_id}/songs/{song_id}",post(add_song_to_playlist_handler))
+        .route(
+            "/playlists/{playlist_id}/songs/{link_id}",
+            delete(remove_song_from_pl),
+        )
+        .route(
+            "/playlists/{id}",
+            get(get_playlist_by_id_handler)
+                .put(update_playlist_handler)
+                .delete(delete_playlist_handler),
+        )
+        .route(
+            "/playlists/{playlist_id}/songs/{song_id}",
+            post(add_song_to_playlist_handler),
+        )
         .route("/users/{id}", get(get_user_by_id_handler))
         .layer(cors)
         .with_state(state);

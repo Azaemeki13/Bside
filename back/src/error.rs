@@ -30,12 +30,14 @@ pub enum BSideError {
     ConversionError(#[from] std::num::TryFromIntError),
     #[error("Conflict: {0}")]
     Conflict(String),
+    #[error("Song is not ready!")]
+    SongNotReady,
 }
 
 impl IntoResponse for BSideError {
     fn into_response(self) -> Response {
         let (status, error_message) = match self {
-            Self::InvalidFormat => (StatusCode::BAD_REQUEST, self.to_string()),
+            Self::InvalidFormat | Self::SongNotReady => (StatusCode::BAD_REQUEST, self.to_string()),
             Self::BadRequest(ref msg) => (StatusCode::BAD_REQUEST, msg.clone()),
             Self::Conflict(ref msg) => (StatusCode::CONFLICT, msg.clone()),
             Self::AuthError(ref msg) => (StatusCode::UNAUTHORIZED, msg.clone()),

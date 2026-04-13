@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT s.duration_seconds, p.owner_id\n        FROM playlist_songs ps\n        JOIN songs s ON s.id = ps.song_id\n        JOIN playlists p ON p.id = ps.playlist_id\n        WHERE ps.id = $1 AND ps.playlist_id = $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "duration_seconds",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "owner_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "a5b850b7f7ffc1bf8f1793ee6040e75609a9a60ca9def5223e628b449f08aaf4"
+}

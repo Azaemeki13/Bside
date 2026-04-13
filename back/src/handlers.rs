@@ -1,7 +1,7 @@
 use crate::{
-    AlbumPayload, AlbumResponse, AppState, AuthRequest, BSideError, Claims, GoogleUserProfile,
-    Playlist, PlaylistPayload, PlaylistResponse, PlaylistSongItem, Song, SongPayload, SongResponse,
-    User, UserPayload,
+    AddSongResponse, AlbumPayload, AlbumResponse, AppState, AuthRequest, BSideError, Claims,
+    GoogleUserProfile, Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, Song,
+    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use aws_sdk_s3::presigning::PresigningConfig;
 use axum::{
@@ -36,14 +36,15 @@ pub async fn create_user_handler(
 pub async fn get_me_handler(
     State(state): State<AppState>,
     claims: Claims,
-    ) -> Result<Json<User>, BSideError> {
+) -> Result<Json<User>, BSideError> {
     let result = sqlx::query_as!(
         User,
         r#"SELECT id, username, created_at as "created_at!" FROM users WHERE id = $1"#,
-        claims.sub)
-        .fetch_optional(&state.db)
-        .await?
-        .ok_or(BSideError::UserNotFound)?;
+        claims.sub
+    )
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::UserNotFound)?;
     Ok(Json(result))
 }
 
@@ -216,14 +217,10 @@ pub async fn verify_song_handler(
             .await?;
         return Err(BSideError::PayloadTooLarge);
     }
-    let body = get_request
-        .body
-        .collect()
-        .await
-        .map_err(|e| {
-            tracing::error!("S3 Body Collection Error: {:?}" ,e);
-            BSideError::S3Error(format!("Streaming Error: {e}"))
-        })?;
+    let body = get_request.body.collect().await.map_err(|e| {
+        tracing::error!("S3 Body Collection Error: {:?}", e);
+        BSideError::S3Error(format!("Streaming Error: {e}"))
+    })?;
     let bytes = body.into_bytes();
     if bytes.len() < 4 || (&bytes[..4] != b"fLaC" && &bytes[..4] != b"RIFF") {
         let _ = state
@@ -238,9 +235,12 @@ pub async fn verify_song_handler(
             .await?;
         return Err(BSideError::InvalidFormat);
     }
-    let _response = sqlx::query!("UPDATE songs SET status = 'Ready'::song_status WHERE id = $1", song_id)
-        .execute(&state.db)
-        .await?;
+    let _response = sqlx::query!(
+        "UPDATE songs SET status = 'Ready'::song_status WHERE id = $1",
+        song_id
+    )
+    .execute(&state.db)
+    .await?;
     Ok(axum::Json(serde_json::json!({"status": "verified"})))
 }
 
@@ -260,7 +260,7 @@ pub async fn add_song_to_playlist_handler(
     State(state): State<AppState>,
     axum::extract::Path((playlist_id, song_id)): axum::extract::Path<(uuid::Uuid, uuid::Uuid)>,
     claims: Claims,
-) -> Result<axum::http::StatusCode, BSideError> {
+) -> Result<(axum::http::StatusCode, axum::Json<AddSongResponse>), BSideError> {
     let mut tx = state.db.begin().await?;
     let is_owner = sqlx::query_scalar!(
         "SELECT EXISTS(SELECT 1 FROM playlists WHERE id = $1 AND owner_id = $2)",
@@ -273,6 +273,30 @@ pub async fn add_song_to_playlist_handler(
     if !is_owner {
         return Err(BSideError::UnauthorizedProfile);
     }
+    let song = sqlx::query!(
+        r#"SELECT duration_seconds, status::text "status!", ml_features FROM songs WHERE id = $1
+        "#,
+        song_id
+    )
+    .fetch_one(&mut *tx)
+    .await?;
+    if song.status != "Ready" {
+        return Err(BSideError::SongNotReady);
+    }
+    let is_duplicate = sqlx::query_scalar!(
+        r#"SELECT EXISTS(SELECT 1 FROM playlist_songs WHERE playlist_id = $1
+        AND song_id = $2)"#,
+        playlist_id,
+        song_id
+    )
+    .fetch_one(&mut *tx)
+    .await?
+    .unwrap_or(false);
+    let warning = if is_duplicate {
+        Some("Note: This song is already in this playlist !".to_string())
+    } else {
+        None
+    };
     let next_pos = sqlx::query_scalar!(
         "SELECT COALESCE(MAX(position), 0)  + 1 FROM playlist_songs WHERE playlist_id = $1",
         playlist_id
@@ -288,46 +312,165 @@ pub async fn add_song_to_playlist_handler(
     )
     .execute(&mut *tx)
     .await?;
+    sqlx::query!(
+        "UPDATE playlists SET total_duration = total_duration + $1,
+        song_count = song_count + 1,
+        ml_features = ml_features || $2
+        WHERE id = $3",
+        song.duration_seconds,
+        song.ml_features,
+        playlist_id
+    )
+    .execute(&mut *tx)
+    .await?;
     tx.commit().await?;
-    Ok(axum::http::StatusCode::CREATED)
+    Ok((
+        axum::http::StatusCode::CREATED,
+        axum::Json(AddSongResponse {
+            message: "Song added to playlist successfully.".to_string(),
+            warning,
+        }),
+    ))
+}
+
+pub async fn remove_song_from_pl(
+    State(state): State<AppState>,
+    claims: Claims,
+    axum::extract::Path((playlist_id, link_id)): axum::extract::Path<(Uuid, Uuid)>,
+) -> Result<axum::http::StatusCode, BSideError> {
+    let mut tx = state.db.begin().await?;
+    let info = sqlx::query!(
+        r#"
+        SELECT s.duration_seconds, p.owner_id
+        FROM playlist_songs ps
+        JOIN songs s ON s.id = ps.song_id
+        JOIN playlists p ON p.id = ps.playlist_id
+        WHERE ps.id = $1 AND ps.playlist_id = $2
+        "#,
+        link_id,
+        playlist_id
+    )
+    .fetch_optional(&mut *tx)
+    .await?;
+    let info = match info {
+        Some(i) if i.owner_id == claims.sub => i,
+        Some(_) => return Err(BSideError::UnauthorizedProfile),
+        None => return Err(BSideError::NotFound),
+    };
+    let _delete = sqlx::query!("DELETE FROM playlist_songs WHERE id = $1", link_id)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query!(
+        "UPDATE playlists
+            SET total_duration = total_duration - $1,
+            song_count = song_count - 1
+            WHERE id = $2",
+        info.duration_seconds,
+        playlist_id
+    )
+    .execute(&mut *tx)
+    .await?;
+    tx.commit().await?;
+    Ok(axum::http::StatusCode::NO_CONTENT)
 }
 
 pub async fn get_playlist_by_id_handler(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    _claims: Claims,
-) -> Result<Json<PlaylistResponse>, BSideError> {
-    let playlist = sqlx::query_as!(
-        PlaylistResponse,
+    claims: Claims,
+) -> Result<Json<PlaylistDetailedResponse>, BSideError> {
+    let playlist = sqlx::query!(
         r#"
         SELECT 
             p.id, 
             p.title,
+            p.description,
             p.owner_id,
+            u.username as owner_username,
+            p.total_duration as "total_duration!",
+            p.song_count as "song_count!",
+            p.is_public as "is_public!",
             COALESCE(
                 (SELECT json_agg(json_build_object(
-                    'id', s.id,
+                    'link_id', ps.id,
+                    'song_id', s.id,
                     'title', s.title,
-                    'artist', u.username, -- The new path to the artist's name
-                    'duration_seconds', s.duration_seconds
+                    'duration_seconds', s.duration_seconds,
+                    'position', ps.position
                 ) ORDER BY ps.position)
                  FROM playlist_songs ps
                  JOIN songs s ON ps.song_id = s.id
-                 JOIN albums a ON s.album_id = a.id
-                 JOIN users u ON a.owner_id = u.id
                  WHERE ps.playlist_id = p.id
                 ), '[]'
             ) as "songs!: sqlx::types::Json<Vec<PlaylistSongItem>>"
         FROM playlists p
+        JOIN users u ON p.owner_id = u.id
         WHERE p.id = $1
+            AND (p.is_public = true OR p.owner_id = $2)
         "#,
-        id
+        id,
+        claims.sub
     )
     .fetch_optional(&state.db)
     .await?
     .ok_or(BSideError::NotFound)?;
 
-    Ok(Json(playlist))
+    Ok(Json(PlaylistDetailedResponse {
+        id: playlist.id,
+        title: playlist.title,
+        description: playlist.description,
+        owner_id: playlist.owner_id,
+        owner_username: playlist.owner_username,
+        total_duration: playlist.total_duration,
+        song_count: playlist.song_count,
+        is_public: playlist.is_public,
+        songs: playlist.songs.0,
+    }))
+}
+
+pub async fn update_playlist_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    axum::extract::Path(id): axum::extract::Path<Uuid>,
+    axum::extract::Json(payload): axum::extract::Json<UpdateStructurePayload>,
+) -> Result<axum::Json<serde_json::Value>, BSideError> {
+    let res = sqlx::query!(
+        "UPDATE playlists
+        SET
+            title = COALESCE($1, title),
+            description = COALESCE($2, description),
+            is_public = COALESCE($3, is_public)
+        WHERE id = $4 and owner_id = $5",
+        payload.title,
+        payload.description,
+        payload.is_public,
+        id,
+        claims.sub
+    )
+    .execute(&state.db)
+    .await?;
+    if res.rows_affected() == 0 {
+        return Err(BSideError::UnauthorizedProfile);
+    }
+    Ok(axum::Json(serde_json::json!({ "status": "updated"})))
+}
+
+pub async fn delete_playlist_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    axum::extract::Path(id): axum::extract::Path<Uuid>,
+) -> Result<axum::http::StatusCode, BSideError> {
+    let res = sqlx::query!(
+        "DELETE FROM playlists WHERE id = $1 AND owner_id = $2",
+        id,
+        claims.sub
+    )
+    .execute(&state.db)
+    .await?;
+    if res.rows_affected() == 0 {
+        return Err(BSideError::UnauthorizedProfile);
+    }
+    Ok(axum::http::StatusCode::NO_CONTENT)
 }
 
 pub async fn google_login_handler(State(state): State<AppState>) -> impl IntoResponse {

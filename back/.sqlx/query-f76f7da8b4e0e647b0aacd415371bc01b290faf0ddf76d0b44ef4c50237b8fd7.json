@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE playlists SET total_duration = total_duration + $1,\n        song_count = song_count + 1,\n        ml_features = ml_features || $2\n        WHERE id = $3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Jsonb",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f76f7da8b4e0e647b0aacd415371bc01b290faf0ddf76d0b44ef4c50237b8fd7"
+}

@@ -54,3 +54,12 @@ CREATE INDEX idx_playlist_owner ON playlists(owner_id);
 
 ALTER TABLE albums
 ADD CONSTRAINT unique_user_album_title UNIQUE (owner_id, title);
+
+ALTER TABLE playlists
+ADD COLUMN total_duration INTEGER DEFAULT 0,
+ADD COLUMN song_count INTEGER DEFAULT 0,
+ADD COLUMN ml_features JSONB DEFAULT '{}';
+
+ALTER TABLE playlist_songs DROP CONSTRAINT IF EXISTS playlist_songs_pkey;
+ALTER TABLE playlist_songs ADD COLUMN  IF NOT EXISTS id UUID PRIMARY KEY DEFAULT gen_random_uuid();
+CREATE INDEX IF NOT EXISTS idx_playlist_songs_playlist_id ON playlist_songs(playlist_id);
