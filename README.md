@@ -139,6 +139,7 @@
 - Playlists also have ml features ? :D
 
 **CRUD Status:**
+
 Entity,Create,Read,Update,Delete
 User,✅,✅,⏳,⏳
 Album,✅,⏳,⏳,⏳
