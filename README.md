@@ -66,7 +66,7 @@
 - [x] Best practices to apply according to git.
 - [ ] CLI Tool to buld load songs from a directory
 - [x] Build Playlist CRUD operations in Rust.
-- [ ] Metadata Aggregation. Playlist response also includes total_duration and song_count.
+- [x] Metadata Aggregation. Playlist response also includes total_duration and song_count.
 - [ ] Build Advanced Search endpoint (`ILIKE` queries via SQLx).
 - [ ] Look if there is anything else to do related to the AI week 5.
 
@@ -145,4 +145,4 @@
 | **User** | ✅ | ✅ | ⏳ | ⏳ |
 | **Album** | ✅ | ⏳ | ⏳ | ⏳ |
 | **Playlist** | ✅ | ✅ | ✅ | ✅ |
-| **Song** | ✅ | ⏳ | ✅ (Verify) | ❌ |
+| **Song** | ✅ | ⏳ | ✅ (Verify) | ✅ |
