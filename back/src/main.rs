@@ -11,20 +11,22 @@ use crate::auth::{Claims, auth_gate};
 use crate::error::BSideError;
 use crate::handlers::{
     add_song_to_playlist_handler, create_album_handler, create_playlist_handler,
-    create_song_handler, create_user_handler, delete_playlist_handler, delete_song_handler,
-    get_all_users_handler, get_me_handler, get_playlist_by_id_handler, get_user_by_id_handler,
-    google_callback_handler, google_login_handler, ping_handler, remove_song_from_pl,
-    update_playlist_handler, verify_song_handler,
+    create_song_handler, create_user_handler, delete_album_handler, delete_playlist_handler,
+    delete_song_handler, get_all_users_handler, get_me_handler, get_playlist_by_id_handler,
+    get_user_by_id_handler, google_callback_handler, google_login_handler, ping_handler,
+    remove_song_from_pl, update_playlist_handler, verify_song_handler, flush_deleted_songs_task,
+    flush_deleted_albums_task,
 };
 use crate::models::{
-    AddSongResponse, AlbumPayload, AlbumResponse, AppState, AuthRequest, GoogleUserProfile,
-    Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RawSearchResult,
-    SearchResult, Song, SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
+    AddSongResponse, AlbumResponse, AppState, AuthRequest, GoogleUserProfile, Playlist,
+    PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RawSearchResult, SearchResult,
+    Song, SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use crate::search::searcher;
 
 use axum::{
     Router,
+    extract::State,
     http::Method,
     middleware::from_fn_with_state,
     routing::{delete, get, post, put},
@@ -32,6 +34,7 @@ use axum::{
 use oauth2::{AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl, basic::BasicClient};
 use sqlx::postgres::PgPoolOptions;
 use std::env;
+use std::time::Duration;
 use std::sync::Arc;
 use tower_http::cors::{Any, CorsLayer};
 
@@ -75,7 +78,20 @@ async fn main() {
         jwt: Arc::new(secrecy::SecretBox::new(jwt_secret.into())),
         aws_client,
     };
-
+    let gc_state = state.clone();
+    tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_mins(720));
+        loop {
+            interval.tick().await;
+            println!("Cleaning services how can i help you");
+            if let Err(e) = flush_deleted_albums_task(State(gc_state.clone())).await {
+                eprintln!("Critical: Album deletion task failed completely {e}");
+            }
+            if let Err(e) = flush_deleted_songs_task(gc_state.clone()).await {
+                eprintln!("Critical: Song deletion task failed completely {e}");
+            }
+        }
+    });
     let cors = CorsLayer::new()
         .allow_origin(Any) // to replace w/ frontend URL
         .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
@@ -94,6 +110,7 @@ async fn main() {
         )
         .route("/users/me", get(get_me_handler))
         .route("/albums", post(create_album_handler))
+        .route("/albums/{album_id}", delete(delete_album_handler))
         .route("/songs", post(create_song_handler))
         .route("/songs/{song_id}/verify", put(verify_song_handler))
         .route("/songs/{id}", delete(delete_song_handler))

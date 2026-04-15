@@ -29,7 +29,7 @@ pub struct Song {
 #[derive(serde::Deserialize)]
 pub struct SongPayload {
     pub title: String,
-    pub primary_artist_id: uuid::Uuid,
+    pub _primary_artist_id: uuid::Uuid,
     pub album_id: uuid::Uuid,
     pub duration_seconds: i32,
     pub format: String,
@@ -86,16 +86,13 @@ pub struct PlaylistSongItem {
     pub position: i32,
 }
 
-#[derive(serde::Deserialize)]
-pub struct AlbumPayload {
-    pub title: String,
-}
-
 #[derive(serde::Serialize)]
 pub struct AlbumResponse {
     pub id: uuid::Uuid,
     pub title: String,
-    pub message: String,
+    pub genre: String,
+    pub cover_url: String,
+    pub status: String,
 }
 
 #[derive(serde::Deserialize)]

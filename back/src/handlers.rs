@@ -1,13 +1,12 @@
 use crate::{
-    AddSongResponse, AlbumPayload, AlbumResponse, AppState, AuthRequest, BSideError, Claims,
-    GoogleUserProfile, Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, Song,
-    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
+    AddSongResponse, AlbumResponse, AppState, AuthRequest, BSideError, Claims, GoogleUserProfile,
+    Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, Song, SongPayload,
+    SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use aws_sdk_s3::presigning::PresigningConfig;
 use axum::{
     Json,
-    extract::Path,
-    extract::State,
+    extract::{Extension, Multipart, Path, State},
     response::{IntoResponse, Redirect},
 };
 use oauth2::{AuthorizationCode, CsrfToken, Scope, TokenResponse};
@@ -76,73 +75,175 @@ pub async fn get_user_by_id_handler(
 
 pub async fn create_album_handler(
     State(state): State<AppState>,
-    claims: Claims,
-    axum::extract::Json(payload): axum::extract::Json<AlbumPayload>,
+    Extension(current_user_id): Extension<uuid::Uuid>,
+    mut multipart: Multipart,
 ) -> Result<Json<AlbumResponse>, BSideError> {
-    let trimmed_title = payload.title.trim();
-    if trimmed_title.is_empty() {
-        return Err(BSideError::BadRequest(
-            "Album title cannot be empty !".to_string(),
-        ));
+    let mut title: Option<String> = None;
+    let mut genre: Option<String> = None;
+    let mut cover_url = "http://minio:9000/bside-covers/default_cover.png".to_string();
+    while let Some(field) = multipart
+        .next_field()
+        .await
+        .map_err(|e| BSideError::BadRequest(e.to_string()))?
+    {
+        let name = field.name().unwrap_or("").to_string();
+        match name.as_str() {
+            "title" => {
+                title = Some(
+                    field
+                        .text()
+                        .await
+                        .map_err(|e| BSideError::BadRequest(e.to_string()))?,
+                );
+            }
+            "genre" => {
+                genre = Some(
+                    field
+                        .text()
+                        .await
+                        .map_err(|e| BSideError::BadRequest(e.to_string()))?,
+                );
+            }
+            "cover" => {
+                match field.content_type() {
+                    Some("image/png") => {}
+                    _ => return Err(BSideError::BadRequest("Only PNG images are allowed".into())),
+                }
+                let data = field
+                    .bytes()
+                    .await
+                    .map_err(|e| BSideError::BadRequest(e.to_string()))?;
+                if data.len() < 8 {
+                    return Err(BSideError::BadRequest(
+                        "File too small to be valid !".into(),
+                    ));
+                }
+                let png_header = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+                if data[0..8] != png_header {
+                    return Err(BSideError::BadRequest("File signature mismatch !".into()));
+                }
+                let max_size = 10 * 1024 * 1024;
+                if data.len() > max_size {
+                    return Err(BSideError::BadRequest(
+                        "File size exceeds 10MB limit!".into(),
+                    ));
+                }
+                if !data.is_empty() {
+                    let file_id = Uuid::new_v4();
+                    let key = format!("{file_id}.png");
+                    state
+                        .aws_client
+                        .put_object()
+                        .bucket("bside-covers")
+                        .key(&key)
+                        .body(data.into())
+                        .content_type("image/png")
+                        .send()
+                        .await
+                        .map_err(|e| BSideError::S3Error(e.to_string()))?;
+                    cover_url = format!("http://minio:9000/bside-covers/{key}");
+                }
+            }
+            _ => {}
+        }
     }
-    if trimmed_title.len() > 100 {
-        return Err(BSideError::BadRequest(
-            "Album title cannot be more than 100 chars!".to_string(),
-        ));
-    }
-    let result = sqlx::query_scalar!(
-        r#"
-        INSERT INTO albums (title, owner_id)
-        VALUES ($1, $2)
-        RETURNING id
-        "#,
-        trimmed_title,
-        claims.sub
+    let title = title.ok_or_else(|| BSideError::BadRequest("Missing title".into()))?;
+    let genre = genre.ok_or_else(|| BSideError::BadRequest("Missing genre".into()))?;
+    let album_id = Uuid::new_v4();
+    sqlx::query!(
+        "INSERT INTO albums (id, owner_id, title, genre, cover_url, status)
+    VALUES ($1, $2, $3, $4, $5, 'Ready')",
+        album_id,
+        current_user_id,
+        title,
+        genre,
+        cover_url,
     )
-    .fetch_one(&state.db)
-    .await;
-    match result {
-        Ok(album_id) => Ok(Json(AlbumResponse {
-            id: album_id,
-            title: trimmed_title.to_string(),
-            message: "Album create successfully".to_string(),
-        })),
-        Err(sqlx::Error::Database(db_err)) if db_err.is_unique_violation() => Err(
-            BSideError::Conflict("You already have an album with this title!".to_string()),
-        ),
-        Err(e) => Err(BSideError::SqlxError(e)),
-    }
+    .execute(&state.db)
+    .await?;
+    Ok(Json(AlbumResponse {
+        id: album_id,
+        title,
+        genre,
+        cover_url,
+        status: "Ready".to_string(),
+    }))
 }
 
 pub async fn delete_album_handler(
     State(state): State<AppState>,
-    Path(album_id): Path<Uuid::uuid>,
+    Path(album_id): Path<uuid::Uuid>,
     axum::Extension(current_user_id): axum::Extension<Uuid>,
 ) -> Result<Json<serde_json::Value>, BSideError> {
     let mut tx = state.db.begin().await?;
-    let album_resut = sqlx::query!(
+    let album_result = sqlx::query!(
         "UPDATE albums
         SET status = 'Deleted' WHERE id = $1 AND owner_id = $2",
         album_id,
         current_user_id
-        )
-        .execute(&mute *tx)
-        .await?;
-    if album_result_rows_affected() == 0 {
-        return Err(BSideError::Forbidden("Unauthorized or album not found".into()));
+    )
+    .execute(&mut *tx)
+    .await?;
+    if album_result.rows_affected() == 0 {
+        return Err(BSideError::UnauthorizedProfile);
     }
     sqlx::query!(
         "UPDATE songs
         SET status = 'Deleted' WHERE album_id = $1",
         album_id
-        )
-        .execute(&mut *tx)
-        .await?;
+    )
+    .execute(&mut *tx)
+    .await?;
     tx.commit().await?;
     Ok(Json(serde_json::json!({
         "status": "success",
         "message": "Album and associated songs queued for deletion."
     })))
+}
+
+pub async fn flush_deleted_albums_task(state: State<AppState>) -> Result<(), BSideError> {
+    let records = sqlx::query!(
+        r#"SELECT a.id, a.cover_url as "cover_url!"
+        FROM albums a
+        LEFT JOIN songs s ON a.id = s.album_id
+        WHERE a.status = 'Deleted' AND s.id IS NULL"#
+    )
+    .fetch_all(&state.db)
+    .await?;
+    let mut successfully_clean_ids: Vec<Uuid> = Vec::new();
+    for record in records {
+        if record.cover_url.ends_with("default_cover.png") {
+            successfully_clean_ids.push(record.id);
+            continue;
+        }
+        if let Some(key) = record.cover_url.split('/').next_back() {
+            match state
+                .aws_client
+                .delete_object()
+                .bucket("bside-covers")
+                .key(key)
+                .send()
+                .await
+            {
+                Ok(_) => {
+                    successfully_clean_ids.push(record.id);
+                }
+                Err(e) => {
+                    eprintln!("Failed to delete cover art {key}: {e}");
+                }
+            }
+        }
+    }
+    if !successfully_clean_ids.is_empty() {
+        sqlx::query!(
+            "DELETE FROM albums
+            WHERE id = ANY($1)",
+            &successfully_clean_ids
+        )
+        .execute(&state.db)
+        .await?;
+    }
+    Ok(())
 }
 
 pub async fn create_song_handler(
@@ -276,7 +377,7 @@ pub async fn verify_song_handler(
 }
 
 pub async fn delete_song_handler(
-    State(state): State<AppState>,
+    state: State<AppState>,
     claims: Claims,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<axum::http::StatusCode, BSideError> {
@@ -319,7 +420,7 @@ pub async fn delete_song_handler(
     Ok(axum::http::StatusCode::NO_CONTENT)
 }
 
-pub async fn _flush_deleted_songs_task(state: &AppState) -> Result<u64, BSideError> {
+pub async fn flush_deleted_songs_task(state: AppState) -> Result<u64, BSideError> {
     let batch_size = 50;
     let mut total_purged = 0;
     loop {
@@ -330,7 +431,7 @@ pub async fn _flush_deleted_songs_task(state: &AppState) -> Result<u64, BSideErr
         .fetch_all(&state.db)
         .await?;
         if candidates.is_empty() {
-            break ;
+            break;
         }
         let mut delete_builder = aws_sdk_s3::types::Delete::builder();
         for song in &candidates {
@@ -360,16 +461,18 @@ pub async fn _flush_deleted_songs_task(state: &AppState) -> Result<u64, BSideErr
         let mut successful_ids = Vec::new();
         for deleted in response.deleted() {
             if let Some(key) = deleted.key()
-               && let Some(c) = candidates.iter().find(|c| c.audio_url.ends_with(key)) {
-                    successful_ids.push(c.id);
-                }
+                && let Some(c) = candidates.iter().find(|c| c.audio_url.ends_with(key))
+            {
+                successful_ids.push(c.id);
+            }
         }
         for err in response.errors() {
             if err.code() == Some("NoSuchKey") {
-                if let Some(key) = err.key() 
-                  && let Some(c) = candidates.iter().find(|c| c.audio_url.ends_with(key)) {
-                        successful_ids.push(c.id);
-                    }
+                if let Some(key) = err.key()
+                    && let Some(c) = candidates.iter().find(|c| c.audio_url.ends_with(key))
+                {
+                    successful_ids.push(c.id);
+                }
             } else {
                 println!(
                     "S3 Delete Error for {}: {:?}",
@@ -379,15 +482,13 @@ pub async fn _flush_deleted_songs_task(state: &AppState) -> Result<u64, BSideErr
             }
         }
         if successful_ids.is_empty() {
-            break ;
+            break;
         }
-        let result = sqlx::query!(
-            "DELETE FROM songs WHERE id = ANY($1)", &successful_ids[..]
-            )
+        let result = sqlx::query!("DELETE FROM songs WHERE id = ANY($1)", &successful_ids[..])
             .execute(&state.db)
             .await?;
         total_purged += result.rows_affected();
-        if candidates.len() < batch_size.try_into().expect("Couldn't allocate size ?"){
+        if candidates.len() < batch_size.try_into().expect("Couldn't allocate size ?") {
             break;
         }
     }

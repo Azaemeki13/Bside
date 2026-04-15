@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-axum = { version = "0.8.8", features = ["macros"] }
+axum = { version = "0.8.8", features = ["macros", "multipart"] }
 secrecy = {version = "0.10.3" }
 thiserror = "1.0"
 jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
