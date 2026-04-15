@@ -1,5 +1,5 @@
 CREATE TYPE album_type AS ENUM ('LP', 'EP', 'Single');
-CREATE TYPE song_status AS ENUM ('Pending', 'Ready', 'Failed');
+CREATE TYPE song_status AS ENUM ('Pending', 'Ready', 'Failed', 'Deleted');
 
 CREATE TABLE users (
     id UUID PRIMARY KEY,

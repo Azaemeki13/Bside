@@ -244,6 +244,104 @@ pub async fn verify_song_handler(
     Ok(axum::Json(serde_json::json!({"status": "verified"})))
 }
 
+pub async fn delete_song_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    axum::extract::Path(id): axum::extract::Path<Uuid>,
+) -> Result<axum::http::StatusCode, BSideError> {
+    let mut tx = state.db.begin().await?;
+    let owner = sqlx::query!(
+        "SELECT a.owner_id, s.duration_seconds 
+        FROM songs s
+        JOIN albums a on s.album_id = a.id
+        WHERE s.id = $1",
+        id
+    )
+    .fetch_optional(&mut *tx)
+    .await?
+    .ok_or(BSideError::NotFound)?;
+    if owner.owner_id != claims.sub {
+        return Err(BSideError::UnauthorizedProfile);
+    }
+    sqlx::query!(
+        r#"
+        UPDATE playlists p 
+        SET
+            total_duration = total_duration - (sub.occurences * $1),
+            song_count = song_count - sub.occurences
+        FROM (
+            SELECT playlist_id, count(*) as occurences
+            FROM playlist_songs
+            WHERE song_id = $2
+            GROUP BY playlist_id
+        ) AS sub
+            WHERE p.id = sub.playlist_id"#,
+        i64::from(owner.duration_seconds),
+        id
+    )
+    .execute(&mut *tx)
+    .await?;
+    sqlx::query!(r#"UPDATE songs SET status = 'Deleted' WHERE id = $1 "#, id)
+        .execute(&mut *tx)
+        .await?;
+    tx.commit().await?;
+    Ok(axum::http::StatusCode::NO_CONTENT)
+}
+
+pub async fn _flush_deleted_songs_task(state: &AppState) -> Result<u64, BSideError> {
+    let batch_size = 50;
+    let mut total_purged = 0;
+    loop {
+        let candidates = sqlx::query!(
+            r#"SELECT id, audio_url FROM songs WHERE status = 'Deleted' LIMIT $1"#,
+            batch_size
+        )
+        .fetch_all(&state.db)
+        .await?;
+        if candidates.is_empty() {
+            break;
+        }
+        let mut delete_builder = aws_sdk_s3::types::Delete::builder();
+        for song in &candidates {
+            let obj = aws_sdk_s3::types::ObjectIdentifier::builder()
+                .key(&song.audio_url)
+                .build()
+                .map_err(|e| BSideError::BadRequest(e.to_string()))?;
+            delete_builder = delete_builder.objects(obj);
+        }
+        let response = state
+            .aws_client
+            .delete_objects()
+            .bucket("bside-tracks")
+            .delete(
+                delete_builder
+                    .build()
+                    .map_err(|e| BSideError::BadRequest(e.to_string()))?,
+            )
+            .send()
+            .await
+            .map_err(|e| BSideError::S3Error(e.to_string()))?;
+        let mut successful_ids = Vec::new();
+        for deleted in response.deleted() {
+            if let Some(key) = deleted.key()
+                && let Some(c) = candidates.iter().find(|c| c.audio_url == key)
+            {
+                successful_ids.push(c.id);
+            }
+        }
+        if !successful_ids.is_empty() {
+            let result = sqlx::query!("DELETE FROM songs WHERE id = ANY($1)", &successful_ids[..])
+                .execute(&state.db)
+                .await?;
+            total_purged += result.rows_affected();
+        }
+        if candidates.len() < batch_size.try_into().expect("Couldn't allocate size ?") {
+            break;
+        }
+    }
+    Ok(total_purged)
+}
+
 pub async fn create_playlist_handler(
     State(state): State<AppState>,
     claims: Claims,

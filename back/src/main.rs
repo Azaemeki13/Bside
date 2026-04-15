@@ -6,24 +6,27 @@ mod auth;
 mod error;
 mod handlers;
 mod models;
-use crate::auth::Claims;
+mod search;
+use crate::auth::{Claims, auth_gate};
 use crate::error::BSideError;
 use crate::handlers::{
     add_song_to_playlist_handler, create_album_handler, create_playlist_handler,
-    create_song_handler, create_user_handler, delete_playlist_handler, get_all_users_handler,
-    get_me_handler, get_playlist_by_id_handler, get_user_by_id_handler, google_callback_handler,
-    google_login_handler, ping_handler, remove_song_from_pl, update_playlist_handler,
-    verify_song_handler,
+    create_song_handler, create_user_handler, delete_playlist_handler, delete_song_handler,
+    get_all_users_handler, get_me_handler, get_playlist_by_id_handler, get_user_by_id_handler,
+    google_callback_handler, google_login_handler, ping_handler, remove_song_from_pl,
+    update_playlist_handler, verify_song_handler,
 };
 use crate::models::{
     AddSongResponse, AlbumPayload, AlbumResponse, AppState, AuthRequest, GoogleUserProfile,
     Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, Song, SongPayload,
-    SongResponse, UpdateStructurePayload, User, UserPayload,
+    SongResponse, UpdateStructurePayload, User, UserPayload, SearchResult, RawSearchResult,
 };
+use crate::search::searcher;
 
 use axum::{
     Router,
     http::Method,
+    middleware::from_fn_with_state,
     routing::{delete, get, post, put},
 };
 use oauth2::{AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl, basic::BasicClient};
@@ -77,10 +80,14 @@ async fn main() {
         .allow_origin(Any) // to replace w/ frontend URL
         .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
         .allow_headers(Any);
-    let app: Router = Router::new()
+
+    let public_routes = Router::<AppState>::new()
         .route("/auth/google/login", get(google_login_handler))
         .route("/auth/google/callback", get(google_callback_handler))
         .route("/ping", get(ping_handler))
+        .route("/search", get(searcher));
+
+    let protected_routes = Router::<AppState>::new()
         .route(
             "/users",
             post(create_user_handler).get(get_all_users_handler),
@@ -89,11 +96,8 @@ async fn main() {
         .route("/albums", post(create_album_handler))
         .route("/songs", post(create_song_handler))
         .route("/songs/{song_id}/verify", put(verify_song_handler))
+        .route("/songs/{id}", delete(delete_song_handler))
         .route("/playlists", post(create_playlist_handler))
-        .route(
-            "/playlists/{playlist_id}/songs/{link_id}",
-            delete(remove_song_from_pl),
-        )
         .route(
             "/playlists/{id}",
             get(get_playlist_by_id_handler)
@@ -102,9 +106,15 @@ async fn main() {
         )
         .route(
             "/playlists/{playlist_id}/songs/{song_id}",
-            post(add_song_to_playlist_handler),
+            post(add_song_to_playlist_handler)
+            .delete(remove_song_from_pl),
         )
         .route("/users/{id}", get(get_user_by_id_handler))
+        .layer(from_fn_with_state(state.clone(), auth_gate));
+
+    let app: Router = Router::new()
+        .merge(public_routes)
+        .merge(protected_routes)
         .layer(cors)
         .with_state(state);
 

@@ -1,7 +1,9 @@
 use crate::{AppState, BSideError};
 use axum::{
-    extract::{FromRef, FromRequestParts},
+    extract::{FromRef, FromRequestParts, Request},
     http::{StatusCode, request::Parts},
+    middleware::Next,
+    response::Response,
 };
 use secrecy::ExposeSecret;
 
@@ -59,4 +61,8 @@ where
         .map_err(|_| StatusCode::UNAUTHORIZED)?;
         Ok(token_data.claims)
     }
+}
+
+pub async fn auth_gate(_claims: Claims, request: Request, next: Next) -> Response {
+    next.run(request).await
 }

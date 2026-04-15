@@ -134,3 +134,38 @@ pub struct GoogleUserProfile {
     pub name: String,
     pub picture: String,
 }
+
+#[derive(Debug, serde::Serialize, sqlx::FromRow)]
+pub struct RawSearchResult {
+    pub id: uuid::Uuid,
+    pub name: String,
+    pub entity_type: String,
+    pub rank: f64,
+    pub metadata: Option<String>,
+    pub audio_url: Option<String>,
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(tag = "type", content = "data", rename_all = "lowercase")]
+pub enum SearchResult {
+    Song {
+        id: uuid::Uuid,
+        title: String,
+        artist: String,
+        audio_url: String,
+    },
+    Album {
+        id: uuid::Uuid,
+        name: String,
+        artist: String,
+    },
+    Artist {
+        id: uuid::Uuid,
+        name: String,
+    },
+    Playlist {
+        id: uuid::Uuid,
+        name: String,
+        creator: String,
+    },
+}
