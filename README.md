@@ -67,7 +67,7 @@
 - [ ] CLI Tool to buld load songs from a directory
 - [x] Build Playlist CRUD operations in Rust.
 - [x] Metadata Aggregation. Playlist response also includes total_duration and song_count.
-- [ ] Build Advanced Search endpoint (`ILIKE` queries via SQLx).
+- [x] Build Advanced Search endpoint (`ILIKE` queries via SQLx).
 - [ ] Look if there is anything else to do related to the AI week 5.
 
 **Developer 2 (UI, DB, DevOps):**
