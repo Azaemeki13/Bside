@@ -18,8 +18,8 @@ use crate::handlers::{
 };
 use crate::models::{
     AddSongResponse, AlbumPayload, AlbumResponse, AppState, AuthRequest, GoogleUserProfile,
-    Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, Song, SongPayload,
-    SongResponse, UpdateStructurePayload, User, UserPayload, SearchResult, RawSearchResult,
+    Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RawSearchResult,
+    SearchResult, Song, SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use crate::search::searcher;
 
@@ -106,8 +106,7 @@ async fn main() {
         )
         .route(
             "/playlists/{playlist_id}/songs/{song_id}",
-            post(add_song_to_playlist_handler)
-            .delete(remove_song_from_pl),
+            post(add_song_to_playlist_handler).delete(remove_song_from_pl),
         )
         .route("/users/{id}", get(get_user_by_id_handler))
         .layer(from_fn_with_state(state.clone(), auth_gate));

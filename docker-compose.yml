@@ -1,3 +1,4 @@
+name: bside
 services:
   db:
     image: postgres:15-alpine
@@ -21,7 +22,7 @@ services:
       - db
   minio:
     image: minio/minio
-    container_name: flacky_minio
+    container_name: bside_minio
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -31,7 +32,16 @@ services:
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
-
+  minio-setup:
+    image: minio/minio
+    depends_on:
+      - minio
+    volumes:
+      - ./scripts/setup-minio.sh:/setup-minio.sh
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    entrypoint: /bin/sh /setup-minio.sh
 
 volumes:
   minio_data:

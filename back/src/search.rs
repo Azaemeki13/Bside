@@ -10,7 +10,7 @@ pub async fn searcher(
     let query_str = params
         .get("q")
         .ok_or(BSideError::BadRequest("Missing query".into()))?;
-let rows = sqlx::query_as!(
+    let rows = sqlx::query_as!(
     RawSearchResult,
     r#"
     WITH candidates AS (
@@ -31,6 +31,7 @@ let rows = sqlx::query_as!(
             (unaccent(a.title) || ' ' || unaccent(u.username)) as raw_text
         FROM albums a
         JOIN users u ON a.owner_id = u.id
+        WHERE a.status = 'Ready'
         
     -- 3 Artists 
         UNION ALL

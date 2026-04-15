@@ -114,6 +114,37 @@ pub async fn create_album_handler(
     }
 }
 
+pub async fn delete_album_handler(
+    State(state): State<AppState>,
+    Path(album_id): Path<Uuid::uuid>,
+    axum::Extension(current_user_id): axum::Extension<Uuid>,
+) -> Result<Json<serde_json::Value>, BSideError> {
+    let mut tx = state.db.begin().await?;
+    let album_resut = sqlx::query!(
+        "UPDATE albums
+        SET status = 'Deleted' WHERE id = $1 AND owner_id = $2",
+        album_id,
+        current_user_id
+        )
+        .execute(&mute *tx)
+        .await?;
+    if album_result_rows_affected() == 0 {
+        return Err(BSideError::Forbidden("Unauthorized or album not found".into()));
+    }
+    sqlx::query!(
+        "UPDATE songs
+        SET status = 'Deleted' WHERE album_id = $1",
+        album_id
+        )
+        .execute(&mut *tx)
+        .await?;
+    tx.commit().await?;
+    Ok(Json(serde_json::json!({
+        "status": "success",
+        "message": "Album and associated songs queued for deletion."
+    })))
+}
+
 pub async fn create_song_handler(
     State(state): State<AppState>,
     claims: Claims,
@@ -299,12 +330,17 @@ pub async fn _flush_deleted_songs_task(state: &AppState) -> Result<u64, BSideErr
         .fetch_all(&state.db)
         .await?;
         if candidates.is_empty() {
-            break;
+            break ;
         }
         let mut delete_builder = aws_sdk_s3::types::Delete::builder();
         for song in &candidates {
+            let key = song
+                .audio_url
+                .split("bside-tracks/")
+                .last()
+                .unwrap_or(&song.audio_url);
             let obj = aws_sdk_s3::types::ObjectIdentifier::builder()
-                .key(&song.audio_url)
+                .key(key)
                 .build()
                 .map_err(|e| BSideError::BadRequest(e.to_string()))?;
             delete_builder = delete_builder.objects(obj);
@@ -324,18 +360,34 @@ pub async fn _flush_deleted_songs_task(state: &AppState) -> Result<u64, BSideErr
         let mut successful_ids = Vec::new();
         for deleted in response.deleted() {
             if let Some(key) = deleted.key()
-                && let Some(c) = candidates.iter().find(|c| c.audio_url == key)
-            {
-                successful_ids.push(c.id);
+               && let Some(c) = candidates.iter().find(|c| c.audio_url.ends_with(key)) {
+                    successful_ids.push(c.id);
+                }
+        }
+        for err in response.errors() {
+            if err.code() == Some("NoSuchKey") {
+                if let Some(key) = err.key() 
+                  && let Some(c) = candidates.iter().find(|c| c.audio_url.ends_with(key)) {
+                        successful_ids.push(c.id);
+                    }
+            } else {
+                println!(
+                    "S3 Delete Error for {}: {:?}",
+                    err.key().unwrap_or("Unknown"),
+                    err.message()
+                );
             }
         }
-        if !successful_ids.is_empty() {
-            let result = sqlx::query!("DELETE FROM songs WHERE id = ANY($1)", &successful_ids[..])
-                .execute(&state.db)
-                .await?;
-            total_purged += result.rows_affected();
+        if successful_ids.is_empty() {
+            break ;
         }
-        if candidates.len() < batch_size.try_into().expect("Couldn't allocate size ?") {
+        let result = sqlx::query!(
+            "DELETE FROM songs WHERE id = ANY($1)", &successful_ids[..]
+            )
+            .execute(&state.db)
+            .await?;
+        total_purged += result.rows_affected();
+        if candidates.len() < batch_size.try_into().expect("Couldn't allocate size ?"){
             break;
         }
     }
