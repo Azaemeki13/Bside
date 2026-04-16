@@ -27,14 +27,14 @@
 - [x] Set up the basic HTTP router and CORS.
 - [x] Connect Rust to the PostgreSQL port provided by Dev 2.
 
-**Developer 2 (UI, DB, DevOps):**
-- [x] Write `docker-compose.yml` (Postgres , Adminer ).
-- [x] Write `.sql` migration files (`Users` , `Songs` , `Playlists`).
-- [ ] Initialize Frontend framework and setup basic routing. TODO
+**Developer 2 (UI + Front):**
+- [ ] Landing page   
+- [ ] Components Part I
+- [ ] Figma UI Part I
 
 **Developer 3 (Client Engine):**
-- [ ] Setup Global State store. TODO
-- [ ] Build the Audio Player component shell (no logic yet). TODO
+- [ ] Help Chlo
+- [ ] Inception
 
 ---
 
@@ -49,11 +49,12 @@
 - [x] Build `POST /tracks` endpoint using SQLx.
 
 **Developer 2 (UI, DB, DevOps):**
-- [ ] Build Auth UI (Login/Register forms).
-- [ ] Build the Drag-and-Drop upload visual component.
+- [ ] Component to think about 
+- [ ] Components Part II
+- [ ] Figma UI Part II
 
 **Developer 3 (Client Engine):**
-- [ ] Write the logic to request the Pre-Signed URL and `PUT` to S3.
+- [ ] Build the Audio Player component shell (no logic yet).
 - [ ] Implement `Howler.js` to stream the S3 URL.
 
 ---
@@ -70,14 +71,17 @@
 - [x] Metadata Aggregation. Playlist response also includes total_duration and song_count.
 - [x] Build Advanced Search endpoint (`ILIKE` queries via SQLx).
 - [ ] Look if there is anything else to do related to the AI week 5.
+- [ ] Redo for Artists ( think about friends aswell)
 
 **Developer 2 (UI, DB, DevOps):**
-- [ ] Build User Profile and Settings UI.
-- [ ] Build Playlist layout and Search bar UI.
+- [ ] Component to think about 
+- [ ] Components Part III
+- [ ] Figma UI Part III
 
 **Developer 3 (Client Engine):**
 - [ ] Connect Profile/Search components to Rust APIs.
 - [ ] Implement the audio queue logic (auto-play next song).
+- [ ] Randomize + no repeat ? 
 
 ---
 
@@ -95,7 +99,7 @@
 
 **Developer 3 (Client Engine):**
 - [ ] Connect Frontend WebSocket client.
-- [ ] Wire up state to send/receive messages dynamically.
+- [ ] Wire up state to send/receive messages dynamically. (dev 1 mayb)
 
 ---
 
@@ -135,10 +139,19 @@
 **Dummy 1:**
 - [ ] Finalize `README.md`, Privacy Policy, and E2E Testing.
 
-**Nice to have**:
-- Playlist also show amount of songs in them, + total time of listening.
-- Playlists also have ml features ? :D
-- 
+
+**Things nice to have**:
+- Mobile View
+- Electron
+- Light theme
+- Machine learning that listens to song
+- Daily Mix
+- Stats 
+
+**Figma UI**: 
+
+**Components**:
+
 **CRUD Status:**
 
 | Entity | Create | Read | Update | Delete |
