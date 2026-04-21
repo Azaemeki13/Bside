@@ -1,7 +1,7 @@
 use crate::{
-    AddSongResponse, AlbumResponse, AppState, AuthRequest, BSideError, Claims, GoogleUserProfile,
-    Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, Song, SongPayload,
-    SongResponse, UpdateStructurePayload, User, UserPayload,
+    AddSongResponse, AlbumResponse, AppState, ArtistResponse, AuthRequest, BSideError, Claims,
+    GoogleUserProfile, Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, Song,
+    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use aws_sdk_s3::presigning::PresigningConfig;
 use axum::{
@@ -32,13 +32,102 @@ pub async fn create_user_handler(
     Ok(Json(user))
 }
 
+pub async fn create_artist_handler(
+    State(state): State<AppState>,
+    Extension(current_user_id): Extension<Uuid>,
+    mut multipart: Multipart,
+) -> Result<Json<ArtistResponse>, BSideError> {
+    let mut name: Option<String> = None;
+    let mut bio: Option<String> = None;
+    let mut photo_url = "http://minio:9000/bside-covers/default_artist.png".to_string();
+    while let Some(field) = multipart
+        .next_field()
+        .await
+        .map_err(|e| BSideError::BadRequest(e.to_string()))?
+    {
+        let field_name = field.name().unwrap_or("").to_string();
+        match field_name.as_str() {
+            "name" => {
+                name = Some(
+                    field
+                        .text()
+                        .await
+                        .map_err(|e| BSideError::BadRequest(e.to_string()))?,
+                );
+            }
+            "bio" => {
+                bio = Some(
+                    field
+                        .text()
+                        .await
+                        .map_err(|e| BSideError::BadRequest(e.to_string()))?,
+                );
+            }
+            "photo" => {
+                if let Some(mime) = field.content_type()
+                    && mime != "image/png"
+                {
+                    return Err(BSideError::BadRequest(
+                        "Only PNG images are allowed.".into(),
+                    ));
+                }
+                let data = field
+                    .bytes()
+                    .await
+                    .map_err(|e| BSideError::BadRequest(e.to_string()))?;
+                if data.len() >= 8 {
+                    let png_header = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+                    if data[0..8] == png_header && data.len() <= 10 * 1024 * 1024 {
+                        let file_id = Uuid::new_v4();
+                        let key = format!("{file_id}.png");
+                        state
+                            .aws_client
+                            .put_object()
+                            .bucket("bside-covers")
+                            .key(&key)
+                            .body(data.into())
+                            .content_type("image/png")
+                            .send()
+                            .await
+                            .map_err(|e| BSideError::S3Error(e.to_string()))?;
+                        photo_url = format!("http://minio:9000/bside-covers/{key}");
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    let artist_name = name.ok_or_else(|| BSideError::BadRequest("Missing artist name".into()))?;
+    let artist_id = Uuid::new_v4();
+    sqlx::query!(
+        r#"
+        INSERT INTO artists (id, user_id, name, bio, photo_url, status)
+        VALUES ($1, $2, $3, $4, $5, 'Ready')"#,
+        artist_id,
+        current_user_id,
+        artist_name,
+        bio,
+        photo_url
+    )
+    .execute(&state.db)
+    .await?;
+    Ok(Json(ArtistResponse {
+        id: artist_id,
+        user_id: current_user_id,
+        name: artist_name,
+        bio,
+        photo_url,
+        status: "Ready".to_string(),
+    }))
+}
+
 pub async fn get_me_handler(
     State(state): State<AppState>,
     claims: Claims,
 ) -> Result<Json<User>, BSideError> {
     let result = sqlx::query_as!(
         User,
-        r#"SELECT id, username, created_at as "created_at!" FROM users WHERE id = $1"#,
+        r#"SELECT id, username, role, created_at as "created_at!" FROM users WHERE id = $1"#,
         claims.sub
     )
     .fetch_optional(&state.db)
@@ -78,6 +167,15 @@ pub async fn create_album_handler(
     Extension(current_user_id): Extension<uuid::Uuid>,
     mut multipart: Multipart,
 ) -> Result<Json<AlbumResponse>, BSideError> {
+    let artist_record = sqlx::query!("SELECT id FROM artists WHERE user_id = $1", current_user_id)
+        .fetch_optional(&state.db)
+        .await?;
+    let artist_id = match artist_record {
+        Some(record) => record.id,
+        None => {
+            return Err(BSideError::UnauthorizedProfile);
+        }
+    };
     let mut title: Option<String> = None;
     let mut genre: Option<String> = None;
     let mut cover_url = "http://minio:9000/bside-covers/default_cover.png".to_string();
@@ -151,10 +249,10 @@ pub async fn create_album_handler(
     let genre = genre.ok_or_else(|| BSideError::BadRequest("Missing genre".into()))?;
     let album_id = Uuid::new_v4();
     sqlx::query!(
-        "INSERT INTO albums (id, owner_id, title, genre, cover_url, status)
-    VALUES ($1, $2, $3, $4, $5, 'Ready')",
+        "INSERT INTO albums (id, artist_id, title, genre, cover_url, status)
+        VALUES ($1, $2, $3, $4, $5, 'Ready')",
         album_id,
-        current_user_id,
+        artist_id,
         title,
         genre,
         cover_url,
@@ -163,6 +261,7 @@ pub async fn create_album_handler(
     .await?;
     Ok(Json(AlbumResponse {
         id: album_id,
+        artist_id,
         title,
         genre,
         cover_url,
@@ -178,7 +277,7 @@ pub async fn delete_album_handler(
     let mut tx = state.db.begin().await?;
     let album_result = sqlx::query!(
         "UPDATE albums
-        SET status = 'Deleted' WHERE id = $1 AND owner_id = $2",
+        SET status = 'Deleted' WHERE id = $1 AND artist_id = $2",
         album_id,
         current_user_id
     )
@@ -213,7 +312,11 @@ pub async fn flush_deleted_albums_task(state: State<AppState>) -> Result<(), BSi
     let mut successfully_clean_ids: Vec<Uuid> = Vec::new();
     for record in records {
         if record.cover_url.ends_with("default_cover.png") {
-            successfully_clean_ids.push(record.id);
+            successfully_clean_ids.push(
+                record
+                    .id
+                    .expect("Couldn't push ids on deleted albums task."),
+            );
             continue;
         }
         if let Some(key) = record.cover_url.split('/').next_back() {
@@ -226,7 +329,11 @@ pub async fn flush_deleted_albums_task(state: State<AppState>) -> Result<(), BSi
                 .await
             {
                 Ok(_) => {
-                    successfully_clean_ids.push(record.id);
+                    successfully_clean_ids.push(
+                        record
+                            .id
+                            .expect("Couldn't push ids on deleted albums task."),
+                    );
                 }
                 Err(e) => {
                     eprintln!("Failed to delete cover art {key}: {e}");
@@ -255,7 +362,7 @@ pub async fn create_song_handler(
         return Err(BSideError::InvalidFormat);
     }
     let is_owner = sqlx::query_scalar!(
-        "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND owner_id = $2)",
+        "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND artist_id = $2)",
         payload.album_id,
         claims.sub
     )
@@ -309,7 +416,7 @@ pub async fn verify_song_handler(
     .fetch_one(&state.db)
     .await?;
     let is_owner = sqlx::query_scalar!(
-        "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND owner_id = $2)",
+        "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND artist_id = $2)",
         song.album_id,
         claims.sub
     )
@@ -383,7 +490,7 @@ pub async fn delete_song_handler(
 ) -> Result<axum::http::StatusCode, BSideError> {
     let mut tx = state.db.begin().await?;
     let owner = sqlx::query!(
-        "SELECT a.owner_id, s.duration_seconds 
+        "SELECT a.artist_id, s.duration_seconds 
         FROM songs s
         JOIN albums a on s.album_id = a.id
         WHERE s.id = $1",
@@ -392,7 +499,7 @@ pub async fn delete_song_handler(
     .fetch_optional(&mut *tx)
     .await?
     .ok_or(BSideError::NotFound)?;
-    if owner.owner_id != claims.sub {
+    if owner.artist_id != claims.sub {
         return Err(BSideError::UnauthorizedProfile);
     }
     sqlx::query!(

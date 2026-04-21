@@ -15,30 +15,31 @@ pub async fn searcher(
     r#"
     WITH candidates AS (
     -- 1 Songs
-        SELECT s.id, s.title as name, 'song' as entity_type, u.username as metadata, s.audio_url,
-            to_tsvector('english', unaccent(s.title) || ' ' || unaccent(u.username)) as doc,
-            (unaccent(s.title) || ' ' || unaccent(u.username)) as raw_text
+        SELECT s.id, s.title as name, 'song' as entity_type, ar.name as metadata, s.audio_url,
+            to_tsvector('english', unaccent(s.title) || ' ' || unaccent(ar.name)) as doc,
+            (unaccent(s.title) || ' ' || unaccent(ar.name)) as raw_text
         FROM songs s
         JOIN albums a ON s.album_id = a.id
-        JOIN users u ON a.owner_id = u.id
+        JOIN artists ar ON a.artist_id = ar.id
         WHERE s.status = 'Ready'
         
         UNION ALL
         
     -- 2 Albums
-        SELECT a.id, a.title as name, 'album' as entity_type, u.username as metadata, NULL as audio_url,
-            to_tsvector('english', unaccent(a.title) || ' ' || unaccent(u.username)) as doc,
-            (unaccent(a.title) || ' ' || unaccent(u.username)) as raw_text
+        SELECT a.id, a.title as name, 'album' as entity_type, ar.name as metadata, NULL as audio_url,
+            to_tsvector('english', unaccent(a.title) || ' ' || unaccent(ar.name)) as doc,
+            (unaccent(a.title) || ' ' || unaccent(ar.name)) as raw_text
         FROM albums a
-        JOIN users u ON a.owner_id = u.id
+        JOIN artists ar ON a.artist_id = ar.id
         WHERE a.status = 'Ready'
         
     -- 3 Artists 
         UNION ALL
-        SELECT id, username as name, 'artist' as entity_type, NULL as metadata, NULL as audio_url,
-            to_tsvector('english', unaccent(username)) as doc,
-            unaccent(username) as raw_text
-        FROM users u
+        SELECT id, name, 'artist' as entity_type, NULL as metadata, NULL as audio_url,
+            to_tsvector('english', unaccent(name)) as doc,
+            unaccent(name) as raw_text
+        FROM artists
+        WHERE status = 'Ready'
         
     -- 4 Playlists
         UNION ALL

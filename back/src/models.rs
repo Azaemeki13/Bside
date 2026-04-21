@@ -6,12 +6,23 @@ use std::sync::Arc;
 pub struct User {
     pub id: uuid::Uuid,
     pub username: String,
+    pub role: String,
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(serde::Deserialize)]
 pub struct UserPayload {
     pub username: String,
+}
+
+#[derive(serde::Serialize)]
+pub struct ArtistResponse {
+    pub id: uuid::Uuid,
+    pub user_id: uuid::Uuid,
+    pub name: String,
+    pub bio: Option<String>,
+    pub photo_url: String,
+    pub status: String,
 }
 
 #[derive(serde::Serialize, sqlx::FromRow)]
@@ -29,7 +40,6 @@ pub struct Song {
 #[derive(serde::Deserialize)]
 pub struct SongPayload {
     pub title: String,
-    pub _primary_artist_id: uuid::Uuid,
     pub album_id: uuid::Uuid,
     pub duration_seconds: i32,
     pub format: String,
@@ -89,6 +99,7 @@ pub struct PlaylistSongItem {
 #[derive(serde::Serialize)]
 pub struct AlbumResponse {
     pub id: uuid::Uuid,
+    pub artist_id: uuid::Uuid,
     pub title: String,
     pub genre: String,
     pub cover_url: String,
