@@ -71,7 +71,7 @@
 - [x] Metadata Aggregation. Playlist response also includes total_duration and song_count.
 - [x] Build Advanced Search endpoint (`ILIKE` queries via SQLx).
 - [ ] Look if there is anything else to do related to the AI week 5.
-- [ ] Redo for Artists ( think about friends aswell)
+- [x] Redo for Artists ( think about friends aswell)
 
 **Developer 2 (UI, DB, DevOps):**
 - [ ] Component to think about 
