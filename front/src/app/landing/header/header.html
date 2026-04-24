@@ -1,7 +1,11 @@
-<header class="header">
-    <div class="header__container">
-        <div class="header_bside">
-            <h1 class="climate-title">BSIDE</h1>
-        </div>
-    </div>
+<header class="bg-[#0C060C]">
+  <div class="w-full px-8 py-4 flex items-center justify-between">
+    <a routerLink="/" class="cursor-pointer">
+      <img src="assets/B-SIDE.svg" alt="B-Side logo">
+    </a>
+    <nav class="flex gap-6">
+      <nav-button [label]="'Connect'" [link]="'https://google.com'" variant="connect"></nav-button>
+      <nav-button [label]="'Create an account'" [link]="'https://google.com'" variant="create-account"></nav-button>
+    </nav>
+  </div>
 </header>

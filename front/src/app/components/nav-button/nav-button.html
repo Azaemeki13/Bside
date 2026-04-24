@@ -1,0 +1,13 @@
+<a
+  [href]="link"
+  [target]="isExternal ? '_blank' : '_self'"
+  class="rounded-full px-6 py-2 font-raleway inline-block"
+  [ngClass]="{
+    'bg-white text-[#0C060C] hover:bg-gray-200': variant === 'primary',
+    'bg-transparent text-white border border-white hover:bg-white hover:text-[#0C060C]': variant === 'secondary',
+    'bg-[#FFE6DB] text-[#8C0750] hover:opacity-90': variant === 'connect',
+    'bg-[#8C0750] text-[#FFE6DB] hover:opacity-90': variant === 'create-account'
+  }"
+>
+  {{ label }}
+</a>
