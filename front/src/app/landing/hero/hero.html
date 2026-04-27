@@ -1,9 +1,12 @@
-<main class="relative min-h-screen overflow-hidden bg-[#0c060c]">
-    <img class="block h-full w-full object-cover rounded-[1.875rem]" src="assets/hero_img.png" alt="Hero Image">
-    <div class="absolute inset-0 z-20 flex items-center justify-start p-8 text-left">
-        <div class="flex max-w-[48rem] flex-col gap-3">
-            <h1 class="text-[5rem] leading-none font-bold font-raleway text-[#FFE6DB] max-w-[6ch]">MUSIC FOR EVERY MOMENT.</h1>
-            <h2 class="text-[2.5rem] leading-none font-normal font-raleway text-[#FFE6DB] max-w-[30ch]">Stream millions of songs, discover new artists, and build the soundtrack of your life.</h2>
-            <nav-button [label]="'Get started'" [link]="'https://google.com'" variant="raspberry" fontSize="text-[1.5rem]" fontStyle="font-medium"></nav-button>        </div>
+<main class="bg-[#170814] pb-12 sm:pb-14 md:pb-16">
+  <div class="relative min-h-[65vh] w-full overflow-hidden rounded-none sm:min-h-[75vh] sm:rounded-[1.5rem] md:min-h-screen md:rounded-[1.875rem]">
+  <img class="absolute inset-0 h-full w-full rounded-none object-cover object-center sm:rounded-[1.5rem] md:rounded-[1.875rem]" src="assets/hero_img.png" alt="Hero Image">
+  <div class="absolute left-4 top-1/2 z-20 w-[92%] -translate-y-1/2 text-left sm:left-6 sm:w-[80%] md:left-8 md:w-auto">
+    <div class="flex max-w-[48rem] flex-col gap-3">
+            <h1 class="max-w-[9ch] text-[clamp(2.25rem,8vw,5rem)] leading-[0.95] font-bold font-raleway text-[#FFE6DB] sm:max-w-[8ch] md:max-w-[6ch]">MUSIC FOR EVERY MOMENT.</h1>
+            <h2 class="max-w-[30ch] text-[clamp(1rem,4vw,2.5rem)] leading-tight font-normal font-raleway text-[#FFE6DB] md:leading-none">Stream millions of songs, discover new artists, and build the soundtrack of your life.</h2>
+            <nav-button [label]="'Get started'" [link]="'https://google.com'" variant="raspberry" fontSize="text-[clamp(0.875rem,2.2vw,1.5rem)]" fontStyle="font-medium"></nav-button>
+        </div>
     </div>
+  </div>
 </main>
