@@ -11,9 +11,17 @@ import { NgClass } from '@angular/common';
 export class NavButton {
   @Input() label = '';
   @Input() link = '';
-  @Input() variant = 'primary';
+  @Input() variant = 'light-pink';
+  @Input() fontSize = 'text-base';
+  @Input() fontStyle = 'font-normal';
 
   get isExternal(): boolean {
     return this.link.startsWith('http');
+  }
+
+  get variantClass(): string {
+    return this.variant === 'raspberry'
+      ? 'bg-[#8C0750] text-[#FFE6DB]'
+      : 'bg-[#FFE6DB] text-[#8C0750]';
   }
 }
