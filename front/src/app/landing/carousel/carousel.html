@@ -1,0 +1,27 @@
+<main class="bg-[#170814]">
+  <div class="flex flex-col items-center gap-[3rem] text-center py-[3rem] sm:py-[3.5rem] md:py-[4rem]">
+    <h1 class="max-w-[18ch] font-climate-crisis text-[#FFE6DB] text-[clamp(2rem,5vw,3rem)]">
+      YOUR MUSIC, YOUR TASTE. ALL IN ONE PLACE.
+    </h1>
+    <div class="w-full relative">
+      <div class="overflow-x-hidden">
+        <div class="flex gap-6 md:gap-8 animate-scroll hover:pause-animation py-16" #carousel>
+          <div class="flex gap-6 md:gap-8 shrink-0">
+            <app-album-card [cover]="'/assets/cover1.png'"></app-album-card>
+            <app-album-card [cover]="'/assets/cover2.png'"></app-album-card>
+            <app-album-card [cover]="'/assets/cover3.png'"></app-album-card>
+            <app-album-card [cover]="'/assets/cover4.png'"></app-album-card>
+            <app-album-card [cover]="'/assets/cover5.png'"></app-album-card>
+          </div>
+          <div class="flex gap-6 md:gap-8 shrink-0">
+            <app-album-card [cover]="'/assets/cover1.png'"></app-album-card>
+            <app-album-card [cover]="'/assets/cover2.png'"></app-album-card>
+            <app-album-card [cover]="'/assets/cover3.png'"></app-album-card>
+            <app-album-card [cover]="'/assets/cover4.png'"></app-album-card>
+            <app-album-card [cover]="'/assets/cover5.png'"></app-album-card>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,32 @@
+.carousel-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 1.5rem)); }
+}
+
+@media (min-width: 768px) {
+  @keyframes scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(calc(-50% - 2rem)); }
+  }
+}
+
+.animate-scroll {
+  animation: scroll 20s linear infinite;
+  width: max-content;
+  will-change: transform;
+  display: flex;
+}
+
+.pause-animation {
+  animation-play-state: paused;
+}
