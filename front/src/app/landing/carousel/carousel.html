@@ -1,10 +1,11 @@
 <main class="bg-[#170814]">
-  <div class="flex flex-col items-center gap-[3rem] text-center py-[3rem] sm:py-[3.5rem] md:py-[4rem]">
-    <h1 class="max-w-[18ch] font-climate-crisis text-[#FFE6DB] text-[clamp(2rem,5vw,3rem)]">
-      YOUR MUSIC, YOUR TASTE. ALL IN ONE PLACE.
+  <div class="flex flex-col items-center gap-[3rem] text-center py-[3rem] sm:py-[3.5rem] md:py-[4rem] relative z-0">
+    <h1 class="max-w-[18ch] lg:max-w-none font-climate-crisis text-[#FFE6DB] text-[clamp(2rem,5vw,3rem)]">
+      <span class="block lg:whitespace-nowrap">YOUR MUSIC, YOUR TASTE.</span>
+      <span class="block lg:whitespace-nowrap">ALL IN ONE PLACE.</span>
     </h1>
-    <div class="w-full relative">
-      <div class="overflow-x-hidden">
+    <div class="w-full relative z-10">
+      <div class="overflow-x-hidden pb-[13.75rem]">
         <div class="flex gap-6 md:gap-8 animate-scroll hover:pause-animation py-16" #carousel>
           <div class="flex gap-6 md:gap-8 shrink-0">
             <app-album-card [cover]="'/assets/cover1.png'"></app-album-card>

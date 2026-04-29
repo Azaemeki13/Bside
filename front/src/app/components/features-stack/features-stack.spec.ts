@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CtaStack } from './cta-stack';
+import { FeaturesStack } from './features-stack';
 
-describe('CtaStack', () => {
-  let component: CtaStack;
-  let fixture: ComponentFixture<CtaStack>;
+describe('FeaturesStack', () => {
+  let component: FeaturesStack;
+  let fixture: ComponentFixture<FeaturesStack>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CtaStack],
+      imports: [FeaturesStack],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CtaStack);
+    fixture = TestBed.createComponent(FeaturesStack);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { CtaStack } from '../../components/cta-stack/cta-stack';
+import { FeaturesStack } from '../../components/features-stack/features-stack';
 import { CircleDollarSign, LucideAngularModule, MessageCircle, BadgeCheck, Puzzle } from 'lucide-angular';
 
 @Component({
   selector: 'app-features',
-  imports: [CtaStack, LucideAngularModule],
+  imports: [FeaturesStack, LucideAngularModule],
   templateUrl: './features.html',
   styleUrl: './features.scss',
 })
