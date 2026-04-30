@@ -2,5 +2,12 @@
   <div class="z-10 w-[24rem] h-[24rem] rounded-[3rem] overflow-hidden transition-transform duration-300 group-hover:scale-110">
     <img [src]="cover()" alt="Album cover" class="w-full h-full object-cover">
   </div>
-  <img src="/assets/vinyl.png" alt="Vinyl" class="z-[-1] absolute top-full left-1/2 -translate-x-1/2 w-full h-full transition-all duration-300 -translate-y-1/2 opacity-0 group-hover:-translate-y-[25%] group-hover:opacity-100">
+
+  <div class="z-[-1] absolute top-full left-1/2 -translate-x-1/2 w-[24rem] h-[24rem] -translate-y-1/2 opacity-0 transition-all duration-300 group-hover:-translate-y-[25%] group-hover:opacity-100">
+    <img src="/assets/vinyl.png" alt="Vinyl" class="absolute inset-0 w-full h-full">
+
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none [animation:spin_10s_linear_infinite]">
+      <img *ngIf="label()" [src]="label()" alt="Center label" class="w-1/4 aspect-square object-contain">
+    </div>
+  </div>
 </div>

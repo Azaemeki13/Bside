@@ -20,8 +20,14 @@ export class NavButton {
   }
 
   get variantClass(): string {
-    return this.variant === 'raspberry'
-      ? 'bg-[#8C0750] text-[#FFE6DB]'
-      : 'bg-[#FFE6DB] text-[#8C0750]';
+    if (this.variant === 'raspberry') {
+      return 'bg-[#8C0750] text-[#FFE6DB]';
+    }
+
+    if (this.variant === 'strawberry') {
+      return 'border border-[#FFE6DB] bg-[#FFE6DB]/20 text-[#FFE6DB]';
+    }
+
+    return 'bg-[#FFE6DB] text-[#8C0750]';
   }
 }
