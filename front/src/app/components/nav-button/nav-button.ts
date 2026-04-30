@@ -25,7 +25,11 @@ export class NavButton {
     }
 
     if (this.variant === 'strawberry') {
-      return 'border border-[#FFE6DB] bg-[#FFE6DB]/20 text-[#FFE6DB]';
+      return 'border border-[#FFE6DB] bg-[#FFE6DB]/20 text-[#FFE6DB] text-[1rem]';
+    }
+
+    if (this.variant === 'orange') {
+      return 'bg-[#FF5500] text-[#FFE6DB] text-[1rem]';
     }
 
     return 'bg-[#FFE6DB] text-[#8C0750]';
