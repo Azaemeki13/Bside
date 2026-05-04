@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { LucideAngularModule, Mail, KeyRound, UserRound } from 'lucide-angular';
-import { NavButton } from '../nav-button/nav-button';
 
 @Component({
   selector: 'app-sign-form',
-  imports: [LucideAngularModule, NavButton],
+  imports: [LucideAngularModule],
   templateUrl: './sign-form.html',
   styleUrl: './sign-form.scss',
 })

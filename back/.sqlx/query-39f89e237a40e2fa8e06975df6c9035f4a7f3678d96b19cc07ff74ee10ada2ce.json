@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND owner_id = $2)",
+  "query": "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND artist_id = $2)",
   "describe": {
     "columns": [
       {
@@ -19,5 +19,5 @@
       null
     ]
   },
-  "hash": "ec9db9773770aca2626ca09d2262ace6f6a33b6c3c600cde3de7c496b46a0e3d"
+  "hash": "39f89e237a40e2fa8e06975df6c9035f4a7f3678d96b19cc07ff74ee10ada2ce"
 }

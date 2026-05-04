@@ -14,8 +14,9 @@ use crate::handlers::{
     create_playlist_handler, create_song_handler, create_user_handler, delete_album_handler,
     delete_playlist_handler, delete_song_handler, flush_deleted_albums_task,
     flush_deleted_songs_task, get_all_users_handler, get_me_handler, get_playlist_by_id_handler,
-    get_user_by_id_handler, google_callback_handler, google_login_handler, ping_handler,
-    remove_song_from_pl, update_playlist_handler, verify_song_handler,
+    get_user_by_id_handler, google_callback_handler, google_login_handler,
+    google_signup_handler, ping_handler, remove_song_from_pl, update_playlist_handler,
+    verify_song_handler,
 };
 use crate::models::{
     AddSongResponse, AlbumResponse, AppState, ArtistResponse, AuthRequest, GoogleUserProfile,
@@ -99,6 +100,7 @@ async fn main() {
 
     let public_routes = Router::<AppState>::new()
         .route("/auth/google/login", get(google_login_handler))
+        .route("/auth/google/signup", get(google_signup_handler))
         .route("/auth/google/callback", get(google_callback_handler))
         .route("/ping", get(ping_handler))
         .route("/search", get(searcher));

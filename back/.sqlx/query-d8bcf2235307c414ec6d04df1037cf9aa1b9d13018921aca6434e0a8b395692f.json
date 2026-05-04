@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n    WITH candidates AS (\n    -- 1 Songs\n        SELECT s.id, s.title as name, 'song' as entity_type, ar.name as metadata, s.audio_url,\n            to_tsvector('english', unaccent(s.title) || ' ' || unaccent(ar.name)) as doc,\n            (unaccent(s.title) || ' ' || unaccent(ar.name)) as raw_text\n        FROM songs s\n        JOIN albums a ON s.album_id = a.id\n        JOIN artists ar ON a.artist_id = ar.id\n        WHERE s.status = 'Ready'\n        \n        UNION ALL\n        \n    -- 2 Albums\n        SELECT a.id, a.title as name, 'album' as entity_type, ar.name as metadata, NULL as audio_url,\n            to_tsvector('english', unaccent(a.title) || ' ' || unaccent(ar.name)) as doc,\n            (unaccent(a.title) || ' ' || unaccent(ar.name)) as raw_text\n        FROM albums a\n        JOIN artists ar ON a.artist_id = ar.id\n        WHERE a.status = 'Ready'\n        \n    -- 3 Artists \n        UNION ALL\n        SELECT id, name, 'artist' as entity_type, NULL as metadata, NULL as audio_url,\n            to_tsvector('english', unaccent(name)) as doc,\n            unaccent(name) as raw_text\n        FROM artists\n        WHERE status = 'Ready'\n        \n    -- 4 Playlists\n        UNION ALL\n        SELECT p.id, p.title as name, 'playlist' as entity_type, u.username as metadata, NULL as audio_url,\n            to_tsvector('english', unaccent(p.title) || ' ' || unaccent(u.username)) as doc,\n            (unaccent(p.title) || ' ' || unaccent(u.username)) as raw_text\n        FROM playlists p\n        JOIN users u ON p.owner_id = u.id\n        WHERE p.is_public = true\n    )\n    SELECT \n        id as \"id!\", name as \"name!\", entity_type as \"entity_type!\", metadata, audio_url,\n        (\n            ts_rank(doc, websearch_to_tsquery('english', $1)) * 0.6 + \n            GREATEST(similarity(raw_text, $1), similarity(COALESCE(metadata, ''), $1)) * 0.4\n        ) as \"rank!\"\n    FROM candidates\n    WHERE doc @@ websearch_to_tsquery('english', $1)\n        OR name % $1\n        OR COALESCE(metadata, '') % $1\n    ORDER BY \"rank!\" DESC\n    LIMIT 20\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "entity_type!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "metadata",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "audio_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "rank!",
+        "type_info": "Float8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "d8bcf2235307c414ec6d04df1037cf9aa1b9d13018921aca6434e0a8b395692f"
+}

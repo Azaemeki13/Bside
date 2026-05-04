@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE songs\n        SET status = 'Deleted' WHERE album_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9766b312107807a4902677890c5e37d87ed91fd240eec67a3406fc7c68fd82e7"
+}

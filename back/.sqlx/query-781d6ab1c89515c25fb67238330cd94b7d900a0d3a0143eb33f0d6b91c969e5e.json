@@ -11,7 +11,7 @@
       {
         "ordinal": 1,
         "name": "title",
-        "type_info": "Text"
+        "type_info": "Varchar"
       },
       {
         "ordinal": 2,
@@ -26,7 +26,7 @@
       {
         "ordinal": 4,
         "name": "audio_url",
-        "type_info": "Text"
+        "type_info": "Varchar"
       },
       {
         "ordinal": 5,
@@ -47,10 +47,10 @@
     "parameters": {
       "Left": [
         "Uuid",
-        "Text",
+        "Varchar",
         "Uuid",
         "Int4",
-        "Text",
+        "Varchar",
         "Jsonb"
       ]
     },
@@ -62,7 +62,7 @@
       false,
       null,
       true,
-      true
+      false
     ]
   },
   "hash": "781d6ab1c89515c25fb67238330cd94b7d900a0d3a0143eb33f0d6b91c969e5e"

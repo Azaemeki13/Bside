@@ -842,6 +842,18 @@ pub async fn google_login_handler(State(state): State<AppState>) -> impl IntoRes
     Redirect::temporary(auth_url.as_str())
 }
 
+pub async fn google_signup_handler(State(state): State<AppState>) -> impl IntoResponse {
+    let (auth_url, _cfrs_token) = state
+        .oauth_client
+        .authorize_url(CsrfToken::new_random)
+        .add_scope(Scope::new("openid".to_string()))
+        .add_scope(Scope::new("email".to_string()))
+        .add_scope(Scope::new("profile".to_string()))
+        .add_extra_param("prompt", "select_account")
+        .url();
+    Redirect::temporary(auth_url.as_str())
+}
+
 pub async fn google_callback_handler(
     State(state): State<AppState>,
     axum::extract::Query(query): axum::extract::Query<AuthRequest>,
@@ -882,6 +894,8 @@ pub async fn google_callback_handler(
         new_id
     };
     let jwt = crate::auth::create_jwt(user_id)?;
-    let redirect_url = format!("http://localhost:8081?token={jwt}");
+    let frontend_url = std::env::var("FRONTEND_URL")
+        .unwrap_or_else(|_| "http://localhost:4200".to_string());
+    let redirect_url = format!("{frontend_url}/bside_app?token={jwt}");
     Ok(Redirect::to(&redirect_url))
 }

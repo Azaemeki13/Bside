@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE playlists p \n        SET\n            total_duration = total_duration - (sub.occurences * $1),\n            song_count = song_count - sub.occurences\n        FROM (\n            SELECT playlist_id, count(*) as occurences\n            FROM playlist_songs\n            WHERE song_id = $2\n            GROUP BY playlist_id\n        ) AS sub\n            WHERE p.id = sub.playlist_id",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "47bbaec2708e62e55710b5e874a8c8f3906af153a4cbca3519dc25a7faa8257b"
+}
