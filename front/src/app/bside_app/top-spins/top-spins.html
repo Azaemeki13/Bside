@@ -1,0 +1,18 @@
+<div class="bg-[#1F0E1C] rounded-2xl p-6 flex flex-col gap-4">
+  <h2 class="font-raleway font-black text-[#FFE6DB] text-[1.5rem]">Your top spins of the month</h2>
+
+  <div class="grid grid-cols-2 gap-x-3 gap-y-6">
+
+    @for (artist of artists; track artist.name) {
+    <div class="flex items-center gap-2 w-full overflow-hidden">
+      <img class="w-[2.75rem] h-[2.75rem] rounded-full object-cover shrink-0" [src]="artist.img" [alt]="artist.name" />
+      <div class="flex flex-col min-w-0 flex-1">
+        <span class="font-raleway font-bold text-[#FFE6DB] text-[0.9rem] truncate leading-tight">{{ artist.name }}</span>
+        <span class="font-raleway text-[#FFE6DB] text-[0.75rem] opacity-70 leading-tight whitespace-nowrap">{{ artist.minutes }} minutes listened</span>
+      </div>
+      <lucide-icon [img]="chevronRight" class="w-[0.875rem] h-[0.875rem] shrink-0 text-[#FFE6DB] opacity-60"></lucide-icon>
+    </div>
+    }
+
+  </div>
+</div>

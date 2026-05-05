@@ -1,12 +1,17 @@
 import { Component, OnInit, inject, PLATFORM_ID, ChangeDetectorRef } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { NavBar } from './nav-bar/nav-bar';
+import { SideBar } from './side-bar/side-bar';
+import { RecentPlay } from './recent-play/recent-play';
+import { TopSpins } from './top-spins/top-spins';
+import { NewRelease } from './new-release/new-release';
 
 @Component({
   selector: 'app-bside-app',
   templateUrl: './bside_app.html',
   styleUrl: './bside_app.scss',
-  imports: [CommonModule],
+  imports: [CommonModule, NavBar, SideBar, RecentPlay, TopSpins, NewRelease],
 })
 export class BsideApp implements OnInit {
   name = '';

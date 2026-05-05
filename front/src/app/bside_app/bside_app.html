@@ -1,4 +1,13 @@
-<main class="bside-app">
-  <h1 class="text-2xl font-bold">Hi <span *ngIf="name; else anon">{{ name }}</span><ng-template #anon>there</ng-template>!</h1>
-  <p class="mt-2 text-sm text-gray-400">You are connected.</p>
-</main>
+<div class="flex h-screen bg-[#0C060C]">
+  <app-side-bar></app-side-bar>
+  <div class="flex flex-col flex-1 min-w-0">
+    <app-nav-bar></app-nav-bar>
+    <main class="flex-1 overflow-y-auto p-6">
+        <div class="grid gap-4 items-stretch grid-cols-[0.24fr_0.40fr_0.36fr]">
+          <app-recent-play class="min-w-0 block h-full"></app-recent-play>
+          <app-top-spins class="min-w-0 block h-full"></app-top-spins>
+          <app-new-release class="min-w-0 block"></app-new-release>
+        </div>
+    </main>
+  </div>
+</div>
