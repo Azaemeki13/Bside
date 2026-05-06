@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { LucideAngularModule, ChevronRight } from 'lucide-angular';
-import { NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-top-spins',
-  imports: [LucideAngularModule, NgFor],
+  imports: [LucideAngularModule],
   templateUrl: './top-spins.html',
   styleUrl: './top-spins.scss',
 })
