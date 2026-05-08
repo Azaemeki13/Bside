@@ -1,9 +1,21 @@
-<a
-  [href]="isExternal ? link : null"
-  [routerLink]="!isExternal ? link : null"
-  [target]="isExternal ? '_blank' : '_self'"
-  class="inline-block cursor-pointer rounded-full px-6 py-2 font-raleway no-underline"
-  [ngClass]="[variantClass, fontSize, fontStyle]"
->
-  {{ label }}
-</a>
+<ng-container *ngIf="link; else buttonTemplate">
+  <a
+    [href]="isExternal ? link : null"
+    [routerLink]="!isExternal ? link : null"
+    [target]="isExternal ? '_blank' : '_self'"
+    class="inline-block cursor-pointer rounded-full px-6 py-2 font-raleway no-underline"
+    [ngClass]="[variantClass, fontSize, fontStyle]"
+  >
+    {{ label }}
+  </a>
+</ng-container>
+
+<ng-template #buttonTemplate>
+  <button
+    [attr.type]="type"
+    class="inline-block cursor-pointer rounded-full px-6 py-2 font-raleway"
+    [ngClass]="[variantClass, fontSize, fontStyle]"
+  >
+    {{ label }}
+  </button>
+</ng-template>

@@ -1,13 +1,25 @@
 <div class="flex flex-col items-center h-full w-20 bg-[#0C060C] rounded-[1.5rem]">
 
   <div class="flex flex-col items-center gap-4 pt-6">  
-        <app-side-bar-button><lucide-icon [img]="house" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
-        <app-side-bar-button><lucide-icon [img]="disc3" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
-        <app-side-bar-button><lucide-icon [img]="heart" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
-        <app-side-bar-button><lucide-icon [img]="usersRound" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
+        <app-side-bar-button link="/bside_app/home"><lucide-icon [img]="house" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
+      <app-side-bar-button link="/bside_app/library"><lucide-icon [img]="disc3" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
+      <app-side-bar-button link="/bside_app/favorites"><lucide-icon [img]="heart" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
+      <app-side-bar-button link="/bside_app/social"><lucide-icon [img]="usersRound" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
     </div>
     <div class="flex flex-col items-center gap-4 mt-auto pb-6">
-        <app-side-bar-button><lucide-icon [img]="house" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
-        <app-side-bar-button><lucide-icon [img]="house" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
+        <app-side-bar-button (click)="openLogoutConfirm()">
+          <lucide-icon [img]="logout" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon>
+        </app-side-bar-button>
     </div>
+</div>
+
+<div *ngIf="isLogoutConfirmOpen" class="fixed inset-0 z-[1000] flex items-center justify-center p-5 bg-[#FFE6DB]/10 text-center backdrop-blur-sm glass-card" role="dialog" aria-modal="true" aria-label="Logout confirmation" (click)="closeLogoutConfirm()">
+  <div class="w-[min(92vw,26rem)] px-5 py-5 text-[#FFE6DB]" (click)="$event.stopPropagation()">
+    <h1 class="font-climate-crisis text-[#FFE6DB] text-[3rem]">Logout</h1>
+    <p class="m-0 font-raleway font-bold text-[1rem] text-center font-bold">Are you sure you want to logout?</p>
+    <div class="mt-4 items-center justify-center flex gap-4">
+      <button type="button" class="cursor-pointer rounded-full px-4 py-2 font-raleway text-[1rem] font-medium bg-[#FFE6DB] text-[#1F0E1C] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-[#FFE6DB]" (click)="closeLogoutConfirm()">Cancel</button>
+      <button type="button" class="cursor-pointer rounded-full px-4 py-2 font-raleway text-[1rem] font-medium bg-[#FF5500] text-[#FFE6DB] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-[#FFE6DB]" (click)="confirmLogout()">Confirm</button>
+    </div>
+  </div>
 </div>

@@ -1,16 +1,17 @@
 import { Component, Input } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { NgClass } from '@angular/common';
+import { NgClass, NgIf } from '@angular/common';
 
 @Component({
-  selector: 'nav-button',
+  selector: 'nav-button, app-nav-button',
   templateUrl: './nav-button.html',
   styleUrl: './nav-button.scss',
-  imports: [RouterModule, NgClass]
+  imports: [RouterModule, NgClass, NgIf]
 })
 export class NavButton {
   @Input() label = '';
   @Input() link = '';
+  @Input() type: 'button' | 'submit' | 'reset' = 'button';
   @Input() variant = 'light-pink';
   @Input() fontSize = 'text-base';
   @Input() fontStyle = 'font-normal';

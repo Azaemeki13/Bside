@@ -3,11 +3,7 @@
   <div class="flex flex-col flex-1 min-w-0">
     <app-nav-bar></app-nav-bar>
     <main class="flex-1 overflow-y-auto px-6">
-      <div class="grid gap-4 grid-cols-[24%_40%_36%] grid-rows-[400px]">
-        <app-recent-play></app-recent-play>
-        <app-top-spins></app-top-spins>
-        <app-new-release class="self-start"></app-new-release>
-      </div>
+      <router-outlet></router-outlet>
     </main>
   </div>
 </div>
