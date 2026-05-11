@@ -3,6 +3,17 @@ use axum::Json;
 use axum::extract::{Query, State};
 use std::collections::HashMap;
 
+#[utoipa::path(
+    get,
+    path = "/search",
+    params(("q" = String, Query, description = "Search query string")),
+    responses(
+        (status = 200, description = "Search results from songs, albums, artists, and playlists", body = Vec<SearchResult>),
+        (status = 400, description = "Missing or invalid query parameter"),
+        (status = 500, description = "Internal server error"),
+    ),
+    tags = ["Search"]
+)]
 pub async fn searcher(
     State(state): State<AppState>,
     Query(params): Query<HashMap<String, String>>,

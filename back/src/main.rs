@@ -7,6 +7,7 @@ mod error;
 mod handlers;
 mod models;
 mod search;
+mod swagger;
 use crate::auth::{Claims, auth_gate};
 use crate::error::BSideError;
 use crate::handlers::{
@@ -33,6 +34,8 @@ use axum::{
     middleware::from_fn_with_state,
     routing::{delete, get, post, put},
 };
+use utoipa_swagger_ui::SwaggerUi;
+use utoipa::OpenApi;
 use oauth2::{AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl, basic::BasicClient};
 use sqlx::postgres::PgPoolOptions;
 use std::env;
@@ -134,11 +137,12 @@ async fn main() {
         .route("/users/{id}", get(get_user_by_id_handler))
         .layer(from_fn_with_state(state.clone(), auth_gate));
 
-    let app: Router = Router::new()
+    let app = Router::new()
         .merge(public_routes)
         .merge(protected_routes)
         .layer(cors)
-        .with_state(state);
+        .with_state(state)
+        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", swagger::ApiDoc::openapi()));
 
     let listener_addr = "0.0.0.0:8080";
     println!("B-Side engine starting on http://{listener_addr}");

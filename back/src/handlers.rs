@@ -19,14 +19,33 @@ use argon2::{
 };
 use secrecy::ExposeSecret;
 
+#[utoipa::path(
+    get,
+    path = "/ping",
+    responses(
+        (status = 200, description = "Server health check", body = String),
+    ),
+    tags = ["Health"]
+)]
 #[axum::debug_handler]
 pub async fn ping_handler() -> &'static str {
     "pong"
 }
 
+#[utoipa::path(
+    post,
+    path = "/register",
+    request_body = RegisterPayload,
+    responses(
+        (status = 200, description = "User registered successfully", body = User),
+        (status = 400, description = "Username or email already exists"),
+        (status = 500, description = "Internal server error"),
+    ),
+    tags = ["Authentication"]
+)]
 pub async fn register_handler(
     State(state): State<AppState>,
-    Json(payload): Json<RegisterPayload>, 
+    Json(payload): Json<RegisterPayload>,
 ) -> Result<Json<User>, BSideError> {
     let exists: Option<bool> = Some(sqlx::query_scalar!(
         "SELECT EXISTS (SELECT 1  FROM users WHERE email = $1 OR username = $2)",
@@ -74,6 +93,17 @@ pub async fn register_handler(
     Ok(Json(new_user))
 }
 
+#[utoipa::path(
+    get,
+    path = "/login",
+    request_body = LoginPayload,
+    responses(
+        (status = 200, description = "Login successful", body = AuthResponse),
+        (status = 401, description = "Invalid credentials"),
+        (status = 500, description = "Internal server error"),
+    ),
+    tags = ["Authentication"]
+)]
 pub async fn classic_auth_handler(
     State(state): State<AppState>,
     axum::extract::Json(payload): axum::extract::Json<LoginPayload>,
@@ -112,6 +142,18 @@ pub async fn classic_auth_handler(
     })) 
 }
 
+#[utoipa::path(
+    post,
+    path = "/users",
+    request_body = UserPayload,
+    responses(
+        (status = 200, description = "User created successfully", body = User),
+        (status = 401, description = "Unauthorized"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Users"]
+)]
 #[axum::debug_handler]
 pub async fn create_user_handler(
     State(state): State<AppState>,
@@ -126,6 +168,19 @@ pub async fn create_user_handler(
     Ok(Json(user))
 }
 
+#[utoipa::path(
+    post,
+    path = "/artists",
+    request_body(content = String, description = "Multipart form data with name, bio, and photo"),
+    responses(
+        (status = 200, description = "Artist created successfully", body = ArtistResponse),
+        (status = 400, description = "Invalid form data or missing required fields"),
+        (status = 401, description = "Unauthorized"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Artists"]
+)]
 pub async fn create_artist_handler(
     State(state): State<AppState>,
     Extension(current_user_id): Extension<Uuid>,
@@ -215,6 +270,17 @@ pub async fn create_artist_handler(
     }))
 }
 
+#[utoipa::path(
+    get,
+    path = "/users/me",
+    responses(
+        (status = 200, description = "Current user data", body = User),
+        (status = 401, description = "Unauthorized"),
+        (status = 404, description = "User not found"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Users"]
+)]
 pub async fn get_me_handler(
     State(state): State<AppState>,
     claims: Claims,
@@ -230,6 +296,16 @@ pub async fn get_me_handler(
     Ok(Json(result))
 }
 
+#[utoipa::path(
+    get,
+    path = "/users",
+    responses(
+        (status = 200, description = "List of all users", body = Vec<User>),
+        (status = 401, description = "Unauthorized"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Users"]
+)]
 pub async fn get_all_users_handler(
     State(state): State<AppState>,
     _claims: Claims,
@@ -242,6 +318,18 @@ pub async fn get_all_users_handler(
     Ok(axum::Json(users))
 }
 
+#[utoipa::path(
+    get,
+    path = "/users/{id}",
+    params(("id" = uuid::Uuid, Path, description = "User ID")),
+    responses(
+        (status = 200, description = "User found", body = User),
+        (status = 401, description = "Unauthorized"),
+        (status = 404, description = "User not found"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Users"]
+)]
 pub async fn get_user_by_id_handler(
     State(state): State<AppState>,
     Path(user_id): Path<uuid::Uuid>,
@@ -256,6 +344,19 @@ pub async fn get_user_by_id_handler(
     Ok(Json(user))
 }
 
+#[utoipa::path(
+    post,
+    path = "/albums",
+    request_body(content = String, description = "Multipart form data with title, genre, and cover image"),
+    responses(
+        (status = 200, description = "Album created successfully", body = AlbumResponse),
+        (status = 400, description = "Invalid form data or missing required fields"),
+        (status = 401, description = "Unauthorized or not an artist"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Albums"]
+)]
 pub async fn create_album_handler(
     State(state): State<AppState>,
     Extension(current_user_id): Extension<uuid::Uuid>,
@@ -363,6 +464,18 @@ pub async fn create_album_handler(
     }))
 }
 
+#[utoipa::path(
+    delete,
+    path = "/albums/{album_id}",
+    params(("album_id" = uuid::Uuid, Path, description = "Album ID")),
+    responses(
+        (status = 200, description = "Album queued for deletion", body = serde_json::Value),
+        (status = 401, description = "Unauthorized - not album owner"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Albums"]
+)]
 pub async fn delete_album_handler(
     State(state): State<AppState>,
     Path(album_id): Path<uuid::Uuid>,
@@ -447,6 +560,19 @@ pub async fn flush_deleted_albums_task(state: State<AppState>) -> Result<(), BSi
     Ok(())
 }
 
+#[utoipa::path(
+    post,
+    path = "/songs",
+    request_body = SongPayload,
+    responses(
+        (status = 200, description = "Song created successfully with upload URL", body = SongResponse),
+        (status = 400, description = "Invalid format (only wav/flac allowed) or not album owner"),
+        (status = 401, description = "Unauthorized"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Songs"]
+)]
 pub async fn create_song_handler(
     State(state): State<AppState>,
     claims: Claims,
@@ -498,6 +624,20 @@ pub async fn create_song_handler(
     Ok(Json(SongResponse { song, upload_url }))
 }
 
+#[utoipa::path(
+    put,
+    path = "/songs/{song_id}/verify",
+    params(("song_id" = uuid::Uuid, Path, description = "Song ID")),
+    responses(
+        (status = 200, description = "Song verified and ready", body = serde_json::Value),
+        (status = 400, description = "Invalid audio format or file too large"),
+        (status = 401, description = "Unauthorized - not song owner"),
+        (status = 404, description = "Song not found"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Songs"]
+)]
 pub async fn verify_song_handler(
     State(state): State<AppState>,
     claims: Claims,
@@ -577,6 +717,19 @@ pub async fn verify_song_handler(
     Ok(axum::Json(serde_json::json!({"status": "verified"})))
 }
 
+#[utoipa::path(
+    delete,
+    path = "/songs/{id}",
+    params(("id" = uuid::Uuid, Path, description = "Song ID")),
+    responses(
+        (status = 204, description = "Song deleted successfully"),
+        (status = 401, description = "Unauthorized - not song owner"),
+        (status = 404, description = "Song not found"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Songs"]
+)]
 pub async fn delete_song_handler(
     state: State<AppState>,
     claims: Claims,
@@ -696,6 +849,18 @@ pub async fn flush_deleted_songs_task(state: AppState) -> Result<u64, BSideError
     Ok(total_purged)
 }
 
+#[utoipa::path(
+    post,
+    path = "/playlists",
+    request_body = PlaylistPayload,
+    responses(
+        (status = 200, description = "Playlist created successfully", body = Playlist),
+        (status = 401, description = "Unauthorized"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Playlists"]
+)]
 pub async fn create_playlist_handler(
     State(state): State<AppState>,
     claims: Claims,
@@ -708,6 +873,22 @@ pub async fn create_playlist_handler(
     Ok(Json(playlist))
 }
 
+#[utoipa::path(
+    post,
+    path = "/playlists/{playlist_id}/songs/{song_id}",
+    params(
+        ("playlist_id" = uuid::Uuid, Path, description = "Playlist ID"),
+        ("song_id" = uuid::Uuid, Path, description = "Song ID"),
+    ),
+    responses(
+        (status = 201, description = "Song added to playlist successfully", body = AddSongResponse),
+        (status = 400, description = "Song not ready or invalid state"),
+        (status = 401, description = "Unauthorized - not playlist owner"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Playlists"]
+)]
 pub async fn add_song_to_playlist_handler(
     State(state): State<AppState>,
     axum::extract::Path((playlist_id, song_id)): axum::extract::Path<(uuid::Uuid, uuid::Uuid)>,
@@ -785,6 +966,22 @@ pub async fn add_song_to_playlist_handler(
     ))
 }
 
+#[utoipa::path(
+    delete,
+    path = "/playlists/{playlist_id}/songs/{song_id}",
+    params(
+        ("playlist_id" = uuid::Uuid, Path, description = "Playlist ID"),
+        ("song_id" = uuid::Uuid, Path, description = "Song ID (link_id)"),
+    ),
+    responses(
+        (status = 204, description = "Song removed from playlist successfully"),
+        (status = 401, description = "Unauthorized - not playlist owner"),
+        (status = 404, description = "Song or playlist not found"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Playlists"]
+)]
 pub async fn remove_song_from_pl(
     State(state): State<AppState>,
     claims: Claims,
@@ -826,6 +1023,18 @@ pub async fn remove_song_from_pl(
     Ok(axum::http::StatusCode::NO_CONTENT)
 }
 
+#[utoipa::path(
+    get,
+    path = "/playlists/{id}",
+    params(("id" = uuid::Uuid, Path, description = "Playlist ID")),
+    responses(
+        (status = 200, description = "Playlist details with songs", body = PlaylistDetailedResponse),
+        (status = 401, description = "Unauthorized"),
+        (status = 404, description = "Playlist not found or not accessible"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Playlists"]
+)]
 pub async fn get_playlist_by_id_handler(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
@@ -880,6 +1089,19 @@ pub async fn get_playlist_by_id_handler(
     }))
 }
 
+#[utoipa::path(
+    put,
+    path = "/playlists/{id}",
+    params(("id" = uuid::Uuid, Path, description = "Playlist ID")),
+    request_body = UpdateStructurePayload,
+    responses(
+        (status = 200, description = "Playlist updated successfully", body = serde_json::Value),
+        (status = 401, description = "Unauthorized - not playlist owner"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Playlists"]
+)]
 pub async fn update_playlist_handler(
     State(state): State<AppState>,
     claims: Claims,
@@ -907,6 +1129,18 @@ pub async fn update_playlist_handler(
     Ok(axum::Json(serde_json::json!({ "status": "updated"})))
 }
 
+#[utoipa::path(
+    delete,
+    path = "/playlists/{id}",
+    params(("id" = uuid::Uuid, Path, description = "Playlist ID")),
+    responses(
+        (status = 204, description = "Playlist deleted successfully"),
+        (status = 401, description = "Unauthorized - not playlist owner"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Playlists"]
+)]
 pub async fn delete_playlist_handler(
     State(state): State<AppState>,
     claims: Claims,
@@ -925,6 +1159,14 @@ pub async fn delete_playlist_handler(
     Ok(axum::http::StatusCode::NO_CONTENT)
 }
 
+#[utoipa::path(
+    get,
+    path = "/auth/google/login",
+    responses(
+        (status = 302, description = "Redirect to Google OAuth login"),
+    ),
+    tags = ["Authentication"]
+)]
 pub async fn google_login_handler(State(state): State<AppState>) -> impl IntoResponse {
     let (auth_url, _cfrs_token) = state
         .oauth_client
@@ -936,6 +1178,14 @@ pub async fn google_login_handler(State(state): State<AppState>) -> impl IntoRes
     Redirect::temporary(auth_url.as_str())
 }
 
+#[utoipa::path(
+    get,
+    path = "/auth/google/signup",
+    responses(
+        (status = 302, description = "Redirect to Google OAuth signup"),
+    ),
+    tags = ["Authentication"]
+)]
 pub async fn google_signup_handler(State(state): State<AppState>) -> impl IntoResponse {
     let (auth_url, _cfrs_token) = state
         .oauth_client
@@ -948,6 +1198,20 @@ pub async fn google_signup_handler(State(state): State<AppState>) -> impl IntoRe
     Redirect::temporary(auth_url.as_str())
 }
 
+#[utoipa::path(
+    get,
+    path = "/auth/google/callback",
+    params(
+        ("code" = String, Query, description = "Google OAuth authorization code"),
+        ("state" = String, Query, description = "CSRF state token"),
+    ),
+    responses(
+        (status = 302, description = "Redirect to frontend with JWT token"),
+        (status = 400, description = "OAuth exchange failed"),
+        (status = 500, description = "Internal server error"),
+    ),
+    tags = ["Authentication"]
+)]
 pub async fn google_callback_handler(
     State(state): State<AppState>,
     axum::extract::Query(query): axum::extract::Query<AuthRequest>,
