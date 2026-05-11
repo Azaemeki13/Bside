@@ -16,12 +16,13 @@ use crate::handlers::{
     flush_deleted_songs_task, get_all_users_handler, get_me_handler, get_playlist_by_id_handler,
     get_user_by_id_handler, google_callback_handler, google_login_handler,
     google_signup_handler, ping_handler, remove_song_from_pl, update_playlist_handler,
-    verify_song_handler,
+    verify_song_handler, register_handler, classic_auth_handler,
 };
 use crate::models::{
     AddSongResponse, AlbumResponse, AppState, ArtistResponse, AuthRequest, GoogleUserProfile,
     Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RawSearchResult,
     SearchResult, Song, SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
+    RegisterPayload, LoginPayload, AuthResponse
 };
 use crate::search::searcher;
 
@@ -102,6 +103,8 @@ async fn main() {
         .route("/auth/google/login", get(google_login_handler))
         .route("/auth/google/signup", get(google_signup_handler))
         .route("/auth/google/callback", get(google_callback_handler))
+        .route("/register", post(register_handler))
+        .route("/login", get(classic_auth_handler))
         .route("/ping", get(ping_handler))
         .route("/search", get(searcher));
 

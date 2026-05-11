@@ -6,6 +6,7 @@ use std::sync::Arc;
 pub struct User {
     pub id: uuid::Uuid,
     pub username: String,
+    pub email: String,
     pub role: String,
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
@@ -129,9 +130,28 @@ pub struct AppState {
 }
 
 #[derive(serde::Deserialize)]
+pub struct RegisterPayload {
+    pub username: String,
+    pub email: String,
+    pub password: secrecy::SecretString,
+}
+
+#[derive(serde::Deserialize)]
+pub struct LoginPayload {
+    pub identifier: String,
+    pub password: secrecy::SecretString,
+}
+
+#[derive(serde::Deserialize)]
 pub struct AuthRequest {
     pub code: String,
     pub state: String,
+}
+
+#[derive(serde::Serialize)]
+pub struct AuthResponse {
+    pub user: User,
+    pub token: String,
 }
 
 #[derive(serde::Deserialize, Debug)]

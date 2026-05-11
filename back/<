@@ -3,7 +3,6 @@ use crate::{
     GoogleUserProfile, Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, Song,
     SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload, RegisterPayload, LoginPayload, AuthResponse,
 };
-use crate::auth::create_jwt;
 use aws_sdk_s3::presigning::PresigningConfig;
 use axum::{
     Json,
@@ -15,7 +14,7 @@ use std::time::Duration;
 use uuid::Uuid;
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHasher, SaltString},
-    Argon2, PasswordHash, PasswordVerifier,
+    Argon2,
 };
 use secrecy::ExposeSecret;
 
@@ -79,33 +78,23 @@ pub async fn classic_auth_handler(
     axum::extract::Json(payload): axum::extract::Json<LoginPayload>,
 ) -> Result<Json<AuthResponse>, BSideError> {
     let password = payload.password.expose_secret().to_string();
-    let user = sqlx::query!(
+    let user = sqlx::query_as!(
+        User,
         r#"
-        SELECT id, username, email, role, created_at as "created_at!", c.password_hash FROM users u INNER JOIN local_credentials c ON u.id = c.user_id WHERE u.username = $1 OR u.email=$1"#,
-        payload.identifier,
+        SELECT id, username, email, role, created_at as "created_at!", c.password hash FROM users u INNER JOIN local_credentials c ON u.id = c.user_id WHERE u.username = $1 OR u.email=$1"#,
+        user.id,
         )
-        .fetch_optional(&state.db)
-        .await?
-        .ok_or_else(|| BSideError::UnauthorizedProfile)?;
-    let saved_hash_string = user.password_hash.clone();
-    tokio::task::spawn_blocking(move || -> Result<(), BSideError> {
-        let pw_hash = PasswordHash::new(&saved_hash_string)
-            .map_err(|_| BSideError::InternalServerError("Hash Parsing has failed.".into()))?;
+        .fetch_one(state.db)
+        .await?;
+    let pw_verif = toki::task::spawn_blocking(move |user| -> Result<bool, BSideError> {
         let verif = Argon2::default;
-        verif().verify_password(password.as_bytes(), &pw_hash)
+        verif.verify_password(&self, &password, &user.password.hash)
+            .map(|result|)
             .map_err(|_| BSideError::InternalServerError("ID error, please retry.".into()))
         })
         .await
-        .map_err(|_| BSideError::InternalServerError("Thread panicked.".into()))??;
-    let token = create_jwt(user.id)?;
-    let user = User {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        created_at: user.created_at,
-    };
-
+        .map_err(|e| BSideError::InternalServerError("Thread panicked.".into()))??;
+    let token = create_jwt(user.id);
     Ok(Json(AuthResponse {
         user,
         token,
