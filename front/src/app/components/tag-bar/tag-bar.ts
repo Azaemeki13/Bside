@@ -1,6 +1,6 @@
 import { NgFor } from '@angular/common';
 import { Component } from '@angular/core';
-import { TagCard } from '../../components/tag-card/tag-card';
+import { TagCard } from '../tag-card/tag-card';
 
 @Component({
   selector: 'app-tag-bar',

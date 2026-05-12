@@ -2,14 +2,15 @@ import { Component, OnInit, inject, PLATFORM_ID, ChangeDetectorRef } from '@angu
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { RouterOutlet } from '@angular/router';
-import { NavBar } from './nav-bar/nav-bar';
-import { SideBar } from './side-bar/side-bar';
+import { NavBar } from '../components/nav-bar/nav-bar';
+import { SideBar } from '../components/side-bar/side-bar';
+import { SoundBar } from './sound-bar/sound-bar';
 
 @Component({
   selector: 'app-bside-app',
   templateUrl: './bside_app.html',
   styleUrl: './bside_app.scss',
-  imports: [CommonModule, RouterOutlet, NavBar, SideBar],
+  imports: [CommonModule, RouterOutlet, NavBar, SideBar, SoundBar],
 })
 export class BsideApp implements OnInit {
   name = '';

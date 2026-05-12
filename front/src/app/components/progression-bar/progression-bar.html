@@ -1,0 +1,33 @@
+<div class="w-full rounded-full border border-[#FFE6DB]/15 bg-[#FFE6DB]/10 pl-2 pr-6 py-2 backdrop-blur-sm glass-card">
+	<div class="flex items-center gap-8 w-full min-w-0">
+		<button type="button" aria-label="Album cover" class="shrink-0 w-[3rem] h-[3rem] rounded-full overflow-hidden cursor-pointer">
+			<img src="assets/cover1.png" alt="" class="w-full h-full object-cover" />
+		</button>
+		<div class="flex items-center gap-4 shrink-0 px-4">
+			<button type="button" aria-label="Track back" class="text-[#FFE6DB] cursor-pointer">
+				<lucide-icon [img]="skipBack" class="w-[1.25rem] h-[1.25rem]"></lucide-icon>
+			</button>
+			<button type="button" [attr.aria-label]="isPlaying() ? 'Pause' : 'Play'" (click)="togglePlay()" class="text-[#FFE6DB] cursor-pointer rounded-full bg-orange-500 p-2">
+				<lucide-icon [img]="isPlaying() ? pause : play" class="w-[1.75rem] h-[1.75rem] fill-current"></lucide-icon>
+			</button>
+			<button type="button" aria-label="Track next" class="text-[#FFE6DB] cursor-pointer">
+				<lucide-icon [img]="skipForward" class="w-[1.25rem] h-[1.25rem]"></lucide-icon>
+			</button>
+		</div>
+		<div class="relative flex-1 flex items-center min-w-0 h-6 group">
+			<div class="absolute left-0 top-1/2 w-full -translate-y-1/2 h-[3px] rounded-full bg-[#FFE6DB]"></div>
+			<div
+				class="absolute left-0 top-1/2 -translate-y-1/2 h-1 rounded-full bg-orange-500 pointer-events-none"
+				[style.width.%]="progress()"
+			></div>
+			<input
+				type="range"
+				min="0" max="100" step="1"
+				[value]="progress()"
+				(input)="onInput($event)"
+				aria-label="Progress"
+				class="absolute w-full opacity-0 cursor-pointer h-6"
+			/>
+		</div>
+	</div>
+</div>

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { SearchBar } from '../../components/search-bar/search-bar';
-import { ProfileCard } from '../../components/profile-card/profile-card';
+import { SearchBar } from '../search-bar/search-bar';
+import { ProfileCard } from '../profile-card/profile-card';
 
 @Component({
   selector: 'app-nav-bar',

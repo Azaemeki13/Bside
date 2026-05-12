@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RecentPlayCard } from '../../components/recent-play-card/recent-play-card';
+import { RecentPlayCard } from '../recent-play-card/recent-play-card';
 
 @Component({
   selector: 'app-recent-play',
