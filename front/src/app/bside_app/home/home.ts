@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { RecentPlay } from '../recent-play/recent-play';
-import { TopSpins } from '../top-spins/top-spins';
-import { NewRelease } from '../new-release/new-release';
-import { TagBar } from '../tag-bar/tag-bar';
+import { RecentPlay } from '../../components/recent-play/recent-play';
+import { TopSpins } from '../../components/top-spins/top-spins';
+import { NewRelease } from '../../components/new-release/new-release';
+import { TagBar } from '../../components/tag-bar/tag-bar';
 
 @Component({
   selector: 'app-bside-home',

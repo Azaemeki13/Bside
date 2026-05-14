@@ -1,13 +1,12 @@
 import { Component, HostListener, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser, NgIf } from '@angular/common';
-import { SideBarButton } from '../../components/side-bar-button/side-bar-button';
-import { NavButton } from '../../components/nav-button/nav-button';
+import { SideBarButton } from '../side-bar-button/side-bar-button';
 import { LucideAngularModule, House, Disc3, Heart, UsersRound, LogOut} from 'lucide-angular';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-side-bar',
-  imports: [SideBarButton, NavButton, LucideAngularModule, NgIf],
+  imports: [SideBarButton, LucideAngularModule, NgIf],
   templateUrl: './side-bar.html',
   styleUrl: './side-bar.scss',
 })
