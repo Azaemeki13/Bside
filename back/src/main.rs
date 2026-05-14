@@ -8,6 +8,9 @@ mod handlers;
 mod models;
 mod search;
 mod swagger;
+mod network;
+mod ws;
+
 use crate::auth::{Claims, auth_gate};
 use crate::error::BSideError;
 use crate::handlers::{
@@ -42,6 +45,7 @@ use std::env;
 use std::sync::Arc;
 use std::time::Duration;
 use tower_http::cors::{Any, CorsLayer};
+use crate::ws::ws_handler;
 
 #[tokio::main]
 async fn main() {
@@ -82,6 +86,7 @@ async fn main() {
         http_client: reqwest::Client::new(),
         jwt: Arc::new(secrecy::SecretBox::new(jwt_secret.into())),
         aws_client,
+        network: network::NetworkState::new(),
     };
     let gc_state = state.clone();
     tokio::spawn(async move {
@@ -109,7 +114,8 @@ async fn main() {
         .route("/register", post(register_handler))
         .route("/login", get(classic_auth_handler))
         .route("/ping", get(ping_handler))
-        .route("/search", get(searcher));
+        .route("/search", get(searcher))
+        .route("/ws", get(ws_handler));
 
     let protected_routes = Router::<AppState>::new()
         .route(

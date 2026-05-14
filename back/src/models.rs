@@ -1,6 +1,7 @@
 use oauth2::{EndpointNotSet, EndpointSet, basic::BasicClient};
 use secrecy::SecretString;
 use std::sync::Arc;
+use crate::network::NetworkState;
 
 #[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
 pub struct User {
@@ -131,6 +132,8 @@ pub struct AppState {
     pub http_client: reqwest::Client,
     pub jwt: Arc<SecretString>,
     pub aws_client: aws_sdk_s3::Client,
+    //for user status -> online/offline
+    pub network: NetworkState,
 }
 
 #[derive(serde::Deserialize, utoipa::ToSchema)]

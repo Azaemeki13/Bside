@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-axum = { version = "0.8.8", features = ["macros", "multipart"] }
+axum = { version = "0.8.8", features = ["macros", "multipart", "ws"] }
 secrecy = {version = "0.10.3", features = ["serde"] }
 thiserror = "1.0"
 jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
@@ -27,3 +27,4 @@ argon2 = "0.5"
 password-hash = "0.5"
 utoipa = { version = "5.5.0", features = ["axum_extras", "uuid", "chrono"] }
 utoipa-swagger-ui = { version = "9", features = ["axum"] }
+futures-util = "0.3"
