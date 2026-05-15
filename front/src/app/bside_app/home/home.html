@@ -2,5 +2,7 @@
   <app-recent-play></app-recent-play>
   <app-top-spins></app-top-spins>
   <app-new-release class="self-start"></app-new-release>
-  <app-tag-bar class="col-span-2 block min-w-0 self-end"></app-tag-bar>
+  <h2 class="col-span-3 font-raleway text-[1.5rem] font-semibold text-[#FFE6DB]/60 self-end mt-6">Fresh picks, just for you</h2>
+  <app-tag-bar (tagSelected)="onTagSelected($event)" class="col-span-2 block min-w-0 self-end"></app-tag-bar>
+  <app-fresh-picks [selectedTag]="selectedTag()" class="col-span-3 block min-w-0 mt-8"></app-fresh-picks>
 </div>

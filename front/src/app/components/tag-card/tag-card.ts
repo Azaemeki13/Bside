@@ -8,5 +8,5 @@ import { Component, input } from '@angular/core';
 })
 export class TagCard {
   label = input<string>('');
+  active = input<boolean>(false);
 }
-

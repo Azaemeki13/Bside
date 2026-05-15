@@ -1,5 +1,11 @@
 <button class="inline-flex items-center gap-3 cursor-pointer shrink-0">
-  <div class="rounded-full border border-[#FFE6DB] px-4 py-2 inline-flex items-center justify-center whitespace-nowrap">
-    <span class="font-raleway font-normal text-[#FFE6DB] text-[1rem] whitespace-nowrap">{{ label() }}</span>
+  <div [class]="active()
+    ? 'rounded-full bg-[#FF5500] border border-[#FF5500] px-4 py-2 inline-flex items-center justify-center whitespace-nowrap'
+    : 'rounded-full border border-[#FFE6DB] px-4 py-2 inline-flex items-center justify-center whitespace-nowrap'">
+    <span [class]="active()
+      ? 'font-raleway font-normal text-white text-[1rem] whitespace-nowrap'
+      : 'font-raleway font-normal text-[#FFE6DB] text-[1rem] whitespace-nowrap'">
+      {{ label() }}
+    </span>
   </div>
 </button>

@@ -6,7 +6,6 @@ import { LucideAngularModule, Pause, Play, SkipBack, SkipForward } from 'lucide-
   selector: 'app-progression-bar',
   imports: [LucideAngularModule],
   templateUrl: './progression-bar.html',
-  styleUrl: './progression-bar.scss',
 })
 export class ProgressionBar {
   protected readonly skipBack = SkipBack;
@@ -16,6 +15,8 @@ export class ProgressionBar {
 
   readonly isPlaying = signal<boolean>(false);
   readonly progress = signal<number>(35);
+  readonly songTitle = signal<string>('The Adults Are Talking');
+  readonly songBand = signal<string>('The Strokes');
 
   togglePlay(): void {
     this.isPlaying.update((v) => !v);
