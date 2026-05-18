@@ -1,0 +1,14 @@
+<div class="h-full bg-[#1F0E1C] rounded-[1.563rem] p-4 overflow-y-auto">
+    <button class="flex items-center gap-2 border-[#FFE6DB] border-2 rounded-full px-3 py-2">
+        <lucide-icon [img]="plus" class="w-[2rem] h-[2rem] text-[#FFE6DB]"></lucide-icon>
+        <span class="font-raleway font-semibold text-[#FFE6DB]">Create</span>
+    </button>
+    <div class="grid grid-cols-3 gap-2">
+        <app-heart-card></app-heart-card>
+        @for (i of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]; track i) {
+            <div class="w-[9rem] h-[9rem] aspect-square rounded-[0.625rem] overflow-hidden hover:border-[#FF5500] border-2 duration-300">
+                <img src="assets/cover1.png" alt="Playlist" class="w-full h-full object-cover" />
+            </div>
+        }
+    </div>
+</div>

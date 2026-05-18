@@ -4,14 +4,16 @@
   <div class="grid grid-cols-2 gap-x-5 gap-y-6">
 
     @for (artist of artists; track $index) {
-    <div class="flex items-center gap-2 w-full overflow-hidden self-center">
+    <button type="button" class="flex items-center gap-5 w-full overflow-hidden self-center bg-none border-none cursor-pointer">
       <img class="w-[5rem] h-[5rem] rounded-full object-cover shrink-0" [src]="artist.img" [alt]="artist.name" />
-      <div class="flex flex-col min-w-0 flex-1">
-        <span class="font-raleway font-bold text-[#FFE6DB] text-[0.9rem] truncate leading-tight">{{ artist.name }}</span>
-        <span class="font-raleway text-[#FFE6DB] text-[0.75rem] opacity-70 leading-tight whitespace-nowrap">{{ artist.minutes }} minutes listened</span>
+      <div class="flex items-center gap-3 flex-1 rounded-full px-3 py-2 transition-colors hover:bg-[#431E3A]">
+        <div class="flex flex-col min-w-0 flex-1 text-left">
+          <span class="font-raleway font-bold text-[#FFE6DB] text-[0.9rem] truncate leading-tight">{{ artist.name }}</span>
+          <span class="font-raleway text-[#FFE6DB] text-[0.75rem] opacity-70 leading-tight whitespace-nowrap">{{ artist.minutes }} minutes listened</span>
+        </div>
+        <lucide-icon [img]="chevronRight" class="w-[2rem] h-[2rem] shrink-0 text-[#FFE6DB] opacity-60"></lucide-icon>
       </div>
-      <lucide-icon [img]="chevronRight" class="w-[2rem] h-[2rem] shrink-0 text-[#FFE6DB] opacity-60"></lucide-icon>
-    </div>
+    </button>
     }
 
   </div>

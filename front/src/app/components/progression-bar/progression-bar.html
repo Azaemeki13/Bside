@@ -4,7 +4,7 @@
 			<button type="button" aria-label="Album cover" class="shrink-0 w-[3rem] h-[3rem] rounded-full overflow-hidden cursor-pointer">
 				<img src="assets/cover1.png" alt="" class="w-full h-full object-cover" />
 			</button>
-			<div class="flex flex-col justify-center min-w-0 max-w-[100px]">
+			<div class="flex flex-col justify-center max-w-[100px]">
 				<p class="font-Raleway text-sm font-semibold text-[#FFE6DB] truncate">{{ songTitle() }}</p>
 				<p class="font-Raleway text-xs font-normal text-[#FFE6DB] truncate">{{ songBand() }}</p>
 			</div>
@@ -20,7 +20,7 @@
 				<lucide-icon [img]="skipForward" class="w-[1.25rem] h-[1.25rem]"></lucide-icon>
 			</button>
 		</div>
-		<div class="relative flex-1 flex items-center min-w-0 h-6 group">
+		<div class="relative flex-1 flex items-center min-w-20 h-6 group">
 			<div class="absolute left-0 top-1/2 w-full -translate-y-1/2 h-[3px] rounded-full bg-[#FFE6DB]"></div>
 			<div
 				class="absolute left-0 top-1/2 -translate-y-1/2 h-1 rounded-full bg-[#FF5500] pointer-events-none"

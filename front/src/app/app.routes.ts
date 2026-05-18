@@ -7,6 +7,7 @@ import { BsideHome } from './bside_app/home/home';
 import { BsideLibrary } from './bside_app/library/library';
 import { BsideFavorites } from './bside_app/favorites/favorites';
 import { BsideSocial } from './bside_app/social/social';
+import { BsideSettings } from './bside_app/settings/settings';
 
 export const routes: Routes = [
     {path: '', component: LandingComponent },
@@ -21,6 +22,7 @@ export const routes: Routes = [
             { path: 'library', component: BsideLibrary },
             { path: 'favorites', component: BsideFavorites },
             { path: 'social', component: BsideSocial },
+            { path: 'settings', component: BsideSettings },
         ],
     },
 ];

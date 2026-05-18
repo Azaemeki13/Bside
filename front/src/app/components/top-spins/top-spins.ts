@@ -11,11 +11,11 @@ export class TopSpins {
   protected readonly chevronRight = ChevronRight;
 
   artists = [
-    { name: 'Daft Punk', minutes: '1,000', img: 'assets/cover1.png' },
-    { name: 'Daft Punk', minutes: '1,000', img: 'assets/cover1.png' },
-    { name: 'Sade', minutes: '1,000', img: 'assets/cover2.png' },
-    { name: 'Sade', minutes: '1,000', img: 'assets/cover2.png' },
-    { name: 'Electric Light...', minutes: '1,000', img: 'assets/cover3.png' },
-    { name: 'Electric Light...', minutes: '1,000', img: 'assets/cover3.png' },
+    { name: 'The Strokes', minutes: '1,000', img: 'assets/cover1.png' },
+    { name: 'The Strokes', minutes: '1,000', img: 'assets/cover1.png' },
+    { name: 'Her\'s', minutes: '1,000', img: 'assets/cover2.png' },
+    { name: 'Her\'s', minutes: '1,000', img: 'assets/cover2.png' },
+    { name: 'Radiohead', minutes: '1,000', img: 'assets/cover3.png' },
+    { name: 'Radiohead', minutes: '1,000', img: 'assets/cover3.png' },
   ];
 }
