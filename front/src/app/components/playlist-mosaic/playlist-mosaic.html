@@ -1,14 +1,65 @@
-<div class="h-full bg-[#1F0E1C] rounded-[1.563rem] p-4 overflow-y-auto">
-    <button class="flex items-center gap-2 border-[#FFE6DB] border-2 rounded-full px-3 py-2">
+<div class="h-full bg-[#1F0E1C] rounded-[1.563rem] flex flex-col">
+  <div class="bg-[#1F0E1C] p-4 rounded-t-[1.563rem] flex items-center justify-between h-[4.5rem]">
+    @if (!searchOpen) {
+      <button (click)="isCreateOpen = true" class="flex items-center gap-2 border-[#FFE6DB] border-2 rounded-full px-3 py-2 cursor-pointer">
         <lucide-icon [img]="plus" class="w-[2rem] h-[2rem] text-[#FFE6DB]"></lucide-icon>
         <span class="font-raleway font-semibold text-[#FFE6DB]">Create</span>
-    </button>
+      </button>
+      <button class="cursor-pointer" (click)="searchOpen = true">
+        <lucide-icon [img]="search" class="w-[2rem] h-[2rem] text-[#FFE6DB]"></lucide-icon>
+      </button>
+    } @else {
+      <div class="flex w-full items-center gap-3 rounded-full border-2 border-[#FFE6DB] bg-transparent px-4 py-3">
+        <lucide-icon [img]="search" class="w-5 h-5 text-[#FFE6DB] stroke-2"></lucide-icon>
+        <input type="text" placeholder="Search in your library" class="font-raleway font-bold flex-1 bg-transparent text-sm text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none">
+        <button (click)="searchOpen = false" class="cursor-pointer">
+          <lucide-icon [img]="x" class="w-5 h-5 text-[#FFE6DB]/70"></lucide-icon>
+        </button>
+      </div>
+    }
+  </div>
+  <div class="flex-1 overflow-y-auto p-4 pt-0">
     <div class="grid grid-cols-3 gap-2">
-        <app-heart-card></app-heart-card>
-        @for (i of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]; track i) {
-            <div class="w-[9rem] h-[9rem] aspect-square rounded-[0.625rem] overflow-hidden hover:border-[#FF5500] border-2 duration-300">
-                <img src="assets/cover1.png" alt="Playlist" class="w-full h-full object-cover" />
+      <app-heart-card></app-heart-card>
+        @for (playlist of playlistService.playlists(); track $index) {
+        <button (click)="selectPlaylist(playlist)" class="rounded-[0.625rem] border-2 border-transparent hover:border-[#FF5500] duration-300 cursor-pointer">
+            <div class="w-[9rem] h-[9rem] rounded-[calc(0.625rem-2px)] overflow-hidden">
+            @if (playlist.cover) {
+                <img [src]="playlist.cover" [alt]="playlist.name" class="w-full h-full object-cover" />
+            } @else {
+                <div class="w-full h-full bg-gradient-to-br from-[#FF5500] to-[#B90E4D] flex items-center justify-center">
+                <span class="font-raleway font-bold text-[#FFE6DB] text-xs text-center px-2">{{ playlist.name }}</span>
+                </div>
+            }
             </div>
+        </button>
         }
     </div>
+  </div>
 </div>
+
+@if (isCreateOpen) {
+  <div class="fixed inset-0 z-[1000] flex items-center justify-center p-5 bg-[#FFE6DB]/10 text-center backdrop-blur-sm glass-card" role="dialog" aria-modal="true" aria-label="Create playlist" (click)="closeCreateDialog()">
+    <div class="bg-[#1F0E1C] p-5 rounded-[3.125rem]" (click)="$event.stopPropagation()">
+      <div class="flex gap-4">
+        <button type="button" (click)="coverInput.click()" class="h-[15rem] w-[15rem] aspect-square bg-[#FFE6DB] rounded-[0.625rem] shrink-0 overflow-hidden relative group cursor-pointer">
+          @if (coverPreview) {
+            <img [src]="coverPreview" alt="Cover preview" class="w-full h-full object-cover" />
+          } @else {
+            <div class="flex flex-col items-center justify-center h-full gap-2 text-[#1F0E1C]">
+              <lucide-icon [img]="imagePlus" class="w-8 h-8"></lucide-icon>
+              <span class="font-raleway font-semibold text-sm">Add cover</span>
+            </div>
+          }
+        </button>
+        <input #coverInput type="file" accept="image/*" class="hidden" (change)="onCoverSelected($event)" />
+
+        <div class="flex flex-col gap-4 justify-center">
+          <input type="text" [(ngModel)]="playlistName" placeholder="Playlist name" class="font-raleway font-bold text-sm text-[#1F0E1C] bg-[#FFE6DB] rounded-[0.625rem] px-4 py-3 focus:outline-none">
+          <input type="text" [(ngModel)]="playlistDescription" placeholder="Playlist description" class="font-raleway font-bold text-sm text-[#1F0E1C] bg-[#FFE6DB] rounded-[0.625rem] px-4 py-3 focus:outline-none">
+          <button type="button" class="cursor-pointer rounded-full px-4 py-2 font-raleway text-[1rem] font-medium bg-[#FF5500] text-[#FFE6DB] disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="!playlistName.trim()" (click)="confirmCreate()">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

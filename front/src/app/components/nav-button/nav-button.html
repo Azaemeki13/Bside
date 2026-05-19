@@ -1,4 +1,4 @@
-<ng-container *ngIf="link; else buttonTemplate">
+@if (link) {
   <a
     [href]="isExternal ? link : null"
     [routerLink]="!isExternal ? link : null"
@@ -8,9 +8,7 @@
   >
     {{ label }}
   </a>
-</ng-container>
-
-<ng-template #buttonTemplate>
+} @else {
   <button
     [attr.type]="type"
     class="inline-block cursor-pointer rounded-full px-6 py-2 font-raleway"
@@ -18,4 +16,4 @@
   >
     {{ label }}
   </button>
-</ng-template>
+}

@@ -7,7 +7,9 @@
     <img src="/assets/vinyl.png" alt="Vinyl" class="absolute inset-0 w-full h-full">
 
     <div class="absolute inset-0 flex items-center justify-center pointer-events-none [animation:spin_10s_linear_infinite]">
-      <img *ngIf="label()" [src]="label()" alt="Center label" class="w-1/4 aspect-square object-contain">
+      @if (label()) {
+        <img [src]="label()" alt="Center label" class="w-1/4 aspect-square object-contain">
+      }
     </div>
   </div>
 </div>

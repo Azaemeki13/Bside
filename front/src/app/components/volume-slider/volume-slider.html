@@ -1,7 +1,10 @@
 <div class="flex items-center gap-3 w-full min-w-0">
   <button (click)="volumeService.toggleMute()" class="text-[#FFE6DB]">
-    <lucide-icon *ngIf="!volumeService.muted()" [img]="volume2" class="w-[1rem] h-[1rem]"></lucide-icon>
-    <lucide-icon *ngIf="volumeService.muted()" [img]="volumeX" class="w-[1rem] h-[1rem]"></lucide-icon>
+    @if (!volumeService.muted()) {
+      <lucide-icon [img]="volume2" class="w-[1rem] h-[1rem]"></lucide-icon>
+    } @else {
+      <lucide-icon [img]="volumeX" class="w-[1rem] h-[1rem]"></lucide-icon>
+    }
   </button>
   <div class="relative flex items-center w-full min-w-0 h-6 group">
     <div class="absolute left-0 top-1/2 w-full -translate-y-1/2 h-[3px] rounded-full bg-[#FFE6DB]"></div>
