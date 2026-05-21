@@ -50,19 +50,47 @@ import { AudioPlayerService } from '../../services/audio.player.service';
     protected readonly play = Play;
     protected readonly pause = Pause;
 
-    readonly songTitle = signal<string>('Local Test Track');
-    readonly songBand = signal<string>('Howler.js');
+    readonly songTitle = signal<string>('Test WAV Upload');
+    readonly songBand = signal<string>('Curl Test Artist');
 
     private hasLoadedTestTrack = false;
+    private readonly testSongId = 'ea04d576-61ce-4961-9269-efe3ba01e45e';
 
-    togglePlay(): void {
+    async togglePlay(): Promise<void> {
       if (!this.hasLoadedTestTrack) {
+        // old version:
+        // this.audio.load({
+        //   id: 'local-test',
+        //   title: 'Local Test Track',
+        //   artist: 'Howler.js',
+        //   src: 'assets/test.mp3',
+        //   format: 'mp3',
+        // });
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          this.audio.error.set('Missing authentication token.');
+          return;
+        }
+
+        const res = await fetch(`http://localhost:8080/songs/${this.testSongId}/stream-url`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          this.audio.error.set(`Stream URL request failed: ${res.status}`);
+          return;
+        }
+
+        const data = await res.json() as { url: string };
+
         this.audio.load({
-          id: 'local-test',
-          title: 'Local Test Track',
-          artist: 'Howler.js',
-          src: 'assets/test.mp3',
-          format: 'mp3',
+          id: this.testSongId,
+          title: 'Test WAV Upload',
+          artist: 'Curl Test Artist',
+          src: data.url,
+          format: 'wav',
         });
 
         this.hasLoadedTestTrack = true;

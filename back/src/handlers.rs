@@ -90,6 +90,7 @@ pub async fn register_handler(
         )
         .execute(&mut *tx)
         .await?;
+    tx.commit().await?;
     Ok(Json(new_user))
 }
 
@@ -183,9 +184,12 @@ pub async fn create_user_handler(
 )]
 pub async fn create_artist_handler(
     State(state): State<AppState>,
-    Extension(current_user_id): Extension<Uuid>,
+    // old version:
+    // Extension(current_user_id): Extension<Uuid>,
+    claims: Claims,
     mut multipart: Multipart,
 ) -> Result<Json<ArtistResponse>, BSideError> {
+    let current_user_id = claims.sub;
     let mut name: Option<String> = None;
     let mut bio: Option<String> = None;
     let mut photo_url = "http://minio:9000/bside-covers/default_artist.png".to_string();
@@ -359,9 +363,12 @@ pub async fn get_user_by_id_handler(
 )]
 pub async fn create_album_handler(
     State(state): State<AppState>,
-    Extension(current_user_id): Extension<uuid::Uuid>,
+    // old version:
+    // Extension(current_user_id): Extension<uuid::Uuid>,
+    claims: Claims,
     mut multipart: Multipart,
 ) -> Result<Json<AlbumResponse>, BSideError> {
+    let current_user_id = claims.sub;
     let artist_record = sqlx::query!("SELECT id FROM artists WHERE user_id = $1", current_user_id)
         .fetch_optional(&state.db)
         .await?;
@@ -581,8 +588,21 @@ pub async fn create_song_handler(
     if !matches!(payload.format.as_str(), "wav" | "flac") {
         return Err(BSideError::InvalidFormat);
     }
+    // old version:
+    // let is_owner = sqlx::query_scalar!(
+    //     "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND artist_id = $2)",
+    //     payload.album_id,
+    //     claims.sub
+    // )
     let is_owner = sqlx::query_scalar!(
-        "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND artist_id = $2)",
+        r#"
+        SELECT EXISTS(
+            SELECT 1
+            FROM albums a
+            JOIN artists ar ON ar.id = a.artist_id
+            WHERE a.id = $1 AND ar.user_id = $2
+        )
+        "#,
         payload.album_id,
         claims.sub
     )
@@ -649,8 +669,21 @@ pub async fn verify_song_handler(
     )
     .fetch_one(&state.db)
     .await?;
+    // old version:
+    // let is_owner = sqlx::query_scalar!(
+    //     "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND artist_id = $2)",
+    //     song.album_id,
+    //     claims.sub
+    // )
     let is_owner = sqlx::query_scalar!(
-        "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND artist_id = $2)",
+        r#"
+        SELECT EXISTS(
+            SELECT 1
+            FROM albums a
+            JOIN artists ar ON ar.id = a.artist_id
+            WHERE a.id = $1 AND ar.user_id = $2
+        )
+        "#,
         song.album_id,
         claims.sub
     )
@@ -715,6 +748,57 @@ pub async fn verify_song_handler(
     .execute(&state.db)
     .await?;
     Ok(axum::Json(serde_json::json!({"status": "verified"})))
+}
+
+pub async fn get_song_stream_url_handler(
+    State(state): State<AppState>,
+    _claims: Claims,
+    Path(song_id): Path<Uuid>,
+) -> Result<Json<serde_json::Value>, BSideError> {
+    // old version:
+    // let song = sqlx::query!(
+    //     r#"
+    //     SELECT s.audio_url, s.status::text as "status!"
+    //     FROM songs s
+    //     JOIN albums a ON s.album_id = a.id
+    //     JOIN artists ar ON ar.id = a.artist_id
+    //     WHERE s.id = $1 AND ar.user_id = $2
+    //     "#,
+    //     song_id,
+    //     claims.sub
+    // )
+    let song = sqlx::query!(
+        r#"
+        SELECT audio_url, status::text as "status!"
+        FROM songs
+        WHERE id = $1
+        "#,
+        song_id
+    )
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::NotFound)?;
+
+    if song.status != "Ready" {
+        return Err(BSideError::SongNotReady);
+    }
+
+    let expires_in = PresigningConfig::expires_in(Duration::from_secs(300))
+        .map_err(|e| BSideError::S3Error(format!("Presigning config failure: {e}")))?;
+
+    let presigned_request = state
+        .aws_client
+        .get_object()
+        .bucket("bside-tracks")
+        .key(&song.audio_url)
+        .presigned(expires_in)
+        .await
+        .map_err(|e| BSideError::S3Error(format!("Presigning request failure: {e}")))?;
+
+    Ok(Json(serde_json::json!({
+        "url": presigned_request.uri().to_string(),
+        "expires_in": 300
+    })))
 }
 
 #[utoipa::path(
@@ -1254,6 +1338,8 @@ pub async fn google_callback_handler(
     let jwt = crate::auth::create_jwt(user_id)?;
     let frontend_url = std::env::var("FRONTEND_URL")
         .unwrap_or_else(|_| "http://localhost:4200".to_string());
-    let redirect_url = format!("{frontend_url}/bside_app?token={jwt}");
+    // old version:
+    // let redirect_url = format!("{frontend_url}/bside_app?token={jwt}");
+    let redirect_url = format!("{frontend_url}/login?token={jwt}");
     Ok(Redirect::to(&redirect_url))
 }

@@ -55,8 +55,7 @@
   			<button type="button" aria-label="Track back" class="text-[#FFE6DB] cursor-pointer">
   				<lucide-icon [img]="skipBack" class="w-[1.25rem] h-[1.25rem]"></lucide-icon>
   			</button>
-  			<button type="button" [attr.aria-label]="audio.isPlaying() ? 'Pause' : 'Play'" (click)="togglePlay()" class="text-[#FFE6DB] cursor-pointer rounded-full bg-[
-#FF5500] p-2">
+  			<button type="button" [attr.aria-label]="audio.isPlaying() ? 'Pause' : 'Play'" (click)="togglePlay()" class="text-[#FFE6DB] cursor-pointer rounded-full bg-[#FF5500] p-2">
   				<lucide-icon [img]="audio.isPlaying() ? pause : play" class="w-[1.75rem] h-[1.75rem] fill-current"></lucide-icon>
   			</button>
   			<button type="button" aria-label="Track next" class="text-[#FFE6DB] cursor-pointer">
@@ -79,4 +78,7 @@
   			/>
   		</div>
   	</div>
+  	@if (audio.error()) {
+  		<p class="mt-2 px-4 text-xs text-[#FFE6DB]/80">{{ audio.error() }}</p>
+  	}
 </div>
