@@ -10,6 +10,7 @@ import { VolumeService } from '../../services/volume.service';
   templateUrl: './sound-bar.html',
   styleUrl: './sound-bar.scss',
 })
+
 export class SoundBar {
-  protected readonly volumeService = inject(VolumeService);
+    protected readonly volumeService = inject(VolumeService);
 }
