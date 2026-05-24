@@ -97,12 +97,12 @@ export class AudioPlayerService {
                 this.position.set(0);
             },
 
-            onloaderror: (_id, error) => {
+            onloaderror: (_id: number, error: unknown) => {
                 this.isLoading.set(false);
                 this.error.set(String(error));
             },
 
-            onplayerror: (_id, error) => {
+            onplayerror: (_id: number, error: unknown) => {
                 this.isPlaying.set(false);
                 this.error.set(String(error));
             },

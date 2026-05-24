@@ -41,7 +41,9 @@ impl IntoResponse for BSideError {
         let (status, error_message) = match self {
             Self::InvalidFormat | Self::SongNotReady => (StatusCode::BAD_REQUEST, self.to_string()),
             Self::BadRequest(ref msg) => (StatusCode::BAD_REQUEST, msg.clone()),
-            Self::InternalServerError(ref _msg) => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
+            Self::InternalServerError(ref _msg) => {
+                (StatusCode::INTERNAL_SERVER_ERROR, self.to_string())
+            }
             Self::Conflict(ref msg) => (StatusCode::CONFLICT, msg.clone()),
             Self::AuthError(ref msg) => (StatusCode::UNAUTHORIZED, msg.clone()),
             Self::UnauthorizedProfile => (StatusCode::FORBIDDEN, self.to_string()),

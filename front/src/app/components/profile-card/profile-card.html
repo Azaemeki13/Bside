@@ -1,7 +1,12 @@
 <div class="relative inline-flex">
     <button type="button" class="flex items-center gap-1 rounded-full bg-[#431E3A] px-1 py-1 cursor-pointer shrink-0" [attr.aria-expanded]="isMenuOpen" aria-haspopup="menu" (click)="toggleMenu()">
         <lucide-icon [img]="chevronDown" class="h-[2rem] w-[2rem] shrink-0 text-[#FFE6DB] transition-transform duration-200" [class.rotate-180]="isMenuOpen"></lucide-icon>
-        <img class="h-[3.125rem] w-[3.125rem] rounded-full object-cover" src="https://upload.wikimedia.org/wikipedia/en/thumb/0/0a/Leon_Kennedy_%28Resident_Evil_Requiem%29.jpg/250px-Leon_Kennedy_%28Resident_Evil_Requiem%29.jpg" alt="Profile picture"/>
+            <img 
+                class="h-[3.125rem] w-[3.125rem] rounded-full object-cover" 
+                [src]="avatarUrl()" 
+                alt="Profile picture"
+                referrerpolicy="no-referrer" 
+            />
     </button>
     @if (isMenuOpen) {
         <div class="absolute right-0 top-[calc(100%+0.75rem)] z-20 grid w-56 gap-1 rounded-[1.5rem] bg-[#431E3A] p-2">

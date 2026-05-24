@@ -1,9 +1,9 @@
 use std::collections::HashMap;
-use std::sync::{Arc};
-use tokio::sync::{mpsc, Mutex};
+use std::sync::Arc;
+use tokio::sync::{Mutex, mpsc};
 use uuid::Uuid;
 
-pub type WsSender = mpsc :: UnboundedSender<String>;
+pub type WsSender = mpsc::UnboundedSender<String>;
 
 pub type OnlineUsers = Arc<Mutex<HashMap<Uuid, WsSender>>>;
 
@@ -16,6 +16,6 @@ impl NetworkState {
     pub fn new() -> Self {
         Self {
             online_users: Arc::new(Mutex::new(HashMap::new())),
-    }
+        }
     }
 }

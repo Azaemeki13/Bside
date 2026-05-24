@@ -6,30 +6,31 @@ mod auth;
 mod error;
 mod handlers;
 mod models;
+mod network;
 mod search;
 mod swagger;
-mod network;
 mod ws;
 
 use crate::auth::{Claims, auth_gate};
 use crate::error::BSideError;
 use crate::handlers::{
-    add_song_to_playlist_handler, create_album_handler, create_artist_handler,
-    create_playlist_handler, create_song_handler, create_user_handler, delete_album_handler,
-    delete_playlist_handler, delete_song_handler, flush_deleted_albums_task,
+    add_song_to_playlist_handler, classic_auth_handler, create_album_handler,
+    create_artist_handler, create_playlist_handler, create_song_handler, create_user_handler,
+    delete_album_handler, delete_playlist_handler, delete_song_handler, flush_deleted_albums_task,
     flush_deleted_songs_task, get_all_users_handler, get_me_handler, get_playlist_by_id_handler,
-    get_song_stream_url_handler, get_user_by_id_handler, google_callback_handler, google_login_handler,
-    google_signup_handler, ping_handler, remove_song_from_pl, update_playlist_handler,
-    verify_song_handler, register_handler, classic_auth_handler,
+    get_song_stream_url_handler, get_user_by_id_handler, google_callback_handler,
+    google_login_handler, google_signup_handler, ping_handler, register_handler,
+    remove_song_from_pl, update_playlist_handler, upload_avatar, verify_song_handler,
 };
 use crate::models::{
-    AddSongResponse, AlbumResponse, AppState, ArtistResponse, AuthRequest, GoogleUserProfile,
-    Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RawSearchResult,
-    SearchResult, Song, SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
-    RegisterPayload, LoginPayload, AuthResponse
+    AddSongResponse, AlbumResponse, AppState, ArtistResponse, AuthRequest, AuthResponse,
+    GoogleUserProfile, LoginPayload, Playlist, PlaylistDetailedResponse, PlaylistPayload,
+    PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, Song, SongPayload,
+    SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use crate::search::searcher;
 
+use crate::ws::ws_handler;
 use axum::{
     Router,
     extract::State,
@@ -37,15 +38,15 @@ use axum::{
     middleware::from_fn_with_state,
     routing::{delete, get, post, put},
 };
-use utoipa_swagger_ui::SwaggerUi;
-use utoipa::OpenApi;
 use oauth2::{AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl, basic::BasicClient};
+use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, HeaderValue};
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 use std::sync::Arc;
 use std::time::Duration;
-use tower_http::cors::{Any, CorsLayer};
-use crate::ws::ws_handler;
+use tower_http::cors::CorsLayer;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
 #[tokio::main]
 async fn main() {
@@ -103,9 +104,13 @@ async fn main() {
         }
     });
     let cors = CorsLayer::new()
-        .allow_origin(Any) // to replace w/ frontend URL
+        .allow_origin(
+            "http://localhost:4200"
+                .parse::<HeaderValue>()
+                .expect("CORS error for origin."),
+        )
         .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
-        .allow_headers(Any);
+        .allow_headers([AUTHORIZATION, ACCEPT, CONTENT_TYPE]);
 
     let public_routes = Router::<AppState>::new()
         .route("/auth/google/login", get(google_login_handler))
@@ -123,12 +128,16 @@ async fn main() {
             post(create_user_handler).get(get_all_users_handler),
         )
         .route("/users/me", get(get_me_handler))
+        .route("/users/me/avatar", post(upload_avatar))
         .route("/artists", post(create_artist_handler))
         .route("/albums", post(create_album_handler))
         .route("/albums/{album_id}", delete(delete_album_handler))
         .route("/songs", post(create_song_handler))
         .route("/songs/{song_id}/verify", put(verify_song_handler))
-        .route("/songs/{song_id}/stream-url", get(get_song_stream_url_handler))
+        .route(
+            "/songs/{song_id}/stream-url",
+            get(get_song_stream_url_handler),
+        )
         .route("/songs/{id}", delete(delete_song_handler))
         .route("/playlists", post(create_playlist_handler))
         .route(
@@ -149,7 +158,9 @@ async fn main() {
         .merge(protected_routes)
         .layer(cors)
         .with_state(state)
-        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", swagger::ApiDoc::openapi()));
+        .merge(
+            SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", swagger::ApiDoc::openapi()),
+        );
 
     let listener_addr = "0.0.0.0:8080";
     println!("B-Side engine starting on http://{listener_addr}");

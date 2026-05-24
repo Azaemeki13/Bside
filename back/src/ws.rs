@@ -1,11 +1,17 @@
 use crate::models::AppState;
-use axum::{extract::{State, ws::{WebSocket, WebSocketUpgrade}, }, response::IntoResponse, };
 use axum::extract::Query;
 use axum::extract::ws::Message;
-use serde::Deserialize;
+use axum::{
+    extract::{
+        State,
+        ws::{WebSocket, WebSocketUpgrade},
+    },
+    response::IntoResponse,
+};
 use futures_util::{SinkExt, StreamExt};
+use serde::Deserialize;
+use tokio::sync::mpsc;
 use uuid::Uuid;
-use tokio::sync::{mpsc};
 
 //SinkExt-> sender.send(Message::Text(...)).await
 //StreamExt-> receiver.next().await
@@ -20,9 +26,13 @@ pub struct WsConnectQuery {
     pub user_id: Uuid,
 }
 
-pub async fn ws_handler(ws: WebSocketUpgrade, State(state): State<AppState>, Query(query): Query<WsConnectQuery>) -> impl IntoResponse {
+pub async fn ws_handler(
+    ws: WebSocketUpgrade,
+    State(state): State<AppState>,
+    Query(query): Query<WsConnectQuery>,
+) -> impl IntoResponse {
     //(move | socket | handle_socket(socket, state)-> Une fois le socket obtenu, appelez handle_socket(socket, state).
-    ws.on_upgrade(move | socket | handle_socket(socket, state, query.user_id))
+    ws.on_upgrade(move |socket| handle_socket(socket, state, query.user_id))
 }
 
 async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
@@ -48,13 +58,9 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
     //on the same time, still listen if have new messages
     let mut receive_task = tokio::spawn(async move {
         while let Some(Ok(message)) = receiver.next().await {
-            match message {
-                //check if user is offline, if yes in the future, message will save in DB
-                Message::Close(_) => {
-                    println!("WebSocket closed by user: {user_id}");
-                    break;
-                }
-                _ => {}
+            if let Message::Close(_) = message {
+                println!("WebSocket closed by user: {user_id}");
+                break;
             }
         }
     });

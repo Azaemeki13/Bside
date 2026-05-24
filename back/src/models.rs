@@ -1,13 +1,14 @@
+use crate::network::NetworkState;
 use oauth2::{EndpointNotSet, EndpointSet, basic::BasicClient};
 use secrecy::SecretString;
 use std::sync::Arc;
-use crate::network::NetworkState;
 
 #[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
 pub struct User {
     pub id: uuid::Uuid,
     pub username: String,
     pub email: String,
+    pub avatar_url: Option<String>,
     pub role: String,
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
@@ -25,7 +26,9 @@ pub struct ArtistResponse {
     pub name: String,
     #[schema(example = "He loved kids")]
     pub bio: Option<String>,
-    #[schema(example = "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fopen.spotify.com%2Fintl-fr%2Fartist%2F3fMbdgg4jU18AjLCKBhRSm&ved=0CBYQjRxqFwoTCPDimtCqsZQDFQAAAAAdAAAAABAG&opi=89978449")]
+    #[schema(
+        example = "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fopen.spotify.com%2Fintl-fr%2Fartist%2F3fMbdgg4jU18AjLCKBhRSm&ved=0CBYQjRxqFwoTCPDimtCqsZQDFQAAAAAdAAAAABAG&opi=89978449"
+    )]
     pub photo_url: String,
     #[schema(example = "Available")]
     pub status: String,

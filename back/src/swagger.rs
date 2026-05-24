@@ -1,10 +1,9 @@
-use utoipa::OpenApi;
 use crate::models::{
-    User, UserPayload, Song, SongPayload, SongResponse, AddSongResponse,
-    Playlist, UpdateStructurePayload, PlaylistDetailedResponse, PlaylistSongItem,
-    AlbumResponse, ArtistResponse, PlaylistPayload, AuthResponse,
-    RegisterPayload, LoginPayload, RawSearchResult, SearchResult,
+    AddSongResponse, AlbumResponse, ArtistResponse, AuthResponse, LoginPayload, Playlist,
+    PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RawSearchResult, RegisterPayload,
+    SearchResult, Song, SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
 };
+use utoipa::OpenApi;
 
 #[derive(OpenApi)]
 #[openapi(

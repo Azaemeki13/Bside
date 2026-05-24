@@ -1,9 +1,14 @@
-use crate::{
-    AddSongResponse, AlbumResponse, AppState, ArtistResponse, AuthRequest, BSideError, Claims,
-    GoogleUserProfile, Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, Song,
-    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload, RegisterPayload, LoginPayload, AuthResponse,
-};
 use crate::auth::create_jwt;
+use crate::{
+    AddSongResponse, AlbumResponse, AppState, ArtistResponse, AuthRequest, AuthResponse,
+    BSideError, Claims, GoogleUserProfile, LoginPayload, Playlist, PlaylistDetailedResponse,
+    PlaylistPayload, PlaylistSongItem, RegisterPayload, Song, SongPayload, SongResponse,
+    UpdateStructurePayload, User, UserPayload,
+};
+use argon2::{
+    Argon2, PasswordHash, PasswordVerifier,
+    password_hash::{PasswordHasher, SaltString, rand_core::OsRng},
+};
 use aws_sdk_s3::presigning::PresigningConfig;
 use axum::{
     Json,
@@ -11,13 +16,10 @@ use axum::{
     response::{IntoResponse, Redirect},
 };
 use oauth2::{AuthorizationCode, CsrfToken, Scope, TokenResponse};
+use reqwest::StatusCode;
+use secrecy::ExposeSecret;
 use std::time::Duration;
 use uuid::Uuid;
-use argon2::{
-    password_hash::{rand_core::OsRng, PasswordHasher, SaltString},
-    Argon2, PasswordHash, PasswordVerifier,
-};
-use secrecy::ExposeSecret;
 
 #[utoipa::path(
     get,
@@ -47,27 +49,32 @@ pub async fn register_handler(
     State(state): State<AppState>,
     Json(payload): Json<RegisterPayload>,
 ) -> Result<Json<User>, BSideError> {
-    let exists: Option<bool> = Some(sqlx::query_scalar!(
-        "SELECT EXISTS (SELECT 1  FROM users WHERE email = $1 OR username = $2)",
-        payload.email,
-        payload.username
+    let exists: Option<bool> = Some(
+        sqlx::query_scalar!(
+            "SELECT EXISTS (SELECT 1  FROM users WHERE email = $1 OR username = $2)",
+            payload.email,
+            payload.username
         )
         .fetch_one(&state.db)
         .await?
-        .unwrap_or(false));
+        .unwrap_or(false),
+    );
     if exists.expect("Already existent.") {
-        return Err(BSideError::BadRequest("Username or email already taken.".into()));
+        return Err(BSideError::BadRequest(
+            "Username or email already taken.".into(),
+        ));
     }
     let password = payload.password.expose_secret().to_string();
-    let password_hash  = tokio::task::spawn_blocking(move || -> Result<String, BSideError> {
+    let password_hash = tokio::task::spawn_blocking(move || -> Result<String, BSideError> {
         let salt = SaltString::generate(&mut OsRng);
         let argon2 = Argon2::default();
-        argon2.hash_password(password.as_bytes(), &salt)
-            .map (|hash| hash.to_string())
+        argon2
+            .hash_password(password.as_bytes(), &salt)
+            .map(|hash| hash.to_string())
             .map_err(|e| BSideError::InternalServerError(e.to_string()))
     })
-        .await
-        .map_err(|_| BSideError::InternalServerError("Thread panicked.".into()))??;
+    .await
+    .map_err(|_| BSideError::InternalServerError("Thread panicked.".into()))??;
     let user_id = Uuid::new_v4();
     let mut tx = state.db.begin().await?;
     let new_user = sqlx::query_as!(
@@ -75,23 +82,130 @@ pub async fn register_handler(
         r#"
         INSERT INTO users (id, username, email, role)
         VALUES($1, $2, $3, 'User')
-        RETURNING id, username, email, role, created_at as "created_at!"
+        RETURNING id, username, email, role, created_at as "created_at!", avatar_url
         "#,
         user_id,
         payload.username,
         payload.email
-        )
-        .fetch_one(&mut *tx)
-        .await?;
+    )
+    .fetch_one(&mut *tx)
+    .await?;
     sqlx::query!(
         "INSERT INTO local_credentials (user_id, password_hash) VALUES ($1, $2)",
         user_id,
         password_hash
-        )
-        .execute(&mut *tx)
-        .await?;
+    )
+    .execute(&mut *tx)
+    .await?;
     tx.commit().await?;
     Ok(Json(new_user))
+}
+
+#[derive(utoipa::ToSchema)]
+pub struct AvatarUploadSchema {
+    /// The avatar image file (Must be PNG or JPEG, Max 15MB)
+    #[schema(value_type = String, format = Binary)]
+    pub avatar: Vec<u8>,
+}
+#[utoipa::path(
+    post,
+    path = "/users/me/avatar",
+    request_body(
+        content = AvatarUploadSchema,
+        content_type = "multipart/form-data",
+        description = "User avatar image upload"
+    ),
+    responses(
+        (status = 200, description = "Avatar uploaded successfully", body = inline(serde_json::Value)),
+        (status = 400, description = "Bad Request - Wrong format, size, or missing file"),
+        (status = 401, description = "Unauthorized - Missing or invalid token"),
+        (status = 500, description = "Internal Server Error - Database or S3 failure")
+    ),
+    security(
+        ("bearer_auth" = [])
+    ),
+    tags = ["Authentication"]
+)]
+#[axum::debug_handler]
+pub async fn upload_avatar(
+    State(state): State<AppState>,
+    Extension(claims): Extension<Claims>,
+    mut multipart: Multipart,
+) -> Result<impl IntoResponse, BSideError> {
+    let mut avatar_url: Option<String> = None;
+    while let Some(field) = multipart
+        .next_field()
+        .await
+        .map_err(|e| BSideError::BadRequest(e.to_string()))?
+    {
+        let field_name = field.name().unwrap_or("").to_string();
+        let file_id = Uuid::new_v4();
+        if field_name.as_str() == "avatar" {
+            let content_type = field
+                .content_type()
+                .expect("Content-type empty !")
+                .to_string();
+            let data = field
+                .bytes()
+                .await
+                .map_err(|e| BSideError::BadRequest(e.to_string()))?;
+            if data.len() > 15 * 1024 * 1024 || data.len() < 8 {
+                return Err(BSideError::BadRequest("Wronge size!".into()));
+            }
+            let key: String;
+            let ctype: String;
+            let mime = content_type;
+            if mime == "image/png" {
+                let png_header = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+                if data[0..8] != png_header {
+                    return Err(BSideError::BadRequest("Incorrect format !".into()));
+                }
+                key = format!("{file_id}.png");
+                ctype = mime;
+            } else if mime == "image/jpeg" {
+                let jpg_header = [0xFF, 0xD8, 0xFF];
+                if data[0..3] != jpg_header {
+                    return Err(BSideError::BadRequest("Incorrect format !".into()));
+                }
+                key = format!("{file_id}.jpg");
+                ctype = mime;
+            } else {
+                return Err(BSideError::BadRequest(
+                    "Must be PNG or JPEG format !".into(),
+                ));
+            }
+            let avatar_bytes = data.to_vec();
+            state
+                .aws_client
+                .put_object()
+                .bucket("bside-avatars")
+                .key(&key)
+                .body(avatar_bytes.into())
+                .content_type(ctype)
+                .send()
+                .await
+                .map_err(|e| BSideError::S3Error(e.to_string()))?;
+            avatar_url = Some(format!("http://localhost:9000/bside-avatars/{key}"));
+        }
+    }
+    let result = sqlx::query!(
+        r#"
+        UPDATE users
+        SET avatar_url = $2 WHERE id = $1
+        "#,
+        claims.sub,
+        avatar_url
+    )
+    .execute(&state.db)
+    .await
+    .map_err(|e| BSideError::InternalServerError(e.to_string()))?;
+    if result.rows_affected() == 0 {
+        return Err(BSideError::NotFound);
+    }
+    Ok((
+        StatusCode::OK,
+        Json(serde_json::json!({ "avatar_url": avatar_url})),
+    ))
 }
 
 #[utoipa::path(
@@ -112,7 +226,7 @@ pub async fn classic_auth_handler(
     let password = payload.password.expose_secret().to_string();
     let user = sqlx::query!(
         r#"
-        SELECT id, username, email, role, created_at as "created_at!", c.password_hash FROM users u INNER JOIN local_credentials c ON u.id = c.user_id WHERE u.username = $1 OR u.email=$1"#,
+        SELECT id, username, email, role, created_at as "created_at!", avatar_url, c.password_hash FROM users u INNER JOIN local_credentials c ON u.id = c.user_id WHERE u.username = $1 OR u.email=$1"#,
         payload.identifier,
         )
         .fetch_optional(&state.db)
@@ -123,24 +237,23 @@ pub async fn classic_auth_handler(
         let pw_hash = PasswordHash::new(&saved_hash_string)
             .map_err(|_| BSideError::InternalServerError("Hash Parsing has failed.".into()))?;
         let verif = Argon2::default;
-        verif().verify_password(password.as_bytes(), &pw_hash)
+        verif()
+            .verify_password(password.as_bytes(), &pw_hash)
             .map_err(|_| BSideError::InternalServerError("ID error, please retry.".into()))
-        })
-        .await
-        .map_err(|_| BSideError::InternalServerError("Thread panicked.".into()))??;
+    })
+    .await
+    .map_err(|_| BSideError::InternalServerError("Thread panicked.".into()))??;
     let token = create_jwt(user.id)?;
     let user = User {
         id: user.id,
         username: user.username,
         email: user.email,
         role: user.role,
+        avatar_url: user.avatar_url,
         created_at: user.created_at,
     };
 
-    Ok(Json(AuthResponse {
-        user,
-        token,
-    })) 
+    Ok(Json(AuthResponse { user, token }))
 }
 
 #[utoipa::path(
@@ -291,7 +404,7 @@ pub async fn get_me_handler(
 ) -> Result<Json<User>, BSideError> {
     let result = sqlx::query_as!(
         User,
-        r#"SELECT id, username, email, role, created_at as "created_at!" FROM users WHERE id = $1"#,
+        r#"SELECT id, username, email, role, created_at as "created_at!", avatar_url FROM users WHERE id = $1"#,
         claims.sub
     )
     .fetch_optional(&state.db)
@@ -1321,23 +1434,32 @@ pub async fn google_callback_handler(
         .fetch_optional(&state.db)
         .await?;
     let user_id = if let Some(record) = existing_user {
+        sqlx::query!(
+            "UPDATE users SET avatar_url = $1, username = $2 WHERE id = $3",
+            profile.picture,
+            profile.name,
+            record.id
+        )
+        .execute(&state.db)
+        .await?;
         record.id
     } else {
         println!("New use, inserting into database...");
         let new_id = uuid::Uuid::new_v4();
         sqlx::query!(
-            "INSERT into users (id, email, username) VALUES ($1, $2, $3)",
+            "INSERT into users (id, email, username, avatar_url) VALUES ($1, $2, $3, $4)",
             new_id,
             profile.email,
-            profile.name
+            profile.name,
+            profile.picture
         )
         .execute(&state.db)
         .await?;
         new_id
     };
     let jwt = crate::auth::create_jwt(user_id)?;
-    let frontend_url = std::env::var("FRONTEND_URL")
-        .unwrap_or_else(|_| "http://localhost:4200".to_string());
+    let frontend_url =
+        std::env::var("FRONTEND_URL").unwrap_or_else(|_| "http://localhost:4200".to_string());
     // old version:
     // let redirect_url = format!("{frontend_url}/bside_app?token={jwt}");
     let redirect_url = format!("{frontend_url}/login?token={jwt}");
