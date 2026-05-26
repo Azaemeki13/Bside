@@ -1,11 +1,12 @@
 <nav class="flex items-center justify-between py-6 pl-0 pr-6 bg-[#0C060C]">
   @if (showGreeting) {
-    <h1 class="font-climate-crisis text-[3rem] text-[#FFE6DB] text-nowrap">Hi, {{ authService.currentUser()?.username }} </h1>
+    <!-- <h1 class="font-climate-crisis text-[3rem] text-[#FFE6DB] text-nowrap">Hi, {{ authService.currentUser()?.username }} </h1> -->
+	<h1 class="font-climate-crisis text-[3rem] text-[#FFE6DB] text-nowrap">Hi, {{ user?.username }} </h1>
   } @else {
     <div class="text-[3rem]">&nbsp;</div>
   }
   <div class="flex items-center gap-4">
     <app-search-bar></app-search-bar>
-    <app-profile-card></app-profile-card>
+    <app-profile-card [user]="user"></app-profile-card>
   </div>
 </nav>
