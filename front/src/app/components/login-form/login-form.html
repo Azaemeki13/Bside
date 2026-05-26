@@ -23,7 +23,7 @@
         {{ errorMessage }}
     </div>
 
-    <button type="submit" [disabled]="loginForm.invalid || isLoading" class="w-[24rem] rounded-full bg-[#FF5500] py-3 font-raleway font-bold text-white transition-all hover:bg-[#FF5500]/80 disabled:cursor-not-allowed disabled:opacity-50">
+    <button type="submit" [disabled]="loginForm.invalid || isLoading" class="w-auto rounded-full bg-[#FF5500] px-8 py-3 font-raleway font-bold text-white transition-all hover:bg-[#FF5500]/80 disabled:cursor-not-allowed disabled:opacity-50">
         {{ isLoading ? 'Connecting...' : 'Login' }}
     </button>
 

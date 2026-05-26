@@ -19,14 +19,9 @@
 	@if (errorMessage) {
 		<p class="text-red-500 font-raleway font-bold text-sm w-full text-left -mt-2">{{ errorMessage }}</p>
 	}
-	<app-nav-button 
-        type="submit"
-		variant="orange"
-        label="CREATE ACCOUNT" 
-        fontSize="text-xl" 
-        fontStyle="font-climate-crisis"
-        class="w-[24rem] block">
-    </app-nav-button>
+	<button type="submit" [disabled]="registerForm.invalid || isLoading" class="w-auto rounded-full bg-[#FF5500] px-8 py-3 font-raleway font-bold text-white transition-all hover:bg-[#FF5500]/80 disabled:cursor-not-allowed disabled:opacity-50">
+		{{ isLoading ? 'Creating...' : 'Create Account' }}
+	</button>
     <div class="flex w-full items-center gap-4">
         <div class="flex-1 border-t border-2 border-[#FFE6DB]/20"></div>
         <span class="text-md text-[#FFE6DB]">or</span>
