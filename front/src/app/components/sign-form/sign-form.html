@@ -1,20 +1,32 @@
-<div class="mx-auto flex w-full max-w-[28rem] flex-col items-center gap-6 rounded-3xl border border-[#FFE6DB]/15 bg-[#FFE6DB]/10 p-8 text-center backdrop-blur-sm glass-card">
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="mx-auto flex w-full max-w-[28rem] flex-col items-center gap-6 rounded-3xl border border-[#FFE6DB]/15 bg-[#FFE6DB]/10 p-8 text-center backdrop-blur-sm glass-card">
 	<h1 class="max-w-[7ch] font-climate-crisis text-[2.5rem] text-[#FFE6DB]">SIGN UP</h1>
     <div class="flex w-[24rem] items-center gap-3 rounded-full border border-[#FFE6DB] bg-transparent px-4 py-3">
 		<lucide-icon [img]="userRound" class="w-5 h-5 text-[#FFE6DB]/70"></lucide-icon>
-		<input type="text" placeholder="name" class="font-raleway font-bold flex-1 bg-transparent text-sm text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none">
+		<input type="text" formControlName="username" placeholder="name" class="font-raleway font-bold flex-1 bg-transparent text-sm text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none">
 	</div>
 
 	<div class="flex w-[24rem] items-center gap-3 rounded-full border border-[#FFE6DB] bg-transparent px-4 py-3">
 		<lucide-icon [img]="mail" class="w-5 h-5 text-[#FFE6DB]/70"></lucide-icon>
-		<input type="email" placeholder="email" class="font-raleway font-bold flex-1 bg-transparent text-sm text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none">
+		<input type="email" formControlName="email" placeholder="email" class="font-raleway font-bold flex-1 bg-transparent text-sm text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none">
 	</div>
 
 	<div class="flex w-[24rem] items-center gap-3 rounded-full border border-[#FFE6DB] bg-transparent px-4 py-3">
 		<lucide-icon [img]="keyRound" class="w-5 h-5 text-[#FFE6DB]/70"></lucide-icon>
-		<input type="password" placeholder="password" class="font-raleway font-bold flex-1 bg-transparent text-sm text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none">
+		<input type="password" formControlName="password" placeholder="password" class="font-raleway font-bold flex-1 bg-transparent text-sm text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none">
 	</div>
+
 	<a href="/login" class="self-start w-full -mt-5 text-left text-[0.75rem] text-[#FFE6DB] underline cursor-pointer">already have an account?</a>
+	@if (errorMessage) {
+		<p class="text-red-500 font-raleway font-bold text-sm w-full text-left -mt-2">{{ errorMessage }}</p>
+	}
+	<app-nav-button 
+        type="submit"
+		variant="orange"
+        label="CREATE ACCOUNT" 
+        fontSize="text-xl" 
+        fontStyle="font-climate-crisis"
+        class="w-[24rem] block">
+    </app-nav-button>
     <div class="flex w-full items-center gap-4">
         <div class="flex-1 border-t border-2 border-[#FFE6DB]/20"></div>
         <span class="text-md text-[#FFE6DB]">or</span>
@@ -23,4 +35,4 @@
 	<a href="http://localhost:8080/auth/google/signup" class="inline-flex items-center justify-center">
 	<img src="assets/signup.svg" alt="Continue with Google" />
 	</a>
-</div>
+</form>

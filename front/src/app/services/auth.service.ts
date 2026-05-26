@@ -1,8 +1,8 @@
 import { Injectable, PLATFORM_ID, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap} from 'rxjs';
+import { Observable, tap, switchMap } from 'rxjs';
 import { environment } from '../../environment';
-import { LoginPayload, AuthResponse } from '../models/auth.model';
+import { LoginPayload, AuthResponse, RegisterPayload } from '../models/auth.model';
 import { isPlatformBrowser } from '@angular/common';
 
 export interface UserProfile {
@@ -45,5 +45,16 @@ export class AuthService {
                 }
             });
         }
+    }
+    registerAndLogin(payload: RegisterPayload): Observable<AuthResponse> {
+        return this.http.post(`${this.apiUrl}/register`, payload).pipe(
+            switchMap(() => {
+                const loginData: LoginPayload = {
+                    identifier: payload.username,
+                    password: payload.password
+                };
+                return this.login(loginData);
+            })
+        );
     }
 }

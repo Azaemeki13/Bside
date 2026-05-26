@@ -117,7 +117,7 @@ async fn main() {
         .route("/auth/google/signup", get(google_signup_handler))
         .route("/auth/google/callback", get(google_callback_handler))
         .route("/register", post(register_handler))
-        .route("/login", get(classic_auth_handler))
+        .route("/login", post(classic_auth_handler))
         .route("/ping", get(ping_handler))
         .route("/search", get(searcher))
         .route("/ws", get(ws_handler));
