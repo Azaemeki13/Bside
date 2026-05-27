@@ -1063,6 +1063,7 @@ pub async fn create_playlist_handler(
     claims: Claims,
     axum::extract::Json(payload): axum::extract::Json<PlaylistPayload>,
 ) -> Result<Json<Playlist>, BSideError> {
+    println!("CREATE PLAYLIST HIT - user: {:?}, title: {:?}", claims.sub, payload.title);
     let playlist = sqlx::query_as!
         (Playlist, r#"INSERT INTO playlists (title, owner_id, is_public) VALUES ($1, $2, true) RETURNING id, title, owner_id, is_public as "is_public!", created_at as "created_at!" "#, payload.title, claims.sub)
         .fetch_one(&state.db)
@@ -1464,4 +1465,27 @@ pub async fn google_callback_handler(
     // let redirect_url = format!("{frontend_url}/bside_app?token={jwt}");
     let redirect_url = format!("{frontend_url}/login?token={jwt}");
     Ok(Redirect::to(&redirect_url))
+}
+
+#[utoipa::path(
+    get,
+    path = "/playlists",
+    responses(
+        (status = 200, description = "List of user's playlists", body = Vec<Playlist>),
+        (status = 401, description = "Unauthorized"),
+    ),
+    tags = ["Playlists"]
+)]
+pub async fn get_my_playlists_handler(
+    claims: Claims,
+    State(state): State<AppState>,
+) -> Result<Json<Vec<Playlist>>, BSideError> {
+    let playlists = sqlx::query_as!(
+        Playlist,
+        r#"SELECT id, title, owner_id, is_public as "is_public!", created_at as "created_at!" FROM playlists WHERE owner_id = $1 ORDER BY created_at DESC"#,
+        claims.sub
+    )
+    .fetch_all(&state.db)
+    .await?;
+    Ok(Json(playlists))
 }

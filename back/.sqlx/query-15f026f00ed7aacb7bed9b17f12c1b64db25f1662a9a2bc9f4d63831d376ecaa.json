@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, username, role, created_at as \"created_at!\" FROM users WHERE id = $1",
+  "query": "SELECT id, username, email, role, created_at as \"created_at!\", avatar_url FROM users WHERE id = $1",
   "describe": {
     "columns": [
       {
@@ -15,13 +15,23 @@
       },
       {
         "ordinal": 2,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
         "name": "role",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 3,
+        "ordinal": 4,
         "name": "created_at!",
         "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "avatar_url",
+        "type_info": "Varchar"
       }
     ],
     "parameters": {
@@ -33,8 +43,10 @@
       false,
       false,
       false,
+      false,
+      true,
       true
     ]
   },
-  "hash": "76b8b29cc8a9d3bf5772ee4603ca1e86eae007168f7aaf129352e94aa1e06ae0"
+  "hash": "15f026f00ed7aacb7bed9b17f12c1b64db25f1662a9a2bc9f4d63831d376ecaa"
 }

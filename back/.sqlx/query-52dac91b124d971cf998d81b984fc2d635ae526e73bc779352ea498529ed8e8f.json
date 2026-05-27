@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND artist_id = $2)",
+  "query": "SELECT EXISTS (SELECT 1  FROM users WHERE email = $1 OR username = $2)",
   "describe": {
     "columns": [
       {
@@ -11,13 +11,13 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid",
-        "Uuid"
+        "Text",
+        "Text"
       ]
     },
     "nullable": [
       null
     ]
   },
-  "hash": "39f89e237a40e2fa8e06975df6c9035f4a7f3678d96b19cc07ff74ee10ada2ce"
+  "hash": "52dac91b124d971cf998d81b984fc2d635ae526e73bc779352ea498529ed8e8f"
 }
