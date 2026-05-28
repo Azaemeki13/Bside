@@ -1,20 +1,10 @@
 use crate::auth::create_jwt;
 use crate::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
-<<<<<<< HEAD
-    ArtistResponse, AuthRequest, AuthResponse, BSideError, Claims, GoogleUserProfile, LoginPayload,
+    ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload, ArtistResponse,
+    AuthRequest, AuthResponse, BSideError, Claims, ContactPayload, GoogleUserProfile, LoginPayload,
     Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RegisterPayload, Song,
     SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
-    AddSongResponse, AlbumResponse, AppState, ArtistResponse, AuthRequest, AuthResponse,
-    BSideError, Claims, ContactPayload, GoogleUserProfile, LoginPayload, Playlist,
-    PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RegisterPayload, Song,
-    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
-=======
-    ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload, ArtistResponse,
-    AuthRequest, AuthResponse, BSideError, Claims, GoogleUserProfile, LoginPayload, Playlist,
-    PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RegisterPayload, Song, SongPayload,
-    SongResponse, UpdateStructurePayload, User, UserPayload,
->>>>>>> 13908d1 (artist request, admin side)
 };
 use argon2::{
     Argon2, PasswordHash, PasswordVerifier,
@@ -26,7 +16,6 @@ use axum::{
     extract::{Extension, Multipart, Path, State},
     response::{IntoResponse, Redirect},
 };
-use base64::Engine;
 use lettre::{
     AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor,
     transport::smtp::authentication::Credentials,

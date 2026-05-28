@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id, user_id, artist_name, bio\n        FROM artist_requests\n        WHERE id = $1 AND status = 'Pending'\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "artist_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "bio",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "10a5d1b68057b7a5d019b5a1cfa229deb3d02311315ff62c93c6c745fcff3548"
+}

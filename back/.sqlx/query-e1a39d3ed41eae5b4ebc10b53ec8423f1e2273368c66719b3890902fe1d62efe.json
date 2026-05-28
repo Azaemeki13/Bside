@@ -1,0 +1,71 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            a.id,\n            a.artist_id,\n            ar.name AS \"artist_name!\",\n            a.title,\n            a.genre,\n            a.cover_url,\n            a.status,\n            a.created_at AS \"created_at!\",\n            COALESCE(\n                jsonb_agg(\n                    jsonb_build_object(\n                        'id', s.id,\n                        'title', s.title,\n                        'duration_seconds', s.duration_seconds,\n                        'status', s.status,\n                        'audio_url', s.audio_url,\n                        'created_at', s.created_at\n                    )\n                    ORDER BY s.created_at ASC\n                ) FILTER (WHERE s.id IS NOT NULL),\n                '[]'::jsonb\n            ) AS \"songs!: sqlx::types::Json<Vec<AlbumSongItem>>\"\n        FROM albums a\n        JOIN artists ar ON ar.id = a.artist_id\n        LEFT JOIN songs s ON s.album_id = a.id AND s.status != 'Deleted'\n        WHERE a.id = $1 AND ar.user_id = $2 AND a.status != 'Deleted'\n        GROUP BY a.id, ar.name\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "artist_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "artist_name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "genre",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "cover_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_at!",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "songs!: sqlx::types::Json<Vec<AlbumSongItem>>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "e1a39d3ed41eae5b4ebc10b53ec8423f1e2273368c66719b3890902fe1d62efe"
+}
