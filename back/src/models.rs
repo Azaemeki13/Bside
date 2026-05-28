@@ -139,6 +139,13 @@ pub struct AppState {
     pub network: NetworkState,
 }
 
+#[derive(serde::Deserialize, sqlx::FromRow, utoipa::ToSchema)]
+pub struct ContactPayload {
+    pub name: String,
+    pub email: String,
+    pub message: String,
+}
+
 #[derive(serde::Deserialize, utoipa::ToSchema)]
 pub struct RegisterPayload {
     pub username: String,

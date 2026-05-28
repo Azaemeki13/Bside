@@ -14,7 +14,7 @@ mod ws;
 use crate::auth::{Claims, auth_gate};
 use crate::error::BSideError;
 use crate::handlers::{
-    add_song_to_playlist_handler, classic_auth_handler, create_album_handler,
+    add_song_to_playlist_handler, classic_auth_handler, contact_handler, create_album_handler,
     create_artist_handler, create_playlist_handler, create_song_handler, create_user_handler,
     delete_album_handler, delete_playlist_handler, delete_song_handler, flush_deleted_albums_task,
     flush_deleted_songs_task, get_all_users_handler, get_me_handler, get_playlist_by_id_handler,
@@ -24,9 +24,9 @@ use crate::handlers::{
 };
 use crate::models::{
     AddSongResponse, AlbumResponse, AppState, ArtistResponse, AuthRequest, AuthResponse,
-    GoogleUserProfile, LoginPayload, Playlist, PlaylistDetailedResponse, PlaylistPayload,
-    PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, Song, SongPayload,
-    SongResponse, UpdateStructurePayload, User, UserPayload,
+    ContactPayload, GoogleUserProfile, LoginPayload, Playlist, PlaylistDetailedResponse,
+    PlaylistPayload, PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, Song,
+    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use crate::search::searcher;
 

@@ -1,9 +1,9 @@
 use crate::auth::create_jwt;
 use crate::{
     AddSongResponse, AlbumResponse, AppState, ArtistResponse, AuthRequest, AuthResponse,
-    BSideError, Claims, GoogleUserProfile, LoginPayload, Playlist, PlaylistDetailedResponse,
-    PlaylistPayload, PlaylistSongItem, RegisterPayload, Song, SongPayload, SongResponse,
-    UpdateStructurePayload, User, UserPayload,
+    BSideError, Claims, ContactPayload, GoogleUserProfile, LoginPayload, Playlist,
+    PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RegisterPayload, Song,
+    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use argon2::{
     Argon2, PasswordHash, PasswordVerifier,
@@ -14,6 +14,11 @@ use axum::{
     Json,
     extract::{Extension, Multipart, Path, State},
     response::{IntoResponse, Redirect},
+};
+use base64::Engine;
+use lettre::{
+    AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor,
+    transport::smtp::authentication::Credentials,
 };
 use oauth2::{AuthorizationCode, CsrfToken, Scope, TokenResponse};
 use reqwest::StatusCode;
@@ -32,6 +37,55 @@ use uuid::Uuid;
 #[axum::debug_handler]
 pub async fn ping_handler() -> &'static str {
     "pong"
+}
+
+#[utoipa::path(
+    post,
+    path = "/contact",
+    request_body = ContactPayload,
+    responses(
+        (status = 200, description = "Contacted successfully", body = String),
+        (status = 500, description = "Internal server error"),
+    ),
+    tags = ["Contact"]
+)]
+pub async fn contact_handler(
+    State(state): State<AppState>,
+    Json(payload): Json<ContactPayload>,
+) -> Result<impl IntoResponse, BSideError> {
+    let smtp_user = std::env::var("SMTP_USERNAME")
+        .map_err(|_| BSideError::InternalServerError("SMTP config missing".to_string()))?;
+    let smtp_pass = std::env::var("SMTP_PASSWORD")
+        .map_err(|_| BSideError::InternalServerError("SMTP config missing".to_string()))?;
+    sqlx::query!(
+        "INSERT INTO contacts (name, email, message) VALUES ($1, $2, $3)",
+        payload.name,
+        payload.email,
+        payload.message
+    )
+    .execute(&state.db)
+    .await
+    .map_err(|e| BSideError::InternalServerError(e.to_string()))?;
+    let email = Message::builder()
+        .from(format!("BSide App <{}>", smtp_user).parse().unwrap())
+        .to(smtp_user.parse().unwrap())
+        .subject(format!("New B-Side contact from {}", payload.name))
+        .body(format!(
+            "Name: {}\nEmail: {}\nMessage: {}",
+            payload.name, payload.email, payload.message
+        ))
+        .map_err(|e| BSideError::InternalServerError(e.to_string()))?;
+    let creds = Credentials::new(smtp_user, smtp_pass);
+    let mailer: AsyncSmtpTransport<Tokio1Executor> =
+        AsyncSmtpTransport::<Tokio1Executor>::relay("smtp.gmail.com")
+            .unwrap()
+            .credentials(creds)
+            .build();
+    mailer
+        .send(email)
+        .await
+        .map_err(|e| BSideError::InternalServerError(e.to_string()))?;
+    Ok(StatusCode::OK)
 }
 
 #[utoipa::path(
