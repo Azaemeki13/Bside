@@ -17,16 +17,17 @@ use crate::handlers::{
     add_song_to_playlist_handler, classic_auth_handler, create_album_handler,
     create_artist_handler, create_playlist_handler, create_song_handler, create_user_handler,
     delete_album_handler, delete_playlist_handler, delete_song_handler, flush_deleted_albums_task,
-    flush_deleted_songs_task, get_all_users_handler, get_me_handler, get_playlist_by_id_handler,
-    get_song_stream_url_handler, get_user_by_id_handler, get_my_playlists_handler, google_callback_handler,
+    flush_deleted_songs_task, get_album_by_id_handler, get_all_users_handler, get_me_handler,
+    get_my_albums_handler, get_playlist_by_id_handler, get_song_stream_url_handler,
+    get_user_by_id_handler, get_my_playlists_handler, google_callback_handler,
     google_login_handler, google_signup_handler, ping_handler, register_handler,
     remove_song_from_pl, update_playlist_handler, upload_avatar, verify_song_handler,
 };
 use crate::models::{
-    AddSongResponse, AlbumResponse, AppState, ArtistResponse, AuthRequest, AuthResponse,
-    GoogleUserProfile, LoginPayload, Playlist, PlaylistDetailedResponse, PlaylistPayload,
-    PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, Song, SongPayload,
-    SongResponse, UpdateStructurePayload, User, UserPayload,
+    AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
+    ArtistResponse, AuthRequest, AuthResponse, GoogleUserProfile, LoginPayload, Playlist,
+    PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RawSearchResult, RegisterPayload,
+    SearchResult, Song, SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use crate::search::searcher;
 
@@ -40,6 +41,7 @@ use axum::{
 };
 use oauth2::{AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl, basic::BasicClient};
 use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, HeaderValue};
+use aws_sdk_s3::types::{CorsConfiguration, CorsRule};
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 use std::sync::Arc;
@@ -81,6 +83,9 @@ async fn main() {
         .force_path_style(true)
         .build();
     let aws_client = aws_sdk_s3::Client::from_conf(s3_config);
+    ensure_storage_buckets(&aws_client)
+        .await
+        .expect("Storage buckets must be available.");
     let state = AppState {
         db: pool,
         oauth_client: client,
@@ -130,8 +135,11 @@ async fn main() {
         .route("/users/me", get(get_me_handler))
         .route("/users/me/avatar", post(upload_avatar))
         .route("/artists", post(create_artist_handler))
-        .route("/albums", post(create_album_handler))
-        .route("/albums/{album_id}", delete(delete_album_handler))
+        .route("/albums", get(get_my_albums_handler).post(create_album_handler))
+        .route(
+            "/albums/{album_id}",
+            get(get_album_by_id_handler).delete(delete_album_handler),
+        )
         .route("/songs", post(create_song_handler))
         .route("/songs/{song_id}/verify", put(verify_song_handler))
         .route(
@@ -170,4 +178,48 @@ async fn main() {
     axum::serve(listener, app)
         .await
         .expect("Axum failed to server Router with listener.");
+}
+
+async fn ensure_storage_buckets(client: &aws_sdk_s3::Client) -> Result<(), BSideError> {
+    for bucket in ["bside-tracks", "bside-covers", "bside-avatars"] {
+        if client.head_bucket().bucket(bucket).send().await.is_err() {
+            client
+                .create_bucket()
+                .bucket(bucket)
+                .send()
+                .await
+                .map_err(|e| BSideError::S3Error(format!("Failed to create bucket {bucket}: {e}")))?;
+        }
+    }
+
+    let cors = CorsConfiguration::builder()
+        .cors_rules(
+            CorsRule::builder()
+                .allowed_origins("http://localhost:4200")
+                .allowed_origins("http://localhost:4300")
+                .allowed_methods("GET")
+                .allowed_methods("PUT")
+                .allowed_methods("HEAD")
+                .allowed_headers("*")
+                .expose_headers("ETag")
+                .max_age_seconds(3000)
+                .build()
+                .map_err(|e| BSideError::S3Error(format!("Failed to build bucket CORS: {e}")))?,
+        )
+        .build()
+        .map_err(|e| BSideError::S3Error(format!("Failed to build bucket CORS config: {e}")))?;
+
+    for bucket in ["bside-tracks", "bside-covers", "bside-avatars"] {
+        if let Err(e) = client
+            .put_bucket_cors()
+            .bucket(bucket)
+            .cors_configuration(cors.clone())
+            .send()
+            .await
+        {
+            eprintln!("Warning: failed to configure CORS for bucket {bucket}: {e}");
+        }
+    }
+
+    Ok(())
 }

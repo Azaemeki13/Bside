@@ -8,6 +8,8 @@ import { BsideLibrary } from './bside_app/library/library';
 import { BsideFavorites } from './bside_app/favorites/favorites';
 import { BsideSocial } from './bside_app/social/social';
 import { BsideSettings } from './bside_app/settings/settings';
+import { BsideUpload } from './bside_app/upload/upload';
+import { BsideAlbums } from './bside_app/albums/albums';
 
 export const routes: Routes = [
     {path: '', component: LandingComponent },
@@ -20,8 +22,10 @@ export const routes: Routes = [
             { path: '', pathMatch: 'full', redirectTo: 'home' },
             { path: 'home', component: BsideHome },
             { path: 'library', component: BsideLibrary },
+            { path: 'albums', component: BsideAlbums },
             { path: 'favorites', component: BsideFavorites },
             { path: 'social', component: BsideSocial },
+            { path: 'upload', component: BsideUpload },
             { path: 'settings', component: BsideSettings },
         ],
     },

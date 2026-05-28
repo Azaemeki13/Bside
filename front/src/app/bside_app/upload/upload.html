@@ -1,0 +1,128 @@
+<section class="mx-auto flex w-full max-w-5xl flex-col gap-5 py-6 text-[#FFE6DB]">
+  <header class="flex flex-col gap-2">
+    <h1 class="font-raleway text-3xl font-bold">Artist upload</h1>
+    <p class="max-w-3xl font-raleway text-sm text-[#FFE6DB]/70">
+      Create your artist profile, create an album, then upload WAV or FLAC tracks.
+    </p>
+  </header>
+
+  <div class="grid gap-5 xl:grid-cols-3">
+    <form class="flex flex-col gap-4 rounded-lg border border-[#FFE6DB]/15 bg-[#1F0E1C] p-5" (ngSubmit)="saveArtist()">
+      <div>
+        <p class="font-raleway text-lg font-bold">1. Artist profile</p>
+        <p class="font-raleway text-xs text-[#FFE6DB]/60">One artist profile is linked to your account.</p>
+      </div>
+
+      <label class="flex flex-col gap-2 font-raleway text-sm">
+        Artist name
+        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="artistName" [(ngModel)]="artistName" required />
+      </label>
+
+      <label class="flex flex-col gap-2 font-raleway text-sm">
+        Bio
+        <textarea class="min-h-24 rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="artistBio" [(ngModel)]="artistBio"></textarea>
+      </label>
+
+      <label class="flex flex-col gap-2 font-raleway text-sm">
+        Photo PNG
+        <input class="text-sm text-[#FFE6DB]" type="file" accept="image/png" (change)="onArtistPhotoSelected($event)" />
+      </label>
+
+      <button class="rounded-md bg-[#FF5500] px-4 py-2 font-raleway font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" type="submit" [disabled]="isSavingArtist">
+        {{ isSavingArtist ? 'Saving...' : 'Save artist profile' }}
+      </button>
+
+      @if (artistMessage) {
+        <p class="font-raleway text-sm text-green-300">{{ artistMessage }}</p>
+      }
+      @if (artistError) {
+        <p class="font-raleway text-sm text-red-300">{{ artistError }}</p>
+      }
+    </form>
+
+    <form class="flex flex-col gap-4 rounded-lg border border-[#FFE6DB]/15 bg-[#1F0E1C] p-5" (ngSubmit)="createAlbum()">
+      <div>
+        <p class="font-raleway text-lg font-bold">2. Album and tracks</p>
+        <p class="font-raleway text-xs text-[#FFE6DB]/60">Create the album and optionally upload its tracks in the same action.</p>
+      </div>
+
+      <label class="flex flex-col gap-2 font-raleway text-sm">
+        Album title
+        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="albumTitle" [(ngModel)]="albumTitle" required />
+      </label>
+
+      <label class="flex flex-col gap-2 font-raleway text-sm">
+        Genre
+        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="albumGenre" [(ngModel)]="albumGenre" required />
+      </label>
+
+      <label class="flex flex-col gap-2 font-raleway text-sm">
+        Cover PNG
+        <input class="text-sm text-[#FFE6DB]" type="file" accept="image/png" (change)="onAlbumCoverSelected($event)" />
+      </label>
+
+      <label class="flex flex-col gap-2 font-raleway text-sm">
+        Track files
+        <input class="text-sm text-[#FFE6DB]" type="file" multiple accept=".wav,.flac,audio/wav,audio/flac" (change)="onAlbumSongsSelected($event)" />
+      </label>
+
+      <label class="flex flex-col gap-2 font-raleway text-sm">
+        Default duration seconds
+        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="fallbackDurationSeconds" type="number" min="1" [(ngModel)]="fallbackDurationSeconds" />
+      </label>
+
+      <button class="rounded-md bg-[#FF5500] px-4 py-2 font-raleway font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" type="submit" [disabled]="!canCreateAlbum">
+        {{ isCreatingAlbum ? 'Working...' : 'Create album' }}
+      </button>
+
+      @if (album) {
+        <p class="break-all font-raleway text-xs text-[#FFE6DB]/70">Current album ID: {{ album.id }}</p>
+      }
+      @if (albumMessage) {
+        <p class="font-raleway text-sm text-green-300">{{ albumMessage }}</p>
+      }
+      @if (releaseUploadMessage) {
+        <p class="font-raleway text-sm text-[#FFE6DB]/70">{{ releaseUploadMessage }}</p>
+      }
+      @if (albumError) {
+        <p class="font-raleway text-sm text-red-300">{{ albumError }}</p>
+      }
+    </form>
+
+    <form class="flex flex-col gap-4 rounded-lg border border-[#FFE6DB]/15 bg-[#1F0E1C] p-5" (ngSubmit)="uploadSong()">
+      <div>
+        <p class="font-raleway text-lg font-bold">3. Track</p>
+        <p class="font-raleway text-xs text-[#FFE6DB]/60">Upload limit is 200 MB. WAV and FLAC only.</p>
+      </div>
+
+      <label class="flex flex-col gap-2 font-raleway text-sm">
+        Audio file
+        <input class="text-sm text-[#FFE6DB]" type="file" accept=".wav,.flac,audio/wav,audio/flac" (change)="onSongFileSelected($event)" />
+      </label>
+
+      <label class="flex flex-col gap-2 font-raleway text-sm">
+        Song title
+        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="songTitle" [(ngModel)]="songTitle" required />
+      </label>
+
+      <label class="flex flex-col gap-2 font-raleway text-sm">
+        Duration seconds
+        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="songDurationSeconds" type="number" min="1" [(ngModel)]="songDurationSeconds" required />
+      </label>
+
+      <button class="rounded-md bg-[#FF5500] px-4 py-2 font-raleway font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" type="submit" [disabled]="!canUploadSong">
+        Upload and verify
+      </button>
+
+      @if (uploadStep !== 'idle') {
+        <p class="font-raleway text-sm text-[#FFE6DB]/70">Status: {{ uploadStep }}</p>
+      }
+      @if (songMessage) {
+        <p class="font-raleway text-sm text-green-300">{{ songMessage }}</p>
+      }
+      @if (songError) {
+        <p class="font-raleway text-sm text-red-300">{{ songError }}</p>
+      }
+    </form>
+  </div>
+</section>

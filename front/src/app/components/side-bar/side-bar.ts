@@ -1,7 +1,7 @@
 import { Component, HostListener, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser, NgIf } from '@angular/common';
 import { SideBarButton } from '../side-bar-button/side-bar-button';
-import { LucideAngularModule, House, Disc3, Heart, UsersRound, LogOut, Settings} from 'lucide-angular';
+import { LucideAngularModule, House, Disc3, Heart, UsersRound, LogOut, Settings, Upload, Library} from 'lucide-angular';
 import { Router } from '@angular/router';
 
 @Component({
@@ -21,6 +21,8 @@ export class SideBar {
   protected readonly usersRound = UsersRound;
   protected readonly logout = LogOut;
   protected readonly settings = Settings;
+  protected readonly upload = Upload;
+  protected readonly library = Library;
 
   protected isLogoutConfirmOpen = false;
 
