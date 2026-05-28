@@ -6,7 +6,7 @@
       <app-side-bar-button link="/bside_app/albums"><lucide-icon [img]="library" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
       <app-side-bar-button link="/bside_app/favorites"><lucide-icon [img]="heart" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
       <app-side-bar-button link="/bside_app/social"><lucide-icon [img]="usersRound" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
-      @if (authService.currentUser()?.role === 'Artist') {
+      @if (authService.currentUser()?.role === 'Artist' || authService.currentUser()?.role === 'Admin') {
         <app-side-bar-button link="/bside_app/upload"><lucide-icon [img]="upload" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
       }
       @if (authService.currentUser()?.role === 'Admin') {

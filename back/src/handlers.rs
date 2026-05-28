@@ -434,7 +434,7 @@ pub async fn create_artist_handler(
     .execute(&mut *tx)
     .await?;
     sqlx::query!(
-        "UPDATE users SET role = 'Artist' WHERE id = $1",
+        "UPDATE users SET role = 'Artist' WHERE id = $1 AND role = 'User'",
         current_user_id
     )
     .execute(&mut *tx)
@@ -633,7 +633,7 @@ pub async fn review_artist_request_handler(
         }
 
         sqlx::query!(
-            "UPDATE users SET role = 'Artist' WHERE id = $1",
+            "UPDATE users SET role = 'Artist' WHERE id = $1 AND role = 'User'",
             request.user_id
         )
         .execute(&mut *tx)

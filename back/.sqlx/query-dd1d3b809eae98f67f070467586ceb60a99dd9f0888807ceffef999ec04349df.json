@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE users SET role = 'Artist' WHERE id = $1",
+  "query": "UPDATE users SET role = 'Artist' WHERE id = $1 AND role = 'User'",
   "describe": {
     "columns": [],
     "parameters": {
@@ -10,5 +10,5 @@
     },
     "nullable": []
   },
-  "hash": "41c467d5c12ab74e8bff7b0b759976bc71319e637cf03acc20fabfde500a4937"
+  "hash": "dd1d3b809eae98f67f070467586ceb60a99dd9f0888807ceffef999ec04349df"
 }
