@@ -21,19 +21,15 @@
   <div class="flex-1 overflow-y-auto p-4 pt-0">
     <div class="grid grid-cols-3 gap-2">
       <app-heart-card></app-heart-card>
-        @for (playlist of playlistService.playlists(); track $index) {
+      @for (playlist of playlistService.playlists(); track playlist.id) {
         <button (click)="selectPlaylist(playlist)" class="rounded-[0.625rem] border-2 border-transparent hover:border-[#FF5500] duration-300 cursor-pointer">
-            <div class="w-[9rem] h-[9rem] rounded-[calc(0.625rem-2px)] overflow-hidden">
-            @if (playlist.cover) {
-                <img [src]="playlist.cover" [alt]="playlist.name" class="w-full h-full object-cover" />
-            } @else {
-                <div class="w-full h-full bg-gradient-to-br from-[#FF5500] to-[#B90E4D] flex items-center justify-center">
-                <span class="font-raleway font-bold text-[#FFE6DB] text-xs text-center px-2">{{ playlist.name }}</span>
-                </div>
-            }
+          <div class="w-[9rem] h-[9rem] rounded-[calc(0.625rem-2px)] overflow-hidden">
+            <div class="w-full h-full bg-[#FFE6DB]/10 flex items-center justify-center backdrop-blur-sm glass-card">
+              <span class="font-raleway font-bold text-[#FFE6DB] text-xs text-center px-2">{{ playlist.title }}</span>
             </div>
+          </div>
         </button>
-        }
+      }
     </div>
   </div>
 </div>
@@ -52,8 +48,7 @@
             </div>
           }
         </button>
-        <input #coverInput type="file" accept="image/*" class="hidden" (change)="onCoverSelected($event)" />
-
+        <input #coverInput type="file" accept="image/*" class="hidden" (change)="onCoverSelected($event)">
         <div class="flex flex-col gap-4 justify-center">
           <input type="text" [(ngModel)]="playlistName" placeholder="Playlist name" class="font-raleway font-bold text-sm text-[#1F0E1C] bg-[#FFE6DB] rounded-[0.625rem] px-4 py-3 focus:outline-none">
           <input type="text" [(ngModel)]="playlistDescription" placeholder="Playlist description" class="font-raleway font-bold text-sm text-[#1F0E1C] bg-[#FFE6DB] rounded-[0.625rem] px-4 py-3 focus:outline-none">

@@ -115,6 +115,42 @@ pub struct AlbumResponse {
     pub status: String,
 }
 
+#[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
+pub struct AlbumListItem {
+    pub id: uuid::Uuid,
+    pub artist_id: uuid::Uuid,
+    pub artist_name: String,
+    pub title: String,
+    pub genre: String,
+    pub cover_url: String,
+    pub status: String,
+    pub song_count: i64,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, sqlx::FromRow, Debug, utoipa::ToSchema)]
+pub struct AlbumSongItem {
+    pub id: uuid::Uuid,
+    pub title: String,
+    pub duration_seconds: i32,
+    pub status: String,
+    pub audio_url: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct AlbumDetailedResponse {
+    pub id: uuid::Uuid,
+    pub artist_id: uuid::Uuid,
+    pub artist_name: String,
+    pub title: String,
+    pub genre: String,
+    pub cover_url: String,
+    pub status: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub songs: Vec<AlbumSongItem>,
+}
+
 #[derive(serde::Deserialize, utoipa::ToSchema)]
 pub struct PlaylistPayload {
     pub title: String,

@@ -14,10 +14,10 @@ import { CommonModule } from '@angular/common';
 })
 export class SignForm {
   isLoading = false;
+  protected readonly authService = inject(AuthService);
   protected readonly mail = Mail;
   protected readonly keyRound = KeyRound;
   protected readonly userRound = UserRound;
-  private authService = inject(AuthService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
   protected registerForm = this.fb.nonNullable.group({

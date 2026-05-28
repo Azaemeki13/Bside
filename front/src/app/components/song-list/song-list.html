@@ -1,35 +1,93 @@
 <div class="h-full bg-[#1F0E1C] rounded-[1.563rem] flex flex-col overflow-hidden">
-  @if (playlistService.selectedPlaylist(); as playlist) {
+  @if (playlistService.likedSongsSelected() || playlistService.selectedPlaylist()) {
     <div class="flex flex-1 min-h-0">
-      <div class="flex flex-col flex-1 min-w-0 p-4">
-        <div class="bg-[#1F0E1C]">
-          <div class="grid grid-cols-3 space-between text-[#FFE6DB] font-raleway text-[1rem] font-medium pb-2 border-b border-[#FFE6DB]">
-            <span>Title</span>
-            <span>Album</span>
-            <span>Date added</span>
-            <span></span>
-          </div>
+      <div class="flex flex-col flex-1 min-w-0 p-4 overflow-hidden">
+
+        <div class="grid text-[#FFE6DB] font-raleway text-[1rem] font-medium pb-2 border-b border-[#FFE6DB]/30"
+             style="grid-template-columns: 2rem 2fr 1.5fr 1fr 3rem">
+          <span class="text-[#FFE6DB]/50 text-sm">#</span>
+          <span>Title</span>
+          <span>Album</span>
+          <span>Date added</span>
+          <span class="flex justify-end">
+            <lucide-icon [img]="timer" class="w-4 h-4 text-[#FFE6DB]/50"></lucide-icon>
+          </span>
         </div>
-        <div class="flex-1 overflow-y-auto px-4 pb-4">
-          <p class="font-raleway text-[#FFE6DB]/50 text-sm pt-4">No songs yet.</p>
-        </div>
-      </div>
-      <div class="flex flex-col items-end gap-2 p-4 shrink-0">
-        @if (playlist.isLiked) {
-          <div class="w-[21rem] h-[21rem] rounded-[0.625rem] bg-gradient-to-br from-[#FF5500] to-[#B90E4D] flex items-center justify-center">
-            <lucide-icon [img]="heart" class="w-[6.5rem] h-[6.5rem] text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
-          </div>
-        } @else if (playlist.cover) {
-          <img [src]="playlist.cover" [alt]="playlist.name" class="w-[21rem] h-[21rem] rounded-[0.625rem] object-cover" />
-        }
-        <div class="w-[21rem]">
-          <h2 class="font-climate-crisis text-[#FFE6DB] text-2xl truncate">{{ playlist.name }}</h2>
-          @if (playlist.description) {
-            <p class="font-raleway text-[#FFE6DB]/70 text-sm mt-1 truncate">{{ playlist.description }}</p>
+
+        <div class="flex-1 overflow-y-auto pb-4">
+          @if (placeholderSongs.length === 0) {
+            <p class="font-raleway text-[#FFE6DB]/50 text-sm pt-4">No songs yet.</p>
+          } @else {
+            @for (song of placeholderSongs; track song.link_id) {
+              <div class="grid items-center py-2 rounded-lg hover:bg-[#FFE6DB]/5 duration-200 group cursor-pointer"
+                   style="grid-template-columns: 2rem 2fr 1.5fr 1fr 3rem">
+
+                <span class="font-raleway text-[#FFE6DB]/50 text-sm group-hover:hidden">{{ song.position }}</span>
+                <button class="hidden group-hover:flex items-center justify-center cursor-pointer">
+                  <lucide-icon [img]="play" class="w-4 h-4 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
+                </button>
+
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-10 h-10 rounded bg-[#FFE6DB]/10 shrink-0 flex items-center justify-center">
+                    <span class="text-[#FFE6DB]/30 text-xs">♪</span>
+                  </div>
+                  <div class="min-w-0 pr-4">
+                    <p class="font-raleway font-semibold text-[#FFE6DB] text-sm truncate">{{ song.title }}</p>
+                    <p class="font-raleway text-[#FFE6DB]/50 text-xs truncate">Unknown artist</p>
+                  </div>
+                </div>
+
+                <span class="font-raleway text-[#FFE6DB]/70 text-sm truncate pr-4">Unknown albumaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
+
+                <span class="font-raleway text-[#FFE6DB]/50 text-sm truncate pr-4">cdccdsckdhkklsjnqlpjos,xqxopqo</span>
+
+                <span class="font-raleway text-[#FFE6DB]/50 text-sm text-right">{{ formatDuration(song.duration_seconds) }}</span>
+              </div>
+            }
           }
         </div>
       </div>
 
+      <div class="flex flex-col items-end gap-2 p-4 shrink-0">
+        @if (playlistService.likedSongsSelected()) {
+          <div class="w-[21rem] h-[21rem] rounded-[0.625rem] bg-[#FF5500] flex items-center justify-center">
+            <lucide-icon [img]="heart" class="w-[6.5rem] h-[6.5rem] text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
+          </div>
+          <div class="w-[21rem]">
+            <h2 class="font-climate-crisis text-[#FFE6DB] text-2xl truncate">Liked Songs</h2>
+            <p class="font-raleway text-[#FFE6DB]/70 text-sm mt-1">Your liked songs</p>
+          </div>
+        } @else if (playlistService.selectedPlaylist(); as playlist) {
+          <div class="w-[21rem] h-[21rem] rounded-[0.625rem] border border-[#FFE6DB]/15 bg-[#FFE6DB]/10 backdrop-blur-sm glass-card flex items-center justify-center">
+            <span class="font-raleway font-bold text-[#FFE6DB] text-lg text-center px-4">{{ playlist.title }}</span>
+          </div>
+          <div class="w-[21rem] flex flex-col gap-1">
+            <h2 class="font-climate-crisis text-[#FFE6DB] text-2xl truncate">{{ playlist.title }}</h2>
+            @if (playlist.description) {
+              <p class="font-raleway text-[#FFE6DB]/70 text-sm truncate">{{ playlist.description }}</p>
+            }
+            <p class="font-raleway text-[#FFE6DB]/50 text-xs">
+              Created by
+              <span class="text-[#FF5500]">{{ playlist.owner_username ?? authService.currentUser()?.username ?? 'unknown' }}</span>
+              {{ playlist.created_at | date:'dd/MM/yyyy' }}
+            </p>
+            @if (playlist.total_duration || playlist.song_count) {
+              <p class="font-raleway text-[#FFE6DB]/50 text-xs">
+                @if (playlist.total_duration) {
+                  {{ formatTotalDuration(playlist.total_duration) }}
+                }
+                @if (playlist.total_duration && playlist.song_count) { | }
+                @if (playlist.song_count) {
+                  {{ playlist.song_count }} songs
+                }
+              </p>
+            }
+            <button (click)="deletePlaylist()" class="mt-2 self-start cursor-pointer">
+              <lucide-icon [img]="trash2" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]/50 hover:text-[#FF5500] duration-300"></lucide-icon>
+            </button>
+          </div>
+        }
+      </div>
     </div>
   } @else {
     <div class="flex-1 flex items-center justify-center">

@@ -1,0 +1,93 @@
+<section class="grid h-full min-h-0 grid-cols-[22rem_1fr] gap-4 py-6 text-[#FFE6DB]">
+  <aside class="flex min-h-0 flex-col gap-4 rounded-lg border border-[#FFE6DB]/15 bg-[#1F0E1C] p-4">
+    <div class="flex items-center justify-between gap-3">
+      <h1 class="font-raleway text-2xl font-bold">Albums</h1>
+      <button class="rounded-md bg-[#FF5500] px-3 py-2 font-raleway text-sm font-bold text-white" type="button" (click)="loadAlbums()">Refresh</button>
+    </div>
+
+    @if (isLoadingAlbums) {
+      <p class="font-raleway text-sm text-[#FFE6DB]/70">Loading albums...</p>
+    }
+
+    @if (error) {
+      <p class="font-raleway text-sm text-red-300">{{ error }}</p>
+    }
+
+    <div class="flex min-h-0 flex-col gap-2 overflow-auto pr-1">
+      @for (album of albums; track album.id) {
+        <button
+          type="button"
+          class="flex w-full items-center gap-3 rounded-md border border-transparent p-3 text-left hover:border-[#FF5500] hover:bg-[#FFE6DB]/5"
+          [class.border-[#FF5500]]="selectedAlbum?.id === album.id"
+          [class.bg-[#FFE6DB]/10]="selectedAlbum?.id === album.id"
+          (click)="selectAlbum(album)">
+          <img class="h-12 w-12 shrink-0 rounded object-cover" [src]="coverUrl(album.cover_url)" alt="" />
+          <span class="min-w-0">
+            <span class="block truncate font-raleway text-sm font-bold">{{ album.title }}</span>
+            <span class="block truncate font-raleway text-xs text-[#FFE6DB]/60">{{ album.genre }} | {{ album.song_count }} songs</span>
+          </span>
+        </button>
+      } @empty {
+        @if (!isLoadingAlbums) {
+          <p class="font-raleway text-sm text-[#FFE6DB]/60">No albums yet.</p>
+        }
+      }
+    </div>
+  </aside>
+
+  <main class="flex min-h-0 flex-col gap-4 overflow-hidden rounded-lg border border-[#FFE6DB]/15 bg-[#1F0E1C] p-5">
+    @if (selectedAlbum; as album) {
+      <div class="flex items-start gap-5">
+        <img class="h-32 w-32 shrink-0 rounded-md object-cover" [src]="coverUrl(album.cover_url)" alt="" />
+        <div class="min-w-0">
+          <p class="font-raleway text-sm text-[#FFE6DB]/60">{{ album.artist_name }}</p>
+          <h2 class="truncate font-raleway text-3xl font-bold">{{ album.title }}</h2>
+          <p class="font-raleway text-sm text-[#FFE6DB]/70">{{ album.genre }} | {{ album.songs.length }} songs | {{ album.status }}</p>
+        </div>
+      </div>
+
+      @if (isLoadingAlbum) {
+        <p class="font-raleway text-sm text-[#FFE6DB]/70">Loading songs...</p>
+      }
+
+      @if (playbackError) {
+        <p class="font-raleway text-sm text-red-300">{{ playbackError }}</p>
+      }
+
+      <audio #audio controls class="w-full"></audio>
+
+      <div class="min-h-0 overflow-auto">
+        <table class="w-full border-collapse font-raleway text-sm">
+          <thead class="sticky top-0 bg-[#1F0E1C] text-left text-[#FFE6DB]/60">
+            <tr>
+              <th class="border-b border-[#FFE6DB]/10 py-3 pr-3 font-medium">Title</th>
+              <th class="border-b border-[#FFE6DB]/10 py-3 pr-3 font-medium">Status</th>
+              <th class="border-b border-[#FFE6DB]/10 py-3 pr-3 font-medium">Duration</th>
+              <th class="border-b border-[#FFE6DB]/10 py-3 font-medium"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (song of album.songs; track song.id) {
+              <tr [class.bg-[#FFE6DB]/5]="activeSongId === song.id">
+                <td class="border-b border-[#FFE6DB]/10 py-3 pr-3">{{ song.title }}</td>
+                <td class="border-b border-[#FFE6DB]/10 py-3 pr-3">{{ song.status }}</td>
+                <td class="border-b border-[#FFE6DB]/10 py-3 pr-3">{{ formatDuration(song.duration_seconds) }}</td>
+                <td class="border-b border-[#FFE6DB]/10 py-3 text-right">
+                  <button class="rounded-md bg-[#FF5500] px-3 py-1.5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" type="button" [disabled]="song.status !== 'Ready'" (click)="play(song, audio)">
+                    Play
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td class="py-4 text-[#FFE6DB]/60" colspan="4">No songs in this album.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p class="font-raleway text-sm text-[#FFE6DB]/60">Select an album to see its songs.</p>
+    }
+  </main>
+</section>

@@ -19,3 +19,11 @@ export interface AuthResponse {
     };
     token: string;
 }
+
+export interface UserProfile {
+    id: string;
+    username: string;
+    email: string;
+    role: string;
+    avatar_url?: string;
+}

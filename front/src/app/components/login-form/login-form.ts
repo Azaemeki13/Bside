@@ -35,6 +35,7 @@ export class LoginForm {
     };
     this.authService.login(payload).subscribe({
       next: () => {
+        this.authService.loadUserProfile();
         this.router.navigate(['/bside_app']);
       },
       error: (err) => {

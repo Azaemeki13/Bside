@@ -13,6 +13,6 @@ export class HeartCard {
   private playlistService = inject(PlaylistService);
 
   select(): void {
-    this.playlistService.select(this.playlistService.likedPlaylist);
+    this.playlistService.selectLiked();
   }
 }

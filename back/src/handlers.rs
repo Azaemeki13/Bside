@@ -1,5 +1,9 @@
 use crate::auth::create_jwt;
 use crate::{
+    AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
+    ArtistResponse, AuthRequest, AuthResponse, BSideError, Claims, GoogleUserProfile, LoginPayload,
+    Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RegisterPayload, Song,
+    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
     AddSongResponse, AlbumResponse, AppState, ArtistResponse, AuthRequest, AuthResponse,
     BSideError, Claims, ContactPayload, GoogleUserProfile, LoginPayload, Playlist,
     PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RegisterPayload, Song,
@@ -429,6 +433,13 @@ pub async fn create_artist_handler(
         bio,
         photo_url
     )
+    .execute(&mut *tx)
+    .await?;
+    sqlx::query!(
+        "UPDATE users SET role = 'Artist' WHERE id = $1",
+        current_user_id
+    )
+
     .execute(&state.db)
     .await?;
     Ok(Json(ArtistResponse {
@@ -635,6 +646,118 @@ pub async fn create_album_handler(
         genre,
         cover_url,
         status: "Ready".to_string(),
+    }))
+}
+
+#[utoipa::path(
+    get,
+    path = "/albums",
+    responses(
+        (status = 200, description = "Current artist albums", body = Vec<AlbumListItem>),
+        (status = 401, description = "Unauthorized or not an artist"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Albums"]
+)]
+pub async fn get_my_albums_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+) -> Result<Json<Vec<AlbumListItem>>, BSideError> {
+    let albums = sqlx::query_as!(
+        AlbumListItem,
+        r#"
+        SELECT
+            a.id,
+            a.artist_id,
+            ar.name AS "artist_name!",
+            a.title,
+            a.genre,
+            a.cover_url,
+            a.status,
+            COUNT(s.id) AS "song_count!",
+            a.created_at AS "created_at!"
+        FROM albums a
+        JOIN artists ar ON ar.id = a.artist_id
+        LEFT JOIN songs s ON s.album_id = a.id AND s.status != 'Deleted'
+        WHERE ar.user_id = $1 AND a.status != 'Deleted'
+        GROUP BY a.id, ar.name
+        ORDER BY a.created_at DESC
+        "#,
+        claims.sub
+    )
+    .fetch_all(&state.db)
+    .await?;
+
+    Ok(Json(albums))
+}
+
+#[utoipa::path(
+    get,
+    path = "/albums/{album_id}",
+    params(("album_id" = uuid::Uuid, Path, description = "Album ID")),
+    responses(
+        (status = 200, description = "Album details with songs", body = AlbumDetailedResponse),
+        (status = 401, description = "Unauthorized - not album owner"),
+        (status = 404, description = "Album not found"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Albums"]
+)]
+pub async fn get_album_by_id_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    Path(album_id): Path<uuid::Uuid>,
+) -> Result<Json<AlbumDetailedResponse>, BSideError> {
+    let album = sqlx::query!(
+        r#"
+        SELECT
+            a.id,
+            a.artist_id,
+            ar.name AS "artist_name!",
+            a.title,
+            a.genre,
+            a.cover_url,
+            a.status,
+            a.created_at AS "created_at!",
+            COALESCE(
+                jsonb_agg(
+                    jsonb_build_object(
+                        'id', s.id,
+                        'title', s.title,
+                        'duration_seconds', s.duration_seconds,
+                        'status', s.status,
+                        'audio_url', s.audio_url,
+                        'created_at', s.created_at
+                    )
+                    ORDER BY s.created_at ASC
+                ) FILTER (WHERE s.id IS NOT NULL),
+                '[]'::jsonb
+            ) AS "songs!: sqlx::types::Json<Vec<AlbumSongItem>>"
+        FROM albums a
+        JOIN artists ar ON ar.id = a.artist_id
+        LEFT JOIN songs s ON s.album_id = a.id AND s.status != 'Deleted'
+        WHERE a.id = $1 AND ar.user_id = $2 AND a.status != 'Deleted'
+        GROUP BY a.id, ar.name
+        "#,
+        album_id,
+        claims.sub
+    )
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::NotFound)?;
+
+    Ok(Json(AlbumDetailedResponse {
+        id: album.id,
+        artist_id: album.artist_id,
+        artist_name: album.artist_name,
+        title: album.title,
+        genre: album.genre,
+        cover_url: album.cover_url,
+        status: album.status,
+        created_at: album.created_at,
+        songs: album.songs.0,
     }))
 }
 
@@ -1117,6 +1240,7 @@ pub async fn create_playlist_handler(
     claims: Claims,
     axum::extract::Json(payload): axum::extract::Json<PlaylistPayload>,
 ) -> Result<Json<Playlist>, BSideError> {
+    println!("CREATE PLAYLIST HIT - user: {:?}, title: {:?}", claims.sub, payload.title);
     let playlist = sqlx::query_as!
         (Playlist, r#"INSERT INTO playlists (title, owner_id, is_public) VALUES ($1, $2, true) RETURNING id, title, owner_id, is_public as "is_public!", created_at as "created_at!" "#, payload.title, claims.sub)
         .fetch_one(&state.db)
@@ -1518,4 +1642,27 @@ pub async fn google_callback_handler(
     // let redirect_url = format!("{frontend_url}/bside_app?token={jwt}");
     let redirect_url = format!("{frontend_url}/login?token={jwt}");
     Ok(Redirect::to(&redirect_url))
+}
+
+#[utoipa::path(
+    get,
+    path = "/playlists",
+    responses(
+        (status = 200, description = "List of user's playlists", body = Vec<Playlist>),
+        (status = 401, description = "Unauthorized"),
+    ),
+    tags = ["Playlists"]
+)]
+pub async fn get_my_playlists_handler(
+    claims: Claims,
+    State(state): State<AppState>,
+) -> Result<Json<Vec<Playlist>>, BSideError> {
+    let playlists = sqlx::query_as!(
+        Playlist,
+        r#"SELECT id, title, owner_id, is_public as "is_public!", created_at as "created_at!" FROM playlists WHERE owner_id = $1 ORDER BY created_at DESC"#,
+        claims.sub
+    )
+    .fetch_all(&state.db)
+    .await?;
+    Ok(Json(playlists))
 }

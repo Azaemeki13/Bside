@@ -1,7 +1,8 @@
 use crate::models::{
-    AddSongResponse, AlbumResponse, ArtistResponse, AuthResponse, LoginPayload, Playlist,
-    PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RawSearchResult, RegisterPayload,
-    SearchResult, Song, SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
+    AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem,
+    ArtistResponse, AuthResponse, LoginPayload, Playlist, PlaylistDetailedResponse,
+    PlaylistPayload, PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, Song,
+    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use utoipa::OpenApi;
 
@@ -20,6 +21,8 @@ use utoipa::OpenApi;
         crate::handlers::get_user_by_id_handler,
         crate::handlers::create_artist_handler,
         crate::handlers::create_album_handler,
+        crate::handlers::get_my_albums_handler,
+        crate::handlers::get_album_by_id_handler,
         crate::handlers::delete_album_handler,
         crate::handlers::create_song_handler,
         crate::handlers::verify_song_handler,
@@ -36,7 +39,8 @@ use utoipa::OpenApi;
         schemas(
             User, UserPayload, Song, SongPayload, SongResponse, AddSongResponse,
             Playlist, UpdateStructurePayload, PlaylistDetailedResponse, PlaylistSongItem,
-            AlbumResponse, ArtistResponse, PlaylistPayload, AuthResponse,
+            AlbumResponse, AlbumListItem, AlbumSongItem, AlbumDetailedResponse,
+            ArtistResponse, PlaylistPayload, AuthResponse,
             RegisterPayload, LoginPayload, RawSearchResult, SearchResult,
         )
     ),
