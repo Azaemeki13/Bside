@@ -14,18 +14,11 @@ mod ws;
 use crate::auth::{Claims, auth_gate};
 use crate::error::BSideError;
 use crate::handlers::{
-<<<<<<< HEAD
-    add_song_to_playlist_handler, classic_auth_handler, contact_handler, create_album_handler,
-    create_artist_handler, create_playlist_handler, create_song_handler, create_user_handler,
-    delete_album_handler, delete_playlist_handler, delete_song_handler, flush_deleted_albums_task,
-    flush_deleted_songs_task, get_album_by_id_handler, get_all_users_handler, get_me_handler,
-=======
     add_song_to_playlist_handler, classic_auth_handler, create_album_handler,
     create_artist_handler, create_artist_request_handler, create_playlist_handler,
     create_song_handler, create_user_handler, delete_album_handler, delete_playlist_handler,
     delete_song_handler, flush_deleted_albums_task, flush_deleted_songs_task,
     get_album_by_id_handler, get_all_users_handler, get_artist_requests_handler, get_me_handler,
->>>>>>> 13908d1 (artist request, admin side)
     get_my_albums_handler, get_playlist_by_id_handler, get_song_stream_url_handler,
     get_user_by_id_handler, get_my_playlists_handler, google_callback_handler, google_login_handler,
     google_signup_handler, ping_handler, register_handler, remove_song_from_pl,
