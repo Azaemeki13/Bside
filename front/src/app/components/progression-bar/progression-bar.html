@@ -47,19 +47,23 @@
   				<img src="assets/cover1.png" alt="" class="w-full h-full object-cover" />
   			</button>
   			<div class="flex flex-col justify-center max-w-[100px]">
-  				<p class="font-Raleway text-sm font-semibold text-[#FFE6DB] truncate">{{ songTitle() }}</p>
-  				<p class="font-Raleway text-xs font-normal text-[#FFE6DB] truncate">{{ songBand() }}</p>
+  				@if (audio.currentTrack(); as track) {
+  					<p class="font-Raleway text-sm font-semibold text-[#FFE6DB] truncate">{{ track.title }}</p>
+  					<p class="font-Raleway text-xs font-normal text-[#FFE6DB] truncate">{{ track.artist }}</p>
+  				} @else {
+  					<p class="font-Raleway text-sm font-semibold text-[#FFE6DB] truncate">No track</p>
+  				}
   			</div>
   		</div>
   		<div class="flex items-center gap-4 shrink-0 px-4">
-  			<button type="button" aria-label="Track back" class="text-[#FFE6DB] cursor-pointer">
-  				<lucide-icon [img]="skipBack" class="w-[1.25rem] h-[1.25rem]"></lucide-icon>
+  			<button type="button" aria-label="Track back" class="text-[#FFE6DB] cursor-pointer" (click)="previousTrack()">
+  				<lucide-icon [img]="skipBackIcon" class="w-[1.25rem] h-[1.25rem]"></lucide-icon>
   			</button>
   			<button type="button" [attr.aria-label]="audio.isPlaying() ? 'Pause' : 'Play'" (click)="togglePlay()" class="text-[#FFE6DB] cursor-pointer rounded-full bg-[#FF5500] p-2">
   				<lucide-icon [img]="audio.isPlaying() ? pause : play" class="w-[1.75rem] h-[1.75rem] fill-current"></lucide-icon>
   			</button>
-  			<button type="button" aria-label="Track next" class="text-[#FFE6DB] cursor-pointer">
-  				<lucide-icon [img]="skipForward" class="w-[1.25rem] h-[1.25rem]"></lucide-icon>
+  			<button type="button" aria-label="Track next" class="text-[#FFE6DB] cursor-pointer" (click)="nextTrack()">
+  				<lucide-icon [img]="skipForwardIcon" class="w-[1.25rem] h-[1.25rem]"></lucide-icon>
   			</button>
   		</div>
   		<div class="relative flex-1 flex items-center min-w-20 h-6 group">

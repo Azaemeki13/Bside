@@ -1,15 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, afterNextRender, effect, inject } from '@angular/core';
+import { LucideAngularModule, Play } from 'lucide-angular';
+import { Subscription } from 'rxjs';
+import { AudioPlayerService } from '../../services/audio.player.service';
 import { AlbumDetailedResponse, AlbumListItem, AlbumService, AlbumSongItem } from '../../services/album.service';
 
 @Component({
   selector: 'app-albums',
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './albums.html',
   styleUrl: './albums.scss',
 })
-export class BsideAlbums implements OnInit {
+export class BsideAlbums implements OnDestroy {
   private readonly albumService = inject(AlbumService);
+  private readonly audio = inject(AudioPlayerService);
+
+  readonly playIcon = Play;
 
   albums: AlbumListItem[] = [];
   selectedAlbum: AlbumDetailedResponse | null = null;
@@ -19,8 +25,22 @@ export class BsideAlbums implements OnInit {
   playbackError = '';
   activeSongId = '';
 
-  ngOnInit(): void {
-    this.loadAlbums();
+  private albumCache = new Map<string, AlbumDetailedResponse>();
+  private albumSub?: Subscription;
+
+  constructor() {
+    afterNextRender(() => this.loadAlbums());
+
+    effect(() => {
+      const track = this.audio.currentTrack();
+      if (track) {
+        this.activeSongId = track.id;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.albumSub?.unsubscribe();
   }
 
   loadAlbums(): void {
@@ -31,9 +51,6 @@ export class BsideAlbums implements OnInit {
       next: (albums) => {
         this.albums = albums;
         this.isLoadingAlbums = false;
-        if (albums.length > 0) {
-          this.selectAlbum(albums[0]);
-        }
       },
       error: () => {
         this.error = 'Could not load albums.';
@@ -43,12 +60,21 @@ export class BsideAlbums implements OnInit {
   }
 
   selectAlbum(album: AlbumListItem): void {
+    this.albumSub?.unsubscribe();
+
+    const cached = this.albumCache.get(album.id);
+    if (cached) {
+      this.selectedAlbum = cached;
+      return;
+    }
+
     this.error = '';
     this.playbackError = '';
     this.isLoadingAlbum = true;
 
-    this.albumService.getAlbum(album.id).subscribe({
+    this.albumSub = this.albumService.getAlbum(album.id).subscribe({
       next: (details) => {
+        this.albumCache.set(album.id, details);
         this.selectedAlbum = details;
         this.isLoadingAlbum = false;
       },
@@ -59,7 +85,7 @@ export class BsideAlbums implements OnInit {
     });
   }
 
-  play(song: AlbumSongItem, audio: HTMLAudioElement): void {
+  play(song: AlbumSongItem, index: number): void {
     this.playbackError = '';
 
     if (song.status !== 'Ready') {
@@ -67,16 +93,20 @@ export class BsideAlbums implements OnInit {
       return;
     }
 
-    this.albumService.getSongStreamUrl(song.id).subscribe({
-      next: ({ url }) => {
-        this.activeSongId = song.id;
-        audio.src = url;
-        void audio.play();
-      },
-      error: () => {
-        this.playbackError = 'Could not get a stream URL for this song.';
-      },
-    });
+    const songs = this.selectedAlbum?.songs.filter(s => s.status === 'Ready') ?? [];
+    const startIndex = songs.findIndex(s => s.id === song.id);
+
+    const queue = songs.map(s => ({
+      id: s.id,
+      title: s.title,
+      artist: this.selectedAlbum?.artist_name ?? '',
+      format: 'wav' as const,
+      coverUrl: this.selectedAlbum?.cover_url ?? '',
+      onRequestUrl: () => this.albumService.getSongStreamUrl(s.id),
+    }));
+
+    this.activeSongId = song.id;
+    this.audio.setQueue(queue, Math.max(0, startIndex));
   }
 
   formatDuration(seconds: number): string {
