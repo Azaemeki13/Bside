@@ -2,47 +2,14 @@
   <header class="flex flex-col gap-2">
     <h1 class="font-raleway text-3xl font-bold">Artist upload</h1>
     <p class="max-w-3xl font-raleway text-sm text-[#FFE6DB]/70">
-      Create your artist profile, create an album, then upload WAV or FLAC tracks.
+      Create an album, then upload WAV or FLAC tracks.
     </p>
   </header>
 
-  <div class="grid gap-5 xl:grid-cols-3">
-    <form class="flex flex-col gap-4 rounded-lg border border-[#FFE6DB]/15 bg-[#1F0E1C] p-5" (ngSubmit)="saveArtist()">
-      <div>
-        <p class="font-raleway text-lg font-bold">1. Artist profile</p>
-        <p class="font-raleway text-xs text-[#FFE6DB]/60">One artist profile is linked to your account.</p>
-      </div>
-
-      <label class="flex flex-col gap-2 font-raleway text-sm">
-        Artist name
-        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="artistName" [(ngModel)]="artistName" required />
-      </label>
-
-      <label class="flex flex-col gap-2 font-raleway text-sm">
-        Bio
-        <textarea class="min-h-24 rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="artistBio" [(ngModel)]="artistBio"></textarea>
-      </label>
-
-      <label class="flex flex-col gap-2 font-raleway text-sm">
-        Photo PNG
-        <input class="text-sm text-[#FFE6DB]" type="file" accept="image/png" (change)="onArtistPhotoSelected($event)" />
-      </label>
-
-      <button class="rounded-md bg-[#FF5500] px-4 py-2 font-raleway font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" type="submit" [disabled]="isSavingArtist">
-        {{ isSavingArtist ? 'Saving...' : 'Save artist profile' }}
-      </button>
-
-      @if (artistMessage) {
-        <p class="font-raleway text-sm text-green-300">{{ artistMessage }}</p>
-      }
-      @if (artistError) {
-        <p class="font-raleway text-sm text-red-300">{{ artistError }}</p>
-      }
-    </form>
-
+  <div class="grid gap-5 xl:grid-cols-2">
     <form class="flex flex-col gap-4 rounded-lg border border-[#FFE6DB]/15 bg-[#1F0E1C] p-5" (ngSubmit)="createAlbum()">
       <div>
-        <p class="font-raleway text-lg font-bold">2. Album and tracks</p>
+        <p class="font-raleway text-lg font-bold">1. Album and tracks</p>
         <p class="font-raleway text-xs text-[#FFE6DB]/60">Create the album and optionally upload its tracks in the same action.</p>
       </div>
 
@@ -91,7 +58,7 @@
 
     <form class="flex flex-col gap-4 rounded-lg border border-[#FFE6DB]/15 bg-[#1F0E1C] p-5" (ngSubmit)="uploadSong()">
       <div>
-        <p class="font-raleway text-lg font-bold">3. Track</p>
+        <p class="font-raleway text-lg font-bold">2. Add a track</p>
         <p class="font-raleway text-xs text-[#FFE6DB]/60">Upload limit is 200 MB. WAV and FLAC only.</p>
       </div>
 

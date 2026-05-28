@@ -1,0 +1,43 @@
+<section class="mx-auto flex w-full max-w-5xl flex-col gap-4 py-6 text-[#FFE6DB]">
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <h1 class="font-raleway text-3xl font-bold">Artist requests</h1>
+      <p class="font-raleway text-sm text-[#FFE6DB]/60">Review user requests to become artists.</p>
+    </div>
+    <button class="rounded-md bg-[#FF5500] px-4 py-2 font-raleway font-bold text-white" type="button" (click)="load()">Refresh</button>
+  </div>
+
+  @if (isLoading) {
+    <p class="font-raleway text-sm text-[#FFE6DB]/70">Loading requests...</p>
+  }
+  @if (message) {
+    <p class="font-raleway text-sm text-green-300">{{ message }}</p>
+  }
+  @if (error) {
+    <p class="font-raleway text-sm text-red-300">{{ error }}</p>
+  }
+
+  <div class="flex flex-col gap-3">
+    @for (request of pending; track request.id) {
+      <article class="rounded-lg border border-[#FFE6DB]/15 bg-[#1F0E1C] p-5">
+        <div class="flex items-start justify-between gap-4">
+          <div class="min-w-0">
+            <h2 class="truncate font-raleway text-xl font-bold">{{ request.artist_name }}</h2>
+            <p class="font-raleway text-sm text-[#FFE6DB]/60">{{ request.username }} | {{ request.email }}</p>
+            @if (request.bio) {
+              <p class="mt-3 font-raleway text-sm text-[#FFE6DB]/80">{{ request.bio }}</p>
+            }
+          </div>
+          <div class="flex shrink-0 gap-2">
+            <button class="rounded-md bg-green-700 px-4 py-2 font-raleway font-bold text-white" type="button" (click)="review(request, 'Accepted')">Accept</button>
+            <button class="rounded-md bg-red-700 px-4 py-2 font-raleway font-bold text-white" type="button" (click)="review(request, 'Denied')">Deny</button>
+          </div>
+        </div>
+      </article>
+    } @empty {
+      @if (!isLoading) {
+        <p class="font-raleway text-sm text-[#FFE6DB]/60">No pending artist requests.</p>
+      }
+    }
+  </div>
+</section>

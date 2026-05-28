@@ -5,6 +5,7 @@ import { RouterOutlet } from '@angular/router';
 import { NavBar } from '../components/nav-bar/nav-bar';
 import { SideBar } from '../components/side-bar/side-bar';
 import { SoundBar } from './sound-bar/sound-bar';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-bside-app',
@@ -17,6 +18,7 @@ export class BsideApp implements OnInit {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly authService = inject(AuthService);
 
   async ngOnInit(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -46,6 +48,7 @@ export class BsideApp implements OnInit {
       }
       const data = await res.json();
       console.log('User data:', data);
+      this.authService.currentUser.set(data);
       this.cdr.markForCheck();
       this.name = data.username ?? data.email ?? '';
       console.log('Name set to:', this.name);

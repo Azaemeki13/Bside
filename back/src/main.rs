@@ -14,14 +14,22 @@ mod ws;
 use crate::auth::{Claims, auth_gate};
 use crate::error::BSideError;
 use crate::handlers::{
+<<<<<<< HEAD
     add_song_to_playlist_handler, classic_auth_handler, contact_handler, create_album_handler,
     create_artist_handler, create_playlist_handler, create_song_handler, create_user_handler,
     delete_album_handler, delete_playlist_handler, delete_song_handler, flush_deleted_albums_task,
     flush_deleted_songs_task, get_album_by_id_handler, get_all_users_handler, get_me_handler,
+=======
+    add_song_to_playlist_handler, classic_auth_handler, create_album_handler,
+    create_artist_handler, create_artist_request_handler, create_playlist_handler,
+    create_song_handler, create_user_handler, delete_album_handler, delete_playlist_handler,
+    delete_song_handler, flush_deleted_albums_task, flush_deleted_songs_task,
+    get_album_by_id_handler, get_all_users_handler, get_artist_requests_handler, get_me_handler,
+>>>>>>> 13908d1 (artist request, admin side)
     get_my_albums_handler, get_playlist_by_id_handler, get_song_stream_url_handler,
-    get_user_by_id_handler, get_my_playlists_handler, google_callback_handler,
-    google_login_handler, google_signup_handler, ping_handler, register_handler,
-    remove_song_from_pl, update_playlist_handler, upload_avatar, verify_song_handler,
+    get_user_by_id_handler, get_my_playlists_handler, google_callback_handler, google_login_handler,
+    google_signup_handler, ping_handler, register_handler, remove_song_from_pl,
+    review_artist_request_handler, update_playlist_handler, upload_avatar, verify_song_handler,
 };
 use crate::models::{
     AddSongResponse, AlbumResponse, AppState, ArtistResponse, AuthRequest, AuthResponse,
@@ -29,9 +37,10 @@ use crate::models::{
     PlaylistPayload, PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, Song,
     SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
-    ArtistResponse, AuthRequest, AuthResponse, GoogleUserProfile, LoginPayload, Playlist,
-    PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RawSearchResult, RegisterPayload,
-    SearchResult, Song, SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
+    ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload, ArtistResponse,
+    AuthRequest, AuthResponse, GoogleUserProfile, LoginPayload, Playlist, PlaylistDetailedResponse,
+    PlaylistPayload, PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, Song,
+    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use crate::search::searcher;
 
@@ -139,6 +148,12 @@ async fn main() {
         .route("/users/me", get(get_me_handler))
         .route("/users/me/avatar", post(upload_avatar))
         .route("/artists", post(create_artist_handler))
+        .route("/artist-requests", post(create_artist_request_handler))
+        .route("/admin/artist-requests", get(get_artist_requests_handler))
+        .route(
+            "/admin/artist-requests/{request_id}",
+            put(review_artist_request_handler),
+        )
         .route("/albums", get(get_my_albums_handler).post(create_album_handler))
         .route(
             "/albums/{album_id}",
@@ -174,11 +189,15 @@ async fn main() {
             SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", swagger::ApiDoc::openapi()),
         );
 
-    let listener_addr = "0.0.0.0:8080";
+    let port = env::var("PORT")
+        .ok()
+        .and_then(|value| value.parse::<u16>().ok())
+        .unwrap_or(8080);
+    let listener_addr = format!("0.0.0.0:{port}");
     println!("B-Side engine starting on http://{listener_addr}");
-    let listener = tokio::net::TcpListener::bind(listener_addr)
+    let listener = tokio::net::TcpListener::bind(&listener_addr)
         .await
-        .expect("Tokio bind listener failed !");
+        .unwrap_or_else(|error| panic!("Tokio bind listener failed for {listener_addr}: {error}"));
     axum::serve(listener, app)
         .await
         .expect("Axum failed to server Router with listener.");

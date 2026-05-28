@@ -24,6 +24,7 @@ export class NavBar implements OnInit {
       this.authService.getCurrentUser().subscribe({
         next: (res) => {
           this.user = res;
+          this.authService.currentUser.set(res);
           console.log('this.user', this.user);
         },
         error: (err) => {

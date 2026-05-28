@@ -11,10 +11,11 @@ import { BsideSettings } from './bside_app/settings/settings';
 import { BsideUpload } from './bside_app/upload/upload';
 import { BsideAlbums } from './bside_app/albums/albums';
 import { artistGuard } from './guards/artist.guard';
+import { adminGuard } from './guards/admin.guard';
+import { AdminArtistRequests } from './bside_app/admin-artist-requests/admin-artist-requests';
 
 export const routes: Routes = [
     {path: '', component: LandingComponent },
-    { path: 'upload', component: BsideUpload, canActivate: [artistGuard] },
     {path: 'login', component: Login },
     {path: 'signup', component: Signup },
     {
@@ -27,7 +28,8 @@ export const routes: Routes = [
             { path: 'albums', component: BsideAlbums },
             { path: 'favorites', component: BsideFavorites },
             { path: 'social', component: BsideSocial },
-            { path: 'upload', component: BsideUpload },
+            { path: 'upload', component: BsideUpload, canActivate: [artistGuard] },
+            { path: 'admin/artist-requests', component: AdminArtistRequests, canActivate: [adminGuard] },
             { path: 'settings', component: BsideSettings },
         ],
     },

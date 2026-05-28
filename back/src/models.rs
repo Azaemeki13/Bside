@@ -34,6 +34,31 @@ pub struct ArtistResponse {
     pub status: String,
 }
 
+#[derive(serde::Deserialize, utoipa::ToSchema)]
+pub struct ArtistRequestPayload {
+    pub artist_name: String,
+    pub bio: Option<String>,
+}
+
+#[derive(serde::Deserialize, utoipa::ToSchema)]
+pub struct ArtistRequestReviewPayload {
+    pub decision: String,
+}
+
+#[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
+pub struct ArtistRequestResponse {
+    pub id: uuid::Uuid,
+    pub user_id: uuid::Uuid,
+    pub username: String,
+    pub email: String,
+    pub artist_name: String,
+    pub bio: Option<String>,
+    pub status: String,
+    pub reviewed_by: Option<uuid::Uuid>,
+    pub reviewed_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+}
+
 #[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
 pub struct Song {
     pub id: uuid::Uuid,
