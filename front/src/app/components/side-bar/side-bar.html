@@ -28,3 +28,9 @@
     </div>
   </div>
 }
+
+@if (authService.currentUser()?.role === 'Artist') {
+  <app-side-bar-button link="/bside_app/upload">
+    <lucide-icon [img]="upload" ...></lucide-icon>
+  </app-side-bar-button>
+}

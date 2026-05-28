@@ -375,6 +375,13 @@ pub async fn create_artist_handler(
         bio,
         photo_url
     )
+    .execute(&mut *tx)
+    .await?;
+    sqlx::query!(
+        "UPDATE users SET role = 'Artist' WHERE id = $1",
+        current_user_id
+    )
+
     .execute(&state.db)
     .await?;
     Ok(Json(ArtistResponse {

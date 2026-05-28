@@ -10,9 +10,11 @@ import { BsideSocial } from './bside_app/social/social';
 import { BsideSettings } from './bside_app/settings/settings';
 import { BsideUpload } from './bside_app/upload/upload';
 import { BsideAlbums } from './bside_app/albums/albums';
+import { artistGuard } from './guards/artist.guard';
 
 export const routes: Routes = [
     {path: '', component: LandingComponent },
+    { path: 'upload', component: BsideUpload, canActivate: [artistGuard] },
     {path: 'login', component: Login },
     {path: 'signup', component: Signup },
     {

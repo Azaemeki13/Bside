@@ -3,6 +3,7 @@ import { isPlatformBrowser, NgIf } from '@angular/common';
 import { SideBarButton } from '../side-bar-button/side-bar-button';
 import { LucideAngularModule, House, Disc3, Heart, UsersRound, LogOut, Settings, Upload, Library} from 'lucide-angular';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-side-bar',
@@ -14,6 +15,7 @@ import { Router } from '@angular/router';
 export class SideBar {
   private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
+  protected readonly authService = inject(AuthService);
 
   protected readonly house = House;
   protected readonly disc3 = Disc3;
@@ -47,5 +49,4 @@ export class SideBar {
     if (!this.isLogoutConfirmOpen) return;
     this.closeLogoutConfirm();
   }
-
 }

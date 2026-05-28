@@ -1,3 +1,15 @@
-<div class="py-6">
+<div class="py-6 flex flex-col gap-4">
   <p class="text-[#FFE6DB]">Settings</p>
+  @if (authService.currentUser()?.role !== 'Artist') {
+    <div class="rounded-lg border border-[#FFE6DB]/15 bg-[#1F0E1C] p-5 flex flex-col gap-3">
+      <p class="font-raleway font-bold text-[#FFE6DB]">Become an artist</p>
+      <p class="font-raleway text-sm text-[#FFE6DB]/60">
+        Upload your music and reach listeners on B-Side.
+      </p>
+      <a routerLink="/bside_app/upload"
+         class="rounded-md bg-[#FF5500] px-4 py-2 font-raleway font-bold text-white text-center">
+        Apply
+      </a>
+    </div>
+  }
 </div>
