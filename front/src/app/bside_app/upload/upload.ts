@@ -36,7 +36,7 @@ interface SongResponse {
   upload_url: string;
 }
 
-type UploadStep = 'idle' | 'creating-song' | 'uploading-file' | 'verifying' | 'done';
+type UploadStep = 'idle' | 'creating-album' | 'creating-song' | 'uploading-file' | 'verifying' | 'done';
 
 @Component({
   selector: 'app-upload',
@@ -71,6 +71,8 @@ export class BsideUpload {
   songTitle = '';
   songDurationSeconds: number | null = null;
   songFile: File | null = null;
+  singleCover: File | null = null;
+  singleTag = 'Single';
   songMessage = '';
   songError = '';
   uploadStep: UploadStep = 'idle';
@@ -81,11 +83,10 @@ export class BsideUpload {
 
   get canUploadSong(): boolean {
     return Boolean(
-      this.album?.id &&
-        this.songTitle.trim() &&
+      this.songTitle.trim() &&
+        this.singleTag.trim() &&
         this.songFile &&
-        this.songDurationSeconds &&
-        this.songDurationSeconds > 0 &&
+        this.uploadStep !== 'creating-album' &&
         this.uploadStep !== 'creating-song' &&
         this.uploadStep !== 'uploading-file' &&
         this.uploadStep !== 'verifying'
@@ -98,6 +99,15 @@ export class BsideUpload {
 
   onAlbumCoverSelected(event: Event): void {
     this.albumCover = this.fileFromEvent(event);
+  }
+
+  onSingleCoverSelected(event: Event): void {
+    this.singleCover = this.fileFromEvent(event);
+    this.songError = '';
+
+    if (this.singleCover && !this.isCoverImage(this.singleCover)) {
+      this.songError = 'Single cover must be a PNG, JPEG, or WebP image.';
+    }
   }
 
   onAlbumSongsSelected(event: Event): void {
@@ -126,12 +136,9 @@ export class BsideUpload {
       this.songTitle = this.songFile.name.replace(/\.[^/.]+$/, '');
     }
 
-    if (format === 'wav') {
-      const duration = await this.readAudioDuration(this.songFile);
-      if (duration) {
-        this.songDurationSeconds = Math.ceil(duration);
-      }
-    }
+    const duration = await this.readAudioDuration(this.songFile);
+    this.songDurationSeconds = duration ? Math.ceil(duration) : null;
+    this.cdr.detectChanges();
   }
 
   saveArtist(): void {
@@ -177,8 +184,8 @@ export class BsideUpload {
       return;
     }
 
-    if (this.albumCover && this.albumCover.type !== 'image/png') {
-      this.albumError = 'Album cover must be a PNG.';
+    if (this.albumCover && !this.isCoverImage(this.albumCover)) {
+      this.albumError = 'Album cover must be a PNG, JPEG, or WebP image.';
       return;
     }
 
@@ -215,8 +222,8 @@ export class BsideUpload {
     this.songError = '';
     this.songMessage = '';
 
-    if (!this.album?.id || !this.songFile || !this.songDurationSeconds) {
-      this.songError = 'Choose an album, audio file, title, and duration first.';
+    if (!this.songFile || !this.songTitle.trim() || !this.singleTag.trim()) {
+      this.songError = 'Choose an audio file, song title, and tag first.';
       return;
     }
 
@@ -226,41 +233,46 @@ export class BsideUpload {
       return;
     }
 
+    if (this.singleCover && !this.isCoverImage(this.singleCover)) {
+      this.songError = 'Single cover must be a PNG, JPEG, or WebP image.';
+      return;
+    }
+
+    const title = this.songTitle.trim();
+    const durationSeconds = Math.ceil(this.songDurationSeconds ?? this.fallbackDurationSeconds);
+
     try {
+      this.uploadStep = 'creating-album';
+      const album = await this.createSingleAlbum(title);
+      this.album = album;
+
       this.uploadStep = 'creating-song';
-      const songResponse = await firstValueFrom(
-        this.http.post<SongResponse>(`${this.apiUrl}/songs`, {
-          title: this.songTitle.trim(),
-          album_id: this.album.id,
-          duration_seconds: Math.ceil(this.songDurationSeconds),
-          format,
-          ml_features: null,
-        })
-      );
-
-      this.uploadStep = 'uploading-file';
-      const uploadResponse = await fetch(songResponse.upload_url, {
-        method: 'PUT',
-        headers: { 'Content-Type': `audio/${format}` },
-        body: this.songFile,
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error(`File upload failed with status ${uploadResponse.status}.`);
-      }
-
-      this.uploadStep = 'verifying';
-      await firstValueFrom(this.http.put(`${this.apiUrl}/songs/${songResponse.song.id}/verify`, {}));
+      await this.uploadOneSong(album.id, this.songFile, title, durationSeconds);
 
       this.uploadStep = 'done';
-      this.songMessage = 'Song uploaded and verified.';
+      this.songMessage = `Single uploaded and added to album: ${album.title}.`;
+      this.albumMessage = `Album created: ${album.title}`;
       this.songTitle = '';
       this.songDurationSeconds = null;
       this.songFile = null;
+      this.singleCover = null;
+      this.singleTag = 'Single';
     } catch (error) {
       this.songError = this.describeError(error, 'Upload failed.');
       this.uploadStep = 'idle';
+    } finally {
+      this.cdr.detectChanges();
     }
+  }
+
+
+  private async createSingleAlbum(title: string): Promise<AlbumResponse> {
+    const form = new FormData();
+    form.append('title', title);
+    form.append('genre', this.singleTag.trim());
+    if (this.singleCover) form.append('cover', this.singleCover);
+
+    return firstValueFrom(this.http.post<AlbumResponse>(`${this.apiUrl}/albums`, form));
   }
 
   private async uploadFilesToAlbum(album: AlbumResponse, files: File[]): Promise<void> {
@@ -281,6 +293,7 @@ export class BsideUpload {
       throw new Error(`${file.name} is not a WAV or FLAC file.`);
     }
 
+    this.uploadStep = 'creating-song';
     const songResponse = await firstValueFrom(
       this.http.post<SongResponse>(`${this.apiUrl}/songs`, {
         title,
@@ -291,6 +304,7 @@ export class BsideUpload {
       })
     );
 
+    this.uploadStep = 'uploading-file';
     const uploadResponse = await fetch(songResponse.upload_url, {
       method: 'PUT',
       headers: { 'Content-Type': `audio/${format}` },
@@ -301,12 +315,22 @@ export class BsideUpload {
       throw new Error(`File upload failed for ${file.name} with status ${uploadResponse.status}.`);
     }
 
+    this.uploadStep = 'verifying';
     await firstValueFrom(this.http.put(`${this.apiUrl}/songs/${songResponse.song.id}/verify`, {}));
   }
 
   private fileFromEvent(event: Event): File | null {
     const input = event.target as HTMLInputElement | null;
     return input?.files?.item(0) ?? null;
+  }
+
+
+  private isCoverImage(file: File): boolean {
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    if (validTypes.includes(file.type))
+      return true;
+
+    return /\.(png|jpe?g|webp)$/i.test(file.name);
   }
 
   private getAudioFormat(file: File): 'wav' | 'flac' | null {

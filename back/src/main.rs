@@ -19,7 +19,8 @@ use crate::handlers::{
     create_song_handler, create_user_handler, delete_album_handler, delete_playlist_handler,
     delete_song_handler, flush_deleted_albums_task, flush_deleted_songs_task,
     get_album_by_id_handler, get_all_users_handler, get_artist_requests_handler, get_me_handler,
-    get_my_albums_handler, get_playlist_by_id_handler, get_song_stream_url_handler,
+    get_my_albums_handler, get_playlist_by_id_handler, get_public_album_by_id_handler,
+    get_song_stream_url_handler,
     get_user_by_id_handler, get_my_playlists_handler, google_callback_handler, google_login_handler,
     google_signup_handler, ping_handler, register_handler, remove_song_from_pl,
     review_artist_request_handler, update_playlist_handler, upload_avatar, verify_song_handler,
@@ -128,6 +129,7 @@ async fn main() {
         .route("/login", post(classic_auth_handler))
         .route("/ping", get(ping_handler))
         .route("/search", get(searcher))
+        .route("/catalog/albums/{album_id}", get(get_public_album_by_id_handler))
         .route("/contact", post(contact_handler))
         .route("/ws", get(ws_handler));
 

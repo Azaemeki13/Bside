@@ -2,7 +2,7 @@
   <header class="flex flex-col gap-2">
     <h1 class="font-raleway text-3xl font-bold">Artist upload</h1>
     <p class="max-w-3xl font-raleway text-sm text-[#FFE6DB]/70">
-      Create an album, then upload WAV or FLAC tracks.
+      Create an album release or upload one single. Singles automatically get their own album.
     </p>
   </header>
 
@@ -24,8 +24,8 @@
       </label>
 
       <label class="flex flex-col gap-2 font-raleway text-sm">
-        Cover PNG
-        <input class="text-sm text-[#FFE6DB]" type="file" accept="image/png" (change)="onAlbumCoverSelected($event)" />
+        Cover image
+        <input class="text-sm text-[#FFE6DB]" type="file" accept="image/png,image/jpeg,image/webp" (change)="onAlbumCoverSelected($event)" />
       </label>
 
       <label class="flex flex-col gap-2 font-raleway text-sm">
@@ -58,8 +58,8 @@
 
     <form class="flex flex-col gap-4 rounded-lg border border-[#FFE6DB]/15 bg-[#1F0E1C] p-5" (ngSubmit)="uploadSong()">
       <div>
-        <p class="font-raleway text-lg font-bold">2. Add a track</p>
-        <p class="font-raleway text-xs text-[#FFE6DB]/60">Upload limit is 200 MB. WAV and FLAC only.</p>
+        <p class="font-raleway text-lg font-bold">2. Upload a single</p>
+        <p class="font-raleway text-xs text-[#FFE6DB]/60">A matching album is created automatically. Upload limit is 200 MB. WAV and FLAC only.</p>
       </div>
 
       <label class="flex flex-col gap-2 font-raleway text-sm">
@@ -73,12 +73,21 @@
       </label>
 
       <label class="flex flex-col gap-2 font-raleway text-sm">
-        Duration seconds
-        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="songDurationSeconds" type="number" min="1" [(ngModel)]="songDurationSeconds" required />
+        Tag
+        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="singleTag" [(ngModel)]="singleTag" required />
       </label>
 
+      <label class="flex flex-col gap-2 font-raleway text-sm">
+        Cover image
+        <input class="text-sm text-[#FFE6DB]" type="file" accept="image/png,image/jpeg,image/webp" (change)="onSingleCoverSelected($event)" />
+      </label>
+
+      @if (songDurationSeconds) {
+        <p class="font-raleway text-xs text-[#FFE6DB]/60">Detected duration: {{ songDurationSeconds }} seconds</p>
+      }
+
       <button class="rounded-md bg-[#FF5500] px-4 py-2 font-raleway font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" type="submit" [disabled]="!canUploadSong">
-        Upload and verify
+        Upload single
       </button>
 
       @if (uploadStep !== 'idle') {

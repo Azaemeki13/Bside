@@ -27,6 +27,7 @@ use utoipa::OpenApi;
         crate::handlers::create_album_handler,
         crate::handlers::get_my_albums_handler,
         crate::handlers::get_album_by_id_handler,
+        crate::handlers::get_public_album_by_id_handler,
         crate::handlers::delete_album_handler,
         crate::handlers::create_song_handler,
         crate::handlers::verify_song_handler,

@@ -800,23 +800,32 @@ pub async fn create_album_handler(
                 );
             }
             "cover" => {
-                match field.content_type() {
-                    Some("image/png") => {}
-                    _ => return Err(BSideError::BadRequest("Only PNG images are allowed".into())),
-                }
                 let data = field
                     .bytes()
                     .await
                     .map_err(|e| BSideError::BadRequest(e.to_string()))?;
-                if data.len() < 8 {
+                if data.len() < 4 {
                     return Err(BSideError::BadRequest(
                         "File too small to be valid !".into(),
                     ));
                 }
+
                 let png_header = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-                if data[0..8] != png_header {
-                    return Err(BSideError::BadRequest("File signature mismatch !".into()));
-                }
+                let (extension, stored_content_type) = if data.starts_with(&png_header) {
+                    ("png", "image/png")
+                } else if data.starts_with(&[0xFF, 0xD8, 0xFF]) {
+                    ("jpg", "image/jpeg")
+                } else if data.starts_with(b"RIFF")
+                    && data.len() >= 12
+                    && &data[8..12] == b"WEBP"
+                {
+                    ("webp", "image/webp")
+                } else {
+                    return Err(BSideError::BadRequest(
+                        "Cover must be a PNG, JPEG, or WebP image.".into(),
+                    ));
+                };
+
                 let max_size = 10 * 1024 * 1024;
                 if data.len() > max_size {
                     return Err(BSideError::BadRequest(
@@ -825,14 +834,14 @@ pub async fn create_album_handler(
                 }
                 if !data.is_empty() {
                     let file_id = Uuid::new_v4();
-                    let key = format!("{file_id}.png");
+                    let key = format!("{file_id}.{extension}");
                     state
                         .aws_client
                         .put_object()
                         .bucket("bside-covers")
                         .key(&key)
                         .body(data.into())
-                        .content_type("image/png")
+                        .content_type(stored_content_type)
                         .send()
                         .await
                         .map_err(|e| BSideError::S3Error(e.to_string()))?;
@@ -907,6 +916,72 @@ pub async fn get_my_albums_handler(
     .await?;
 
     Ok(Json(albums))
+}
+
+
+#[utoipa::path(
+    get,
+    path = "/catalog/albums/{album_id}",
+    params(("album_id" = uuid::Uuid, Path, description = "Album ID")),
+    responses(
+        (status = 200, description = "Public album details with ready songs", body = AlbumDetailedResponse),
+        (status = 404, description = "Album not found"),
+        (status = 500, description = "Internal server error"),
+    ),
+    tags = ["Catalog"]
+)]
+pub async fn get_public_album_by_id_handler(
+    State(state): State<AppState>,
+    Path(album_id): Path<uuid::Uuid>,
+) -> Result<Json<AlbumDetailedResponse>, BSideError> {
+    let album = sqlx::query!(
+        r#"
+        SELECT
+            a.id,
+            a.artist_id,
+            ar.name AS "artist_name!",
+            a.title,
+            a.genre,
+            a.cover_url,
+            a.status,
+            a.created_at AS "created_at!",
+            COALESCE(
+                jsonb_agg(
+                    jsonb_build_object(
+                        'id', s.id,
+                        'title', s.title,
+                        'duration_seconds', s.duration_seconds,
+                        'status', s.status,
+                        'audio_url', s.audio_url,
+                        'created_at', s.created_at
+                    )
+                    ORDER BY s.created_at ASC
+                ) FILTER (WHERE s.id IS NOT NULL),
+                '[]'::jsonb
+            ) AS "songs!: sqlx::types::Json<Vec<AlbumSongItem>>"
+        FROM albums a
+        JOIN artists ar ON ar.id = a.artist_id
+        LEFT JOIN songs s ON s.album_id = a.id AND s.status = 'Ready'
+        WHERE a.id = $1 AND a.status = 'Ready'
+        GROUP BY a.id, ar.name
+        "#,
+        album_id,
+    )
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::NotFound)?;
+
+    Ok(Json(AlbumDetailedResponse {
+        id: album.id,
+        artist_id: album.artist_id,
+        artist_name: album.artist_name,
+        title: album.title,
+        genre: album.genre,
+        cover_url: album.cover_url,
+        status: album.status,
+        created_at: album.created_at,
+        songs: album.songs.0,
+    }))
 }
 
 #[utoipa::path(
