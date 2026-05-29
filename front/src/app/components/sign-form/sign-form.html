@@ -19,7 +19,7 @@
 	@if (errorMessage) {
 		<p class="text-red-500 font-raleway font-bold text-sm w-full text-left -mt-2">{{ errorMessage }}</p>
 	}
-	<button type="submit" [disabled]="registerForm.invalid || isLoading" class="w-auto rounded-full bg-[#FF5500] px-8 py-3 font-raleway font-bold text-white transition-all hover:bg-[#FF5500]/80 disabled:cursor-not-allowed disabled:opacity-50">
+	<button type="submit" [disabled]="registerForm.invalid || isLoading" class="w-auto rounded-full bg-[#FF5500] px-8 py-3 font-raleway font-bold text-[#FFE6DB] transition-all hover:bg-[#FF5500]/80 disabled:cursor-not-allowed disabled:opacity-50">
 		{{ isLoading ? 'Creating...' : 'Create Account' }}
 	</button>
     <div class="flex w-full items-center gap-4">

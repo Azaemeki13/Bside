@@ -17,7 +17,7 @@
         <textarea class="min-h-28 rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="bio" [(ngModel)]="bio"></textarea>
       </label>
 
-      <button class="rounded-md bg-[#FF5500] px-4 py-2 font-raleway font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" type="submit" [disabled]="isSubmitting">
+      <button class="rounded-md bg-[#FF5500] px-4 py-2 font-raleway font-bold text-[#FFE6DB] disabled:cursor-not-allowed disabled:opacity-50" type="submit" [disabled]="isSubmitting">
         {{ isSubmitting ? 'Sending...' : 'Send request' }}
       </button>
 
