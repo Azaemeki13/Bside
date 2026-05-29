@@ -33,6 +33,7 @@ export class AudioPlayerService {
     private sound?: Howl;
     private progressTimer?: number;
     private urlSub?: Subscription;
+    private loadToken = 0;
 
     readonly currentTrack = signal<AudioTrack | null>(null);
     readonly isPlaying = signal(false);
@@ -109,7 +110,9 @@ export class AudioPlayerService {
     }
 
     stop(): void {
+        this.loadToken++;
         this.urlSub?.unsubscribe();
+        this.urlSub = undefined;
         this.stopProgressTimer();
 
         if (this.sound) {
@@ -118,8 +121,10 @@ export class AudioPlayerService {
             this.sound = undefined;
         }
 
+        this.currentTrack.set(null);
         this.isPlaying.set(false);
         this.isLoading.set(false);
+        this.duration.set(0);
         this.position.set(0);
     }
 
@@ -138,15 +143,19 @@ export class AudioPlayerService {
         if (index < 0 || index >= this.queue.length)
             return;
 
-        this.urlSub?.unsubscribe();
         this.stop();
         this.queueIndex.set(index);
 
         const entry = this.queue[index];
+        const token = ++this.loadToken;
         this.isLoading.set(true);
+        this.error.set(null);
 
         this.urlSub = entry.onRequestUrl().subscribe({
             next: ({ url }) => {
+                if (token !== this.loadToken)
+                    return;
+
                 this.loadTrack({
                     id: entry.id,
                     title: entry.title,
@@ -154,18 +163,21 @@ export class AudioPlayerService {
                     src: url,
                     format: entry.format,
                     coverUrl: entry.coverUrl,
-                });
+                }, token);
                 this.sound?.play();
             },
             error: (err) => {
+                if (token !== this.loadToken)
+                    return;
+
                 this.isLoading.set(false);
                 this.error.set(`Could not load stream URL: ${err}`);
             },
         });
     }
 
-    private loadTrack(track: AudioTrack): void {
-        if (!this.isBrowser)
+    private loadTrack(track: AudioTrack, token: number): void {
+        if (!this.isBrowser || token !== this.loadToken)
             return;
 
         this.stopProgressTimer();
@@ -175,35 +187,50 @@ export class AudioPlayerService {
         this.duration.set(0);
         this.position.set(0);
 
-        this.sound = new Howl({
+        const sound = new Howl({
             src: [track.src],
             html5: true,
             format: [track.format],
             volume: this.volumeService.volume01(),
 
             onload: () => {
+                if (token !== this.loadToken || sound !== this.sound)
+                    return;
+
                 this.isLoading.set(false);
-                this.duration.set(this.sound?.duration() ?? 0);
+                this.duration.set(sound.duration() ?? 0);
             },
 
             onplay: () => {
+                if (token !== this.loadToken || sound !== this.sound)
+                    return;
+
                 this.isPlaying.set(true);
                 this.startProgressTimer();
             },
 
             onpause: () => {
+                if (token !== this.loadToken || sound !== this.sound)
+                    return;
+
                 this.isPlaying.set(false);
                 this.stopProgressTimer();
                 this.syncPosition();
             },
 
             onstop: () => {
+                if (token !== this.loadToken || sound !== this.sound)
+                    return;
+
                 this.isPlaying.set(false);
                 this.stopProgressTimer();
                 this.position.set(0);
             },
 
             onend: () => {
+                if (token !== this.loadToken || sound !== this.sound)
+                    return;
+
                 this.isPlaying.set(false);
                 this.stopProgressTimer();
                 this.position.set(0);
@@ -211,15 +238,24 @@ export class AudioPlayerService {
             },
 
             onloaderror: (_id: number, error: unknown) => {
+                if (token !== this.loadToken || sound !== this.sound)
+                    return;
+
                 this.isLoading.set(false);
                 this.error.set(String(error));
             },
 
             onplayerror: (_id: number, error: unknown) => {
+                if (token !== this.loadToken || sound !== this.sound)
+                    return;
+
                 this.isPlaying.set(false);
+                this.isLoading.set(false);
                 this.error.set(String(error));
             },
         });
+
+        this.sound = sound;
     }
 
     private startProgressTimer(): void {

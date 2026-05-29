@@ -32,7 +32,7 @@ export class ProgressionBar {
 }
  */
 
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { LucideAngularModule, Pause, Play, SkipBack, SkipForward } from 'lucide-angular';
 import { AudioPlayerService } from '../../services/audio.player.service';
 
@@ -50,7 +50,7 @@ import { AudioPlayerService } from '../../services/audio.player.service';
     protected readonly play = Play;
     protected readonly pause = Pause;
 
-    async togglePlay(): Promise<void> {
+    togglePlay(): void {
       if (this.audio.currentTrack()) {
         this.audio.toggle();
       }
