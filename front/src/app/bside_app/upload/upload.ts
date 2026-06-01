@@ -1,25 +1,27 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { UploadAlbumForm } from '../../components/upload-album-form/upload-album-form';
 import { UploadSingleForm } from '../../components/upload-single-form/upload-single-form';
+import { AdminArtistUpload } from '../../components/admin-upload/admin-upload';
+import { AuthService } from '../../services/auth.service';
 
 type UploadForm = 'album' | 'single';
 
 @Component({
   selector: 'app-upload',
   standalone: true,
-  imports: [CommonModule, UploadAlbumForm, UploadSingleForm],
+  imports: [CommonModule, UploadAlbumForm, UploadSingleForm, AdminArtistUpload],
   templateUrl: './upload.html',
   styleUrl: './upload.scss',
 })
 export class BsideUpload {
+  protected readonly authService = inject(AuthService);
   activeForm: UploadForm = 'album';
 
-  showAlbumForm(): void {
-    this.activeForm = 'album';
+  get isAdmin(): boolean {
+    return this.authService.currentUser()?.role === 'Admin';
   }
 
-  showSingleForm(): void {
-    this.activeForm = 'single';
-  }
+  showAlbumForm(): void { this.activeForm = 'album'; }
+  showSingleForm(): void { this.activeForm = 'single'; }
 }

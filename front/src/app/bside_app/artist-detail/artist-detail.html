@@ -1,0 +1,27 @@
+  @if (isLoading) {
+    <p class="font-raleway text-sm text-[#FFE6DB]/70">Loading artist...</p>
+  }
+
+  @if (error) {
+    <p class="font-raleway text-sm text-red-300">{{ error }}</p>
+  }
+
+  @if (artist; as currentArtist) {
+    <header>
+      <div class="flex flex-col-2 gap-6 p-6">
+        <img class="h-44 w-44 shrink-0 rounded-[1.25rem] object-cover ring-1 ring-[#FFE6DB]/10" [src]="coverUrl(currentArtist.photo_url)" [alt]="currentArtist.name" />
+
+        <div class="min-w-0 flex-1">
+          <p class="font-raleway text-xs font-bold uppercase tracking-[0.28em] text-[#FFE6DB]/55">Artist profile</p>
+          <h1 class="mt-1 break-words font-climate-crisis text-4xl leading-tight text-[#FFE6DB]">{{ currentArtist.name }}</h1>
+          <p class="mt-3 max-w-3xl font-raleway text-sm leading-6 text-[#FFE6DB]/60">
+            {{ currentArtist.bio || 'This artist has not shared a bio yet.' }}
+          </p>
+          <div class="mt-4 flex flex-wrap gap-3 font-raleway text-xs text-[#FFE6DB] font-bold">
+            <span>{{ currentArtist.albums.length }} albums | {{ playableSongs.length }} songs</span>
+          </div>
+        </div>
+      </div>
+    </header>
+  }
+

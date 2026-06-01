@@ -103,6 +103,12 @@ export class SearchBar implements OnDestroy {
     if (result.type === 'album') {
       this.clearSearch();
       void this.router.navigate(['/bside_app/album', result.data.id]);
+      return;
+    }
+
+    if (result.type === 'artist') {
+      this.clearSearch();
+      void this.router.navigate(['/bside_app/artist', result.data.id]);
     }
   }
 
@@ -130,6 +136,6 @@ export class SearchBar implements OnDestroy {
   }
 
   protected canOpen(result: SearchResult): boolean {
-    return result.type === 'song' || result.type === 'album';
+    return result.type === 'song' || result.type === 'album' || result.type === 'artist';
   }
 }

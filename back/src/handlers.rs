@@ -1,10 +1,10 @@
 use crate::auth::create_jwt;
 use crate::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
-    ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload, ArtistResponse,
+    ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload, ArtistResponse,
     AuthRequest, AuthResponse, BSideError, Claims, ContactPayload, GoogleUserProfile, LoginPayload,
     Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RegisterPayload, Song,
-    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
+    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload, ArtistSongItem,
 };
 use argon2::{
     Argon2, PasswordHash, PasswordVerifier,
@@ -388,9 +388,7 @@ pub async fn create_artist_handler(
                 if let Some(mime) = field.content_type()
                     && mime != "image/png"
                 {
-                    return Err(BSideError::BadRequest(
-                        "Only PNG images are allowed.".into(),
-                    ));
+                    continue;
                 }
                 let data = field
                     .bytes()
@@ -401,7 +399,7 @@ pub async fn create_artist_handler(
                     if data[0..8] == png_header && data.len() <= 10 * 1024 * 1024 {
                         let file_id = Uuid::new_v4();
                         let key = format!("{file_id}.png");
-                        state
+                        if let Err(e) = state
                             .aws_client
                             .put_object()
                             .bucket("bside-covers")
@@ -410,8 +408,11 @@ pub async fn create_artist_handler(
                             .content_type("image/png")
                             .send()
                             .await
-                            .map_err(|e| BSideError::S3Error(e.to_string()))?;
-                        photo_url = format!("http://minio:9000/bside-covers/{key}");
+                        {
+                            tracing::warn!("Artist photo upload failed, using default cover: {e}");
+                        } else {
+                            photo_url = format!("http://minio:9000/bside-covers/{key}");
+                        }
                     }
                 }
             }
@@ -424,29 +425,152 @@ pub async fn create_artist_handler(
     sqlx::query!(
         r#"
         INSERT INTO artists (id, user_id, name, bio, photo_url, status)
-        VALUES ($1, $2, $3, $4, $5, 'Ready')"#,
+        VALUES ($1, NULL, $2, $3, $4, 'Ready')"#,
         artist_id,
-        current_user_id,
         artist_name,
         bio,
         photo_url
     )
     .execute(&mut *tx)
-    .await?;
-    sqlx::query!(
-        "UPDATE users SET role = 'Artist' WHERE id = $1 AND role = 'User'",
-        current_user_id
-    )
-    .execute(&mut *tx)
-    .await?;
+    .await
+    .map_err(|e| {
+        if let sqlx::Error::Database(db_error) = &e
+            && db_error.is_unique_violation()
+        {
+            return BSideError::Conflict("An artist with this name already exists.".into());
+        }
+        BSideError::SqlxError(e)
+    })?;
     tx.commit().await?;
     Ok(Json(ArtistResponse {
         id: artist_id,
-        user_id: current_user_id,
+        user_id: None,
         name: artist_name,
         bio,
         photo_url,
         status: "Ready".to_string(),
+    }))
+}
+
+#[utoipa::path(
+    get,
+    path = "/artists",
+    responses(
+        (status = 200, description = "List of artists", body = Vec<ArtistResponse>),
+        (status = 500, description = "Internal server error"),
+    ),
+    tags = ["Artists"]
+)]
+pub async fn get_artists_handler(
+    State(state): State<AppState>,
+) -> Result<Json<Vec<ArtistResponse>>, BSideError> {
+    let artists = sqlx::query_as!(
+        ArtistResponse,
+        r#"SELECT
+            id AS "id!",
+            user_id AS "user_id?",
+            name AS "name!",
+            bio AS "bio?",
+            photo_url AS "photo_url!",
+            status AS "status!"
+        FROM artists
+        WHERE status = 'Ready'
+        ORDER BY created_at ASC"#
+    )
+    .fetch_all(&state.db)
+    .await?;
+
+    Ok(Json(artists))
+}
+
+#[utoipa::path(
+    get,
+    path = "/catalog/artists/{artist_id}",
+    params(("artist_id" = uuid::Uuid, Path, description = "Artist ID")),
+    responses(
+        (status = 200, description = "Public artist profile", body = ArtistDetailResponse),
+        (status = 404, description = "Artist not found"),
+        (status = 500, description = "Internal server error"),
+    ),
+    tags = ["Catalog"]
+)]
+pub async fn get_public_artist_by_id_handler(
+    State(state): State<AppState>,
+    Path(artist_id): Path<Uuid>,
+) -> Result<Json<ArtistDetailResponse>, BSideError> {
+    let artist = sqlx::query_as!(
+        ArtistResponse,
+        r#"SELECT
+            id AS "id!",
+            user_id AS "user_id?",
+            name AS "name!",
+            bio AS "bio?",
+            photo_url AS "photo_url!",
+            status AS "status!"
+        FROM artists
+        WHERE id = $1 AND status = 'Ready'"#,
+        artist_id
+    )
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::NotFound)?;
+
+    let albums = sqlx::query_as!(
+        AlbumListItem,
+        r#"
+        SELECT
+            a.id,
+            a.artist_id,
+            ar.name AS "artist_name!",
+            a.title,
+            a.genre,
+            a.cover_url,
+            a.status,
+            COUNT(s.id) AS "song_count!",
+            a.created_at AS "created_at!"
+        FROM albums a
+        JOIN artists ar ON ar.id = a.artist_id
+        LEFT JOIN songs s ON s.album_id = a.id AND s.status = 'Ready'
+        WHERE a.artist_id = $1 AND a.status = 'Ready'
+        GROUP BY a.id, ar.name
+        ORDER BY a.created_at DESC
+        "#,
+        artist_id
+    )
+    .fetch_all(&state.db)
+    .await?;
+
+    let songs = sqlx::query_as!(
+        ArtistSongItem,
+        r#"
+        SELECT
+            s.id AS "id!",
+            s.album_id AS "album_id!",
+            a.title AS "album_title!",
+            s.title AS "title!",
+            s.duration_seconds AS "duration_seconds!",
+            s.audio_url AS "audio_url!",
+            s.status::text AS "status!",
+            s.created_at AS "created_at!"
+        FROM songs s
+        JOIN albums a ON a.id = s.album_id
+        WHERE a.artist_id = $1 AND a.status = 'Ready' AND s.status = 'Ready'
+        ORDER BY s.created_at DESC
+        "#,
+        artist_id
+    )
+    .fetch_all(&state.db)
+    .await?;
+
+    Ok(Json(ArtistDetailResponse {
+        id: artist.id,
+        user_id: artist.user_id,
+        name: artist.name,
+        bio: artist.bio,
+        photo_url: artist.photo_url,
+        status: artist.status,
+        albums,
+        songs,
     }))
 }
 
@@ -1957,4 +2081,136 @@ pub async fn get_my_playlists_handler(
     .fetch_all(&state.db)
     .await?;
     Ok(Json(playlists))
+}
+
+#[utoipa::path(
+    post,
+    path = "/admin/artists/{artist_id}/albums",
+    params(("artist_id" = uuid::Uuid, Path, description = "Target artist ID")),
+    request_body(content_type = "multipart/form-data"),
+    responses(
+        (status = 200, description = "Album created for artist", body = AlbumResponse),
+        (status = 401, description = "Unauthorized or not admin"),
+        (status = 404, description = "Artist not found"),
+    )
+)]
+pub async fn admin_create_album_for_artist_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    Path(artist_id): Path<Uuid>,
+    mut multipart: Multipart,
+) -> Result<Json<AlbumResponse>, BSideError> {
+    ensure_admin(&state, claims.sub).await?;
+
+    let artist_exists = sqlx::query_scalar!(
+        "SELECT EXISTS(SELECT 1 FROM artists WHERE id = $1)",
+        artist_id
+    )
+    .fetch_one(&state.db)
+    .await?
+    .unwrap_or(false);
+
+    if !artist_exists {
+        return Err(BSideError::NotFound);
+    }
+
+    let mut title: Option<String> = None;
+    let mut genre: Option<String> = None;
+    let mut cover_url = "http://minio:9000/bside-covers/default_cover.png".to_string();
+
+    while let Some(field) = multipart
+        .next_field()
+        .await
+        .map_err(|e| BSideError::BadRequest(e.to_string()))?
+    {
+        let name = field.name().unwrap_or("").to_string();
+        match name.as_str() {
+            "title" => {
+                title = Some(
+                    field
+                        .text()
+                        .await
+                        .map_err(|e| BSideError::BadRequest(e.to_string()))?,
+                );
+            }
+            "genre" => {
+                genre = Some(
+                    field
+                        .text()
+                        .await
+                        .map_err(|e| BSideError::BadRequest(e.to_string()))?,
+                );
+            }
+            "cover" => {
+                let data = field
+                    .bytes()
+                    .await
+                    .map_err(|e| BSideError::BadRequest(e.to_string()))?;
+
+                if data.len() < 4 {
+                    return Err(BSideError::BadRequest("File too small to be valid !".into()));
+                }
+
+                let png_header = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+                let (extension, stored_content_type) = if data.starts_with(&png_header) {
+                    ("png", "image/png")
+                } else if data.starts_with(&[0xFF, 0xD8, 0xFF]) {
+                    ("jpg", "image/jpeg")
+                } else if data.starts_with(b"RIFF") && data.len() >= 12 && &data[8..12] == b"WEBP" {
+                    ("webp", "image/webp")
+                } else {
+                    return Err(BSideError::BadRequest(
+                        "Cover must be a PNG, JPEG, or WebP image.".into(),
+                    ));
+                };
+
+                let max_size = 10 * 1024 * 1024;
+                if data.len() > max_size {
+                    return Err(BSideError::BadRequest("File size exceeds 10MB limit!".into()));
+                }
+
+                if !data.is_empty() {
+                    let file_id = Uuid::new_v4();
+                    let key = format!("{file_id}.{extension}");
+                    state
+                        .aws_client
+                        .put_object()
+                        .bucket("bside-covers")
+                        .key(&key)
+                        .body(data.into())
+                        .content_type(stored_content_type)
+                        .send()
+                        .await
+                        .map_err(|e| BSideError::S3Error(e.to_string()))?;
+                    cover_url = format!("http://minio:9000/bside-covers/{key}");
+                }
+            }
+            _ => {}
+        }
+    }
+
+    let title = title.ok_or_else(|| BSideError::BadRequest("Missing title".into()))?;
+    let genre = genre.ok_or_else(|| BSideError::BadRequest("Missing genre".into()))?;
+    let album_id = Uuid::new_v4();
+
+    sqlx::query!(
+        "INSERT INTO albums (id, artist_id, title, genre, cover_url, status)
+         VALUES ($1, $2, $3, $4, $5, 'Ready')",
+        album_id,
+        artist_id,
+        title,
+        genre,
+        cover_url,
+    )
+    .execute(&state.db)
+    .await?;
+
+    Ok(Json(AlbumResponse {
+        id: album_id,
+        artist_id,
+        title,
+        genre,
+        cover_url,
+        status: "Ready".to_string(),
+    }))
 }

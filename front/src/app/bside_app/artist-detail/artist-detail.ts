@@ -4,30 +4,32 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { LucideAngularModule, Play } from 'lucide-angular';
 import { Subscription } from 'rxjs';
 import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
-import { AlbumDetailedResponse, AlbumService, AlbumSongItem } from '../../services/album.service';
+import { AlbumService } from '../../services/album.service';
+import { ArtistDetailResponse, ArtistService, ArtistSongItem } from '../../services/artist.service';
 
 @Component({
-  selector: 'app-album-detail',
+  selector: 'app-artist-detail',
   imports: [CommonModule, RouterLink, LucideAngularModule],
-  templateUrl: './album-detail.html',
-  styleUrl: './album-detail.scss',
+  templateUrl: './artist-detail.html',
+  styleUrl: './artist-detail.scss',
 })
-export class AlbumDetail implements OnInit, OnDestroy {
+export class ArtistDetail implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
+  private readonly artistService = inject(ArtistService);
   private readonly albumService = inject(AlbumService);
   private readonly audio = inject(AudioPlayerService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   readonly playIcon = Play;
 
-  album: AlbumDetailedResponse | null = null;
+  artist: ArtistDetailResponse | null = null;
   isLoading = false;
   error = '';
   playbackError = '';
   activeSongId = '';
 
   private routeSub?: Subscription;
-  private albumSub?: Subscription;
+  private artistSub?: Subscription;
 
   constructor() {
     effect(() => {
@@ -37,47 +39,39 @@ export class AlbumDetail implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.routeSub = this.route.paramMap.subscribe((params) => {
-      const albumId = params.get('albumId');
-      if (!albumId) {
-        this.error = 'Album not found.';
-        this.album = null;
+      const artistId = params.get('artistId');
+      if (!artistId) {
+        this.error = 'Artist not found.';
+        this.artist = null;
         return;
       }
 
-      this.loadAlbum(albumId);
+      this.loadArtist(artistId);
     });
   }
 
   ngOnDestroy(): void {
     this.routeSub?.unsubscribe();
-    this.albumSub?.unsubscribe();
+    this.artistSub?.unsubscribe();
   }
 
-  play(song: AlbumSongItem): void {
-    this.playbackError = '';
+  get playableSongs(): ArtistSongItem[] {
+    return this.artist?.songs.filter((song) => song.status === 'Ready') ?? [];
+  }
 
-    if (!this.album)
+  playAll(): void {
+    if (!this.artist)
       return;
 
-    if (song.status !== 'Ready') {
-      this.playbackError = 'This song is not ready yet.';
+    const songs = this.playableSongs;
+    if (songs.length === 0)
       return;
-    }
 
-    const playableSongs = this.album.songs.filter((item) => item.status === 'Ready');
-    const startIndex = playableSongs.findIndex((item) => item.id === song.id);
+    this.playSong(songs[0]);
+  }
 
-    const queue = playableSongs.map((item) => ({
-      id: item.id,
-      title: item.title,
-      artist: this.album?.artist_name ?? '',
-      format: this.audioFormat(item),
-      coverUrl: this.coverUrl(this.album?.cover_url ?? ''),
-      onRequestUrl: () => this.albumService.getSongStreamUrl(item.id),
-    }));
-
-    this.activeSongId = song.id;
-    this.audio.setQueue(queue, Math.max(0, startIndex));
+  play(song: ArtistSongItem): void {
+    this.playSong(song);
   }
 
   coverUrl(url: string): string {
@@ -94,29 +88,54 @@ export class AlbumDetail implements OnInit, OnDestroy {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 
-  private loadAlbum(albumId: string): void {
-    this.albumSub?.unsubscribe();
-    this.album = null;
+  private loadArtist(artistId: string): void {
+    this.artistSub?.unsubscribe();
+    this.artist = null;
     this.error = '';
     this.playbackError = '';
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    this.albumSub = this.albumService.getPublicAlbum(albumId).subscribe({
-      next: (album) => {
-        this.album = album;
+    this.artistSub = this.artistService.getPublicArtist(artistId).subscribe({
+      next: (artist) => {
+        this.artist = artist;
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: () => {
-        this.error = 'Could not load album.';
+        this.error = 'Could not load artist.';
         this.isLoading = false;
         this.cdr.detectChanges();
       },
     });
   }
 
-  private audioFormat(song: AlbumSongItem): AudioFormat {
+  private playSong(song: ArtistSongItem): void {
+    this.playbackError = '';
+
+    if (!this.artist)
+      return;
+
+    if (song.status !== 'Ready') {
+      this.playbackError = 'This song is not ready yet.';
+      return;
+    }
+
+    const queue = this.playableSongs.map((item) => ({
+      id: item.id,
+      title: item.title,
+      artist: this.artist?.name ?? '',
+      format: this.audioFormat(item),
+      coverUrl: this.coverUrl(this.artist?.photo_url ?? ''),
+      onRequestUrl: () => this.albumService.getSongStreamUrl(item.id),
+    }));
+    const startIndex = queue.findIndex((entry) => entry.id === song.id);
+
+    this.activeSongId = song.id;
+    this.audio.setQueue(queue, Math.max(0, startIndex));
+  }
+
+  private audioFormat(song: ArtistSongItem): AudioFormat {
     const source = `${song.audio_url} ${song.title}`.toLowerCase();
 
     if (source.includes('.flac'))

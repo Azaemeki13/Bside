@@ -1,29 +1,33 @@
 <section class="mx-auto flex w-full max-w-5xl flex-col gap-5 py-6 text-[#FFE6DB]">
-  <div class="flex flex-col items-center gap-4 text-center">
-    <p class="font-climate-crisis text-4xl font-bold tracking-tight">DROP A TRACK!</p>
-    <p class="font-raleway text-md text-[#FFE6DB]/60">What are you releasing today?</p>
-    <div class="mt-2 flex flex-wrap justify-center gap-3">
-      <button
-        type="button"
-        class="rounded-full border px-6 py-2.5 font-raleway font-bold transition"
-        [ngClass]="activeForm === 'album' ? 'border-[#FF5500] bg-[#FF5500]/10 text-[#FF5500]' : 'border-[#FFE6DB]/30 bg-[#FFE6DB]/5 text-[#FFE6DB]'"
-        (click)="showAlbumForm()"
-        [attr.aria-pressed]="activeForm === 'album'"
-      >
-        Upload an album
-      </button>
-      <button
-        type="button"
-        class="rounded-full border px-6 py-2.5 font-raleway font-bold transition"
-        [ngClass]="activeForm === 'single' ? 'border-[#FF5500] bg-[#FF5500]/10 text-[#FF5500]' : 'border-[#FFE6DB]/30 bg-[#FFE6DB]/5 text-[#FFE6DB]'"
-        (click)="showSingleForm()"
-        [attr.aria-pressed]="activeForm === 'single'"
-      >
-        Upload a single
-      </button>
+  @if (isAdmin) {
+    <app-admin-artist-upload />
+  } @else {
+    <div class="flex flex-col items-center gap-4 text-center">
+      <p class="font-climate-crisis text-4xl font-bold tracking-tight">DROP A TRACK!</p>
+      <p class="font-raleway text-md text-[#FFE6DB]/60">What are you releasing today?</p>
+      <div class="mt-2 flex flex-wrap justify-center gap-3">
+        <button
+          type="button"
+          class="rounded-full border px-6 py-2.5 font-raleway font-bold transition"
+          [ngClass]="activeForm === 'album' ? 'border-[#FF5500] bg-[#FF5500]/10 text-[#FF5500]' : 'border-[#FFE6DB]/30 bg-[#FFE6DB]/5 text-[#FFE6DB]'"
+          (click)="showAlbumForm()"
+          [attr.aria-pressed]="activeForm === 'album'"
+        >
+          Upload an album
+        </button>
+        <button
+          type="button"
+          class="rounded-full border px-6 py-2.5 font-raleway font-bold transition"
+          [ngClass]="activeForm === 'single' ? 'border-[#FF5500] bg-[#FF5500]/10 text-[#FF5500]' : 'border-[#FFE6DB]/30 bg-[#FFE6DB]/5 text-[#FFE6DB]'"
+          (click)="showSingleForm()"
+          [attr.aria-pressed]="activeForm === 'single'"
+        >
+          Upload a single
+        </button>
+      </div>
     </div>
-  </div>
 
-  <app-upload-album-form [hidden]="activeForm !== 'album'" />
-  <app-upload-single-form [hidden]="activeForm !== 'single'" />
+    <app-upload-album-form [hidden]="activeForm !== 'album'" />
+    <app-upload-single-form [hidden]="activeForm !== 'single'" />
+  }
 </section>

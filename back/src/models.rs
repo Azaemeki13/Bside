@@ -21,7 +21,7 @@ pub struct UserPayload {
 #[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct ArtistResponse {
     pub id: uuid::Uuid,
-    pub user_id: uuid::Uuid,
+    pub user_id: Option<uuid::Uuid>,
     #[schema(example = "MIKAEL JACKSON")]
     pub name: String,
     #[schema(example = "He loved kids")]
@@ -32,6 +32,30 @@ pub struct ArtistResponse {
     pub photo_url: String,
     #[schema(example = "Available")]
     pub status: String,
+}
+
+#[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
+pub struct ArtistSongItem {
+    pub id: uuid::Uuid,
+    pub album_id: uuid::Uuid,
+    pub album_title: String,
+    pub title: String,
+    pub duration_seconds: i32,
+    pub audio_url: String,
+    pub status: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct ArtistDetailResponse {
+    pub id: uuid::Uuid,
+    pub user_id: Option<uuid::Uuid>,
+    pub name: String,
+    pub bio: Option<String>,
+    pub photo_url: String,
+    pub status: String,
+    pub albums: Vec<AlbumListItem>,
+    pub songs: Vec<ArtistSongItem>,
 }
 
 #[derive(serde::Deserialize, utoipa::ToSchema)]
