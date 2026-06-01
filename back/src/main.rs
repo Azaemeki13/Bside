@@ -11,7 +11,7 @@ mod search;
 mod swagger;
 mod ws;
 
-use crate::auth::{Claims, auth_gate};
+use crate::auth::{Claims, auth_gate, bootstrap_admin};
 use crate::error::BSideError;
 use crate::handlers::{
     add_song_to_playlist_handler, classic_auth_handler, create_album_handler,
@@ -40,7 +40,7 @@ use crate::search::searcher;
 use crate::ws::ws_handler;
 use axum::{
     Router,
-    extract::State,
+    extract::{State, DefaultBodyLimit},
     http::Method,
     middleware::from_fn_with_state,
     routing::{delete, get, post, put},
@@ -70,7 +70,9 @@ async fn main() {
         .connect(&db_url)
         .await
         .expect("Database connection established !");
-
+    if let Err(e) = bootstrap_admin(&pool).await {
+        eprintln!("Warning: Failed to bootstrap admin account: {:?}", e);
+    }
     let client_id = env::var("OAUTH_ID").expect("OAUTH_ID must be set.");
     let client_pw = env::var("OAUTH_PW").expect("OAUTH_PW must be set.");
     let auth_uri = env::var("G_AUTH_URL").expect("G_AUTH_URI must be set.");
@@ -180,6 +182,7 @@ async fn main() {
     let app = Router::new()
         .merge(public_routes)
         .merge(protected_routes)
+        .layer(DefaultBodyLimit::max(750 * 1024 * 1024))
         .layer(cors)
         .with_state(state)
         .merge(
@@ -230,34 +233,7 @@ async fn ensure_storage_buckets(client: &aws_sdk_s3::Client) -> Result<(), BSide
         }
     }
 
-    let cors = CorsConfiguration::builder()
-        .cors_rules(
-            CorsRule::builder()
-                .allowed_origins("http://localhost:4200")
-                .allowed_origins("http://localhost:4300")
-                .allowed_methods("GET")
-                .allowed_methods("PUT")
-                .allowed_methods("HEAD")
-                .allowed_headers("*")
-                .expose_headers("ETag")
-                .max_age_seconds(3000)
-                .build()
-                .map_err(|e| BSideError::S3Error(format!("Failed to build bucket CORS: {e}")))?,
-        )
-        .build()
-        .map_err(|e| BSideError::S3Error(format!("Failed to build bucket CORS config: {e}")))?;
 
-    for bucket in BUCKETS {
-        if let Err(e) = client
-            .put_bucket_cors()
-            .bucket(bucket)
-            .cors_configuration(cors.clone())
-            .send()
-            .await
-        {
-            eprintln!("Warning: failed to configure CORS for bucket {bucket}: {e}");
-        }
-    }
 
     Ok(())
 }

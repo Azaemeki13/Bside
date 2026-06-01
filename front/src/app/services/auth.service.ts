@@ -20,17 +20,18 @@ export class AuthService {
         return this.http.post<AuthResponse>(`${this.apiUrl}/login`, payload).pipe(
             tap(response => {
                 localStorage.setItem('auth_token', response.token);
+                this.currentUser.set(response.user);
                 console.log("Login Successful, token saved on the cookies.");
             })
         );
     }
 
     logout() {
-        localStorage.removeItem('auth_token');
+        this.currentUser.set(null);
     }
     loadUserProfile() {
         if (this.currentUser() !== null ) return;
-        if (isPlatformBrowser(this.platformId)) {
+        if (isPlatformBrowser(this.platformId) && localStorage.getItem('auth_token')) {
             this.http.get<UserProfile>(`${this.apiUrl}/users/me`).subscribe({
                 next: (user) => {
                     this.currentUser.set(user);
@@ -38,6 +39,7 @@ export class AuthService {
                 },
                 error: (err) => {
                     console.error("Failed to load profile:", err);
+                    this.logout();
                 }
             });
         }

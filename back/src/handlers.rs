@@ -1314,7 +1314,13 @@ pub async fn create_song_handler(
     )
     .fetch_one(&state.db)
     .await?;
-    if !is_owner.unwrap_or(false) {
+    let is_admin = sqlx::query_scalar!("SELECT role FROM users WHERE id = $1", claims.sub)
+        .fetch_optional(&state.db)
+        .await?
+        .map(|role| role == "Admin")
+        .unwrap_or(false);
+
+    if !is_owner.unwrap_or(false) && !is_admin {
         return Err(BSideError::UnauthorizedProfile);
     }
     let song_uid = Uuid::new_v4();
@@ -1396,7 +1402,12 @@ pub async fn verify_song_handler(
     .fetch_one(&state.db)
     .await?
     .unwrap_or(false);
-    if !is_owner {
+    let is_admin = sqlx::query_scalar!("SELECT role FROM users WHERE id = $1", claims.sub)
+        .fetch_optional(&state.db)
+        .await?
+        .map(|role| role == "Admin")
+        .unwrap_or(false);
+    if !is_owner && !is_admin {
         return Err(BSideError::UnauthorizedProfile);
     }
     let get_request = state

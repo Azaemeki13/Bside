@@ -202,18 +202,36 @@ def multipart_body(fields: dict[str, str], files: dict[str, Path]) -> tuple[byte
     chunks.append(f"--{boundary}--\r\n".encode())
     return b"".join(chunks), f"multipart/form-data; boundary={boundary}"
 
+def create_artist(api_url: str, token: str, name: str) -> str:
+    body, content_type = multipart_body({"name": name, "bio": ""}, {})
+    try:
+        response = request_json("POST", f"{api_url}/artists", token=token, body=body, content_type=content_type)
+        artist_id = response.get("id") if isinstance(response, dict) else None
+        if not artist_id:
+            raise RuntimeError(f"Artist creation returned no id: {response}")
+        return str(artist_id)
+    except RuntimeError as e:
+        if "409" not in str(e):
+            raise
+        print(f"  Artist '{name}' already exists, looking up id...")
+        artists = request_json("GET", f"{api_url}/artists", token=token)
+        if not isinstance(artists, list):
+            raise RuntimeError(f"Failed to fetch artists: {artists}")
+        match = next((a for a in artists if a.get("name") == name), None)
+        if not match:
+            raise RuntimeError(f"Artist '{name}' not found after 409 conflict")
+        return str(match["id"])
 
-def create_album(api_url: str, token: str, album: AlbumFolder) -> str:
+def create_album(api_url: str, token: str, album: AlbumFolder, artist_id: str) -> str:
     body, content_type = multipart_body(
         {"title": album.title, "genre": album.tag},
         {"cover": album.cover} if album.cover else {},
     )
-    response = request_json("POST", f"{api_url}/albums", token=token, body=body, content_type=content_type)
+    response = request_json("POST", f"{api_url}/admin/artists/{artist_id}/albums", token=token, body=body, content_type=content_type)
     album_id = response.get("id") if isinstance(response, dict) else None
     if not album_id:
         raise RuntimeError(f"Album creation returned no id: {response}")
     return str(album_id)
-
 
 def create_song(api_url: str, token: str, album_id: str, song_path: Path, duration: int) -> tuple[str, str]:
     fmt = song_path.suffix.lower().lstrip(".")
@@ -321,6 +339,11 @@ def upload_library(args: argparse.Namespace) -> None:
         return
 
     print(f"Discovered {len(albums)} album folder(s) in {root}")
+
+    if not args.dry_run:
+        artist_id = create_artist(api_url, token, args.artist_name)
+        print(f"Created artist {artist_id} ({args.artist_name})")
+
     for album in albums:
         print(f"\nAlbum: {album.title} [{album.tag}] ({len(album.songs)} song(s))")
         if args.dry_run:
@@ -328,7 +351,7 @@ def upload_library(args: argparse.Namespace) -> None:
                 print(f"  - {song_title(song)} ({song.suffix.lower().lstrip('.')}, {read_duration_seconds(song)}s)")
             continue
 
-        album_id = create_album(api_url, token, album)
+        album_id = create_album(api_url, token, album, artist_id)
         print(f"  Created album {album_id}")
 
         for song_path in album.songs:
@@ -340,9 +363,9 @@ def upload_library(args: argparse.Namespace) -> None:
             verify_song(api_url, token, song_id)
             print(f"  Verified {song_id}")
 
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Upload local test albums and songs to B-Side.")
+    parser.add_argument("--artist-name", required=True, help="Artist name to create and upload albums under.")
     parser.add_argument("--root", default="songs", help="Root folder containing one folder per album. Default: songs")
     parser.add_argument("--api", default="http://localhost:8080", help="Backend API URL. Default: http://localhost:8080")
     parser.add_argument("--token", help="JWT auth token. Alternatively set BSIDE_TOKEN.")
