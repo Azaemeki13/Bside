@@ -14,40 +14,39 @@ mod ws;
 use crate::auth::{Claims, auth_gate, bootstrap_admin};
 use crate::error::BSideError;
 use crate::handlers::{
-    add_song_to_playlist_handler, classic_auth_handler, create_album_handler,
-    create_artist_handler, get_artists_handler, create_artist_request_handler, create_playlist_handler,
-    create_song_handler, create_user_handler, delete_album_handler, delete_playlist_handler,
-    delete_song_handler, flush_deleted_albums_task, flush_deleted_songs_task,
-    get_album_by_id_handler, get_all_users_handler, get_artist_requests_handler, get_me_handler,
-    get_my_albums_handler, get_playlist_by_id_handler, get_public_album_by_id_handler,
-    get_public_artist_by_id_handler,
-    get_song_stream_url_handler,
-    get_user_by_id_handler, get_my_playlists_handler, google_callback_handler, google_login_handler,
-    google_signup_handler, ping_handler, register_handler, remove_song_from_pl,
-    review_artist_request_handler, update_playlist_handler, upload_avatar, verify_song_handler,
-    contact_handler, admin_create_album_for_artist_handler,
+    add_song_to_playlist_handler, admin_create_album_for_artist_handler, classic_auth_handler,
+    contact_handler, create_album_handler, create_artist_handler, create_artist_request_handler,
+    create_playlist_handler, create_song_handler, create_user_handler, delete_album_handler,
+    delete_playlist_handler, delete_song_handler, flush_deleted_albums_task,
+    flush_deleted_songs_task, get_album_by_id_handler, get_all_users_handler,
+    get_artist_requests_handler, get_artists_handler, get_me_handler, get_my_albums_handler,
+    get_my_playlists_handler, get_playlist_by_id_handler, get_public_album_by_id_handler,
+    get_public_artist_by_id_handler, get_song_stream_url_handler, get_user_by_id_handler,
+    google_callback_handler, google_login_handler, google_signup_handler, ping_handler,
+    register_handler, remove_song_from_pl, review_artist_request_handler, update_playlist_handler,
+    upload_avatar, verify_song_handler,
 };
 use crate::models::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
     ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload,
-    ArtistResponse, ArtistSongItem,
-    AuthRequest, AuthResponse, GoogleUserProfile, LoginPayload, Playlist, PlaylistDetailedResponse,
-    PlaylistPayload, PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, Song,
-    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload, ContactPayload,
+    ArtistResponse, ArtistSongItem, AuthRequest, AuthResponse, ContactPayload, GoogleUserProfile,
+    LoginPayload, Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem,
+    RawSearchResult, RegisterPayload, SearchResult, Song, SongPayload, SongResponse,
+    UpdateStructurePayload, User, UserPayload,
 };
 use crate::search::searcher;
 
 use crate::ws::ws_handler;
+use aws_sdk_s3::types::{CorsConfiguration, CorsRule};
 use axum::{
     Router,
-    extract::{State, DefaultBodyLimit},
+    extract::{DefaultBodyLimit, State},
     http::Method,
     middleware::from_fn_with_state,
     routing::{delete, get, post, put},
 };
 use oauth2::{AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl, basic::BasicClient};
 use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, HeaderValue};
-use aws_sdk_s3::types::{CorsConfiguration, CorsRule};
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 use std::sync::Arc;
@@ -133,8 +132,14 @@ async fn main() {
         .route("/login", post(classic_auth_handler))
         .route("/ping", get(ping_handler))
         .route("/search", get(searcher))
-        .route("/catalog/albums/{album_id}", get(get_public_album_by_id_handler))
-        .route("/catalog/artists/{artist_id}", get(get_public_artist_by_id_handler))
+        .route(
+            "/catalog/albums/{album_id}",
+            get(get_public_album_by_id_handler),
+        )
+        .route(
+            "/catalog/artists/{artist_id}",
+            get(get_public_artist_by_id_handler),
+        )
         .route("/contact", post(contact_handler))
         .route("/ws", get(ws_handler));
 
@@ -145,14 +150,20 @@ async fn main() {
         )
         .route("/users/me", get(get_me_handler))
         .route("/users/me/avatar", post(upload_avatar))
-        .route("/artists", get(get_artists_handler).post(create_artist_handler))
+        .route(
+            "/artists",
+            get(get_artists_handler).post(create_artist_handler),
+        )
         .route("/artist-requests", post(create_artist_request_handler))
         .route("/admin/artist-requests", get(get_artist_requests_handler))
         .route(
             "/admin/artist-requests/{request_id}",
             put(review_artist_request_handler),
         )
-        .route("/albums", get(get_my_albums_handler).post(create_album_handler))
+        .route(
+            "/albums",
+            get(get_my_albums_handler).post(create_album_handler),
+        )
         .route(
             "/albums/{album_id}",
             get(get_album_by_id_handler).delete(delete_album_handler),
@@ -164,7 +175,10 @@ async fn main() {
             get(get_song_stream_url_handler),
         )
         .route("/songs/{id}", delete(delete_song_handler))
-        .route("/playlists", get(get_my_playlists_handler).post(create_playlist_handler))
+        .route(
+            "/playlists",
+            get(get_my_playlists_handler).post(create_playlist_handler),
+        )
         .route(
             "/playlists/{id}",
             get(get_playlist_by_id_handler)
@@ -176,7 +190,10 @@ async fn main() {
             post(add_song_to_playlist_handler).delete(remove_song_from_pl),
         )
         .route("/users/{id}", get(get_user_by_id_handler))
-        .route("/admin/artists/{artist_id}/albums", post(admin_create_album_for_artist_handler))
+        .route(
+            "/admin/artists/{artist_id}/albums",
+            post(admin_create_album_for_artist_handler),
+        )
         .layer(from_fn_with_state(state.clone(), auth_gate));
 
     let app = Router::new()
@@ -219,9 +236,7 @@ async fn ensure_storage_buckets(client: &aws_sdk_s3::Client) -> Result<(), BSide
             match client.create_bucket().bucket(bucket).send().await {
                 Ok(_) => break,
                 Err(error) if attempts < 10 => {
-                    eprintln!(
-                        "Warning: bucket {bucket} is not ready yet ({error}); retrying..."
-                    );
+                    eprintln!("Warning: bucket {bucket} is not ready yet ({error}); retrying...");
                     tokio::time::sleep(Duration::from_secs(2)).await;
                 }
                 Err(error) => {
@@ -232,8 +247,6 @@ async fn ensure_storage_buckets(client: &aws_sdk_s3::Client) -> Result<(), BSide
             }
         }
     }
-
-
 
     Ok(())
 }

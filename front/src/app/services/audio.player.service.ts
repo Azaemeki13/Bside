@@ -164,7 +164,6 @@ export class AudioPlayerService {
                     format: entry.format,
                     coverUrl: entry.coverUrl,
                 }, token);
-                this.sound?.play();
             },
             error: (err) => {
                 if (token !== this.loadToken)
@@ -199,6 +198,7 @@ export class AudioPlayerService {
 
                 this.isLoading.set(false);
                 this.duration.set(sound.duration() ?? 0);
+                sound.play();
             },
 
             onplay: () => {

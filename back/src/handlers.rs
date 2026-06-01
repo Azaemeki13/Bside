@@ -1,10 +1,11 @@
 use crate::auth::create_jwt;
 use crate::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
-    ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload, ArtistResponse,
-    AuthRequest, AuthResponse, BSideError, Claims, ContactPayload, GoogleUserProfile, LoginPayload,
-    Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RegisterPayload, Song,
-    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload, ArtistSongItem,
+    ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload,
+    ArtistResponse, ArtistSongItem, AuthRequest, AuthResponse, BSideError, Claims, ContactPayload,
+    GoogleUserProfile, LoginPayload, Playlist, PlaylistDetailedResponse, PlaylistPayload,
+    PlaylistSongItem, RegisterPayload, Song, SongPayload, SongResponse, UpdateStructurePayload,
+    User, UserPayload,
 };
 use argon2::{
     Argon2, PasswordHash, PasswordVerifier,
@@ -939,10 +940,7 @@ pub async fn create_album_handler(
                     ("png", "image/png")
                 } else if data.starts_with(&[0xFF, 0xD8, 0xFF]) {
                     ("jpg", "image/jpeg")
-                } else if data.starts_with(b"RIFF")
-                    && data.len() >= 12
-                    && &data[8..12] == b"WEBP"
-                {
+                } else if data.starts_with(b"RIFF") && data.len() >= 12 && &data[8..12] == b"WEBP" {
                     ("webp", "image/webp")
                 } else {
                     return Err(BSideError::BadRequest(
@@ -1041,7 +1039,6 @@ pub async fn get_my_albums_handler(
 
     Ok(Json(albums))
 }
-
 
 #[utoipa::path(
     get,
@@ -1492,9 +1489,9 @@ pub async fn get_song_stream_url_handler(
         "#,
         song_id
     )
-    .fetch_optional(&state.db)
-    .await?
-    .ok_or(BSideError::NotFound)?;
+        .fetch_optional(&state.db)
+        .await?
+        .ok_or(BSideError::NotFound)?;
 
     if song.status != "Ready" {
         return Err(BSideError::SongNotReady);
@@ -1667,7 +1664,10 @@ pub async fn create_playlist_handler(
     claims: Claims,
     axum::extract::Json(payload): axum::extract::Json<PlaylistPayload>,
 ) -> Result<Json<Playlist>, BSideError> {
-    println!("CREATE PLAYLIST HIT - user: {:?}, title: {:?}", claims.sub, payload.title);
+    println!(
+        "CREATE PLAYLIST HIT - user: {:?}, title: {:?}",
+        claims.sub, payload.title
+    );
     let playlist = sqlx::query_as!
         (Playlist, r#"INSERT INTO playlists (title, owner_id, is_public) VALUES ($1, $2, true) RETURNING id, title, owner_id, is_public as "is_public!", created_at as "created_at!" "#, payload.title, claims.sub)
         .fetch_one(&state.db)
@@ -2159,7 +2159,9 @@ pub async fn admin_create_album_for_artist_handler(
                     .map_err(|e| BSideError::BadRequest(e.to_string()))?;
 
                 if data.len() < 4 {
-                    return Err(BSideError::BadRequest("File too small to be valid !".into()));
+                    return Err(BSideError::BadRequest(
+                        "File too small to be valid !".into(),
+                    ));
                 }
 
                 let png_header = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
@@ -2177,7 +2179,9 @@ pub async fn admin_create_album_for_artist_handler(
 
                 let max_size = 10 * 1024 * 1024;
                 if data.len() > max_size {
-                    return Err(BSideError::BadRequest("File size exceeds 10MB limit!".into()));
+                    return Err(BSideError::BadRequest(
+                        "File size exceeds 10MB limit!".into(),
+                    ));
                 }
 
                 if !data.is_empty() {

@@ -1,56 +1,59 @@
 use crate::{AppState, BSideError};
+use argon2::{
+    Argon2,
+    password_hash::{PasswordHasher, SaltString, rand_core::OsRng},
+};
 use axum::{
     extract::{FromRef, FromRequestParts, Request},
     http::{StatusCode, request::Parts},
     middleware::Next,
     response::Response,
 };
-use secrecy::ExposeSecret;
-use argon2::{
-    password_hash::{rand_core::OsRng, PasswordHasher, SaltString},
-    Argon2,
-};
-use uuid::Uuid;
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
+use secrecy::ExposeSecret;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
-pub async fn bootstrap_admin(
-    pool: &sqlx::PgPool
-) -> Result<(), BSideError> {
+pub async fn bootstrap_admin(pool: &sqlx::PgPool) -> Result<(), BSideError> {
     let admin_email = std::env::var("ADMIN_EMAIL").ok();
     let admin_username = std::env::var("ADMIN_USERNAME").ok();
     let admin_password = std::env::var("ADMIN_PASSWORD").ok();
-    if let (Some(email), Some(username), Some(password)) = (admin_email, admin_username, admin_password) {
-        let exists = sqlx::query_scalar!(
-            "SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)",
-            email
-        )
-        .fetch_one(pool)
-        .await?
-        .unwrap_or(false);
+    if let (Some(email), Some(username), Some(password)) =
+        (admin_email, admin_username, admin_password)
+    {
+        let exists =
+            sqlx::query_scalar!("SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)", email)
+                .fetch_one(pool)
+                .await?
+                .unwrap_or(false);
         if !exists {
             println!("Bootstrapping initial Admin account...");
-            let password_hash_task = tokio::task::spawn_blocking(move || -> Result<String, BSideError> {
-                let salt = SaltString::generate(&mut OsRng);
-                let argon2 = Argon2::default();
-                argon2.hash_password(password.as_bytes(), &salt)
-                    .map(|hash| hash.to_string())
-                    .map_err(|e| BSideError::InternalServerError(e.to_string()))
-            })
-            .await
-            .map_err(|_| BSideError::InternalServerError("Thread panicked".into()))?;
+            let password_hash_task =
+                tokio::task::spawn_blocking(move || -> Result<String, BSideError> {
+                    let salt = SaltString::generate(&mut OsRng);
+                    let argon2 = Argon2::default();
+                    argon2
+                        .hash_password(password.as_bytes(), &salt)
+                        .map(|hash| hash.to_string())
+                        .map_err(|e| BSideError::InternalServerError(e.to_string()))
+                })
+                .await
+                .map_err(|_| BSideError::InternalServerError("Thread panicked".into()))?;
             let password_hash = password_hash_task?;
             let admin_id = Uuid::new_v4();
             let mut tx = pool.begin().await?;
             sqlx::query!(
                 "INSERT INTO users (id, username, email, role) VALUES ($1, $2, $3, 'Admin')",
-                admin_id, username, email
+                admin_id,
+                username,
+                email
             )
             .execute(&mut *tx)
             .await?;
             sqlx::query!(
                 "INSERT INTO local_credentials (user_id, password_hash) VALUES ($1, $2)",
-            admin_id, password_hash
+                admin_id,
+                password_hash
             )
             .execute(&mut *tx)
             .await?;
