@@ -251,6 +251,7 @@ pub struct RawSearchResult {
     pub rank: f64,
     pub metadata: Option<String>,
     pub audio_url: Option<String>,
+    pub album_id: uuid::Uuid,
 }
 
 #[derive(Debug, serde::Serialize, utoipa::ToSchema)]
@@ -261,6 +262,7 @@ pub enum SearchResult {
         title: String,
         artist: String,
         audio_url: String,
+        album_id: uuid::Uuid,
     },
     Album {
         id: uuid::Uuid,

@@ -1,6 +1,7 @@
 import { NgFor } from '@angular/common';
 import { Component, EventEmitter, Output, signal } from '@angular/core';
 import { TagCard } from '../tag-card/tag-card';
+import { TAGS } from '../tag-list';
 
 @Component({
   selector: 'app-tag-bar',
@@ -9,11 +10,7 @@ import { TagCard } from '../tag-card/tag-card';
   styleUrl: './tag-bar.scss',
 })
 export class TagBar {
-  tags: string[] = [
-    'All', 'Hip-Hop', 'Jazz', 'Indie', 'Electronic', 'Pop', 'Classical',
-    'Metal', 'R&B', 'Country', 'Reggae', 'Blues', 'Folk', 'Punk', 'Soul',
-    'Funk', 'Disco', 'Gospel', 'Latin', 'World'
-  ];
+  tags = [...TAGS];
 
   @Output() tagSelected = new EventEmitter<string>();
   selectedTag = signal('All');

@@ -9,13 +9,13 @@ export const artistGuard: CanActivateFn = () => {
   const currentUser = auth.currentUser();
 
   if (currentUser) {
-    return currentUser.role === 'Artist' ? true : router.createUrlTree(['/bside_app/settings']);
+    return currentUser.role === 'Artist' || currentUser.role === 'Admin' ? true : router.createUrlTree(['/bside_app/settings']);
   }
 
   return auth.getCurrentUser().pipe(
     map((user) => {
       auth.currentUser.set(user);
-      return user.role === 'Artist' ? true : router.createUrlTree(['/bside_app/settings']);
+      return user.role === 'Artist' || user.role === 'Admin' ? true : router.createUrlTree(['/bside_app/settings']);
     }),
     catchError(() => of(router.createUrlTree(['/bside_app/settings'])))
   );

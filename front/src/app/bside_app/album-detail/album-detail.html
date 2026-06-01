@@ -1,0 +1,55 @@
+<section class="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col gap-6 py-6 text-[#FFE6DB]">
+  @if (isLoading) {
+    <p class="font-raleway text-sm text-[#FFE6DB]/70">Loading album...</p>
+  }
+
+  @if (error) {
+    <p class="font-raleway text-sm text-red-300">{{ error }}</p>
+  }
+
+  @if (album; as currentAlbum) {
+    <header class="flex flex-col gap-5 border-b border-[#FFE6DB]/15 pb-6 sm:flex-row sm:items-end">
+      <img class="h-40 w-40 shrink-0 rounded-md object-cover" [src]="coverUrl(currentAlbum.cover_url)" alt="" />
+
+      <div class="min-w-0">
+        <p class="font-raleway text-xs font-bold uppercase tracking-wide text-[#FFE6DB]/60">Album</p>
+        <h1 class="break-words font-raleway text-4xl font-bold leading-tight">{{ currentAlbum.title }}</h1>
+        <p class="mt-2 font-raleway text-sm text-[#FFE6DB]/70">
+          {{ currentAlbum.artist_name }} | {{ currentAlbum.genre }} | {{ currentAlbum.songs.length }} songs
+        </p>
+      </div>
+    </header>
+
+    @if (playbackError) {
+      <p class="font-raleway text-sm text-red-300">{{ playbackError }}</p>
+    }
+
+    <div class="flex min-h-0 flex-1 flex-col">
+      <div class="grid border-b border-[#FFE6DB]/20 pb-2 font-raleway text-sm font-medium text-[#FFE6DB]/70"
+           style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem">
+        <span>#</span>
+        <span>Title</span>
+        <span class="text-right">Dur.</span>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto py-2">
+        @for (song of currentAlbum.songs; let i = $index; track song.id) {
+          <button type="button"
+                  class="grid w-full appearance-none items-center rounded-md border-0 bg-transparent py-3 text-left font-raleway hover:bg-[#FFE6DB]/5"
+                  [class.bg-[#FFE6DB]/5]="activeSongId === song.id"
+                  style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem"
+                  (click)="play(song)">
+            <span class="text-sm text-[#FFE6DB]/50">{{ i + 1 }}</span>
+            <span class="min-w-0 pr-4">
+              <span class="block truncate text-sm font-semibold text-[#FFE6DB]">{{ song.title }}</span>
+              <span class="block truncate text-xs text-[#FFE6DB]/50">{{ currentAlbum.artist_name }}</span>
+            </span>
+            <span class="text-right text-sm text-[#FFE6DB]/50">{{ formatDuration(song.duration_seconds) }}</span>
+          </button>
+        } @empty {
+          <p class="py-5 font-raleway text-sm text-[#FFE6DB]/60">No songs in this album.</p>
+        }
+      </div>
+    </div>
+  }
+</section>

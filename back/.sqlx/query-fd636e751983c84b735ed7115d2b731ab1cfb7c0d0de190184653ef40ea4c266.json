@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            a.id,\n            a.artist_id,\n            ar.name AS \"artist_name!\",\n            a.title,\n            a.genre,\n            a.cover_url,\n            a.status,\n            COUNT(s.id) AS \"song_count!\",\n            a.created_at AS \"created_at!\"\n        FROM albums a\n        JOIN artists ar ON ar.id = a.artist_id\n        LEFT JOIN songs s ON s.album_id = a.id AND s.status != 'Deleted'\n        WHERE ar.user_id = $1 AND a.status != 'Deleted'\n        GROUP BY a.id, ar.name\n        ORDER BY a.created_at DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "artist_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "artist_name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "genre",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "cover_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "song_count!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_at!",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null,
+      false
+    ]
+  },
+  "hash": "fd636e751983c84b735ed7115d2b731ab1cfb7c0d0de190184653ef40ea4c266"
+}

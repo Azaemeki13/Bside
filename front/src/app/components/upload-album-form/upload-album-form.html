@@ -1,0 +1,71 @@
+<form class="flex flex-col gap-5 rounded-xl bg-[#1F0E1C] pt-6 px-6 pb-3" (ngSubmit)="createAlbum()">
+  <div class="flex flex-col gap-2 border-b border-[#FFE6DB]/10 pb-4">
+    <p class="font-raleway text-lg font-bold">Album and tracks</p>
+    <p class="max-w-2xl font-raleway text-xs leading-5 text-[#FFE6DB]/60">
+      Create the album and upload its tracks in the same action.
+    </p>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <label class="flex flex-col gap-2 font-raleway text-sm md:col-span-1">
+      Track files
+      <input class="text-sm text-[#FFE6DB] file:mr-4 file:rounded-full file:border-0 file:bg-[#FF5500] file:px-4 file:py-2 file:font-raleway file:font-bold file:text-[#FFE6DB] cursor-pointer" type="file" multiple accept=".wav,.flac,audio/wav,audio/flac" (change)="onAlbumSongsSelected($event)" required />
+    </label>
+
+    <label class="flex flex-col gap-2 font-raleway text-sm md:col-span-1">
+      Album title
+      <input class="rounded-md border border-[#FFE6DB]/10 bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none transition focus:border-[#FF5500]" name="albumTitle" [(ngModel)]="albumTitle" required />
+    </label>
+
+    <label class="flex flex-col gap-2 font-raleway text-sm md:col-span-1">
+      Cover image
+      <input class="text-sm text-[#FFE6DB] file:mr-4 file:rounded-full file:border-0 file:bg-[#FF5500] file:px-4 file:py-2 file:font-raleway file:font-bold file:text-[#FFE6DB] cursor-pointer" type="file" accept="image/png,image/jpeg,image/webp" (change)="onAlbumCoverSelected($event)" required />
+    </label>
+
+    <div class="flex flex-col gap-2 font-raleway text-sm">
+      <span>Genre</span>
+      <div class="relative" #genreDropdown>
+        <input type="hidden" name="albumGenre" [(ngModel)]="albumGenre" required />
+        <button type="button" class="flex h-10 w-full items-center justify-between rounded-md border border-[#FFE6DB]/10 bg-[#FFE6DB] px-3 text-left text-sm text-[#1F0E1C] outline-none transition cursor-pointer" [attr.aria-expanded]="isGenreOpen" (click)="toggleGenreDropdown()">
+          <span class="truncate">{{ albumGenre || 'Select a genre' }}</span>
+          <svg class="ml-3 h-4 w-4 shrink-0 text-[#1F0E1C]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.51a.75.75 0 0 1-1.08 0l-4.25-4.51a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" />
+          </svg>
+        </button>
+
+        @if (isGenreOpen) {
+          <div class="absolute left-0 top-[calc(100%+0.5rem)] z-50 w-56 max-h-36 overflow-y-auto rounded-lg bg-[#FFE6DB] py-1">
+            @for (genre of genreOptions; track genre) {
+              <button type="button" class="flex w-full items-center px-3 py-2 text-left font-raleway text-sm text-[#1F0E1C] cursor-pointer" (click)="selectGenre(genre)">
+                {{ genre }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between px-1 py-1">
+    @if (albumSongFiles.length > 0) {
+      <p class="font-raleway text-xs text-[#FFE6DB]/70">{{ albumSongFiles.length }} track(s) selected</p>
+    } @else {
+      <p class="font-raleway text-xs text-[#FFE6DB]/50">Select WAV or FLAC files to upload with the album.</p>
+    }
+  </div>
+
+  <div class="flex justify-center mt-4">
+    <button class="inline-flex w-max items-center justify-center rounded-full bg-[#FF5500] px-3 py-1.5 font-raleway font-bold text-[#FFE6DB] cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="submit" [disabled]="!canCreateAlbum">
+      {{ albumDone ? 'Done!' : (isCreatingAlbum ? 'Working...' : 'Upload album') }}
+    </button>
+  </div>
+
+  <div class="flex flex-col gap-1 font-raleway text-sm">
+    @if (releaseUploadMessage) {
+      <p class="text-[#FFE6DB]/70">{{ releaseUploadMessage }}</p>
+    }
+    @if (albumError) {
+      <p class="text-red-300">{{ albumError }}</p>
+    }
+  </div>
+</form>

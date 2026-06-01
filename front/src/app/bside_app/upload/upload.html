@@ -1,95 +1,29 @@
 <section class="mx-auto flex w-full max-w-5xl flex-col gap-5 py-6 text-[#FFE6DB]">
-  <header class="flex flex-col gap-2">
-    <h1 class="font-raleway text-3xl font-bold">Artist upload</h1>
-    <p class="max-w-3xl font-raleway text-sm text-[#FFE6DB]/70">
-      Create an album, then upload WAV or FLAC tracks.
-    </p>
-  </header>
-
-  <div class="grid gap-5 xl:grid-cols-2">
-    <form class="flex flex-col gap-4 rounded-lg border border-[#FFE6DB]/15 bg-[#1F0E1C] p-5" (ngSubmit)="createAlbum()">
-      <div>
-        <p class="font-raleway text-lg font-bold">1. Album and tracks</p>
-        <p class="font-raleway text-xs text-[#FFE6DB]/60">Create the album and optionally upload its tracks in the same action.</p>
-      </div>
-
-      <label class="flex flex-col gap-2 font-raleway text-sm">
-        Album title
-        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="albumTitle" [(ngModel)]="albumTitle" required />
-      </label>
-
-      <label class="flex flex-col gap-2 font-raleway text-sm">
-        Genre
-        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="albumGenre" [(ngModel)]="albumGenre" required />
-      </label>
-
-      <label class="flex flex-col gap-2 font-raleway text-sm">
-        Cover PNG
-        <input class="text-sm text-[#FFE6DB]" type="file" accept="image/png" (change)="onAlbumCoverSelected($event)" />
-      </label>
-
-      <label class="flex flex-col gap-2 font-raleway text-sm">
-        Track files
-        <input class="text-sm text-[#FFE6DB]" type="file" multiple accept=".wav,.flac,audio/wav,audio/flac" (change)="onAlbumSongsSelected($event)" />
-      </label>
-
-      <label class="flex flex-col gap-2 font-raleway text-sm">
-        Default duration seconds
-        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="fallbackDurationSeconds" type="number" min="1" [(ngModel)]="fallbackDurationSeconds" />
-      </label>
-
-      <button class="rounded-md bg-[#FF5500] px-4 py-2 font-raleway font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" type="submit" [disabled]="!canCreateAlbum">
-        {{ isCreatingAlbum ? 'Working...' : 'Create album' }}
+  <div class="flex flex-col items-center gap-4 text-center">
+    <p class="font-climate-crisis text-4xl font-bold tracking-tight">DROP A TRACK!</p>
+    <p class="font-raleway text-md text-[#FFE6DB]/60">What are you releasing today?</p>
+    <div class="mt-2 flex flex-wrap justify-center gap-3">
+      <button
+        type="button"
+        class="rounded-full border px-6 py-2.5 font-raleway font-bold transition"
+        [ngClass]="activeForm === 'album' ? 'border-[#FF5500] bg-[#FF5500]/10 text-[#FF5500]' : 'border-[#FFE6DB]/30 bg-[#FFE6DB]/5 text-[#FFE6DB]'"
+        (click)="showAlbumForm()"
+        [attr.aria-pressed]="activeForm === 'album'"
+      >
+        Upload an album
       </button>
-
-      @if (album) {
-        <p class="break-all font-raleway text-xs text-[#FFE6DB]/70">Current album ID: {{ album.id }}</p>
-      }
-      @if (albumMessage) {
-        <p class="font-raleway text-sm text-green-300">{{ albumMessage }}</p>
-      }
-      @if (releaseUploadMessage) {
-        <p class="font-raleway text-sm text-[#FFE6DB]/70">{{ releaseUploadMessage }}</p>
-      }
-      @if (albumError) {
-        <p class="font-raleway text-sm text-red-300">{{ albumError }}</p>
-      }
-    </form>
-
-    <form class="flex flex-col gap-4 rounded-lg border border-[#FFE6DB]/15 bg-[#1F0E1C] p-5" (ngSubmit)="uploadSong()">
-      <div>
-        <p class="font-raleway text-lg font-bold">2. Add a track</p>
-        <p class="font-raleway text-xs text-[#FFE6DB]/60">Upload limit is 200 MB. WAV and FLAC only.</p>
-      </div>
-
-      <label class="flex flex-col gap-2 font-raleway text-sm">
-        Audio file
-        <input class="text-sm text-[#FFE6DB]" type="file" accept=".wav,.flac,audio/wav,audio/flac" (change)="onSongFileSelected($event)" />
-      </label>
-
-      <label class="flex flex-col gap-2 font-raleway text-sm">
-        Song title
-        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="songTitle" [(ngModel)]="songTitle" required />
-      </label>
-
-      <label class="flex flex-col gap-2 font-raleway text-sm">
-        Duration seconds
-        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="songDurationSeconds" type="number" min="1" [(ngModel)]="songDurationSeconds" required />
-      </label>
-
-      <button class="rounded-md bg-[#FF5500] px-4 py-2 font-raleway font-bold text-white disabled:cursor-not-allowed disabled:opacity-50" type="submit" [disabled]="!canUploadSong">
-        Upload and verify
+      <button
+        type="button"
+        class="rounded-full border px-6 py-2.5 font-raleway font-bold transition"
+        [ngClass]="activeForm === 'single' ? 'border-[#FF5500] bg-[#FF5500]/10 text-[#FF5500]' : 'border-[#FFE6DB]/30 bg-[#FFE6DB]/5 text-[#FFE6DB]'"
+        (click)="showSingleForm()"
+        [attr.aria-pressed]="activeForm === 'single'"
+      >
+        Upload a single
       </button>
-
-      @if (uploadStep !== 'idle') {
-        <p class="font-raleway text-sm text-[#FFE6DB]/70">Status: {{ uploadStep }}</p>
-      }
-      @if (songMessage) {
-        <p class="font-raleway text-sm text-green-300">{{ songMessage }}</p>
-      }
-      @if (songError) {
-        <p class="font-raleway text-sm text-red-300">{{ songError }}</p>
-      }
-    </form>
+    </div>
   </div>
+
+  <app-upload-album-form [hidden]="activeForm !== 'album'" />
+  <app-upload-single-form [hidden]="activeForm !== 'single'" />
 </section>

@@ -41,6 +41,10 @@ export class AlbumService {
     return this.http.get<AlbumDetailedResponse>(`${this.apiUrl}/albums/${id}`);
   }
 
+  getPublicAlbum(id: string): Observable<AlbumDetailedResponse> {
+    return this.http.get<AlbumDetailedResponse>(`${this.apiUrl}/catalog/albums/${id}`);
+  }
+
   getSongStreamUrl(id: string): Observable<{ url: string; expires_in: number }> {
     return this.http.get<{ url: string; expires_in: number }>(`${this.apiUrl}/songs/${id}/stream-url`);
   }
