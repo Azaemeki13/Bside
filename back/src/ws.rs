@@ -9,7 +9,7 @@ use axum::{
     response::IntoResponse,
 };
 use futures_util::{SinkExt, StreamExt};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
 use uuid::Uuid;
 
@@ -24,6 +24,37 @@ use uuid::Uuid;
 #[derive(Deserialize)]
 pub struct WsConnectQuery {
     pub user_id: Uuid,
+}
+
+#[derive(Deserialize)]
+#[serde(tag = "type")]
+enum ClientWsMessage {
+    #[serde(rename = "private_message")]
+    PrivateMessage {
+        to_user_id: Uuid,
+        content: String,
+    },
+}
+
+#[derive(Serialize)]
+#[serde(tag = "type")]
+enum ServerWsMessage {
+    #[serde(rename = "private_message")]
+    PrivateMessage {
+        from_user_id: Uuid,
+        content: String,
+    },
+
+    #[serde(rename = "user_offline")]
+    UserOffline {
+        to_user_id: Uuid,
+        message: String,
+    },
+
+    #[serde(rename = "invalid_message")]
+    InvalidMessage {
+        message: String,
+    },
 }
 
 pub async fn ws_handler(
@@ -56,11 +87,115 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
         }
     });
     //on the same time, still listen if have new messages
+    // let mut receive_task = tokio::spawn(async move {
+    //     while let Some(Ok(message)) = receiver.next().await {
+    //         if let Message::Close(_) = message {
+    //             println!("WebSocket closed by user: {user_id}");
+    //             break;
+    //         }
+    //     }
+    // });
+    //1. Receive a WebSocket message from A
+    // 2. Parse the JSON
+    // 3. Retrieve the `to_user_id`
+    // 4. Find B in `online_users`
+    // 5. If B is online, send the message to B
+    // 6. If B is offline, return `user_offline` to A
+    let state_for_receive = state.clone();
+
     let mut receive_task = tokio::spawn(async move {
         while let Some(Ok(message)) = receiver.next().await {
-            if let Message::Close(_) = message {
-                println!("WebSocket closed by user: {user_id}");
-                break;
+            match message {
+                Message::Text(text) => {
+                    println!("Message received from user {user_id}: {text}");
+
+                    let parsed_message = serde_json::from_str::<ClientWsMessage>(text.as_str());
+
+                    match parsed_message {
+                        Ok(ClientWsMessage::PrivateMessage {
+                               to_user_id,
+                               content,
+                           }) => {
+                            println!("Private message from {user_id} to {to_user_id}");
+
+                            let server_message = ServerWsMessage::PrivateMessage {
+                                from_user_id: user_id,
+                                content,
+                            };
+
+                            let message_to_send = match serde_json::to_string(&server_message) {
+                                Ok(value) => value,
+                                Err(error) => {
+                                    println!("Failed to serialize private message: {error}");
+                                    continue;
+                                }
+                            };
+
+                            let target_sender = {
+                                let online_users = state_for_receive.network.online_users.lock().await;
+                                online_users.get(&to_user_id).cloned()
+                            };
+
+                            match target_sender {
+                                Some(sender) => {
+                                    if sender.send(message_to_send).is_err() {
+                                        println!("Failed to send message to user {to_user_id}");
+
+                                        let mut online_users =
+                                            state_for_receive.network.online_users.lock().await;
+                                        online_users.remove(&to_user_id);
+                                    } else {
+                                        println!("Message sent from {user_id} to {to_user_id}");
+                                    }
+                                }
+                                None => {
+                                    println!("User {to_user_id} is offline");
+
+                                    let offline_message = ServerWsMessage::UserOffline {
+                                        to_user_id,
+                                        message: "User is offline".to_string(),
+                                    };
+
+                                    if let Ok(offline_text) = serde_json::to_string(&offline_message) {
+                                        let current_user_sender = {
+                                            let online_users =
+                                                state_for_receive.network.online_users.lock().await;
+                                            online_users.get(&user_id).cloned()
+                                        };
+
+                                        if let Some(sender) = current_user_sender {
+                                            let _ = sender.send(offline_text);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Err(error) => {
+                            println!("Invalid WebSocket message from user {user_id}: {error}");
+
+                            let invalid_message = ServerWsMessage::InvalidMessage {
+                                message: format!("Invalid message format: {error}"),
+                            };
+
+                            if let Ok(invalid_text) = serde_json::to_string(&invalid_message) {
+                                let current_user_sender = {
+                                    let online_users =
+                                        state_for_receive.network.online_users.lock().await;
+                                    online_users.get(&user_id).cloned()
+                                };
+
+                                if let Some(sender) = current_user_sender {
+                                    let _ = sender.send(invalid_text);
+                                }
+                            }
+                        }
+                    }
+                }
+                Message::Close(_) => {
+                    println!("WebSocket closed by user: {user_id}");
+                    break;
+                }
+                _ => {}
             }
         }
     });
