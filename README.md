@@ -160,3 +160,7 @@
 | **Album** | ✅ | ⏳ | ⏳ | ⏳ |
 | **Playlist** | ✅ | ✅ | ✅ | ✅ |
 | **Song** | ✅ | ⏳ | ✅ (Verify) | ✅ |
+
+
+For read DB example:
+docker exec -it bside_db_dev sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT id, username, email FROM users;"'

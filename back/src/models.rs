@@ -303,3 +303,15 @@ pub enum SearchResult {
         creator: String,
     },
 }
+
+#[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
+pub struct ChatMessage {
+    pub id: uuid::Uuid,
+    pub sender_id: uuid::Uuid,
+    pub receiver_id: uuid::Uuid,
+    pub content: String,
+    pub status: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub delivered_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub read_at: Option<chrono::DateTime<chrono::Utc>>,
+}
