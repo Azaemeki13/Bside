@@ -9,11 +9,11 @@
 
   @if (album; as currentAlbum) {
     <header class="flex flex-col gap-5 border-b border-[#FFE6DB]/15 pb-6 sm:flex-row sm:items-end">
-      <img class="h-40 w-40 shrink-0 rounded-md object-cover" [src]="coverUrl(currentAlbum.cover_url)" alt="" />
+      <img class="h-52 w-52 shrink-0 rounded-md object-cover" [src]="coverUrl(currentAlbum.cover_url)" alt="" />
 
       <div class="min-w-0">
         <p class="font-raleway text-xs font-bold uppercase tracking-wide text-[#FFE6DB]/60">Album</p>
-        <h1 class="break-words font-raleway text-4xl font-bold leading-tight">{{ currentAlbum.title }}</h1>
+        <h1 class="break-words font-climate-crisis text-4xl font-bold leading-tight">{{ currentAlbum.title }}</h1>
         <p class="mt-2 font-raleway text-sm text-[#FFE6DB]/70">
           <a class="underline-offset-4 hover:underline" [routerLink]="['/bside_app/artist', currentAlbum.artist_id]">
             {{ currentAlbum.artist_name }}
@@ -32,13 +32,13 @@
            style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem">
         <span>#</span>
         <span>Title</span>
-        <span class="text-right">Dur.</span>
+        <lucide-icon [img]="timer" class="w-4 h-4 text-[#FFE6DB]/50 justify-self-end"></lucide-icon>
       </div>
 
       <div class="min-h-0 flex-1 overflow-y-auto py-2">
         @for (song of currentAlbum.songs; let i = $index; track song.id) {
           <button type="button"
-                  class="grid w-full appearance-none items-center rounded-md border-0 bg-transparent py-3 text-left font-raleway hover:bg-[#FFE6DB]/5"
+                  class="grid w-full appearance-none items-center rounded-md border-0 bg-transparent py-3 text-left font-raleway"
                   [class.bg-[#FFE6DB]/5]="activeSongId === song.id"
                   style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem"
                   (click)="play(song)">

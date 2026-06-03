@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { LucideAngularModule, Play } from 'lucide-angular';
+import { LucideAngularModule, Play, Timer } from 'lucide-angular';
 import { Subscription } from 'rxjs';
 import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
 import { AlbumDetailedResponse, AlbumService, AlbumSongItem } from '../../services/album.service';
@@ -19,6 +19,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
 
   readonly playIcon = Play;
+  readonly timer = Timer;
 
   album: AlbumDetailedResponse | null = null;
   isLoading = false;
