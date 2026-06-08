@@ -1,5 +1,4 @@
 use crate::models::{AppState, ChatMessage};
-use chrono::{DateTime, Utc};
 use axum::extract::Query;
 use axum::extract::ws::Message;
 use axum::{
@@ -9,6 +8,7 @@ use axum::{
     },
     response::IntoResponse,
 };
+use chrono::{DateTime, Utc};
 use futures_util::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
@@ -31,10 +31,7 @@ pub struct WsConnectQuery {
 #[serde(tag = "type")]
 enum ClientWsMessage {
     #[serde(rename = "private_message")]
-    PrivateMessage {
-        to_user_id: Uuid,
-        content: String,
-    },
+    PrivateMessage { to_user_id: Uuid, content: String },
 }
 
 #[derive(Serialize)]
@@ -57,15 +54,10 @@ enum ServerWsMessage {
     },
 
     #[serde(rename = "user_offline")]
-    UserOffline {
-        to_user_id: Uuid,
-        message: String,
-    },
+    UserOffline { to_user_id: Uuid, message: String },
 
     #[serde(rename = "invalid_message")]
-    InvalidMessage {
-        message: String,
-    },
+    InvalidMessage { message: String },
 }
 
 pub async fn ws_handler(
@@ -214,14 +206,14 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
 
                     match parsed_message {
                         Ok(ClientWsMessage::PrivateMessage {
-                               to_user_id,
-                               content,
-                           }) => {
+                            to_user_id,
+                            content,
+                        }) => {
                             println!("Private message from {user_id} to {to_user_id}");
 
                             let saved_message = sqlx::query_as!(
-                            ChatMessage,
-                            r#"
+                                ChatMessage,
+                                r#"
                             INSERT INTO messages (sender_id, receiver_id, content, status)
                             VALUES ($1, $2, $3, 'sent')
                             RETURNING
@@ -234,12 +226,12 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
                                 delivered_at,
                                 read_at
                             "#,
-                            user_id,
-                            to_user_id,
-                            content
-                        )
-                                .fetch_one(&state_for_receive.db)
-                                .await;
+                                user_id,
+                                to_user_id,
+                                content
+                            )
+                            .fetch_one(&state_for_receive.db)
+                            .await;
 
                             let saved_message = match saved_message {
                                 Ok(message) => message,
@@ -250,7 +242,9 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
                                         message: "Failed to save message".to_string(),
                                     };
 
-                                    if let Ok(invalid_text) = serde_json::to_string(&invalid_message) {
+                                    if let Ok(invalid_text) =
+                                        serde_json::to_string(&invalid_message)
+                                    {
                                         let current_user_sender = {
                                             let online_users =
                                                 state_for_receive.network.online_users.lock().await;
@@ -273,7 +267,8 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
                                 created_at: saved_message.created_at,
                             };
 
-                            let message_to_send = match serde_json::to_string(&message_for_receiver) {
+                            let message_to_send = match serde_json::to_string(&message_for_receiver)
+                            {
                                 Ok(value) => value,
                                 Err(error) => {
                                     println!("Failed to serialize private message: {error}");
@@ -282,7 +277,8 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
                             };
 
                             let target_sender = {
-                                let online_users = state_for_receive.network.online_users.lock().await;
+                                let online_users =
+                                    state_for_receive.network.online_users.lock().await;
                                 online_users.get(&to_user_id).cloned()
                             };
 
@@ -298,15 +294,15 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
                                         println!("Message sent from {user_id} to {to_user_id}");
 
                                         let update_result = sqlx::query!(
-                                        r#"
+                                            r#"
                                         UPDATE messages
                                         SET status = 'delivered', delivered_at = NOW()
                                         WHERE id = $1
                                         "#,
-                                        saved_message.id
-                                    )
-                                            .execute(&state_for_receive.db)
-                                            .await;
+                                            saved_message.id
+                                        )
+                                        .execute(&state_for_receive.db)
+                                        .await;
 
                                         if let Err(error) = update_result {
                                             println!("Failed to update message status: {error}");
@@ -323,7 +319,9 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
                                         message: "User is offline. Message saved.".to_string(),
                                     };
 
-                                    if let Ok(offline_text) = serde_json::to_string(&offline_message) {
+                                    if let Ok(offline_text) =
+                                        serde_json::to_string(&offline_message)
+                                    {
                                         let current_user_sender = {
                                             let online_users =
                                                 state_for_receive.network.online_users.lock().await;

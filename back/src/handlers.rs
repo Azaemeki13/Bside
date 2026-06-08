@@ -361,7 +361,7 @@ pub async fn create_artist_handler(
     ensure_admin(&state, current_user_id).await?;
     let mut name: Option<String> = None;
     let mut bio: Option<String> = None;
-    let mut photo_url = "http://minio:9000/bside-covers/default_artist.png".to_string();
+    let mut photo_url = "http://localhost:9000/bside-covers/default_artist.jpg".to_string();
     while let Some(field) = multipart
         .next_field()
         .await
@@ -386,33 +386,42 @@ pub async fn create_artist_handler(
                 );
             }
             "photo" => {
-                if let Some(mime) = field.content_type()
-                    && mime != "image/png"
-                {
+                let content_type = field.content_type().unwrap_or("").to_string();
+                if content_type != "image/png" && content_type != "image/jpeg" {
                     continue;
                 }
                 let data = field
                     .bytes()
                     .await
                     .map_err(|e| BSideError::BadRequest(e.to_string()))?;
-                if data.len() >= 8 {
+                if data.len() >= 4 {
                     let png_header = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-                    if data[0..8] == png_header && data.len() <= 10 * 1024 * 1024 {
+                    let jpg_header = [0xFF, 0xD8, 0xFF];
+
+                    let (is_valid, extension) = if data.starts_with(&png_header) {
+                        (true, "png")
+                    } else if data.starts_with(&jpg_header) {
+                        (true, "jpg")
+                    } else {
+                        (false, "")
+                    };
+                    if is_valid && data.len() <= 10 * 1024 * 1024 {
                         let file_id = Uuid::new_v4();
-                        let key = format!("{file_id}.png");
+                        let key = format!("{file_id}.{extension}");
+                        
                         if let Err(e) = state
                             .aws_client
                             .put_object()
                             .bucket("bside-covers")
                             .key(&key)
                             .body(data.into())
-                            .content_type("image/png")
+                            .content_type(content_type)
                             .send()
                             .await
                         {
                             tracing::warn!("Artist photo upload failed, using default cover: {e}");
                         } else {
-                            photo_url = format!("http://minio:9000/bside-covers/{key}");
+                            photo_url = format!("http://localhost:9000/bside-covers/{key}");
                         }
                     }
                 }
@@ -751,7 +760,7 @@ pub async fn review_artist_request_handler(
                 request.user_id,
                 request.artist_name,
                 request.bio,
-                "http://minio:9000/bside-covers/default_artist.png"
+                "http://localhost:9000/bside-covers/default_artist.jpg"
             )
             .execute(&mut *tx)
             .await?;
@@ -900,7 +909,7 @@ pub async fn create_album_handler(
     };
     let mut title: Option<String> = None;
     let mut genre: Option<String> = None;
-    let mut cover_url = "http://minio:9000/bside-covers/default_cover.png".to_string();
+    let mut cover_url = "http://localhost:9000/bside-covers/default_cover.jpg".to_string();
     while let Some(field) = multipart
         .next_field()
         .await
@@ -967,7 +976,7 @@ pub async fn create_album_handler(
                         .send()
                         .await
                         .map_err(|e| BSideError::S3Error(e.to_string()))?;
-                    cover_url = format!("http://minio:9000/bside-covers/{key}");
+                    cover_url = format!("http://localhost:9000/bside-covers/{key}");
                 }
             }
             _ => {}
@@ -1228,7 +1237,7 @@ pub async fn flush_deleted_albums_task(state: State<AppState>) -> Result<(), BSi
     .await?;
     let mut successfully_clean_ids: Vec<Uuid> = Vec::new();
     for record in records {
-        if record.cover_url.ends_with("default_cover.png") {
+        if record.cover_url.ends_with("default_cover.jpg") {
             successfully_clean_ids.push(
                 record
                     .id
@@ -1489,9 +1498,9 @@ pub async fn get_song_stream_url_handler(
         "#,
         song_id
     )
-        .fetch_optional(&state.db)
-        .await?
-        .ok_or(BSideError::NotFound)?;
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::NotFound)?;
 
     if song.status != "Ready" {
         return Err(BSideError::SongNotReady);
@@ -2127,7 +2136,7 @@ pub async fn admin_create_album_for_artist_handler(
 
     let mut title: Option<String> = None;
     let mut genre: Option<String> = None;
-    let mut cover_url = "http://minio:9000/bside-covers/default_cover.png".to_string();
+    let mut cover_url = "http://localhost:9000/bside-covers/default_cover.jpg".to_string();
 
     while let Some(field) = multipart
         .next_field()
