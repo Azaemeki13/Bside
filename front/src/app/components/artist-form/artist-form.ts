@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -14,6 +14,7 @@ import { ArtistRequestService } from '../../services/artist-request.service';
 export class ArtistForm {
   protected readonly authService = inject(AuthService);
   private readonly artistRequests = inject(ArtistRequestService);
+  @Output() close = new EventEmitter<void>();
 
   protected artistName = '';
   protected bio = '';
@@ -24,12 +25,10 @@ export class ArtistForm {
   protected submitArtistRequest(): void {
     this.message = '';
     this.error = '';
-
     if (!this.artistName.trim()) {
       this.error = 'Artist name is required.';
       return;
     }
-
     this.isSubmitting = true;
     this.artistRequests.create({
       artist_name: this.artistName.trim(),

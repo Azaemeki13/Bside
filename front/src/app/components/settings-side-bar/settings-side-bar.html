@@ -1,0 +1,46 @@
+<div class="h-full bg-[#1F0E1C] rounded-[1.563rem] w-[30rem] flex flex-col px-[2.25rem] py-[2.25rem] gap-6">
+  
+  <span class="font-climate-crisis text-[1.5rem] text-[#FFE6DB] pb-6">Settings</span>
+
+    <button class="flex flex-row items-center justify-between cursor-pointer"
+    (click)="openProfile.emit()">
+    <span class="font-raleway text-[1rem] font-bold text-[#FFE6DB]">PROFILE</span>
+    <lucide-icon [img]="chevronRight" class="text-[#FFE6DB]"></lucide-icon>
+    </button>
+
+  <span class="font-raleway text-[1rem] font-bold text-[#FFE6DB]">ACTIVITY</span>
+
+    <div class="flex flex-row items-center justify-between">
+    <label for="toggle-switch" class="font-raleway text-[1rem] font-medium text-[#FFE6DB]/50 cursor-pointer">
+        Share your listening activity
+    </label>
+    <button type="button" id="toggle-switch" [class]="isListeningOn ? 'bg-[#FF5500]' : 'bg-slate-600'" class="flex w-10 h-6 p-1 rounded-full overflow-hidden outline-none" (click)="isListeningOn = !isListeningOn">
+        <span [class]="isListeningOn ? 'translate-x-4' : 'translate-x-0'" class="w-4 h-4 rounded-full bg-white transition-transform duration-300"></span>
+    </button>
+    </div>
+
+    <div class="flex flex-row items-center justify-between">
+    <label for="toggle-switch" class="font-raleway text-[1rem] font-medium text-[#FFE6DB]/50 cursor-pointer">
+        Allow notifications
+    </label>
+    <button type="button" id="toggle-switch" [class]="isNotificationsOn ? 'bg-[#FF5500]' : 'bg-slate-600'" class="flex w-10 h-6 p-1 rounded-full overflow-hidden outline-none" (click)="isNotificationsOn = !isNotificationsOn">
+        <span [class]="isNotificationsOn ? 'translate-x-4' : 'translate-x-0'" class="w-4 h-4 rounded-full bg-white transition-transform duration-300"></span>
+    </button>
+    </div>
+
+    <div class="flex flex-row items-center justify-between">
+    <label for="toggle-switch" class="font-raleway text-[1rem] font-medium text-[#FFE6DB]/50 cursor-pointer">
+        Share your online status
+    </label>
+    <button type="button" id="toggle-switch" [class]="isStatusOn ? 'bg-[#FF5500]' : 'bg-slate-600'" class="flex w-10 h-6 p-1 rounded-full overflow-hidden outline-none" (click)="isStatusOn = !isStatusOn">
+        <span [class]="isStatusOn ? 'translate-x-4' : 'translate-x-0'" class="w-4 h-4 rounded-full bg-white transition-transform duration-300"></span>
+    </button>
+    </div>
+
+  <button class="flex flex-row items-center justify-between cursor-pointer"
+    (click)="openArtistForm.emit()">
+    <span class="font-raleway text-[1rem] font-bold text-[#FFE6DB]">BECOME AN ARTIST</span>
+    <lucide-icon [img]="chevronRight" class="text-[#FFE6DB]"></lucide-icon>
+  </button>
+
+</div>

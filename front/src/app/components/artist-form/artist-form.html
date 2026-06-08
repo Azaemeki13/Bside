@@ -1,7 +1,7 @@
-<div class="py-6 flex flex-col gap-4">
+<div class="flex flex-col gap-4">
 
     @if (authService.currentUser()?.role !== 'Artist') {
-    <form class="rounded-lg bg-[#1F0E1C] p-5 flex max-w-xl flex-col gap-3" (ngSubmit)="submitArtistRequest()">
+    <form class="rounded-[1.563rem] bg-[#1F0E1C] p-5 flex max-w-xl flex-col gap-3" (ngSubmit)="submitArtistRequest()">
         <p class="font-raleway font-bold text-[#FFE6DB]">Become an artist</p>
         <p class="font-raleway text-sm text-[#FFE6DB]/60">
         Send a request to the admin team. If accepted, your artist profile will be created.
