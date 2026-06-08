@@ -140,9 +140,6 @@ export class ArtistDetail implements OnInit, OnDestroy {
 
     if (source.includes('.flac'))
       return 'flac';
-    if (source.includes('.mp3'))
-      return 'mp3';
-
     return 'wav';
   }
 }

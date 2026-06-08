@@ -4,7 +4,7 @@ import { Howl } from "howler"
 import { Observable, Subscription } from "rxjs"
 import { VolumeService } from "./volume.service"
 
-export type AudioFormat = 'flac' | 'wav' | 'mp3';
+export type AudioFormat = 'flac' | 'wav';
 
 export type AudioTrack = {
     id: string;

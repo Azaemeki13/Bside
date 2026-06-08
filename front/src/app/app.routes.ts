@@ -13,11 +13,16 @@ import { ArtistDetail } from './bside_app/artist-detail/artist-detail';
 import { artistGuard } from './guards/artist.guard';
 import { adminGuard } from './guards/admin.guard';
 import { AdminArtistRequests } from './bside_app/admin-artist-requests/admin-artist-requests';
+import { Forbidden } from './errors/forbidden/forbidden';
+import { ServerError } from './errors/server-error/server-error';
+import { NotFound } from './errors/not-found/not-found';
 
 export const routes: Routes = [
-    {path: '', component: LandingComponent },
-    {path: 'login', component: Login },
-    {path: 'signup', component: Signup },
+    { path: '403', component: Forbidden },
+    { path: '500', component: ServerError },
+    { path: '', component: LandingComponent },
+    { path: 'login', component: Login },
+    { path: 'signup', component: Signup },
     {
         path: 'bside_app',
         component: BsideApp,
@@ -33,4 +38,5 @@ export const routes: Routes = [
             { path: 'settings', component: BsideSettings },
         ],
     },
+    { path: '**', component: NotFound },
 ];
