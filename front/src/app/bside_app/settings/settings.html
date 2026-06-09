@@ -1,14 +1,14 @@
 <div class="flex flex-row gap-4 h-full overflow-hidden">
   <app-settings-side-bar
-    (openArtistForm)="showArtistForm = true; showProfile = false"
-    (openProfile)="showProfile = true; showArtistForm = false"
-    class="min-h-0 overflow-hidden">
+    (openArtistForm)="showArtistForm = !showArtistForm; showProfile = false"
+    (openProfile)="showProfile = !showProfile; showArtistForm = false"
+    class="min-h-0 overflow-y-auto">
   </app-settings-side-bar>
 
   @if (showProfile) {
-    <app-profile (close)="showProfile = false" class="flex-1 min-w-0"/>
+    <app-profile (close)="showProfile = false" class="flex-1 overflow-y-auto min-w-max"/>
   }
   @if (showArtistForm) {
-    <app-artist-form (close)="showArtistForm = false" class="flex-1 min-w-0"/>
+    <app-artist-form (close)="showArtistForm = false" class="flex-1 overflow-y-auto min-w-max"/>
   }
 </div>

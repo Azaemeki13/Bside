@@ -1,4 +1,5 @@
 import { Component, Output, EventEmitter, inject, computed, ElementRef, HostListener } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PlaylistService, Playlist } from '../../services/playlist.service';
 
@@ -12,6 +13,7 @@ import { PlaylistService, Playlist } from '../../services/playlist.service';
 export class Profile {
   protected readonly authService = inject(AuthService);
   protected readonly playlistService = inject(PlaylistService);
+  private readonly router = inject(Router);
   @Output() close = new EventEmitter<void>();
 
   private readonly DEFAULT_AVATAR = 'https://upload.wikimedia.org/wikipedia/en/thumb/0/0a/Leon_Kennedy_%28Resident_Evil_Requiem%29.jpg/250px-Leon_Kennedy_%28Resident_Evil_Requiem%29.jpg';
@@ -24,6 +26,7 @@ export class Profile {
 
   protected selectPlaylist(playlist: Playlist): void {
     this.playlistService.select(playlist);
+    this.router.navigate(['/bside_app/library']);
   }
 
   @HostListener('document:click', ['$event'])
