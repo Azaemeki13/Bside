@@ -3,13 +3,13 @@
     <div class="flex flex-1 min-h-0">
       <div class="flex flex-col flex-1 min-w-0 p-4 overflow-hidden">
 
-        <div class="grid text-[#FFE6DB] font-raleway text-[1rem] font-medium pb-2 border-b border-[#FFE6DB]/30"
-             style="grid-template-columns: 2rem minmax(0,1fr) 4rem 3rem">
-          <span class="text-[#FFE6DB]/50 text-sm">#</span>
+        <div class="grid border-b border-[#FFE6DB]/20 pb-2 font-raleway text-sm font-medium text-[#FFE6DB]/70"
+             style="grid-template-columns: 2rem 2.5rem minmax(0,1fr) 5rem 2.5rem 2.5rem">
+          <span>#</span>
+          <span></span>
           <span>Title</span>
-          <span class="flex justify-end">
-            <lucide-icon [img]="timer" class="w-4 h-4 text-[#FFE6DB]/50"></lucide-icon>
-          </span>
+          <lucide-icon [img]="timer" class="w-4 h-4 text-[#FFE6DB]/50 justify-self-end"></lucide-icon>
+          <span></span>
           <span></span>
         </div>
 
@@ -19,29 +19,42 @@
           } @else {
             @for (song of playlistService.selectedSongs(); track song.link_id) {
               <div class="grid items-center py-2 rounded-lg hover:bg-[#FFE6DB]/5 duration-200 group cursor-pointer"
-                   style="grid-template-columns: 2rem minmax(0,1fr) 4rem 3rem"
+                   style="grid-template-columns: 2rem 2.5rem minmax(0,1fr) 5rem 2.5rem 2.5rem"
                    role="button"
-                   tabindex="0"
                    (click)="playSong(song)"
                    (keydown.enter)="playSong(song)">
 
-                <span class="font-raleway text-[#FFE6DB]/50 text-sm group-hover:hidden">{{ song.position }}</span>
-                <button type="button"
-                        class="hidden group-hover:flex items-center justify-center cursor-pointer"
-                        (click)="playSong(song); $event.stopPropagation()">
-                  <lucide-icon [img]="play" class="w-4 h-4 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
-                </button>
+                @if (isCurrentSong(song)) {
+                  <span class="flex items-center justify-center">
+                    <lucide-icon [img]="audioLines" class="w-4 h-4 text-[#FF5500]"></lucide-icon>
+                  </span>
+                } @else {
+                  <span class="font-raleway text-[#FFE6DB]/50 text-sm group-hover:hidden">{{ song.position }}</span>
+                  <button type="button"
+                          class="hidden group-hover:flex items-center justify-center cursor-pointer"
+                          (click)="playSong(song); $event.stopPropagation()">
+                    <lucide-icon [img]="play" class="w-4 h-4 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
+                  </button>
+                }
 
-                <div class="flex items-center gap-3 min-w-0">
-                  <div class="w-10 h-10 rounded bg-[#FFE6DB]/10 shrink-0 flex items-center justify-center">
-                    <span class="text-[#FFE6DB]/30 text-xs">♪</span>
-                  </div>
-                  <div class="min-w-0 pr-4">
-                    <p class="font-raleway font-semibold text-[#FFE6DB] text-sm truncate">{{ song.title }}</p>
-                  </div>
+                <div class="w-9 h-9 rounded shrink-0 overflow-hidden bg-[#FFE6DB]/10">
+                  @if (song.cover_url) {
+                    <img [src]="coverUrl(song.cover_url)" alt="cover" class="w-full h-full object-cover" />
+                  } @else {
+                    <div class="w-full h-full flex items-center justify-center">
+                      <span class="text-[#FFE6DB]/30 text-xs">♪</span>
+                    </div>
+                  }
                 </div>
 
-                <span class="font-raleway text-[#FFE6DB]/50 text-sm text-right">{{ formatDuration(song.duration_seconds) }}</span>
+                <div class="min-w-0 pl-3 pr-4">
+                  <p class="font-raleway font-semibold text-sm truncate"
+                     [ngClass]="isCurrentSong(song) ? 'text-[#FF5500]' : 'text-[#FFE6DB]'">{{ song.title }}</p>
+                  <p class="font-raleway text-[#FFE6DB]/50 text-xs truncate">{{ song.artist_name }}</p>
+                </div>
+
+                <span class="font-raleway text-[#FFE6DB]/50 text-sm justify-self-end">{{ formatDuration(song.duration_seconds) }}</span>
+
                 <button type="button" (click)="removeSong(song); $event.stopPropagation()" class="flex justify-end cursor-pointer" aria-label="Remove from playlist">
                   <lucide-icon [img]="trash2" class="w-4 h-4 text-[#FFE6DB]/40 hover:text-[#FF5500] duration-300"></lucide-icon>
                 </button>
@@ -61,13 +74,19 @@
             <p class="font-raleway text-[#FFE6DB]/70 text-sm mt-1">Your liked songs</p>
           </div>
         } @else if (playlistService.selectedPlaylist(); as playlist) {
-          <div class="w-[21rem] h-[21rem] rounded-[0.625rem] border border-[#FFE6DB]/15 bg-[#FFE6DB]/10 backdrop-blur-sm glass-card flex items-center justify-center">
-            <span class="font-raleway font-bold text-[#FFE6DB] text-lg text-center px-4">{{ playlist.title }}</span>
+          <div class="w-[21rem] h-[21rem] rounded-[0.625rem] overflow-hidden border border-[#FFE6DB]/15">
+            @if (playlist.cover_url) {
+              <img [src]="coverUrl(playlist.cover_url)" alt="cover" class="w-full h-full object-cover" />
+            } @else {
+              <div class="w-full h-full bg-[#FFE6DB]/10 backdrop-blur-sm glass-card flex items-center justify-center">
+                <span class="font-raleway font-bold text-[#FFE6DB] text-lg text-center px-4">{{ playlist.title }}</span>
+              </div>
+            }
           </div>
           <div class="w-[21rem] flex flex-col gap-1">
             <h2 class="font-climate-crisis text-[#FFE6DB] text-2xl truncate">{{ playlist.title }}</h2>
             @if (playlist.description) {
-              <p class="font-raleway text-[#FFE6DB]/70 text-sm truncate">{{ playlist.description }}</p>
+              <p class="font-raleway text-[#FFE6DB]/70 text-sm font-bold truncate">{{ playlist.description }}</p>
             }
             <p class="font-raleway text-[#FFE6DB]/50 text-xs">
               Created by
@@ -76,18 +95,23 @@
             </p>
             @if (playlist.total_duration || playlist.song_count) {
               <p class="font-raleway text-[#FFE6DB]/50 text-xs">
-                @if (playlist.total_duration) {
-                  {{ formatTotalDuration(playlist.total_duration) }}
-                }
+                @if (playlist.total_duration) { {{ formatTotalDuration(playlist.total_duration) }} }
                 @if (playlist.total_duration && playlist.song_count) { | }
-                @if (playlist.song_count) {
-                  {{ playlist.song_count }} songs
-                }
+                @if (playlist.song_count) { {{ playlist.song_count }} songs }
               </p>
             }
-            <button (click)="deletePlaylist()" class="mt-2 self-start cursor-pointer">
-              <lucide-icon [img]="trash2" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]/50 hover:text-[#FF5500] duration-300"></lucide-icon>
-            </button>
+            <div class="flex items-center gap-3 mt-2">
+              <button (click)="playPlaylist()" class="cursor-pointer flex items-center justify-center w-10 h-10 rounded-full bg-[#FF5500] hover:bg-[#FF7733] duration-200 shadow-lg" aria-label="Play playlist">
+                @if (audio.shuffleEnabled()) {
+                  <lucide-icon [img]="shuffle" class="w-5 h-5 text-[#FFE6DB]"></lucide-icon>
+                } @else {
+                  <lucide-icon [img]="play" class="w-5 h-5 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
+                }
+              </button>
+              <button (click)="deletePlaylist()" class="cursor-pointer" aria-label="Delete playlist">
+                <lucide-icon [img]="trash2" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]/50 hover:text-[#FF5500] duration-300"></lucide-icon>
+              </button>
+            </div>
           </div>
         }
       </div>

@@ -23,6 +23,7 @@ export class PlaylistMosaic implements OnInit {
   searchOpen = false;
   isCreateOpen = false;
   coverPreview: string | null = null;
+  coverFile: File | null = null;
   playlistName = '';
   playlistDescription = '';
 
@@ -40,14 +41,18 @@ export class PlaylistMosaic implements OnInit {
     this.isCreateOpen = false;
     if (this.coverPreview) URL.revokeObjectURL(this.coverPreview);
     this.coverPreview = null;
+    this.coverFile = null;
     this.playlistName = '';
     this.playlistDescription = '';
   }
 
   confirmCreate(): void {
     if (!this.playlistName.trim()) return;
-
-    this.playlistService.create(this.playlistName.trim()).subscribe({
+    this.playlistService.create(
+      this.playlistName.trim(),
+      this.playlistDescription.trim(),
+      this.coverFile ?? undefined
+    ).subscribe({
       next: () => this.closeCreateDialog(),
       error: (err) => console.error('Failed to create playlist', err)
     });
@@ -58,6 +63,7 @@ export class PlaylistMosaic implements OnInit {
     if (file) {
       if (this.coverPreview) URL.revokeObjectURL(this.coverPreview);
       this.coverPreview = URL.createObjectURL(file);
+      this.coverFile = file;
     }
   }
 }

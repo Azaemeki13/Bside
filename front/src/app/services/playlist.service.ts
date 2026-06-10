@@ -13,6 +13,7 @@ export interface Playlist {
   song_count?: number;
   is_public: boolean;
   created_at?: string;
+  cover_url?: string;
 }
 
 export interface PlaylistSongItem {
@@ -56,12 +57,16 @@ export class PlaylistService {
     return this.http.get<PlaylistDetailedResponse>(`${this.apiUrl}/playlists/${id}`);
   }
 
-  create(title: string): Observable<Playlist> {
-    return this.http.post<Playlist>(`${this.apiUrl}/playlists`, { title }).pipe(
+  create(title: string, description: string, cover?: File): Observable<Playlist> {
+    const form = new FormData();
+    form.append('title', title);
+    if (description.trim()) form.append('description', description);
+    if (cover) form.append('cover', cover);
+
+    return this.http.post<Playlist>(`${this.apiUrl}/playlists`, form).pipe(
       tap((playlist) => this.add(playlist))
     );
   }
-
   add(playlist: Playlist): void {
     this.playlists.update(list => list.some(p => p.id === playlist.id) ? list : [playlist, ...list]);
   }

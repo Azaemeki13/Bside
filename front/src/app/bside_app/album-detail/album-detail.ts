@@ -144,7 +144,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
     this.isAddingToPlaylist = true;
     this.playlistActionError = '';
 
-    this.playlistService.create(title).pipe(
+    this.playlistService.create(title, '').pipe(
       switchMap((playlist) => this.playlistService.addSong(playlist.id, songId))
     ).subscribe({
       next: () => {

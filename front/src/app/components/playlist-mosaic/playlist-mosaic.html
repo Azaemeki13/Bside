@@ -24,9 +24,13 @@
       @for (playlist of playlistService.playlists(); track playlist.id) {
         <button (click)="selectPlaylist(playlist)" class="rounded-[0.625rem] border-2 border-transparent hover:border-[#FF5500] duration-300 cursor-pointer">
           <div class="w-[9rem] h-[9rem] rounded-[calc(0.625rem-2px)] overflow-hidden">
-            <div class="w-full h-full bg-[#FFE6DB]/10 flex items-center justify-center backdrop-blur-sm glass-card">
-              <span class="font-raleway font-bold text-[#FFE6DB] text-xs text-center px-2">{{ playlist.title }}</span>
-            </div>
+            @if (playlist.cover_url) {
+              <img [src]="playlist.cover_url" alt="cover" class="w-full h-full object-cover" />
+            } @else {
+              <div class="w-full h-full bg-[#FFE6DB]/10 flex items-center justify-center backdrop-blur-sm glass-card">
+                <span class="font-raleway font-bold text-[#FFE6DB] text-xs text-center px-2">{{ playlist.title }}</span>
+              </div>
+            }
           </div>
         </button>
       }
