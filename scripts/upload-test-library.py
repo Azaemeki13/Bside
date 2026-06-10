@@ -41,6 +41,10 @@ COVER_NAMES = (
     "album.jpg",
     "album.jpeg",
     "album.webp",
+    "albumart.jpg",
+    "albumart.jpeg",
+    "albumart.png",
+    "albumart.webp",
 )
 TAG_NAMES = ("tag.txt", "genre.txt")
 DEFAULT_DURATION_SECONDS = 180

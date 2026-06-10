@@ -1,5 +1,10 @@
 <div class="flex items-center gap-3 w-full min-w-0">
-  <button (click)="volumeService.toggleMute()" class="text-[#FFE6DB]">
+  <button
+    type="button"
+    (click)="volumeService.toggleMute()"
+    class="text-[#FFE6DB]"
+    [attr.aria-label]="volumeService.muted() ? 'Unmute' : 'Mute'"
+    [attr.aria-pressed]="volumeService.muted()">
     @if (!volumeService.muted()) {
       <lucide-icon [img]="volume2" class="w-[1rem] h-[1rem]"></lucide-icon>
     } @else {
@@ -8,7 +13,7 @@
   </button>
   <div class="relative flex items-center w-full min-w-0 h-6 group">
     <div class="absolute left-0 top-1/2 w-full -translate-y-1/2 h-[3px] rounded-full bg-[#FFE6DB]"></div>
-    <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 rounded-full bg-[#FF5500] pointer-events-none" [style.width.%]="volumeService.muted() ? 0 : volumeService.volume()">
+    <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 rounded-full bg-[#FF5500] pointer-events-none" [style.width.%]="volumeService.displayVolume()">
     </div>
     <input
       type="range"
@@ -16,6 +21,7 @@
       [value]="volumeService.volume()"
       (input)="onInput($event)"
       aria-label="Volume"
+      [attr.aria-valuenow]="volumeService.displayVolume()"
       class="absolute w-full opacity-0 cursor-pointer h-4"
     />
   </div>

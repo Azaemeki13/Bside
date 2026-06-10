@@ -24,6 +24,8 @@ export type QueueEntry = {
     onRequestUrl: () => Observable<{ url: string }>;
 };
 
+export type RepeatMode = 'off' | 'all' | 'one';
+
 @Injectable({ providedIn: 'root'})
 export class AudioPlayerService {
     private readonly platformId = inject(PLATFORM_ID);
@@ -45,6 +47,8 @@ export class AudioPlayerService {
     private queue: QueueEntry[] = [];
     readonly queueIndex = signal(-1);
     readonly queueLength = signal(0);
+    readonly shuffleEnabled = signal(false);
+    readonly repeatMode = signal<RepeatMode>('off');
 
     readonly progressPercent = computed(() => {
         const total = this.duration();
@@ -53,7 +57,15 @@ export class AudioPlayerService {
         return Math.min(100, Math.max(0, (this.position() / total) * 100));
     });
 
-    readonly hasNext = computed(() => this.queueIndex() < this.queueLength() - 1);
+    readonly hasNext = computed(() => {
+        const length = this.queueLength();
+        if (length === 0)
+            return false;
+
+        return (this.shuffleEnabled() && length > 1)
+            || this.repeatMode() === 'all'
+            || this.queueIndex() < length - 1;
+    });
     readonly hasPrevious = computed(() => this.queueIndex() > 0);
 
     constructor() {
@@ -61,7 +73,8 @@ export class AudioPlayerService {
             return;
 
         effect(() => {
-            this.sound?.volume(this.volumeService.volume01());
+            const volume = this.volumeService.volume01();
+            this.sound?.volume(volume);
         });
     }
 
@@ -72,9 +85,9 @@ export class AudioPlayerService {
     }
 
     next(): void {
-        if (this.hasNext()) {
-            this.playIndex(this.queueIndex() + 1);
-        }
+        const nextIndex = this.nextIndex();
+        if (nextIndex !== null)
+            this.playIndex(nextIndex);
     }
 
     previous(): void {
@@ -126,6 +139,23 @@ export class AudioPlayerService {
         this.isLoading.set(false);
         this.duration.set(0);
         this.position.set(0);
+    }
+
+    toggleShuffle(): void {
+        this.shuffleEnabled.update((enabled) => !enabled);
+    }
+
+    cycleRepeatMode(): void {
+        const current = this.repeatMode();
+        if (current === 'off') {
+            this.repeatMode.set('all');
+            return;
+        }
+        if (current === 'all') {
+            this.repeatMode.set('one');
+            return;
+        }
+        this.repeatMode.set('off');
     }
 
     seekToPercent(percent: number): void {
@@ -234,6 +264,11 @@ export class AudioPlayerService {
                 this.isPlaying.set(false);
                 this.stopProgressTimer();
                 this.position.set(0);
+                if (this.repeatMode() === 'one') {
+                    this.playIndex(this.queueIndex());
+                    return;
+                }
+
                 this.next();
             },
 
@@ -256,6 +291,32 @@ export class AudioPlayerService {
         });
 
         this.sound = sound;
+    }
+
+    private nextIndex(): number | null {
+        if (this.queue.length === 0)
+            return null;
+
+        const currentIndex = this.queueIndex();
+
+        if (this.shuffleEnabled() && this.queue.length > 1)
+            return this.randomIndexExcept(currentIndex);
+
+        if (currentIndex < this.queue.length - 1)
+            return currentIndex + 1;
+
+        if (this.repeatMode() === 'all')
+            return 0;
+
+        return null;
+    }
+
+    private randomIndexExcept(excludedIndex: number): number {
+        let nextIndex = excludedIndex;
+        while (nextIndex === excludedIndex) {
+            nextIndex = Math.floor(Math.random() * this.queue.length);
+        }
+        return nextIndex;
     }
 
     private startProgressTimer(): void {

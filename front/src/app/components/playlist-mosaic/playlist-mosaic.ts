@@ -4,8 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Plus, Search, X, ImagePlus } from 'lucide-angular';
 import { HeartCard } from '../heart-card/heart-card';
 import { PlaylistService, Playlist } from '../../services/playlist.service';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environment';
 
 @Component({
   selector: 'app-playlist-mosaic',
@@ -20,9 +18,7 @@ export class PlaylistMosaic implements OnInit {
   protected readonly imagePlus = ImagePlus;
 
   protected playlistService = inject(PlaylistService);
-  private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
-  private apiUrl = environment.apiUrl;
 
   searchOpen = false;
   isCreateOpen = false;
@@ -51,11 +47,8 @@ export class PlaylistMosaic implements OnInit {
   confirmCreate(): void {
     if (!this.playlistName.trim()) return;
 
-    this.http.post<Playlist>(`${this.apiUrl}/playlists`, { title: this.playlistName.trim() }).subscribe({
-      next: (playlist) => {
-        this.playlistService.add(playlist);
-        this.closeCreateDialog();
-      },
+    this.playlistService.create(this.playlistName.trim()).subscribe({
+      next: () => this.closeCreateDialog(),
       error: (err) => console.error('Failed to create playlist', err)
     });
   }

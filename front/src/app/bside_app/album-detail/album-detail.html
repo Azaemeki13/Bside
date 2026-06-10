@@ -29,26 +29,47 @@
 
     <div class="flex min-h-0 flex-1 flex-col">
       <div class="grid border-b border-[#FFE6DB]/20 pb-2 font-raleway text-sm font-medium text-[#FFE6DB]/70"
-           style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem">
+           style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem 2.5rem">
         <span>#</span>
         <span>Title</span>
         <lucide-icon [img]="timer" class="w-4 h-4 text-[#FFE6DB]/50 justify-self-end"></lucide-icon>
+        <span></span>
       </div>
 
       <div class="min-h-0 flex-1 overflow-y-auto py-2">
         @for (song of currentAlbum.songs; let i = $index; track song.id) {
-          <button type="button"
-                  class="grid w-full appearance-none items-center rounded-md border-0 bg-transparent py-3 text-left font-raleway"
-                  [class.bg-[#FFE6DB]/5]="activeSongId === song.id"
-                  style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem"
-                  (click)="play(song)">
+          <div class="grid w-full items-center rounded-md py-3 text-left font-raleway hover:bg-[#FFE6DB]/5"
+               [class.bg-[#FFE6DB]/5]="activeSongId === song.id"
+               style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem 2.5rem"
+               role="button"
+               tabindex="0"
+               (click)="play(song)"
+               (keydown.enter)="play(song)">
             <span class="text-sm text-[#FFE6DB]/50">{{ i + 1 }}</span>
             <span class="min-w-0 pr-4">
               <span class="block truncate text-sm font-semibold text-[#FFE6DB]">{{ song.title }}</span>
               <span class="block truncate text-xs text-[#FFE6DB]/50">{{ currentAlbum.artist_name }}</span>
             </span>
             <span class="text-right text-sm text-[#FFE6DB]/50">{{ formatDuration(song.duration_seconds) }}</span>
-          </button>
+            <span class="relative flex justify-end">
+              <button type="button"
+                      class="flex h-8 w-8 items-center justify-center rounded-full text-[#FFE6DB]/50 hover:bg-[#FFE6DB]/10 hover:text-[#FFE6DB]"
+                      aria-label="Song options"
+                      (click)="toggleSongMenu($event, song)">
+                <lucide-icon [img]="ellipsisVertical" class="h-4 w-4"></lucide-icon>
+              </button>
+
+              @if (openMenuSongId === song.id) {
+                <span class="absolute right-0 top-9 z-20 min-w-40 rounded-md border border-[#FFE6DB]/10 bg-[#1F0E1C] p-1 shadow-xl">
+                  <button type="button"
+                          class="w-full rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10"
+                          (click)="openAddToPlaylistDialog($event, song)">
+                    Add to playlist
+                  </button>
+                </span>
+              }
+            </span>
+          </div>
         } @empty {
           <p class="py-5 font-raleway text-sm text-[#FFE6DB]/60">No songs in this album.</p>
         }
@@ -56,3 +77,56 @@
     </div>
   }
 </section>
+
+@if (isPlaylistDialogOpen && selectedSong) {
+  <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-[#1F0E1C]/70 p-5 backdrop-blur-sm"
+       role="dialog"
+       aria-modal="true"
+       aria-label="Add song to playlist"
+       (click)="closePlaylistDialog()">
+    <div class="w-full max-w-md rounded-lg border border-[#FFE6DB]/10 bg-[#1F0E1C] p-5 text-[#FFE6DB] shadow-xl"
+         (click)="$event.stopPropagation()">
+      <div class="mb-4 flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <h2 class="font-raleway text-lg font-bold">Add to playlist</h2>
+          <p class="truncate font-raleway text-sm text-[#FFE6DB]/60">{{ selectedSong.title }}</p>
+        </div>
+        <button type="button" class="shrink-0 rounded-full p-1 text-[#FFE6DB]/60 hover:bg-[#FFE6DB]/10 hover:text-[#FFE6DB]" (click)="closePlaylistDialog()">
+          <lucide-icon [img]="x" class="h-5 w-5"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="max-h-56 overflow-y-auto rounded-md border border-[#FFE6DB]/10">
+        @for (playlist of playlistService.playlists(); track playlist.id) {
+          <button type="button"
+                  class="flex w-full items-center justify-between gap-3 border-b border-[#FFE6DB]/10 px-3 py-3 text-left last:border-b-0 hover:bg-[#FFE6DB]/10 disabled:opacity-50"
+                  [disabled]="isAddingToPlaylist"
+                  (click)="addSelectedSongToPlaylist(playlist)">
+            <span class="min-w-0 truncate font-raleway text-sm font-semibold">{{ playlist.title }}</span>
+            <span class="shrink-0 font-raleway text-xs text-[#FFE6DB]/50">{{ playlist.song_count ?? 0 }} songs</span>
+          </button>
+        } @empty {
+          <p class="px-3 py-4 font-raleway text-sm text-[#FFE6DB]/60">No playlists yet.</p>
+        }
+      </div>
+
+      <div class="mt-4 flex gap-2">
+        <input type="text"
+               class="min-w-0 flex-1 rounded-md bg-[#FFE6DB] px-3 py-2 font-raleway text-sm font-semibold text-[#1F0E1C] outline-none"
+               placeholder="New playlist name"
+               [(ngModel)]="newPlaylistName"
+               [disabled]="isAddingToPlaylist">
+        <button type="button"
+                class="rounded-full bg-[#FF5500] px-4 py-2 font-raleway text-sm font-bold text-[#FFE6DB] disabled:cursor-not-allowed disabled:opacity-50"
+                [disabled]="isAddingToPlaylist || !newPlaylistName.trim()"
+                (click)="createPlaylistWithSelectedSong()">
+          Create
+        </button>
+      </div>
+
+      @if (playlistActionError) {
+        <p class="mt-3 font-raleway text-sm text-red-300">{{ playlistActionError }}</p>
+      }
+    </div>
+  </div>
+}

@@ -1677,10 +1677,24 @@ pub async fn create_playlist_handler(
         "CREATE PLAYLIST HIT - user: {:?}, title: {:?}",
         claims.sub, payload.title
     );
-    let playlist = sqlx::query_as!
-        (Playlist, r#"INSERT INTO playlists (title, owner_id, is_public) VALUES ($1, $2, true) RETURNING id, title, owner_id, is_public as "is_public!", created_at as "created_at!" "#, payload.title, claims.sub)
-        .fetch_one(&state.db)
-        .await?;
+    let playlist = sqlx::query_as!(
+        Playlist,
+        r#"
+        INSERT INTO playlists (title, owner_id, is_public)
+        VALUES ($1, $2, true)
+        RETURNING
+            id,
+            title,
+            owner_id,
+            COALESCE(song_count, 0) as "song_count!",
+            is_public as "is_public!",
+            created_at as "created_at!"
+        "#,
+        payload.title,
+        claims.sub
+    )
+    .fetch_one(&state.db)
+    .await?;
     Ok(Json(playlist))
 }
 
@@ -1736,11 +1750,16 @@ pub async fn add_song_to_playlist_handler(
     .fetch_one(&mut *tx)
     .await?
     .unwrap_or(false);
-    let warning = if is_duplicate {
-        Some("Note: This song is already in this playlist !".to_string())
-    } else {
-        None
-    };
+    if is_duplicate {
+        tx.commit().await?;
+        return Ok((
+            axum::http::StatusCode::OK,
+            axum::Json(AddSongResponse {
+                message: "Song is already in this playlist.".to_string(),
+                warning: Some("Note: This song is already in this playlist.".to_string()),
+            }),
+        ));
+    }
     let next_pos = sqlx::query_scalar!(
         "SELECT COALESCE(MAX(position), 0)  + 1 FROM playlist_songs WHERE playlist_id = $1",
         playlist_id
@@ -1757,10 +1776,14 @@ pub async fn add_song_to_playlist_handler(
     .execute(&mut *tx)
     .await?;
     sqlx::query!(
-        "UPDATE playlists SET total_duration = total_duration + $1,
-        song_count = song_count + 1,
-        ml_features = ml_features || $2
-        WHERE id = $3",
+        r#"
+        UPDATE playlists
+        SET
+            total_duration = COALESCE(total_duration, 0) + $1,
+            song_count = COALESCE(song_count, 0) + 1,
+            ml_features = COALESCE(ml_features, '{}'::jsonb) || COALESCE($2, '{}'::jsonb)
+        WHERE id = $3
+        "#,
         song.duration_seconds,
         song.ml_features,
         playlist_id
@@ -1772,7 +1795,7 @@ pub async fn add_song_to_playlist_handler(
         axum::http::StatusCode::CREATED,
         axum::Json(AddSongResponse {
             message: "Song added to playlist successfully.".to_string(),
-            warning,
+            warning: None,
         }),
     ))
 }
@@ -1868,10 +1891,16 @@ pub async fn get_playlist_by_id_handler(
                     'song_id', s.id,
                     'title', s.title,
                     'duration_seconds', s.duration_seconds,
-                    'position', ps.position
+                    'position', ps.position,
+                    'audio_url', s.audio_url,
+                    'status', s.status,
+                    'artist_name', ar.name,
+                    'cover_url', a.cover_url
                 ) ORDER BY ps.position)
                  FROM playlist_songs ps
                  JOIN songs s ON ps.song_id = s.id
+                 JOIN albums a ON s.album_id = a.id
+                 JOIN artists ar ON a.artist_id = ar.id
                  WHERE ps.playlist_id = p.id
                 ), '[]'
             ) as "songs!: sqlx::types::Json<Vec<PlaylistSongItem>>"
@@ -2095,7 +2124,18 @@ pub async fn get_my_playlists_handler(
 ) -> Result<Json<Vec<Playlist>>, BSideError> {
     let playlists = sqlx::query_as!(
         Playlist,
-        r#"SELECT id, title, owner_id, is_public as "is_public!", created_at as "created_at!" FROM playlists WHERE owner_id = $1 ORDER BY created_at DESC"#,
+        r#"
+        SELECT
+            id,
+            title,
+            owner_id,
+            COALESCE(song_count, 0) as "song_count!",
+            is_public as "is_public!",
+            created_at as "created_at!"
+        FROM playlists
+        WHERE owner_id = $1
+        ORDER BY created_at DESC
+        "#,
         claims.sub
     )
     .fetch_all(&state.db)

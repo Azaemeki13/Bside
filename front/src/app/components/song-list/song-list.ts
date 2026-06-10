@@ -3,6 +3,8 @@ import { DatePipe } from '@angular/common';
 import { LucideAngularModule, Heart, Play, Trash2, Timer } from 'lucide-angular';
 import { PlaylistService, PlaylistSongItem } from '../../services/playlist.service';
 import { AuthService } from '../../services/auth.service';
+import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
+import { AlbumService } from '../../services/album.service';
 
 @Component({
   selector: 'app-song-list',
@@ -17,12 +19,8 @@ export class SongList {
   protected readonly timer = Timer;
   protected playlistService = inject(PlaylistService);
   protected authService = inject(AuthService);
-
-  protected placeholderSongs: PlaylistSongItem[] = [
-    { link_id: '1', song_id: '1', title: 'Digital Love', duration_seconds: 301, position: 1 },
-    { link_id: '2', song_id: '2', title: 'Harder Better Faster Strongfjisdofdosdhoshfodfhsoer', duration_seconds: 224, position: 2 },
-    { link_id: '3', song_id: '3', title: 'One More Time', duration_seconds: 320000, position: 3 },
-  ];
+  private readonly audio = inject(AudioPlayerService);
+  private readonly albumService = inject(AlbumService);
 
   deletePlaylist(): void {
     const playlist = this.playlistService.selectedPlaylist();
@@ -30,6 +28,35 @@ export class SongList {
     this.playlistService.delete(playlist.id).subscribe({
       error: (err) => console.error('Failed to delete playlist', err)
     });
+  }
+
+  removeSong(song: PlaylistSongItem): void {
+    const playlist = this.playlistService.selectedPlaylist();
+    if (!playlist) return;
+
+    this.playlistService.removeSong(playlist.id, song.link_id).subscribe({
+      error: (err) => console.error('Failed to remove song from playlist', err)
+    });
+  }
+
+  playSong(song: PlaylistSongItem): void {
+    const songs = this.playlistService.selectedSongs().filter((item) => item.status === 'Ready');
+    const startIndex = songs.findIndex((item) => item.link_id === song.link_id);
+
+    if (startIndex < 0)
+      return;
+
+    this.audio.setQueue(
+      songs.map((item) => ({
+        id: item.song_id,
+        title: item.title,
+        artist: item.artist_name,
+        format: this.audioFormat(item),
+        coverUrl: this.coverUrl(item.cover_url),
+        onRequestUrl: () => this.albumService.getSongStreamUrl(item.song_id),
+      })),
+      startIndex
+    );
   }
 
   formatDuration(seconds: number): string {
@@ -43,5 +70,20 @@ export class SongList {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     return h > 0 ? `${h}h ${m}min` : `${m}min`;
+  }
+
+  private coverUrl(url: string): string {
+    if (!url)
+      return 'assets/cover1.png';
+
+    return url.replace(/^http:\/\/minio:9000/i, 'http://localhost:9000');
+  }
+
+  private audioFormat(song: PlaylistSongItem): AudioFormat {
+    const source = `${song.audio_url} ${song.title}`.toLowerCase();
+
+    if (source.includes('.flac'))
+      return 'flac';
+    return 'wav';
   }
 }
