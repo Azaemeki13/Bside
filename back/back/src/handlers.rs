@@ -1671,76 +1671,27 @@ pub async fn flush_deleted_songs_task(state: AppState) -> Result<u64, BSideError
 pub async fn create_playlist_handler(
     State(state): State<AppState>,
     claims: Claims,
-mut multipart: Multipart,
+    axum::extract::Json(payload): axum::extract::Json<PlaylistPayload>,
 ) -> Result<Json<Playlist>, BSideError> {
-    let mut title: Option<String> = None;
-    let mut description: Option<String> = None;
-    let mut cover_url: Option<String> = None;
-
-    while let Some(field) = multipart
-        .next_field()
-        .await
-        .map_err(|e| BSideError::BadRequest(e.to_string()))?
-    {
-        let name = field.name().unwrap_or("").to_string();
-        match name.as_str() {
-            "title" => {
-                title = Some(field.text().await.map_err(|e| BSideError::BadRequest(e.to_string()))?);
-            }
-            "description" => {
-                description = Some(field.text().await.map_err(|e| BSideError::BadRequest(e.to_string()))?);
-            }
-            "cover" => {
-                let data = field.bytes().await.map_err(|e| BSideError::BadRequest(e.to_string()))?;
-                if data.len() < 4 { continue; }
-                let png_header = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-                let (extension, content_type) = if data.starts_with(&png_header) {
-                    ("png", "image/png")
-                } else if data.starts_with(&[0xFF, 0xD8, 0xFF]) {
-                    ("jpg", "image/jpeg")
-                } else if data.starts_with(b"RIFF") && data.len() >= 12 && &data[8..12] == b"WEBP" {
-                    ("webp", "image/webp")
-                } else {
-                    return Err(BSideError::BadRequest("Cover must be a PNG, JPEG, or WebP image.".into()));
-                };
-                if data.len() > 10 * 1024 * 1024 {
-                    return Err(BSideError::BadRequest("File size exceeds 10MB limit!".into()));
-                }
-                let key = format!("{}.{}", Uuid::new_v4(), extension);
-                state.aws_client.put_object()
-                    .bucket("bside-covers")
-                    .key(&key)
-                    .body(data.into())
-                    .content_type(content_type)
-                    .send()
-                    .await
-                    .map_err(|e| BSideError::S3Error(e.to_string()))?;
-                cover_url = Some(format!("http://localhost:9000/bside-covers/{key}"));
-            }
-            _ => {}
-        }
-    }
-
-    let title = title.ok_or_else(|| BSideError::BadRequest("Missing title".into()))?;
-
+    println!(
+        "CREATE PLAYLIST HIT - user: {:?}, title: {:?}",
+        claims.sub, payload.title
+    );
     let playlist = sqlx::query_as!(
         Playlist,
         r#"
-        INSERT INTO playlists (title, description, owner_id, is_public, cover_url)
-        VALUES ($1, $2, $3, true, $4)
+        INSERT INTO playlists (title, owner_id, is_public)
+        VALUES ($1, $2, true)
         RETURNING
             id,
             title,
             owner_id,
             COALESCE(song_count, 0) as "song_count!",
             is_public as "is_public!",
-            created_at as "created_at!",
-            cover_url
+            created_at as "created_at!"
         "#,
-        title,
-        description,
-        claims.sub,
-        cover_url,
+        payload.title,
+        claims.sub
     )
     .fetch_one(&state.db)
     .await?;
@@ -2182,8 +2133,7 @@ pub async fn get_my_playlists_handler(
             owner_id,
             COALESCE(song_count, 0) as "song_count!",
             is_public as "is_public!",
-            created_at as "created_at!",
-            cover_url
+            created_at as "created_at!"
         FROM playlists
         WHERE owner_id = $1
         ORDER BY created_at DESC

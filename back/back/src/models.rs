@@ -124,7 +124,6 @@ pub struct Playlist {
     pub song_count: i32,
     pub is_public: bool,
     pub created_at: chrono::DateTime<chrono::Utc>,
-    pub cover_url: Option<String>,
 }
 
 #[derive(serde::Deserialize, utoipa::ToSchema)]
