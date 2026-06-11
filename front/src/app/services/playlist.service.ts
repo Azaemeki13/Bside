@@ -13,6 +13,7 @@ export interface Playlist {
   song_count?: number;
   is_public: boolean;
   created_at?: string;
+  cover_url?: string;
 }
 
 export interface PlaylistSongItem {
@@ -21,10 +22,19 @@ export interface PlaylistSongItem {
   title: string;
   duration_seconds: number;
   position: number;
+  audio_url: string;
+  status: string;
+  artist_name: string;
+  cover_url: string;
 }
 
 export interface PlaylistDetailedResponse extends Playlist {
   songs: PlaylistSongItem[];
+}
+
+export interface AddSongResponse {
+  message: string;
+  warning?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -33,7 +43,7 @@ export class PlaylistService {
   private apiUrl = environment.apiUrl;
 
   playlists = signal<Playlist[]>([]);
-  selectedPlaylist = signal<Playlist | null>(null);
+  selectedPlaylist = signal<(Playlist & { songs?: PlaylistSongItem[] }) | null>(null);
   likedSongsSelected = signal<boolean>(false);
 
   loadPlaylists(): void {
@@ -47,25 +57,58 @@ export class PlaylistService {
     return this.http.get<PlaylistDetailedResponse>(`${this.apiUrl}/playlists/${id}`);
   }
 
+  create(title: string, description: string, cover?: File): Observable<Playlist> {
+    const form = new FormData();
+    form.append('title', title);
+    if (description.trim()) form.append('description', description);
+    if (cover) form.append('cover', cover);
+
+    return this.http.post<Playlist>(`${this.apiUrl}/playlists`, form).pipe(
+      tap((playlist) => this.add(playlist))
+    );
+  }
   add(playlist: Playlist): void {
-    this.playlists.update(list => [...list, playlist]);
+    this.playlists.update(list => list.some(p => p.id === playlist.id) ? list : [playlist, ...list]);
   }
 
-delete(id: string): Observable<void> {
-  return this.http.delete<void>(`${this.apiUrl}/playlists/${id}`).pipe(
-    tap(() => {
-      this.playlists.update(list => list.filter(p => p.id !== id));
-      this.selectedPlaylist.set(null);
-    })
-  );
-}
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/playlists/${id}`).pipe(
+      tap(() => {
+        this.playlists.update(list => list.filter(p => p.id !== id));
+        this.selectedPlaylist.set(null);
+      })
+    );
+  }
 
-  addSong(playlistId: string, songId: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/playlists/${playlistId}/songs/${songId}`, {});
+  addSong(playlistId: string, songId: string): Observable<AddSongResponse> {
+    return this.http.post<AddSongResponse>(`${this.apiUrl}/playlists/${playlistId}/songs/${songId}`, {}).pipe(
+      tap((response) => {
+        if (!response.warning) {
+          this.playlists.update(list => list.map(playlist => (
+            playlist.id === playlistId
+              ? { ...playlist, song_count: (playlist.song_count ?? 0) + 1 }
+              : playlist
+          )));
+        }
+
+        if (this.selectedPlaylist()?.id === playlistId) {
+          this.refreshSelectedPlaylist(playlistId);
+        }
+      })
+    );
   }
 
   removeSong(playlistId: string, linkId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/playlists/${playlistId}/songs/${linkId}`);
+    return this.http.delete<void>(`${this.apiUrl}/playlists/${playlistId}/songs/${linkId}`).pipe(
+      tap(() => {
+        this.playlists.update(list => list.map(playlist => (
+          playlist.id === playlistId
+            ? { ...playlist, song_count: Math.max((playlist.song_count ?? 1) - 1, 0) }
+            : playlist
+        )));
+        this.refreshSelectedPlaylist(playlistId);
+      })
+    );
   }
 
   selectLiked(): void {
@@ -74,7 +117,19 @@ delete(id: string): Observable<void> {
   }
 
   select(playlist: Playlist): void {
-    this.selectedPlaylist.set(playlist);
+    this.selectedPlaylist.set({ ...playlist, songs: [] });
     this.likedSongsSelected.set(false);
+    this.refreshSelectedPlaylist(playlist.id);
+  }
+
+  selectedSongs(): PlaylistSongItem[] {
+    return this.selectedPlaylist()?.songs ?? [];
+  }
+
+  private refreshSelectedPlaylist(id: string): void {
+    this.getById(id).subscribe({
+      next: (playlist) => this.selectedPlaylist.set(playlist),
+      error: (err) => console.error('Failed to load playlist', err)
+    });
   }
 }

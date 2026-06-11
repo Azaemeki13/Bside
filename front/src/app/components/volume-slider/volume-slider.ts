@@ -1,4 +1,3 @@
-import { NgIf } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { VolumeService } from '../../services/volume.service';
 import { LucideAngularModule, Volume2, VolumeX } from 'lucide-angular';
@@ -6,7 +5,7 @@ import { LucideAngularModule, Volume2, VolumeX } from 'lucide-angular';
 
 @Component({
   selector: 'app-volume-slider',
-  imports: [NgIf, LucideAngularModule],
+  imports: [LucideAngularModule],
   templateUrl: './volume-slider.html',
   styleUrl: './volume-slider.scss',
 })
@@ -20,4 +19,3 @@ export class VolumeSlider {
     this.volumeService.setVolume(input ? Number(input.value) : 0);
   }
 }
-

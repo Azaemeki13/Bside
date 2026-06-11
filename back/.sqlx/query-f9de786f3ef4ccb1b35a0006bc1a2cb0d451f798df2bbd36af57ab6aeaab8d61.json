@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            s.id AS \"id!\",\n            s.album_id AS \"album_id!\",\n            a.title AS \"album_title!\",\n            s.title AS \"title!\",\n            s.duration_seconds AS \"duration_seconds!\",\n            s.audio_url AS \"audio_url!\",\n            s.status::text AS \"status!\",\n            s.created_at AS \"created_at!\"\n        FROM songs s\n        JOIN albums a ON a.id = s.album_id\n        WHERE a.artist_id = $1 AND a.status = 'Ready' AND s.status = 'Ready'\n        ORDER BY s.created_at DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "album_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "album_title!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "title!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "duration_seconds!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "audio_url!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "status!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_at!",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null,
+      false
+    ]
+  },
+  "hash": "f9de786f3ef4ccb1b35a0006bc1a2cb0d451f798df2bbd36af57ab6aeaab8d61"
+}

@@ -10,8 +10,8 @@
     </button>
     @if (isMenuOpen) {
         <div class="absolute right-0 top-[calc(100%+0.75rem)] z-20 grid w-56 gap-1 rounded-[1.5rem] bg-[#431E3A] p-2">
-            <button class="flex min-h-12 items-center rounded-full px-4 font-raleway font-semibold text-[#FFE6DB] cursor-pointer">Profile</button>
-            <button class="flex min-h-12 items-center rounded-full px-4 font-raleway font-semibold text-[#FFE6DB] cursor-pointer" link="bside_app/settings/">Settings</button>
+            <button class="flex min-h-12 items-center rounded-full px-4 font-raleway font-semibold text-[#FFE6DB] cursor-pointer" (click)="goToSettings('profile')">Profile</button>
+            <button class="flex min-h-12 items-center rounded-full px-4 font-raleway font-semibold text-[#FFE6DB] cursor-pointer" (click)="goToSettings('settings')">Settings</button>
         </div>
     }
 </div>

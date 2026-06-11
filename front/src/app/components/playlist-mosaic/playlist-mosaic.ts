@@ -4,8 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Plus, Search, X, ImagePlus } from 'lucide-angular';
 import { HeartCard } from '../heart-card/heart-card';
 import { PlaylistService, Playlist } from '../../services/playlist.service';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environment';
 
 @Component({
   selector: 'app-playlist-mosaic',
@@ -20,13 +18,26 @@ export class PlaylistMosaic implements OnInit {
   protected readonly imagePlus = ImagePlus;
 
   protected playlistService = inject(PlaylistService);
-  private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
-  private apiUrl = environment.apiUrl;
 
   searchOpen = false;
+  searchQuery = '';
   isCreateOpen = false;
+
+  get filteredPlaylists() {
+    const q = this.searchQuery.trim().toLowerCase();
+    if (!q) return this.playlistService.playlists();
+    return this.playlistService.playlists().filter(p =>
+      p.title.toLowerCase().includes(q)
+    );
+  }
+
+  closeSearch(): void {
+    this.searchOpen = false;
+    this.searchQuery = '';
+  }
   coverPreview: string | null = null;
+  coverFile: File | null = null;
   playlistName = '';
   playlistDescription = '';
 
@@ -44,18 +55,19 @@ export class PlaylistMosaic implements OnInit {
     this.isCreateOpen = false;
     if (this.coverPreview) URL.revokeObjectURL(this.coverPreview);
     this.coverPreview = null;
+    this.coverFile = null;
     this.playlistName = '';
     this.playlistDescription = '';
   }
 
   confirmCreate(): void {
     if (!this.playlistName.trim()) return;
-
-    this.http.post<Playlist>(`${this.apiUrl}/playlists`, { title: this.playlistName.trim() }).subscribe({
-      next: (playlist) => {
-        this.playlistService.add(playlist);
-        this.closeCreateDialog();
-      },
+    this.playlistService.create(
+      this.playlistName.trim(),
+      this.playlistDescription.trim(),
+      this.coverFile ?? undefined
+    ).subscribe({
+      next: () => this.closeCreateDialog(),
       error: (err) => console.error('Failed to create playlist', err)
     });
   }
@@ -65,6 +77,7 @@ export class PlaylistMosaic implements OnInit {
     if (file) {
       if (this.coverPreview) URL.revokeObjectURL(this.coverPreview);
       this.coverPreview = URL.createObjectURL(file);
+      this.coverFile = file;
     }
   }
 }

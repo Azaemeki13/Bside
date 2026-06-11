@@ -1671,16 +1671,79 @@ pub async fn flush_deleted_songs_task(state: AppState) -> Result<u64, BSideError
 pub async fn create_playlist_handler(
     State(state): State<AppState>,
     claims: Claims,
-    axum::extract::Json(payload): axum::extract::Json<PlaylistPayload>,
+mut multipart: Multipart,
 ) -> Result<Json<Playlist>, BSideError> {
-    println!(
-        "CREATE PLAYLIST HIT - user: {:?}, title: {:?}",
-        claims.sub, payload.title
-    );
-    let playlist = sqlx::query_as!
-        (Playlist, r#"INSERT INTO playlists (title, owner_id, is_public) VALUES ($1, $2, true) RETURNING id, title, owner_id, is_public as "is_public!", created_at as "created_at!" "#, payload.title, claims.sub)
-        .fetch_one(&state.db)
-        .await?;
+    let mut title: Option<String> = None;
+    let mut description: Option<String> = None;
+    let mut cover_url: Option<String> = None;
+
+    while let Some(field) = multipart
+        .next_field()
+        .await
+        .map_err(|e| BSideError::BadRequest(e.to_string()))?
+    {
+        let name = field.name().unwrap_or("").to_string();
+        match name.as_str() {
+            "title" => {
+                title = Some(field.text().await.map_err(|e| BSideError::BadRequest(e.to_string()))?);
+            }
+            "description" => {
+                description = Some(field.text().await.map_err(|e| BSideError::BadRequest(e.to_string()))?);
+            }
+            "cover" => {
+                let data = field.bytes().await.map_err(|e| BSideError::BadRequest(e.to_string()))?;
+                if data.len() < 4 { continue; }
+                let png_header = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+                let (extension, content_type) = if data.starts_with(&png_header) {
+                    ("png", "image/png")
+                } else if data.starts_with(&[0xFF, 0xD8, 0xFF]) {
+                    ("jpg", "image/jpeg")
+                } else if data.starts_with(b"RIFF") && data.len() >= 12 && &data[8..12] == b"WEBP" {
+                    ("webp", "image/webp")
+                } else {
+                    return Err(BSideError::BadRequest("Cover must be a PNG, JPEG, or WebP image.".into()));
+                };
+                if data.len() > 10 * 1024 * 1024 {
+                    return Err(BSideError::BadRequest("File size exceeds 10MB limit!".into()));
+                }
+                let key = format!("{}.{}", Uuid::new_v4(), extension);
+                state.aws_client.put_object()
+                    .bucket("bside-covers")
+                    .key(&key)
+                    .body(data.into())
+                    .content_type(content_type)
+                    .send()
+                    .await
+                    .map_err(|e| BSideError::S3Error(e.to_string()))?;
+                cover_url = Some(format!("http://localhost:9000/bside-covers/{key}"));
+            }
+            _ => {}
+        }
+    }
+
+    let title = title.ok_or_else(|| BSideError::BadRequest("Missing title".into()))?;
+
+    let playlist = sqlx::query_as!(
+        Playlist,
+        r#"
+        INSERT INTO playlists (title, description, owner_id, is_public, cover_url)
+        VALUES ($1, $2, $3, true, $4)
+        RETURNING
+            id,
+            title,
+            owner_id,
+            COALESCE(song_count, 0) as "song_count!",
+            is_public as "is_public!",
+            created_at as "created_at!",
+            cover_url
+        "#,
+        title,
+        description,
+        claims.sub,
+        cover_url,
+    )
+    .fetch_one(&state.db)
+    .await?;
     Ok(Json(playlist))
 }
 
@@ -1736,11 +1799,16 @@ pub async fn add_song_to_playlist_handler(
     .fetch_one(&mut *tx)
     .await?
     .unwrap_or(false);
-    let warning = if is_duplicate {
-        Some("Note: This song is already in this playlist !".to_string())
-    } else {
-        None
-    };
+    if is_duplicate {
+        tx.commit().await?;
+        return Ok((
+            axum::http::StatusCode::OK,
+            axum::Json(AddSongResponse {
+                message: "Song is already in this playlist.".to_string(),
+                warning: Some("Note: This song is already in this playlist.".to_string()),
+            }),
+        ));
+    }
     let next_pos = sqlx::query_scalar!(
         "SELECT COALESCE(MAX(position), 0)  + 1 FROM playlist_songs WHERE playlist_id = $1",
         playlist_id
@@ -1757,10 +1825,14 @@ pub async fn add_song_to_playlist_handler(
     .execute(&mut *tx)
     .await?;
     sqlx::query!(
-        "UPDATE playlists SET total_duration = total_duration + $1,
-        song_count = song_count + 1,
-        ml_features = ml_features || $2
-        WHERE id = $3",
+        r#"
+        UPDATE playlists
+        SET
+            total_duration = COALESCE(total_duration, 0) + $1,
+            song_count = COALESCE(song_count, 0) + 1,
+            ml_features = COALESCE(ml_features, '{}'::jsonb) || COALESCE($2, '{}'::jsonb)
+        WHERE id = $3
+        "#,
         song.duration_seconds,
         song.ml_features,
         playlist_id
@@ -1772,7 +1844,7 @@ pub async fn add_song_to_playlist_handler(
         axum::http::StatusCode::CREATED,
         axum::Json(AddSongResponse {
             message: "Song added to playlist successfully.".to_string(),
-            warning,
+            warning: None,
         }),
     ))
 }
@@ -1858,6 +1930,7 @@ pub async fn get_playlist_by_id_handler(
             p.title,
             p.description,
             p.owner_id,
+            p.cover_url,
             u.username as owner_username,
             p.total_duration as "total_duration!",
             p.song_count as "song_count!",
@@ -1868,10 +1941,16 @@ pub async fn get_playlist_by_id_handler(
                     'song_id', s.id,
                     'title', s.title,
                     'duration_seconds', s.duration_seconds,
-                    'position', ps.position
+                    'position', ps.position,
+                    'audio_url', s.audio_url,
+                    'status', s.status,
+                    'artist_name', ar.name,
+                    'cover_url', a.cover_url
                 ) ORDER BY ps.position)
                  FROM playlist_songs ps
                  JOIN songs s ON ps.song_id = s.id
+                 JOIN albums a ON s.album_id = a.id
+                 JOIN artists ar ON a.artist_id = ar.id
                  WHERE ps.playlist_id = p.id
                 ), '[]'
             ) as "songs!: sqlx::types::Json<Vec<PlaylistSongItem>>"
@@ -1896,6 +1975,7 @@ pub async fn get_playlist_by_id_handler(
         total_duration: playlist.total_duration,
         song_count: playlist.song_count,
         is_public: playlist.is_public,
+        cover_url: playlist.cover_url,
         songs: playlist.songs.0,
     }))
 }
@@ -2095,7 +2175,19 @@ pub async fn get_my_playlists_handler(
 ) -> Result<Json<Vec<Playlist>>, BSideError> {
     let playlists = sqlx::query_as!(
         Playlist,
-        r#"SELECT id, title, owner_id, is_public as "is_public!", created_at as "created_at!" FROM playlists WHERE owner_id = $1 ORDER BY created_at DESC"#,
+        r#"
+        SELECT
+            id,
+            title,
+            owner_id,
+            COALESCE(song_count, 0) as "song_count!",
+            is_public as "is_public!",
+            created_at as "created_at!",
+            cover_url
+        FROM playlists
+        WHERE owner_id = $1
+        ORDER BY created_at DESC
+        "#,
         claims.sub
     )
     .fetch_all(&state.db)

@@ -121,8 +121,10 @@ pub struct Playlist {
     pub id: uuid::Uuid,
     pub title: String,
     pub owner_id: uuid::Uuid,
+    pub song_count: i32,
     pub is_public: bool,
     pub created_at: chrono::DateTime<chrono::Utc>,
+    pub cover_url: Option<String>,
 }
 
 #[derive(serde::Deserialize, utoipa::ToSchema)]
@@ -142,6 +144,7 @@ pub struct PlaylistDetailedResponse {
     pub total_duration: i32,
     pub song_count: i32,
     pub is_public: bool,
+    pub cover_url: Option<String>,
     pub songs: Vec<PlaylistSongItem>,
 }
 
@@ -152,6 +155,10 @@ pub struct PlaylistSongItem {
     pub title: String,
     pub duration_seconds: i32,
     pub position: i32,
+    pub audio_url: String,
+    pub status: String,
+    pub artist_name: String,
+    pub cover_url: String,
 }
 
 #[derive(serde::Serialize, utoipa::ToSchema)]

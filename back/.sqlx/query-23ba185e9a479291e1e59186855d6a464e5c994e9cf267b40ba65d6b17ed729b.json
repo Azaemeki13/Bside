@@ -1,0 +1,50 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n            id AS \"id!\",\n            user_id AS \"user_id?\",\n            name AS \"name!\",\n            bio AS \"bio?\",\n            photo_url AS \"photo_url!\",\n            status AS \"status!\"\n        FROM artists\n        WHERE status = 'Ready'\n        ORDER BY created_at ASC",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id?",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "bio?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "photo_url!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "status!",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "23ba185e9a479291e1e59186855d6a464e5c994e9cf267b40ba65d6b17ed729b"
+}

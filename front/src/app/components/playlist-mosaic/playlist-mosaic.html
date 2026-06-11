@@ -11,8 +11,8 @@
     } @else {
       <div class="flex w-full items-center gap-3 rounded-full border-2 border-[#FFE6DB] bg-transparent px-4 py-3">
         <lucide-icon [img]="search" class="w-5 h-5 text-[#FFE6DB] stroke-2"></lucide-icon>
-        <input type="text" placeholder="Search in your library" class="font-raleway font-bold flex-1 bg-transparent text-sm text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none">
-        <button (click)="searchOpen = false" class="cursor-pointer">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search in your library" class="font-raleway font-bold flex-1 bg-transparent text-sm text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none">
+        <button (click)="closeSearch()" class="cursor-pointer">
           <lucide-icon [img]="x" class="w-5 h-5 text-[#FFE6DB]/70"></lucide-icon>
         </button>
       </div>
@@ -21,12 +21,16 @@
   <div class="flex-1 overflow-y-auto p-4 pt-0">
     <div class="grid grid-cols-3 gap-2">
       <app-heart-card></app-heart-card>
-      @for (playlist of playlistService.playlists(); track playlist.id) {
+      @for (playlist of filteredPlaylists; track playlist.id) {
         <button (click)="selectPlaylist(playlist)" class="rounded-[0.625rem] border-2 border-transparent hover:border-[#FF5500] duration-300 cursor-pointer">
           <div class="w-[9rem] h-[9rem] rounded-[calc(0.625rem-2px)] overflow-hidden">
-            <div class="w-full h-full bg-[#FFE6DB]/10 flex items-center justify-center backdrop-blur-sm glass-card">
-              <span class="font-raleway font-bold text-[#FFE6DB] text-xs text-center px-2">{{ playlist.title }}</span>
-            </div>
+            @if (playlist.cover_url) {
+              <img [src]="playlist.cover_url" alt="cover" class="w-full h-full object-cover" />
+            } @else {
+              <div class="w-full h-full bg-[#FFE6DB]/10 flex items-center justify-center backdrop-blur-sm glass-card">
+                <span class="font-raleway font-bold text-[#FFE6DB] text-xs text-center px-2">{{ playlist.title }}</span>
+              </div>
+            }
           </div>
         </button>
       }

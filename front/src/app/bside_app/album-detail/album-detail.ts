@@ -1,31 +1,43 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { LucideAngularModule, Play, Timer } from 'lucide-angular';
-import { Subscription } from 'rxjs';
+import { EllipsisVertical, LucideAngularModule, Play, Timer, X } from 'lucide-angular';
+import { Subscription, switchMap } from 'rxjs';
 import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
 import { AlbumDetailedResponse, AlbumService, AlbumSongItem } from '../../services/album.service';
+import { Playlist, PlaylistService } from '../../services/playlist.service';
 
 @Component({
   selector: 'app-album-detail',
-  imports: [CommonModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule],
   templateUrl: './album-detail.html',
   styleUrl: './album-detail.scss',
 })
 export class AlbumDetail implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly albumService = inject(AlbumService);
+  protected readonly playlistService = inject(PlaylistService);
   private readonly audio = inject(AudioPlayerService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   readonly playIcon = Play;
   readonly timer = Timer;
+  readonly ellipsisVertical = EllipsisVertical;
+  readonly x = X;
 
   album: AlbumDetailedResponse | null = null;
   isLoading = false;
   error = '';
   playbackError = '';
+  playlistActionMessage = '';
+  playlistActionError = '';
   activeSongId = '';
+  openMenuSongId = '';
+  selectedSong: AlbumSongItem | null = null;
+  isPlaylistDialogOpen = false;
+  newPlaylistName = '';
+  isAddingToPlaylist = false;
 
   private routeSub?: Subscription;
   private albumSub?: Subscription;
@@ -37,6 +49,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.playlistService.loadPlaylists();
     this.routeSub = this.route.paramMap.subscribe((params) => {
       const albumId = params.get('albumId');
       if (!albumId) {
@@ -79,6 +92,72 @@ export class AlbumDetail implements OnInit, OnDestroy {
 
     this.activeSongId = song.id;
     this.audio.setQueue(queue, Math.max(0, startIndex));
+  }
+
+  toggleSongMenu(event: Event, song: AlbumSongItem): void {
+    event.stopPropagation();
+    this.openMenuSongId = this.openMenuSongId === song.id ? '' : song.id;
+  }
+
+  openAddToPlaylistDialog(event: Event, song: AlbumSongItem): void {
+    event.stopPropagation();
+    this.selectedSong = song;
+    this.openMenuSongId = '';
+    this.playlistActionMessage = '';
+    this.playlistActionError = '';
+    this.newPlaylistName = '';
+    this.isPlaylistDialogOpen = true;
+  }
+
+  closePlaylistDialog(): void {
+    if (this.isAddingToPlaylist) return;
+
+    this.isPlaylistDialogOpen = false;
+    this.selectedSong = null;
+    this.newPlaylistName = '';
+  }
+
+  addSelectedSongToPlaylist(playlist: Playlist): void {
+    if (!this.selectedSong) return;
+
+    this.isAddingToPlaylist = true;
+    this.playlistActionError = '';
+    this.playlistService.addSong(playlist.id, this.selectedSong.id).subscribe({
+      next: () => {
+        this.playlistActionMessage = `Added to ${playlist.title}.`;
+        this.isAddingToPlaylist = false;
+        this.closePlaylistDialog();
+      },
+      error: (err) => {
+        this.playlistActionError = 'Could not add this song to the playlist.';
+        this.isAddingToPlaylist = false;
+        console.error('Failed to add song to playlist', err);
+      }
+    });
+  }
+
+  createPlaylistWithSelectedSong(): void {
+    if (!this.selectedSong || !this.newPlaylistName.trim()) return;
+
+    const songId = this.selectedSong.id;
+    const title = this.newPlaylistName.trim();
+    this.isAddingToPlaylist = true;
+    this.playlistActionError = '';
+
+    this.playlistService.create(title, '').pipe(
+      switchMap((playlist) => this.playlistService.addSong(playlist.id, songId))
+    ).subscribe({
+      next: () => {
+        this.playlistActionMessage = `Created ${title}.`;
+        this.isAddingToPlaylist = false;
+        this.closePlaylistDialog();
+      },
+      error: (err) => {
+        this.playlistActionError = 'Could not create the playlist with this song.';
+        this.isAddingToPlaylist = false;
+        console.error('Failed to create playlist with song', err);
+      }
+    });
   }
 
   coverUrl(url: string): string {

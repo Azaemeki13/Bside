@@ -15,14 +15,12 @@
     <div class="grid grid-cols-7 gap-2 pt-2">
         @for (playlist of playlistService.playlists(); track playlist.id) {
             <button (click)="selectPlaylist(playlist)" class="rounded-[0.625rem] cursor-pointer">
-            <div class="rounded-[calc(0.625rem-2px)] overflow-hidden pb-2">
+            <div class="rounded-[calc(0.625rem-2px)] overflow-hidden">
                 <div class="aspect-square bg-[#FFE6DB]/10 flex items-center justify-center backdrop-blur-sm glass-card">
                 </div>
             </div>
             <p class="font-raleway text-[1rem] text-[#FFE6DB] font-bold truncate text-left">{{ playlist.title }}</p>
-            <p class="font-raleway text-[0.75rem] text-[#FFE6DB]/60 font-medium truncate text-left">By {{ playlist.owner_username ?? authService.currentUser()?.username ?? 'unknown' }} | {{ playlist.song_count }} tracks</p>
-
-            </button>
+            <p class="font-raleway text-[0.75rem] text-[#FFE6DB]/60 font-medium truncate text-left">By {{ playlist.owner_id === authService.currentUser()?.id ? 'you' : (playlist.owner_username ?? 'unknown') }} | {{ playlist.song_count }} tracks</p>            </button>
         }
     </div>
 </div>

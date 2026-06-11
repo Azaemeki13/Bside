@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO artists (id, user_id, name, bio, photo_url, status)\n        VALUES ($1, NULL, $2, $3, $4, 'Ready')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Text",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c6311d50c0234e4b645eeb2abcbf4c0ae5f8739242e41b88b28e23f22411234b"
+}

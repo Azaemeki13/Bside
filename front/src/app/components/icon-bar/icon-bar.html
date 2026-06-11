@@ -17,21 +17,21 @@
             </button>
             <button
                 type="button"
-                aria-label="Repeat"
-                [attr.aria-pressed]="isRepeatOne"
-                class="cursor-pointer inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#FFE6DB]"
+                [attr.aria-label]="audio.repeatMode() === 'one' ? 'Repeat one' : audio.repeatMode() === 'all' ? 'Repeat all' : 'Repeat off'"
+                [attr.aria-pressed]="audio.repeatMode() !== 'off'"
+                [class]="audio.repeatMode() !== 'off' ? 'cursor-pointer inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FF5500] text-[#FFE6DB]' : 'cursor-pointer inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#FFE6DB]'"
                 (click)="toggleRepeat()"
             >
                 <lucide-icon
-                    [img]="isRepeatOne ? repeat1 : repeat"
+                    [img]="audio.repeatMode() === 'one' ? repeat1 : repeat"
                     class="w-[1.25rem] h-[1.25rem] text-[#FFE6DB]"
                 ></lucide-icon>
             </button>
             <button
                 type="button"
                 aria-label="Shuffle"
-                [attr.aria-pressed]="isShuffleActive"
-                [class]="isShuffleActive ? 'cursor-pointer inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FF5500] text-[#FFE6DB]' : 'cursor-pointer inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#FFE6DB]'"
+                [attr.aria-pressed]="audio.shuffleEnabled()"
+                [class]="audio.shuffleEnabled() ? 'cursor-pointer inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FF5500] text-[#FFE6DB]' : 'cursor-pointer inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#FFE6DB]'"
                 (click)="toggleShuffle()"
             >
                 <lucide-icon

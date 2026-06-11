@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO albums (id, artist_id, title, genre, cover_url, status)\n         VALUES ($1, $2, $3, $4, $5, 'Ready')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7e6e9dc3a8a0a3bb8964e2dcd09d1ec0afa716ff0b3b9f07d2bd8a6f45efb0a9"
+}

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE playlists\n        SET\n            total_duration = COALESCE(total_duration, 0) + $1,\n            song_count = COALESCE(song_count, 0) + 1,\n            ml_features = COALESCE(ml_features, '{}'::jsonb) || COALESCE($2, '{}'::jsonb)\n        WHERE id = $3\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Jsonb",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "098639ca0d601bf0183c69e60133c705e08f9c9570e29eedcc81e65357b289c4"
+}
