@@ -3,7 +3,8 @@ use crate::models::{
     ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload,
     ArtistResponse, ArtistSongItem, AuthResponse, LoginPayload, Playlist, PlaylistDetailedResponse,
     PlaylistPayload, PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, Song,
-    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
+    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload, ChatMessage, MarkMessagesReadResponse,
+    ConversationListItem,
 };
 use utoipa::OpenApi;
 
@@ -40,6 +41,9 @@ use utoipa::OpenApi;
         crate::handlers::add_song_to_playlist_handler,
         crate::handlers::remove_song_from_pl,
         crate::search::searcher,
+        crate::handlers::get_conversation_messages_handler,
+        crate::handlers::mark_conversation_messages_as_read_handler,
+        crate::handlers::get_conversations_handler,
     ),
     components(
         schemas(
@@ -48,7 +52,8 @@ use utoipa::OpenApi;
             AlbumResponse, AlbumListItem, AlbumSongItem, AlbumDetailedResponse,
             ArtistResponse, ArtistSongItem, ArtistDetailResponse, ArtistRequestPayload,
             ArtistRequestReviewPayload, ArtistRequestResponse, PlaylistPayload, AuthResponse,
-            RegisterPayload, LoginPayload, RawSearchResult, SearchResult,
+            RegisterPayload, LoginPayload, RawSearchResult, SearchResult, ChatMessage, MarkMessagesReadResponse,
+            ConversationListItem,
         )
     ),
     info(title = "B-Side API", version = "0.1.0", description = "Music production and artist platform API"),

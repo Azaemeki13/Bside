@@ -1,4 +1,5 @@
 use crate::models::{AppState, ChatMessage};
+use crate::auth::Claims;
 use axum::extract::Query;
 use axum::extract::ws::Message;
 use axum::{
@@ -13,6 +14,9 @@ use futures_util::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
 use uuid::Uuid;
+use axum::http::StatusCode;
+use jsonwebtoken::{decode, DecodingKey, Validation};
+use secrecy::ExposeSecret;
 
 //SinkExt-> sender.send(Message::Text(...)).await
 //StreamExt-> receiver.next().await
@@ -24,7 +28,7 @@ use uuid::Uuid;
 // }
 #[derive(Deserialize)]
 pub struct WsConnectQuery {
-    pub user_id: Uuid,
+    pub token: String,
 }
 
 #[derive(Deserialize)]
@@ -64,9 +68,17 @@ pub async fn ws_handler(
     ws: WebSocketUpgrade,
     State(state): State<AppState>,
     Query(query): Query<WsConnectQuery>,
-) -> impl IntoResponse {
-    //(move | socket | handle_socket(socket, state)-> Une fois le socket obtenu, appelez handle_socket(socket, state).
-    ws.on_upgrade(move |socket| handle_socket(socket, state, query.user_id))
+) -> Result<impl IntoResponse, StatusCode> {
+    let token_data = decode::<Claims>(
+        &query.token,
+        &DecodingKey::from_secret(state.jwt.expose_secret().as_bytes()),
+        &Validation::default(),
+    )
+        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+
+    let user_id = token_data.claims.sub;
+
+    Ok(ws.on_upgrade(move |socket| handle_socket(socket, state, user_id)))
 }
 
 async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
