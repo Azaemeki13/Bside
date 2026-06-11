@@ -10,7 +10,7 @@ CREATE TABLE artists (
 	user_id UUID UNIQUE REFERENCES users(id) ON DELETE RESTRICT,
 	name VARCHAR(255) UNIQUE NOT NULL,
 	bio TEXT,
-	photo_url VARCHAR(255) NOT NULL DEFAULT 'http://minio:9000/bside-covers/default_artist_pp.png',
+	photo_url VARCHAR(255) NOT NULL DEFAULT 'http://minio:9000/bside-covers/default_artist.jpg',
 	status VARCHAR(50) NOT NULL DEFAULT 'Ready',
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

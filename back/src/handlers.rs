@@ -408,7 +408,7 @@ pub async fn create_artist_handler(
                     if is_valid && data.len() <= 10 * 1024 * 1024 {
                         let file_id = Uuid::new_v4();
                         let key = format!("{file_id}.{extension}");
-                        
+
                         if let Err(e) = state
                             .aws_client
                             .put_object()
