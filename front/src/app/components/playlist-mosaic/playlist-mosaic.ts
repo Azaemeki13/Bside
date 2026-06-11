@@ -21,7 +21,21 @@ export class PlaylistMosaic implements OnInit {
   private platformId = inject(PLATFORM_ID);
 
   searchOpen = false;
+  searchQuery = '';
   isCreateOpen = false;
+
+  get filteredPlaylists() {
+    const q = this.searchQuery.trim().toLowerCase();
+    if (!q) return this.playlistService.playlists();
+    return this.playlistService.playlists().filter(p =>
+      p.title.toLowerCase().includes(q)
+    );
+  }
+
+  closeSearch(): void {
+    this.searchOpen = false;
+    this.searchQuery = '';
+  }
   coverPreview: string | null = null;
   coverFile: File | null = null;
   playlistName = '';
