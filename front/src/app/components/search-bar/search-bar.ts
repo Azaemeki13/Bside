@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { LucideAngularModule, Search } from 'lucide-angular';
 import { Subject, Subscription, catchError, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
 import { SearchResult, SearchService } from '../../services/search.service';
+import { AlbumService } from '../../services/album.service';
+import { AudioPlayerService } from '../../services/audio.player.service';
 
 @Component({
   selector: 'app-search-bar',
@@ -13,6 +15,8 @@ import { SearchResult, SearchService } from '../../services/search.service';
 })
 export class SearchBar implements OnDestroy {
   private readonly searchService = inject(SearchService);
+  private readonly albumService = inject(AlbumService);
+  private readonly audio = inject(AudioPlayerService);
   private readonly router = inject(Router);
   private readonly query$ = new Subject<string>();
   private readonly searchSub: Subscription;
@@ -95,8 +99,27 @@ export class SearchBar implements OnDestroy {
         return;
       }
 
+      this.albumService.getAlbum(result.data.album_id).subscribe({
+        next: (album) => {
+          const playable = album.songs.filter(s => s.status === 'Ready');
+          const startIndex = Math.max(0, playable.findIndex(s => s.id === result.data.id));
+          const queue = playable.map(s => ({
+            id: s.id,
+            title: s.title,
+            artist: album.artist_name,
+            format: (s.audio_url.includes('.flac') ? 'flac' : 'wav') as 'flac' | 'wav',
+            coverUrl: album.cover_url,
+            onRequestUrl: () => this.albumService.getSongStreamUrl(s.id),
+          }));
+          this.audio.setQueue(queue, startIndex);
+        },
+        error: () => {
+          this.error = 'Could not load song.';
+          this.isOpen = true;
+        }
+      });
+
       this.clearSearch();
-      void this.router.navigate(['/bside_app/album', result.data.album_id]);
       return;
     }
 
