@@ -1,4 +1,4 @@
-<div class="flex h-screen bg-[#0C060C]">
+<div class="relative flex h-screen bg-[#0C060C]">
   <app-side-bar></app-side-bar>
   <div class="flex flex-col flex-1 min-w-0">
     <app-nav-bar></app-nav-bar>
@@ -7,4 +7,28 @@
     </main>
     <app-sound-bar></app-sound-bar>
   </div>
+
+  @if (!authService.currentUser()) {
+    <div class="absolute inset-0 z-[900] backdrop-blur-sm bg-[#FFE6DB]/10 flex items-center justify-center pointer-events-auto">
+      <div class="pointer-events-auto flex items-center gap-6 px-8 py-7 text-[#FFE6DB] bg-[#0C060C] rounded-xl">
+        <img src="assets/offline.png" class="w-82 h-82 object-cover rounded-xl" alt="" />
+        <div class="flex flex-col items-center gap-2">
+          <h1 class="font-climate-crisis text-[5rem] leading-none">B-SIDE</h1>
+          <h2 class="font-raleway text-[1rem] font-black text-[#FFE6DB] text-center max-w-sm">
+            Your music, your vibe. Sign up or login to get started!
+          </h2>
+          <div class="flex gap-3 pt-4">
+            <a routerLink="/login"
+               class="cursor-pointer rounded-full px-5 py-2 font-raleway text-[1rem] font-medium bg-[#FFE6DB] text-[#1F0E1C]">
+              Log in
+            </a>
+            <a routerLink="/signup"
+               class="cursor-pointer rounded-full px-5 py-2 font-raleway text-[1rem] font-medium bg-[#FF5500] text-[#FFE6DB]">
+              Create account
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 </div>
