@@ -24,7 +24,8 @@ use crate::handlers::{
     get_public_artist_by_id_handler, get_song_stream_url_handler, get_user_by_id_handler,
     google_callback_handler, google_login_handler, google_signup_handler, ping_handler,
     register_handler, remove_song_from_pl, review_artist_request_handler, update_playlist_handler,
-    upload_avatar, verify_song_handler,
+    upload_avatar, verify_song_handler, get_conversation_messages_handler, mark_conversation_messages_as_read_handler,
+    get_conversations_handler,
 };
 use crate::models::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
@@ -193,6 +194,18 @@ async fn main() {
         .route(
             "/admin/artists/{artist_id}/albums",
             post(admin_create_album_for_artist_handler),
+        )
+        .route(
+            "/messages/{other_user_id}",
+            get(get_conversation_messages_handler),
+        )
+        .route(
+            "/messages/{other_user_id}/read",
+            put(mark_conversation_messages_as_read_handler),
+        )
+        .route(
+            "/conversations",
+            get(get_conversations_handler),
         )
         .layer(from_fn_with_state(state.clone(), auth_gate));
 

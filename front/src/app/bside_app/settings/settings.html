@@ -6,9 +6,9 @@
   </app-settings-side-bar>
 
   @if (showProfile) {
-    <app-profile (close)="showProfile = false" class="flex-1 overflow-y-auto min-w-max"/>
+<app-profile (close)="showProfile = false" class="flex-1 overflow-y-auto min-w-0"/>
   }
   @if (showArtistForm) {
-    <app-artist-form (close)="showArtistForm = false" class="flex-1 overflow-y-auto min-w-max"/>
+    <app-artist-form (close)="showArtistForm = false" class="flex-1 overflow-y-auto min-w-0"/>
   }
 </div>

@@ -322,3 +322,25 @@ pub struct ChatMessage {
     pub delivered_at: Option<chrono::DateTime<chrono::Utc>>,
     pub read_at: Option<chrono::DateTime<chrono::Utc>>,
 }
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct MarkMessagesReadResponse {
+    pub read_count: u64,
+}
+
+#[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
+pub struct ConversationListItem {
+    pub other_user_id: uuid::Uuid,
+    pub other_username: String,
+    pub other_email: String,
+    pub other_avatar_url: Option<String>,
+
+    pub last_message_id: uuid::Uuid,
+    pub last_sender_id: uuid::Uuid,
+    pub last_receiver_id: uuid::Uuid,
+    pub last_message: String,
+    pub last_message_status: String,
+    pub last_message_at: chrono::DateTime<chrono::Utc>,
+
+    pub unread_count: i64,
+}

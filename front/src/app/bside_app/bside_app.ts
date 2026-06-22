@@ -6,19 +6,20 @@ import { NavBar } from '../components/nav-bar/nav-bar';
 import { SideBar } from '../components/side-bar/side-bar';
 import { SoundBar } from './sound-bar/sound-bar';
 import { AuthService } from '../services/auth.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-bside-app',
   templateUrl: './bside_app.html',
   styleUrl: './bside_app.scss',
-  imports: [CommonModule, RouterOutlet, NavBar, SideBar, SoundBar],
+  imports: [CommonModule, RouterOutlet, NavBar, SideBar, SoundBar, RouterLink],
 })
 export class BsideApp implements OnInit {
   name = '';
   private readonly platformId = inject(PLATFORM_ID);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly authService = inject(AuthService);
+  protected readonly authService = inject(AuthService);
 
   async ngOnInit(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) return;

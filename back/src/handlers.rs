@@ -26,6 +26,7 @@ use reqwest::StatusCode;
 use secrecy::ExposeSecret;
 use std::time::Duration;
 use uuid::Uuid;
+use crate::models::{ChatMessage, MarkMessagesReadResponse, ConversationListItem,};
 
 #[utoipa::path(
     get,
@@ -2350,4 +2351,181 @@ pub async fn admin_create_album_for_artist_handler(
         cover_url,
         status: "Ready".to_string(),
     }))
+}
+
+#[utoipa::path(
+    get,
+    path = "/messages/{other_user_id}",
+    params(
+        ("other_user_id" = uuid::Uuid, Path, description = "The other user ID in the conversation")
+    ),
+    responses(
+        (status = 200, description = "Conversation messages loaded successfully", body = Vec<ChatMessage>),
+        (status = 401, description = "Unauthorized"),
+        (status = 500, description = "Internal server error")
+    ),
+    security(("Bearer" = [])),
+    tags = ["Messages"]
+)]
+pub async fn get_conversation_messages_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    Path(other_user_id): Path<Uuid>,
+) -> Result<Json<Vec<ChatMessage>>, BSideError> {
+    let current_user_id = claims.sub;
+
+    let messages = sqlx::query_as!(
+        ChatMessage,
+        r#"
+        SELECT
+            id,
+            sender_id,
+            receiver_id,
+            content,
+            status,
+            created_at,
+            delivered_at,
+            read_at
+        FROM messages
+        WHERE
+            (sender_id = $1 AND receiver_id = $2)
+            OR
+            (sender_id = $2 AND receiver_id = $1)
+        ORDER BY created_at ASC
+        "#,
+        current_user_id,
+        other_user_id
+    )
+        .fetch_all(&state.db)
+        .await?;
+
+    Ok(Json(messages))
+}
+
+#[utoipa::path(
+    put,
+    path = "/messages/{other_user_id}/read",
+    params(
+        ("other_user_id" = uuid::Uuid, Path, description = "The other user ID in the conversation")
+    ),
+    responses(
+        (status = 200, description = "Messages marked as read", body = MarkMessagesReadResponse),
+        (status = 401, description = "Unauthorized"),
+        (status = 500, description = "Internal server error")
+    ),
+    security(("Bearer" = [])),
+    tags = ["Messages"]
+)]
+pub async fn mark_conversation_messages_as_read_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    Path(other_user_id): Path<Uuid>,
+) -> Result<Json<MarkMessagesReadResponse>, BSideError> {
+    let current_user_id = claims.sub;
+
+    let result = sqlx::query!(
+        r#"
+        UPDATE messages
+        SET
+            status = 'read',
+            delivered_at = COALESCE(delivered_at, NOW()),
+            read_at = NOW()
+        WHERE
+            sender_id = $1
+            AND receiver_id = $2
+            AND read_at IS NULL
+        "#,
+        other_user_id,
+        current_user_id
+    )
+        .execute(&state.db)
+        .await?;
+
+    Ok(Json(MarkMessagesReadResponse {
+        read_count: result.rows_affected(),
+    }))
+}
+
+#[utoipa::path(
+    get,
+    path = "/conversations",
+    responses(
+        (status = 200, description = "Conversation list loaded successfully", body = Vec<ConversationListItem>),
+        (status = 401, description = "Unauthorized"),
+        (status = 500, description = "Internal server error")
+    ),
+    security(("Bearer" = [])),
+    tags = ["Messages"]
+)]
+pub async fn get_conversations_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+) -> Result<Json<Vec<ConversationListItem>>, BSideError> {
+    let current_user_id = claims.sub;
+
+    let conversations = sqlx::query_as!(
+        ConversationListItem,
+        r#"
+        WITH user_messages AS (
+            SELECT
+                m.id,
+                m.sender_id,
+                m.receiver_id,
+                m.content,
+                m.status,
+                m.created_at,
+                CASE
+                    WHEN m.sender_id = $1 THEN m.receiver_id
+                    ELSE m.sender_id
+                END AS other_user_id
+            FROM messages m
+            WHERE m.sender_id = $1 OR m.receiver_id = $1
+        ),
+        last_messages AS (
+            SELECT DISTINCT ON (other_user_id)
+                other_user_id,
+                id AS last_message_id,
+                sender_id AS last_sender_id,
+                receiver_id AS last_receiver_id,
+                content AS last_message,
+                status AS last_message_status,
+                created_at AS last_message_at
+            FROM user_messages
+            ORDER BY other_user_id, created_at DESC
+        ),
+        unread_counts AS (
+            SELECT
+                sender_id AS other_user_id,
+                COUNT(*)::BIGINT AS unread_count
+            FROM messages
+            WHERE
+                receiver_id = $1
+                AND read_at IS NULL
+            GROUP BY sender_id
+        )
+        SELECT
+            u.id AS "other_user_id!",
+            u.username AS "other_username!",
+            u.email AS "other_email!",
+            u.avatar_url AS other_avatar_url,
+
+            lm.last_message_id AS "last_message_id!",
+            lm.last_sender_id AS "last_sender_id!",
+            lm.last_receiver_id AS "last_receiver_id!",
+            lm.last_message AS "last_message!",
+            lm.last_message_status AS "last_message_status!",
+            lm.last_message_at AS "last_message_at!",
+
+            COALESCE(uc.unread_count, 0)::BIGINT AS "unread_count!"
+        FROM last_messages lm
+        JOIN users u ON u.id = lm.other_user_id
+        LEFT JOIN unread_counts uc ON uc.other_user_id = lm.other_user_id
+        ORDER BY lm.last_message_at DESC
+        "#,
+        current_user_id
+    )
+        .fetch_all(&state.db)
+        .await?;
+
+    Ok(Json(conversations))
 }

@@ -7,17 +7,21 @@
     />
     <div class="flex flex-col">
         <span class="font-climate-crisis text-[2.5rem] text-[#FFE6DB] text-nowrap">{{ username() }} </span>
-        <p class="font-raleway text-[1rem] font-bold underline text-[#FF5500]">@username?</p>
     </div>
 </div>
 <div>
     <p class="font-raleway font-bold text-[#FFE6DB] text-[1rem]">Public playlist(s)</p>
     <div class="grid grid-cols-7 gap-2 pt-2">
         @for (playlist of playlistService.playlists(); track playlist.id) {
-            <button (click)="selectPlaylist(playlist)" class="rounded-[0.625rem] cursor-pointer">
-            <div class="rounded-[calc(0.625rem-2px)] overflow-hidden">
-                <div class="aspect-square bg-[#FFE6DB]/10 flex items-center justify-center backdrop-blur-sm glass-card">
-                </div>
+            <button (click)="selectPlaylist(playlist)" class="rounded-[0.625rem] cursor-pointer min-w-0 w-full">
+                <div class="w-full aspect-square rounded-[calc(0.625rem-2px)] overflow-hidden">
+            @if (playlist.cover_url) {
+              <img [src]="playlist.cover_url" alt="cover" class="w-full h-full object-cover" />
+            } @else {
+              <div class="w-full h-full bg-[#FFE6DB]/10 flex items-center justify-center backdrop-blur-sm glass-card">
+                <span class="font-raleway font-bold text-[#FFE6DB] text-xs text-center px-2">{{ playlist.title }}</span>
+              </div>
+                }
             </div>
             <p class="font-raleway text-[1rem] text-[#FFE6DB] font-bold truncate text-left">{{ playlist.title }}</p>
             <p class="font-raleway text-[0.75rem] text-[#FFE6DB]/60 font-medium truncate text-left">By {{ playlist.owner_id === authService.currentUser()?.id ? 'you' : (playlist.owner_username ?? 'unknown') }} | {{ playlist.song_count }} tracks</p>            </button>
