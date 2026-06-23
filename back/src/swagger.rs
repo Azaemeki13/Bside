@@ -1,10 +1,10 @@
 use crate::models::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem,
     ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload,
-    ArtistResponse, ArtistSongItem, AuthResponse, LoginPayload, Playlist, PlaylistDetailedResponse,
-    PlaylistPayload, PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, Song,
-    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload, ChatMessage, MarkMessagesReadResponse,
-    ConversationListItem,
+    ArtistResponse, ArtistSongItem, AuthResponse, ChatMessage, ConversationListItem, LoginPayload,
+    MarkMessagesReadResponse, Playlist, PlaylistDetailedResponse, PlaylistPayload,
+    PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, Song, SongPayload,
+    SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use utoipa::OpenApi;
 

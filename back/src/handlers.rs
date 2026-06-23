@@ -1,11 +1,12 @@
 use crate::auth::create_jwt;
+use crate::models::{ChatMessage, ConversationListItem, MarkMessagesReadResponse};
 use crate::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
     ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload,
     ArtistResponse, ArtistSongItem, AuthRequest, AuthResponse, BSideError, Claims, ContactPayload,
     GoogleUserProfile, LoginPayload, Playlist, PlaylistDetailedResponse, PlaylistPayload,
-    PlaylistSongItem, RegisterPayload, Song, SongPayload, SongResponse, UpdateStructurePayload,
-    User, UserPayload,
+    PlaylistSongItem, PublicApiKey, RegisterPayload, Song, SongPayload, SongResponse,
+    UpdateStructurePayload, User, UserPayload,
 };
 use argon2::{
     Argon2, PasswordHash, PasswordVerifier,
@@ -26,7 +27,6 @@ use reqwest::StatusCode;
 use secrecy::ExposeSecret;
 use std::time::Duration;
 use uuid::Uuid;
-use crate::models::{ChatMessage, MarkMessagesReadResponse, ConversationListItem,};
 
 #[utoipa::path(
     get,
@@ -53,6 +53,7 @@ pub async fn ping_handler() -> &'static str {
 )]
 pub async fn contact_handler(
     State(state): State<AppState>,
+    _key: PublicApiKey,
     Json(payload): Json<ContactPayload>,
 ) -> Result<impl IntoResponse, BSideError> {
     let smtp_user = std::env::var("SMTP_USERNAME")
@@ -474,6 +475,7 @@ pub async fn create_artist_handler(
 )]
 pub async fn get_artists_handler(
     State(state): State<AppState>,
+    _key: PublicApiKey,
 ) -> Result<Json<Vec<ArtistResponse>>, BSideError> {
     let artists = sqlx::query_as!(
         ArtistResponse,
@@ -508,6 +510,7 @@ pub async fn get_artists_handler(
 pub async fn get_public_artist_by_id_handler(
     State(state): State<AppState>,
     Path(artist_id): Path<Uuid>,
+    _key: PublicApiKey,
 ) -> Result<Json<ArtistDetailResponse>, BSideError> {
     let artist = sqlx::query_as!(
         ArtistResponse,
@@ -1064,6 +1067,7 @@ pub async fn get_my_albums_handler(
 pub async fn get_public_album_by_id_handler(
     State(state): State<AppState>,
     Path(album_id): Path<uuid::Uuid>,
+    _key: PublicApiKey,
 ) -> Result<Json<AlbumDetailedResponse>, BSideError> {
     let album = sqlx::query!(
         r#"
@@ -2396,8 +2400,8 @@ pub async fn get_conversation_messages_handler(
         current_user_id,
         other_user_id
     )
-        .fetch_all(&state.db)
-        .await?;
+    .fetch_all(&state.db)
+    .await?;
 
     Ok(Json(messages))
 }
@@ -2438,8 +2442,8 @@ pub async fn mark_conversation_messages_as_read_handler(
         other_user_id,
         current_user_id
     )
-        .execute(&state.db)
-        .await?;
+    .execute(&state.db)
+    .await?;
 
     Ok(Json(MarkMessagesReadResponse {
         read_count: result.rows_affected(),
@@ -2524,8 +2528,8 @@ pub async fn get_conversations_handler(
         "#,
         current_user_id
     )
-        .fetch_all(&state.db)
-        .await?;
+    .fetch_all(&state.db)
+    .await?;
 
     Ok(Json(conversations))
 }

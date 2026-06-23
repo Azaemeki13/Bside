@@ -11,7 +11,7 @@ mod search;
 mod swagger;
 mod ws;
 
-use crate::auth::{Claims, auth_gate, bootstrap_admin};
+use crate::auth::{Claims, PublicApiKey, auth_gate, bootstrap_admin};
 use crate::error::BSideError;
 use crate::handlers::{
     add_song_to_playlist_handler, admin_create_album_for_artist_handler, classic_auth_handler,
@@ -19,13 +19,13 @@ use crate::handlers::{
     create_playlist_handler, create_song_handler, create_user_handler, delete_album_handler,
     delete_playlist_handler, delete_song_handler, flush_deleted_albums_task,
     flush_deleted_songs_task, get_album_by_id_handler, get_all_users_handler,
-    get_artist_requests_handler, get_artists_handler, get_me_handler, get_my_albums_handler,
-    get_my_playlists_handler, get_playlist_by_id_handler, get_public_album_by_id_handler,
-    get_public_artist_by_id_handler, get_song_stream_url_handler, get_user_by_id_handler,
-    google_callback_handler, google_login_handler, google_signup_handler, ping_handler,
-    register_handler, remove_song_from_pl, review_artist_request_handler, update_playlist_handler,
-    upload_avatar, verify_song_handler, get_conversation_messages_handler, mark_conversation_messages_as_read_handler,
-    get_conversations_handler,
+    get_artist_requests_handler, get_artists_handler, get_conversation_messages_handler,
+    get_conversations_handler, get_me_handler, get_my_albums_handler, get_my_playlists_handler,
+    get_playlist_by_id_handler, get_public_album_by_id_handler, get_public_artist_by_id_handler,
+    get_song_stream_url_handler, get_user_by_id_handler, google_callback_handler,
+    google_login_handler, google_signup_handler, mark_conversation_messages_as_read_handler,
+    ping_handler, register_handler, remove_song_from_pl, review_artist_request_handler,
+    update_playlist_handler, upload_avatar, verify_song_handler,
 };
 use crate::models::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
@@ -38,7 +38,6 @@ use crate::models::{
 use crate::search::searcher;
 
 use crate::ws::ws_handler;
-use aws_sdk_s3::types::{CorsConfiguration, CorsRule};
 use axum::{
     Router,
     extract::{DefaultBodyLimit, State},
@@ -46,10 +45,12 @@ use axum::{
     middleware::from_fn_with_state,
     routing::{delete, get, post, put},
 };
+use axum_governor::{GovernorConfigBuilder, GovernorLayer, Quota, nz, extractor::PeerIp};
 use oauth2::{AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl, basic::BasicClient};
 use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, HeaderValue};
 use sqlx::postgres::PgPoolOptions;
 use std::env;
+use std::num::NonZeroU32;
 use std::sync::Arc;
 use std::time::Duration;
 use tower_http::cors::CorsLayer;
@@ -124,7 +125,12 @@ async fn main() {
         )
         .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
         .allow_headers([AUTHORIZATION, ACCEPT, CONTENT_TYPE]);
-
+    let governor_config = GovernorConfigBuilder::default()
+        .with_extractor(PeerIp::default())
+        .expect_connect_info()
+        .quota_default(Quota::requests_per_second(nz!(5u32)))
+        .finish()
+        .unwrap();
     let public_routes = Router::<AppState>::new()
         .route("/auth/google/login", get(google_login_handler))
         .route("/auth/google/signup", get(google_signup_handler))
@@ -203,16 +209,14 @@ async fn main() {
             "/messages/{other_user_id}/read",
             put(mark_conversation_messages_as_read_handler),
         )
-        .route(
-            "/conversations",
-            get(get_conversations_handler),
-        )
+        .route("/conversations", get(get_conversations_handler))
         .layer(from_fn_with_state(state.clone(), auth_gate));
 
     let app = Router::new()
         .merge(public_routes)
         .merge(protected_routes)
         .layer(DefaultBodyLimit::max(750 * 1024 * 1024))
+        .layer(GovernorLayer::new(governor_config))
         .layer(cors)
         .with_state(state)
         .merge(
@@ -228,9 +232,12 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind(&listener_addr)
         .await
         .unwrap_or_else(|error| panic!("Tokio bind listener failed for {listener_addr}: {error}"));
-    axum::serve(listener, app)
-        .await
-        .expect("Axum failed to server Router with listener.");
+        axum::serve(
+            listener,
+            app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
+        )
+    .await
+    .expect("Axum failed to server Router with listener.");
 }
 
 async fn ensure_storage_buckets(client: &aws_sdk_s3::Client) -> Result<(), BSideError> {

@@ -120,3 +120,28 @@ where
 pub async fn auth_gate(_claims: Claims, request: Request, next: Next) -> Response {
     next.run(request).await
 }
+
+pub struct PublicApiKey;
+
+impl<S> FromRequestParts<S> for PublicApiKey
+where
+    S: Send + Sync,
+{
+    type Rejection = StatusCode;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        let expected_key = std::env::var("PUBLIC_API_KEY")
+            .unwrap_or_else(|_| "a8e68850-10bd-4791-822b-14bdfc2cfe2b".to_string());
+        let api_key_header = parts
+            .headers
+            .get("X-API-Key")
+            .and_then(|value| value.to_str().ok());
+        match api_key_header {
+            Some(key) if key == expected_key => Ok(PublicApiKey),
+            _ => {
+                eprintln!("Warning: Public access attempt refused - Invalid or missing key!");
+                Err(StatusCode::UNAUTHORIZED)
+            }
+        }
+    }
+}

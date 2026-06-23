@@ -1,4 +1,4 @@
-use crate::{AppState, BSideError, RawSearchResult, SearchResult};
+use crate::{AppState, BSideError, PublicApiKey, RawSearchResult, SearchResult};
 use axum::Json;
 use axum::extract::{Query, State};
 use std::collections::HashMap;
@@ -17,6 +17,7 @@ use std::collections::HashMap;
 pub async fn searcher(
     State(state): State<AppState>,
     Query(params): Query<HashMap<String, String>>,
+    _key: PublicApiKey,
 ) -> Result<Json<Vec<SearchResult>>, BSideError> {
     let query_str = params
         .get("q")

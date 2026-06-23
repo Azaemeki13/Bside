@@ -1,7 +1,8 @@
-use crate::models::{AppState, ChatMessage};
 use crate::auth::Claims;
+use crate::models::{AppState, ChatMessage};
 use axum::extract::Query;
 use axum::extract::ws::Message;
+use axum::http::StatusCode;
 use axum::{
     extract::{
         State,
@@ -11,12 +12,11 @@ use axum::{
 };
 use chrono::{DateTime, Utc};
 use futures_util::{SinkExt, StreamExt};
+use jsonwebtoken::{DecodingKey, Validation, decode};
+use secrecy::ExposeSecret;
 use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
 use uuid::Uuid;
-use axum::http::StatusCode;
-use jsonwebtoken::{decode, DecodingKey, Validation};
-use secrecy::ExposeSecret;
 
 //SinkExt-> sender.send(Message::Text(...)).await
 //StreamExt-> receiver.next().await
@@ -74,7 +74,7 @@ pub async fn ws_handler(
         &DecodingKey::from_secret(state.jwt.expose_secret().as_bytes()),
         &Validation::default(),
     )
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+    .map_err(|_| StatusCode::UNAUTHORIZED)?;
 
     let user_id = token_data.claims.sub;
 
