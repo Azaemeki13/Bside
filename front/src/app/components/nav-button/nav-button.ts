@@ -6,7 +6,7 @@ import { NgClass, NgIf } from '@angular/common';
   selector: 'nav-button, app-nav-button',
   templateUrl: './nav-button.html',
   styleUrl: './nav-button.scss',
-  imports: [RouterModule, NgClass, NgIf]
+  imports: [RouterModule, NgClass]
 })
 export class NavButton {
   @Input() label = '';

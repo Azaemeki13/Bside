@@ -7,7 +7,7 @@ import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-side-bar',
-  imports: [SideBarButton, LucideAngularModule, NgIf],
+  imports: [SideBarButton, LucideAngularModule],
   templateUrl: './side-bar.html',
   styleUrl: './side-bar.scss',
 })

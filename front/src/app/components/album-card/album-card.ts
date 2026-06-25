@@ -3,7 +3,7 @@ import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-album-card',
-  imports: [NgIf],
+  imports: [],
   templateUrl: './album-card.html',
   styleUrl: './album-card.scss',
 })
