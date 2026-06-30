@@ -41,8 +41,8 @@
 -->
 
 <div class="w-full rounded-full border border-[#FFE6DB]/15 bg-[#FFE6DB]/10 pl-2 pr-6 py-2 backdrop-blur-sm glass-card">
-  	<div class="flex items-center gap-8 w-full min-w-0">
-  		<div class="flex items-center gap-3 shrink-0">
+  	<div class="grid w-full min-w-0 items-center gap-6" style="grid-template-columns: 13rem 8rem minmax(5rem, 1fr)">
+  		<div class="flex min-w-0 items-center gap-3">
   			<button type="button" aria-label="Album cover" class="shrink-0 w-[3rem] h-[3rem] rounded-full overflow-hidden cursor-pointer">
   				@if (audio.currentTrack(); as track) {
   					<img [src]="track.coverUrl || 'assets/cover1.png'" alt="" class="w-full h-full object-cover" />
@@ -50,16 +50,28 @@
   					<img src="assets/cover1.png" alt="" class="w-full h-full object-cover" />
   				}
   			</button>
-  			<div class="flex flex-col justify-center max-w-[100px]">
+  			<div class="flex min-w-0 flex-col justify-center">
   				@if (audio.currentTrack(); as track) {
-  					<p class="font-Raleway text-sm font-semibold text-[#FFE6DB] truncate">{{ track.title }}</p>
-  					<p class="font-Raleway text-xs font-normal text-[#FFE6DB] truncate">{{ track.artist }}</p>
+  					<div #titleViewport class="min-w-0 overflow-hidden whitespace-nowrap">
+              <span
+                #titleText
+                class="inline-block font-Raleway text-sm font-semibold text-[#FFE6DB] will-change-transform"
+                [style.transform]="'translateX(-' + titleOffset() + 'px)'"
+              >{{ track.title }}</span>
+            </div>
+  					<div #artistViewport class="min-w-0 overflow-hidden whitespace-nowrap">
+              <span
+                #artistText
+                class="inline-block font-Raleway text-xs font-normal text-[#FFE6DB] will-change-transform"
+                [style.transform]="'translateX(-' + artistOffset() + 'px)'"
+              >{{ track.artist }}</span>
+            </div>
   				} @else {
   					<p class="font-Raleway text-sm font-semibold text-[#FFE6DB] truncate">No track</p>
   				}
   			</div>
   		</div>
-  		<div class="flex items-center gap-4 shrink-0 px-4">
+  		<div class="flex w-32 items-center justify-center gap-4">
   			<button type="button" aria-label="Track back" class="text-[#FFE6DB] cursor-pointer" (click)="previousTrack()">
   				<lucide-icon [img]="skipBackIcon" class="w-[1.25rem] h-[1.25rem]"></lucide-icon>
   			</button>

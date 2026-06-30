@@ -55,9 +55,42 @@
 
                 <span class="font-raleway text-[#FFE6DB]/50 text-sm justify-self-end">{{ formatDuration(song.duration_seconds) }}</span>
 
-                <button type="button" (click)="removeSong(song); $event.stopPropagation()" class="flex justify-end cursor-pointer" aria-label="Remove from playlist">
-                  <lucide-icon [img]="trash2" class="w-4 h-4 text-[#FFE6DB]/40 hover:text-[#FF5500] duration-300"></lucide-icon>
-                </button>
+                <span class="flex justify-end">
+                  <button type="button"
+                          class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[#FFE6DB]/10"
+                          [attr.aria-label]="playlistService.isLiked(song.song_id) ? 'Unlike song' : 'Like song'"
+                          [attr.aria-pressed]="playlistService.isLiked(song.song_id)"
+                          (click)="toggleLike($event, song)">
+                    <lucide-icon
+                      [img]="heart"
+                      [class]="playlistService.isLiked(song.song_id) ? 'h-4 w-4 text-[#FF5500] fill-[#FF5500]' : 'h-4 w-4 text-[#FFE6DB]/50'"
+                      [strokeWidth]="playlistService.isLiked(song.song_id) ? 0 : 1.75">
+                    </lucide-icon>
+                  </button>
+                </span>
+
+                <span class="relative flex justify-end">
+                  <button type="button"
+                          class="flex h-8 w-8 items-center justify-center rounded-full text-[#FFE6DB]/50 hover:bg-[#FFE6DB]/10 hover:text-[#FFE6DB]"
+                          aria-label="Song options"
+                          (click)="toggleSongMenu($event, song)">
+                    <lucide-icon [img]="ellipsisVertical" class="h-4 w-4"></lucide-icon>
+                  </button>
+
+                  @if (openMenuLinkId === song.link_id) {
+                    <span class="absolute right-0 top-9 z-20 min-w-44 rounded-md border border-[#FFE6DB]/10 bg-[#1F0E1C] p-1 shadow-xl">
+                      <button type="button"
+                              class="w-full rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10"
+                              (click)="removeSong(song); $event.stopPropagation()">
+                        @if (playlistService.likedSongsSelected()) {
+                          Remove from liked songs
+                        } @else {
+                          Remove from playlist
+                        }
+                      </button>
+                    </span>
+                  }
+                </span>
               </div>
             }
           }

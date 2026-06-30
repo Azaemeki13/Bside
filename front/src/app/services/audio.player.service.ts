@@ -144,7 +144,12 @@ export class AudioPlayerService {
     }
 
     toggleShuffle(): void {
-        this.shuffleEnabled.update((enabled) => !enabled);
+        const nextShuffle = !this.shuffleEnabled();
+        this.shuffleEnabled.set(nextShuffle);
+
+        if (nextShuffle && this.repeatMode() === 'one') {
+            this.repeatMode.set('off');
+        }
     }
 
     cycleRepeatMode(): void {
@@ -155,6 +160,7 @@ export class AudioPlayerService {
         }
         if (current === 'all') {
             this.repeatMode.set('one');
+            this.shuffleEnabled.set(false);
             return;
         }
         this.repeatMode.set('off');

@@ -29,10 +29,11 @@
 
     <div class="flex min-h-0 flex-1 flex-col">
       <div class="grid border-b border-[#FFE6DB]/20 pb-2 font-raleway text-sm font-medium text-[#FFE6DB]/70"
-           style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem 2.5rem">
+           style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem 2.5rem 2.5rem">
         <span>#</span>
         <span>Title</span>
         <lucide-icon [img]="timer" class="w-4 h-4 text-[#FFE6DB]/50 justify-self-end"></lucide-icon>
+        <span></span>
         <span></span>
       </div>
 
@@ -40,7 +41,7 @@
         @for (song of currentAlbum.songs; let i = $index; track song.id) {
           <div class="grid w-full items-center rounded-md py-3 text-left font-raleway hover:bg-[#FFE6DB]/5"
                [class.bg-[#FFE6DB]/5]="activeSongId === song.id"
-               style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem 2.5rem"
+               style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem 2.5rem 2.5rem"
                role="button"
                tabindex="0"
                (click)="play(song)"
@@ -51,6 +52,19 @@
               <span class="block truncate text-xs text-[#FFE6DB]/50">{{ currentAlbum.artist_name }}</span>
             </span>
             <span class="text-right text-sm text-[#FFE6DB]/50">{{ formatDuration(song.duration_seconds) }}</span>
+            <span class="flex justify-end">
+              <button type="button"
+                      class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[#FFE6DB]/10"
+                      [attr.aria-label]="playlistService.isLiked(song.id) ? 'Unlike song' : 'Like song'"
+                      [attr.aria-pressed]="playlistService.isLiked(song.id)"
+                      (click)="toggleLike($event, song)">
+                <lucide-icon
+                  [img]="heart"
+                  [class]="playlistService.isLiked(song.id) ? 'h-4 w-4 text-[#FF5500] fill-[#FF5500]' : 'h-4 w-4 text-[#FFE6DB]/50'"
+                  [strokeWidth]="playlistService.isLiked(song.id) ? 0 : 1.75">
+                </lucide-icon>
+              </button>
+            </span>
             <span class="relative flex justify-end">
               <button type="button"
                       class="flex h-8 w-8 items-center justify-center rounded-full text-[#FFE6DB]/50 hover:bg-[#FFE6DB]/10 hover:text-[#FFE6DB]"

@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { LucideAngularModule, Heart, Play, Trash2, Timer, AudioLines, Shuffle } from 'lucide-angular';
+import { LucideAngularModule, Heart, Play, Trash2, Timer, AudioLines, Shuffle, EllipsisVertical } from 'lucide-angular';
 import { PlaylistService, PlaylistSongItem } from '../../services/playlist.service';
 import { AuthService } from '../../services/auth.service';
 import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
@@ -13,17 +13,23 @@ import { NgClass } from '@angular/common';
   templateUrl: './song-list.html',
   styleUrl: './song-list.scss',
 })
-export class SongList {
+export class SongList implements OnInit {
   protected readonly heart = Heart;
   protected readonly trash2 = Trash2;
   protected readonly play = Play;
   protected readonly timer = Timer;
   protected readonly audioLines = AudioLines;
   protected readonly shuffle = Shuffle;
+  protected readonly ellipsisVertical = EllipsisVertical;
   protected playlistService = inject(PlaylistService);
   protected authService = inject(AuthService);
   protected readonly audio = inject(AudioPlayerService);
   private readonly albumService = inject(AlbumService);
+  protected openMenuLinkId = '';
+
+  ngOnInit(): void {
+    this.playlistService.loadLikedSongs();
+  }
 
   deletePlaylist(): void {
     const playlist = this.playlistService.selectedPlaylist();
@@ -36,9 +42,29 @@ export class SongList {
   removeSong(song: PlaylistSongItem): void {
     const playlist = this.playlistService.selectedPlaylist();
     if (!playlist) return;
+    this.openMenuLinkId = '';
     this.playlistService.removeSong(playlist.id, song.link_id).subscribe({
       error: (err) => console.error('Failed to remove song from playlist', err)
     });
+  }
+
+  toggleLike(event: Event, song: PlaylistSongItem): void {
+    event.stopPropagation();
+    this.openMenuLinkId = '';
+    if (this.playlistService.isLiked(song.song_id)) {
+      this.playlistService.unlikeSong(song.song_id).subscribe({
+        error: (err) => console.error('Failed to unlike song', err)
+      });
+      return;
+    }
+    this.playlistService.likeSong(song.song_id).subscribe({
+      error: (err) => console.error('Failed to like song', err)
+    });
+  }
+
+  toggleSongMenu(event: Event, song: PlaylistSongItem): void {
+    event.stopPropagation();
+    this.openMenuLinkId = this.openMenuLinkId === song.link_id ? '' : song.link_id;
   }
 
   playSong(song: PlaylistSongItem): void {

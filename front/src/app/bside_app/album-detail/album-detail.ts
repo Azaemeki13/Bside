@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { EllipsisVertical, LucideAngularModule, Play, Timer, X } from 'lucide-angular';
+import { EllipsisVertical, Heart, LucideAngularModule, Play, Timer, X } from 'lucide-angular';
 import { Subscription, switchMap } from 'rxjs';
 import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
 import { AlbumDetailedResponse, AlbumService, AlbumSongItem } from '../../services/album.service';
@@ -24,6 +24,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
   readonly playIcon = Play;
   readonly timer = Timer;
   readonly ellipsisVertical = EllipsisVertical;
+  readonly heart = Heart;
   readonly x = X;
 
   album: AlbumDetailedResponse | null = null;
@@ -51,6 +52,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.playlistService.loadPlaylists();
+    this.playlistService.loadLikedSongs();
     this.routeSub = this.route.paramMap.subscribe((params) => {
       const albumId = params.get('albumId');
       if (!albumId) {
@@ -108,6 +110,19 @@ export class AlbumDetail implements OnInit, OnDestroy {
     this.playlistActionError = '';
     this.newPlaylistName = '';
     this.isPlaylistDialogOpen = true;
+  }
+
+  toggleLike(event: Event, song: AlbumSongItem): void {
+    event.stopPropagation();
+    if (this.playlistService.isLiked(song.id)) {
+      this.playlistService.unlikeSong(song.id).subscribe({
+        error: (err) => console.error('Failed to unlike song', err)
+      });
+      return;
+    }
+    this.playlistService.likeSong(song.id).subscribe({
+      error: (err) => console.error('Failed to like song', err)
+    });
   }
 
   closePlaylistDialog(): void {

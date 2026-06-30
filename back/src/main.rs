@@ -18,12 +18,13 @@ use crate::handlers::{
     contact_handler, create_album_handler, create_artist_handler, create_artist_request_handler,
     create_playlist_handler, create_song_handler, create_user_handler, delete_album_handler,
     delete_playlist_handler, delete_song_handler, get_album_by_id_handler, get_all_users_handler,
-    get_artist_requests_handler, get_artists_handler, get_conversation_messages_handler,
-    get_conversations_handler, get_me_handler, get_my_albums_handler, get_my_playlists_handler,
-    get_playlist_by_id_handler, get_artist_by_id_handler,
+    get_artist_by_id_handler, get_artist_requests_handler, get_artists_handler,
+    get_conversation_messages_handler, get_conversations_handler, get_liked_songs_handler,
+    get_me_handler, get_my_albums_handler, get_my_playlists_handler, get_playlist_by_id_handler,
     get_song_stream_url_handler, get_user_by_id_handler, google_callback_handler,
-    google_login_handler, google_signup_handler, mark_conversation_messages_as_read_handler,
-    ping_handler, register_handler, remove_song_from_pl, review_artist_request_handler,
+    google_login_handler, google_signup_handler, like_song_handler,
+    mark_conversation_messages_as_read_handler, ping_handler, register_handler,
+    remove_song_from_pl, review_artist_request_handler, unlike_song_handler,
     update_playlist_handler, upload_avatar, verify_song_handler,
 };
 use crate::models::{
@@ -39,7 +40,7 @@ use crate::search::searcher;
 use crate::ws::ws_handler;
 use axum::{
     Router,
-    extract::{DefaultBodyLimit},
+    extract::DefaultBodyLimit,
     http::Method,
     middleware::from_fn_with_state,
     routing::{delete, get, post, put},
@@ -123,10 +124,7 @@ async fn main() {
         .route("/login", post(classic_auth_handler))
         .route("/ping", get(ping_handler))
         .route("/search", get(searcher))
-        .route(
-            "/artists/{artist_id}",
-            get(get_artist_by_id_handler),
-        )
+        .route("/artists/{artist_id}", get(get_artist_by_id_handler))
         .route(
             "/albums/{album_id}",
             get(get_album_by_id_handler).delete(delete_album_handler),
@@ -160,10 +158,14 @@ async fn main() {
             "/albums",
             get(get_my_albums_handler).post(create_album_handler),
         )
-    
         .route("/songs", post(create_song_handler))
         .route("/songs/{song_id}/verify", put(verify_song_handler))
+        .route(
+            "/songs/{song_id}/like",
+            post(like_song_handler).delete(unlike_song_handler),
+        )
         .route("/songs/{id}", delete(delete_song_handler))
+        .route("/liked-songs", get(get_liked_songs_handler))
         .route(
             "/playlists",
             get(get_my_playlists_handler).post(create_playlist_handler),
