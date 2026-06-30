@@ -31,7 +31,7 @@ export class ArtistService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
 
-  getPublicArtist(id: string): Observable<ArtistDetailResponse> {
-    return this.http.get<ArtistDetailResponse>(`${this.apiUrl}/catalog/artists/${id}`);
+  getArtist(id: string): Observable<ArtistDetailResponse> {
+    return this.http.get<ArtistDetailResponse>(`${this.apiUrl}/artists/${id}`);
   }
 }

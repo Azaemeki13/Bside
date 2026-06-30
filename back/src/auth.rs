@@ -145,3 +145,26 @@ where
         }
     }
 }
+
+pub enum AnyAuth {
+    User(Claims),
+    ApiKey,
+    Anonymous,
+}
+impl<S> FromRequestParts<S> for AnyAuth
+where
+    AppState: FromRef<S>,
+    S: Send + Sync,
+{
+    type Rejection = StatusCode;
+
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        if let Ok(claims) = Claims::from_request_parts(parts, state).await {
+            return Ok(AnyAuth::User(claims));
+        }
+        if PublicApiKey::from_request_parts(parts, state).await.is_ok() {
+            return Ok(AnyAuth::ApiKey);
+        }
+        Ok(AnyAuth::Anonymous)
+    }
+}

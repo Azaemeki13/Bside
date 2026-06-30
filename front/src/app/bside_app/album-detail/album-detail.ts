@@ -38,6 +38,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
   isPlaylistDialogOpen = false;
   newPlaylistName = '';
   isAddingToPlaylist = false;
+  isTryMePopupOpen = false;
 
   private routeSub?: Subscription;
   private albumSub?: Subscription;
@@ -182,7 +183,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    this.albumSub = this.albumService.getPublicAlbum(albumId).subscribe({
+    this.albumSub = this.albumService.getAlbum(albumId).subscribe({
       next: (album) => {
         this.album = album;
         this.isLoading = false;

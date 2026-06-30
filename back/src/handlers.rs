@@ -1,12 +1,12 @@
 use crate::auth::create_jwt;
 use crate::models::{ChatMessage, ConversationListItem, MarkMessagesReadResponse};
 use crate::{
-    AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
-    ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload,
-    ArtistResponse, ArtistSongItem, AuthRequest, AuthResponse, BSideError, Claims, ContactPayload,
-    GoogleUserProfile, LoginPayload, Playlist, PlaylistDetailedResponse, PlaylistPayload,
-    PlaylistSongItem, PublicApiKey, RegisterPayload, Song, SongPayload, SongResponse,
-    UpdateStructurePayload, User, UserPayload,
+    AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AnyAuth,
+    AppState, ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse,
+    ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem, AuthRequest, AuthResponse,
+    BSideError, Claims, ContactPayload, GoogleUserProfile, LoginPayload, Playlist,
+    PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RegisterPayload,
+    Song, SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use argon2::{
     Argon2, PasswordHash, PasswordVerifier,
@@ -53,7 +53,7 @@ pub async fn ping_handler() -> &'static str {
 )]
 pub async fn contact_handler(
     State(state): State<AppState>,
-    _key: PublicApiKey,
+    _auth: AnyAuth,
     Json(payload): Json<ContactPayload>,
 ) -> Result<impl IntoResponse, BSideError> {
     let smtp_user = std::env::var("SMTP_USERNAME")
@@ -475,7 +475,7 @@ pub async fn create_artist_handler(
 )]
 pub async fn get_artists_handler(
     State(state): State<AppState>,
-    _key: PublicApiKey,
+    _auth: AnyAuth,
 ) -> Result<Json<Vec<ArtistResponse>>, BSideError> {
     let artists = sqlx::query_as!(
         ArtistResponse,
@@ -507,10 +507,10 @@ pub async fn get_artists_handler(
     ),
     tags = ["Catalog"]
 )]
-pub async fn get_public_artist_by_id_handler(
+pub async fn get_artist_by_id_handler(
     State(state): State<AppState>,
     Path(artist_id): Path<Uuid>,
-    _key: PublicApiKey,
+    _auth: AnyAuth,
 ) -> Result<Json<ArtistDetailResponse>, BSideError> {
     let artist = sqlx::query_as!(
         ArtistResponse,
@@ -1064,10 +1064,10 @@ pub async fn get_my_albums_handler(
     ),
     tags = ["Catalog"]
 )]
-pub async fn get_public_album_by_id_handler(
+pub async fn get_album_by_id_handler(
     State(state): State<AppState>,
     Path(album_id): Path<uuid::Uuid>,
-    _key: PublicApiKey,
+    _auth: AnyAuth,
 ) -> Result<Json<AlbumDetailedResponse>, BSideError> {
     let album = sqlx::query!(
         r#"
@@ -1120,75 +1120,6 @@ pub async fn get_public_album_by_id_handler(
 }
 
 #[utoipa::path(
-    get,
-    path = "/albums/{album_id}",
-    params(("album_id" = uuid::Uuid, Path, description = "Album ID")),
-    responses(
-        (status = 200, description = "Album details with songs", body = AlbumDetailedResponse),
-        (status = 401, description = "Unauthorized - not album owner"),
-        (status = 404, description = "Album not found"),
-        (status = 500, description = "Internal server error"),
-    ),
-    security(("Bearer" = [])),
-    tags = ["Albums"]
-)]
-pub async fn get_album_by_id_handler(
-    State(state): State<AppState>,
-    claims: Claims,
-    Path(album_id): Path<uuid::Uuid>,
-) -> Result<Json<AlbumDetailedResponse>, BSideError> {
-    let album = sqlx::query!(
-        r#"
-        SELECT
-            a.id,
-            a.artist_id,
-            ar.name AS "artist_name!",
-            a.title,
-            a.genre,
-            a.cover_url,
-            a.status,
-            a.created_at AS "created_at!",
-            COALESCE(
-                jsonb_agg(
-                    jsonb_build_object(
-                        'id', s.id,
-                        'title', s.title,
-                        'duration_seconds', s.duration_seconds,
-                        'status', s.status,
-                        'audio_url', s.audio_url,
-                        'created_at', s.created_at
-                    )
-                    ORDER BY s.created_at ASC
-                ) FILTER (WHERE s.id IS NOT NULL),
-                '[]'::jsonb
-            ) AS "songs!: sqlx::types::Json<Vec<AlbumSongItem>>"
-        FROM albums a
-        JOIN artists ar ON ar.id = a.artist_id
-        LEFT JOIN songs s ON s.album_id = a.id AND s.status != 'Deleted'
-        WHERE a.id = $1 AND ar.user_id = $2 AND a.status != 'Deleted'
-        GROUP BY a.id, ar.name
-        "#,
-        album_id,
-        claims.sub
-    )
-    .fetch_optional(&state.db)
-    .await?
-    .ok_or(BSideError::NotFound)?;
-
-    Ok(Json(AlbumDetailedResponse {
-        id: album.id,
-        artist_id: album.artist_id,
-        artist_name: album.artist_name,
-        title: album.title,
-        genre: album.genre,
-        cover_url: album.cover_url,
-        status: album.status,
-        created_at: album.created_at,
-        songs: album.songs.0,
-    }))
-}
-
-#[utoipa::path(
     delete,
     path = "/albums/{album_id}",
     params(("album_id" = uuid::Uuid, Path, description = "Album ID")),
@@ -1202,86 +1133,58 @@ pub async fn get_album_by_id_handler(
 )]
 pub async fn delete_album_handler(
     State(state): State<AppState>,
+    claims: Claims,
     Path(album_id): Path<uuid::Uuid>,
-    axum::Extension(current_user_id): axum::Extension<Uuid>,
-) -> Result<Json<serde_json::Value>, BSideError> {
-    let mut tx = state.db.begin().await?;
-    let album_result = sqlx::query!(
-        "UPDATE albums
-        SET status = 'Deleted' WHERE id = $1 AND artist_id = $2",
+) -> Result<impl IntoResponse, BSideError> {
+    let album = sqlx::query!(
+        r#"
+        SELECT a.cover_url, ar.user_id
+        FROM albums a
+        JOIN artists ar ON a.artist_id = ar.id
+        WHERE a.id = $1
+        "#,
         album_id,
-        current_user_id
     )
-    .execute(&mut *tx)
-    .await?;
-    if album_result.rows_affected() == 0 {
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::NotFound)?;
+    let is_admin = sqlx::query_scalar!("SELECT role FROM users WHERE id = $1", claims.sub)
+        .fetch_optional(&state.db)
+        .await?
+        .map(|role| role == "Admin")
+        .unwrap_or(false);
+    if album.user_id != Some(claims.sub) || !is_admin {
         return Err(BSideError::UnauthorizedProfile);
     }
-    sqlx::query!(
-        "UPDATE songs
-        SET status = 'Deleted' WHERE album_id = $1",
-        album_id
-    )
-    .execute(&mut *tx)
-    .await?;
-    tx.commit().await?;
-    Ok(Json(serde_json::json!({
-        "status": "success",
-        "message": "Album and associated songs queued for deletion."
-    })))
-}
-
-pub async fn flush_deleted_albums_task(state: State<AppState>) -> Result<(), BSideError> {
-    let records = sqlx::query!(
-        r#"SELECT a.id, a.cover_url as "cover_url!"
-        FROM albums a
-        LEFT JOIN songs s ON a.id = s.album_id
-        WHERE a.status = 'Deleted' AND s.id IS NULL"#
-    )
-    .fetch_all(&state.db)
-    .await?;
-    let mut successfully_clean_ids: Vec<Uuid> = Vec::new();
-    for record in records {
-        if record.cover_url.ends_with("default_cover.jpg") {
-            successfully_clean_ids.push(
-                record
-                    .id
-                    .expect("Couldn't push ids on deleted albums task."),
-            );
-            continue;
+    let songs = sqlx::query!("SELECT audio_url FROM songs WHERE album_id = $1", album_id)
+        .fetch_all(&state.db)
+        .await?;
+    for song in songs {
+        if let Some(key) = song.audio_url.split('/').last() {
+            let _ = state
+                .aws_client
+                .delete_object()
+                .bucket("bside-tracks")
+                .key(key)
+                .send()
+                .await;
         }
-        if let Some(key) = record.cover_url.split('/').next_back() {
-            match state
+    }
+    if !album.cover_url.contains("default_") {
+        if let Some(key) = album.cover_url.split('/').last() {
+            let _ = state
                 .aws_client
                 .delete_object()
                 .bucket("bside-covers")
                 .key(key)
                 .send()
-                .await
-            {
-                Ok(_) => {
-                    successfully_clean_ids.push(
-                        record
-                            .id
-                            .expect("Couldn't push ids on deleted albums task."),
-                    );
-                }
-                Err(e) => {
-                    eprintln!("Failed to delete cover art {key}: {e}");
-                }
-            }
+                .await;
         }
     }
-    if !successfully_clean_ids.is_empty() {
-        sqlx::query!(
-            "DELETE FROM albums
-            WHERE id = ANY($1)",
-            &successfully_clean_ids
-        )
+    sqlx::query!("DELETE FROM albums WHERE id = $1", album_id)
         .execute(&state.db)
         .await?;
-    }
-    Ok(())
+    Ok(StatusCode::NO_CONTENT)
 }
 
 #[utoipa::path(
@@ -1311,6 +1214,7 @@ pub async fn create_song_handler(
     //     payload.album_id,
     //     claims.sub
     // )
+
     let is_owner = sqlx::query_scalar!(
         r#"
         SELECT EXISTS(
@@ -1480,21 +1384,9 @@ pub async fn verify_song_handler(
 
 pub async fn get_song_stream_url_handler(
     State(state): State<AppState>,
-    _claims: Claims,
+    auth: AnyAuth,
     Path(song_id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, BSideError> {
-    // old version:
-    // let song = sqlx::query!(
-    //     r#"
-    //     SELECT s.audio_url, s.status::text as "status!"
-    //     FROM songs s
-    //     JOIN albums a ON s.album_id = a.id
-    //     JOIN artists ar ON ar.id = a.artist_id
-    //     WHERE s.id = $1 AND ar.user_id = $2
-    //     "#,
-    //     song_id,
-    //     claims.sub
-    // )
     let song = sqlx::query!(
         r#"
         SELECT audio_url, status::text as "status!"
@@ -1510,23 +1402,33 @@ pub async fn get_song_stream_url_handler(
     if song.status != "Ready" {
         return Err(BSideError::SongNotReady);
     }
+    match auth {
+        AnyAuth::User(_claims) => {
+            let expires_in = PresigningConfig::expires_in(Duration::from_secs(300))
+                .map_err(|e| BSideError::S3Error(format!("Presigning config failure: {e}")))?;
+            let presigned_request = state
+                .aws_client
+                .get_object()
+                .bucket("bside-tracks")
+                .key(&song.audio_url)
+                .presigned(expires_in)
+                .await
+                .map_err(|e| BSideError::S3Error(format!("Presigning request failure: {e}")))?;
+            Ok(Json(serde_json::json!({
+                "url": presigned_request.uri().to_string(),
+                "expires_in": 300,
+                "is_anonymous": false,
+            })))
+        },
+        AnyAuth::Anonymous | AnyAuth::ApiKey => {
+            Ok(Json(serde_json::json!({
+                "url": "Try me :)",
+                "expires_in": 0,
+                "is_anonymous": true
+            })))
+        }
 
-    let expires_in = PresigningConfig::expires_in(Duration::from_secs(300))
-        .map_err(|e| BSideError::S3Error(format!("Presigning config failure: {e}")))?;
-
-    let presigned_request = state
-        .aws_client
-        .get_object()
-        .bucket("bside-tracks")
-        .key(&song.audio_url)
-        .presigned(expires_in)
-        .await
-        .map_err(|e| BSideError::S3Error(format!("Presigning request failure: {e}")))?;
-
-    Ok(Json(serde_json::json!({
-        "url": presigned_request.uri().to_string(),
-        "expires_in": 300
-    })))
+    }
 }
 
 #[utoipa::path(
@@ -1546,7 +1448,7 @@ pub async fn delete_song_handler(
     state: State<AppState>,
     claims: Claims,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
-) -> Result<axum::http::StatusCode, BSideError> {
+) -> Result<impl IntoResponse, BSideError> {
     let mut tx = state.db.begin().await?;
     let owner = sqlx::query!(
         "SELECT a.artist_id, s.duration_seconds 
@@ -1558,7 +1460,12 @@ pub async fn delete_song_handler(
     .fetch_optional(&mut *tx)
     .await?
     .ok_or(BSideError::NotFound)?;
-    if owner.artist_id != claims.sub {
+    let is_admin = sqlx::query_scalar!("SELECT role FROM users WHERE id = $1", claims.sub)
+        .fetch_optional(&state.db)
+        .await?
+        .map(|role| role == "Admin")
+        .unwrap_or(false);
+    if owner.artist_id != claims.sub && !is_admin {
         return Err(BSideError::UnauthorizedProfile);
     }
     sqlx::query!(
@@ -1579,86 +1486,24 @@ pub async fn delete_song_handler(
     )
     .execute(&mut *tx)
     .await?;
-    sqlx::query!(r#"UPDATE songs SET status = 'Deleted' WHERE id = $1 "#, id)
-        .execute(&mut *tx)
+    let song_record = sqlx::query!("SELECT audio_url FROM songs WHERE id = $1", id)
+        .fetch_optional(&state.db)
         .await?;
-    tx.commit().await?;
-    Ok(axum::http::StatusCode::NO_CONTENT)
-}
-
-pub async fn flush_deleted_songs_task(state: AppState) -> Result<u64, BSideError> {
-    let batch_size = 50;
-    let mut total_purged = 0;
-    loop {
-        let candidates = sqlx::query!(
-            r#"SELECT id, audio_url FROM songs WHERE status = 'Deleted' LIMIT $1"#,
-            batch_size
-        )
-        .fetch_all(&state.db)
-        .await?;
-        if candidates.is_empty() {
-            break;
-        }
-        let mut delete_builder = aws_sdk_s3::types::Delete::builder();
-        for song in &candidates {
-            let key = song
-                .audio_url
-                .split("bside-tracks/")
-                .last()
-                .unwrap_or(&song.audio_url);
-            let obj = aws_sdk_s3::types::ObjectIdentifier::builder()
+    if let Some(song) = song_record {
+        if let Some(key) = song.audio_url.split('/').last() {
+            let _ = state
+                .aws_client
+                .delete_object()
+                .bucket("bside-tracks")
                 .key(key)
-                .build()
-                .map_err(|e| BSideError::BadRequest(e.to_string()))?;
-            delete_builder = delete_builder.objects(obj);
-        }
-        let response = state
-            .aws_client
-            .delete_objects()
-            .bucket("bside-tracks")
-            .delete(
-                delete_builder
-                    .build()
-                    .map_err(|e| BSideError::BadRequest(e.to_string()))?,
-            )
-            .send()
-            .await
-            .map_err(|e| BSideError::S3Error(e.to_string()))?;
-        let mut successful_ids = Vec::new();
-        for deleted in response.deleted() {
-            if let Some(key) = deleted.key()
-                && let Some(c) = candidates.iter().find(|c| c.audio_url.ends_with(key))
-            {
-                successful_ids.push(c.id);
-            }
-        }
-        for err in response.errors() {
-            if err.code() == Some("NoSuchKey") {
-                if let Some(key) = err.key()
-                    && let Some(c) = candidates.iter().find(|c| c.audio_url.ends_with(key))
-                {
-                    successful_ids.push(c.id);
-                }
-            } else {
-                println!(
-                    "S3 Delete Error for {}: {:?}",
-                    err.key().unwrap_or("Unknown"),
-                    err.message()
-                );
-            }
-        }
-        if successful_ids.is_empty() {
-            break;
-        }
-        let result = sqlx::query!("DELETE FROM songs WHERE id = ANY($1)", &successful_ids[..])
-            .execute(&state.db)
-            .await?;
-        total_purged += result.rows_affected();
-        if candidates.len() < batch_size.try_into().expect("Couldn't allocate size ?") {
-            break;
+                .send()
+                .await;
         }
     }
-    Ok(total_purged)
+    sqlx::query!("DELETE FROM songs WHERE id = $1", id)
+        .execute(&state.db)
+        .await?;
+    Ok(axum::http::StatusCode::NO_CONTENT)
 }
 
 #[utoipa::path(

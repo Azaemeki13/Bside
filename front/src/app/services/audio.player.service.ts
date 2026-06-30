@@ -3,6 +3,7 @@ import { Injectable, PLATFORM_ID, computed, effect, inject, signal } from "@angu
 import { Howl } from "howler"
 import { Observable, Subscription } from "rxjs"
 import { VolumeService } from "./volume.service"
+import { AuthService } from "./auth.service"
 
 export type AudioFormat = 'flac' | 'wav';
 
@@ -31,6 +32,7 @@ export class AudioPlayerService {
     private readonly platformId = inject(PLATFORM_ID);
     private readonly volumeService = inject(VolumeService);
     private readonly isBrowser = isPlatformBrowser(this.platformId);
+    private readonly authService = inject(AuthService);
 
     private sound?: Howl;
     private progressTimer?: number;
@@ -182,15 +184,21 @@ export class AudioPlayerService {
         this.error.set(null);
 
         this.urlSub = entry.onRequestUrl().subscribe({
-            next: ({ url }) => {
+            next: (response: any) => {
                 if (token !== this.loadToken)
                     return;
+                if (response.is_anonymous || response.url == 'Try me :)') {
+                    this.isLoading.set(false);
+                    this.stop();
+                    this.authService.isTryMePopupOpen.set(true);
+                    return;
+                }
 
                 this.loadTrack({
                     id: entry.id,
                     title: entry.title,
                     artist: entry.artist,
-                    src: url,
+                    src: response.url,
                     format: entry.format,
                     coverUrl: entry.coverUrl,
                 }, token);

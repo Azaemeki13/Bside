@@ -13,6 +13,7 @@ export class AuthService {
     private apiUrl = environment.apiUrl;
     private readonly platformId = inject(PLATFORM_ID);
     private readonly http = inject(HttpClient);
+    readonly isTryMePopupOpen = signal<boolean>(false);
 
     currentUser = signal<UserProfile| null>(null);
 

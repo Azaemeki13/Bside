@@ -11,17 +11,16 @@ mod search;
 mod swagger;
 mod ws;
 
-use crate::auth::{Claims, PublicApiKey, auth_gate, bootstrap_admin};
+use crate::auth::{AnyAuth, Claims, auth_gate, bootstrap_admin};
 use crate::error::BSideError;
 use crate::handlers::{
     add_song_to_playlist_handler, admin_create_album_for_artist_handler, classic_auth_handler,
     contact_handler, create_album_handler, create_artist_handler, create_artist_request_handler,
     create_playlist_handler, create_song_handler, create_user_handler, delete_album_handler,
-    delete_playlist_handler, delete_song_handler, flush_deleted_albums_task,
-    flush_deleted_songs_task, get_album_by_id_handler, get_all_users_handler,
+    delete_playlist_handler, delete_song_handler, get_album_by_id_handler, get_all_users_handler,
     get_artist_requests_handler, get_artists_handler, get_conversation_messages_handler,
     get_conversations_handler, get_me_handler, get_my_albums_handler, get_my_playlists_handler,
-    get_playlist_by_id_handler, get_public_album_by_id_handler, get_public_artist_by_id_handler,
+    get_playlist_by_id_handler, get_artist_by_id_handler,
     get_song_stream_url_handler, get_user_by_id_handler, google_callback_handler,
     google_login_handler, google_signup_handler, mark_conversation_messages_as_read_handler,
     ping_handler, register_handler, remove_song_from_pl, review_artist_request_handler,
@@ -40,17 +39,16 @@ use crate::search::searcher;
 use crate::ws::ws_handler;
 use axum::{
     Router,
-    extract::{DefaultBodyLimit, State},
+    extract::{DefaultBodyLimit},
     http::Method,
     middleware::from_fn_with_state,
     routing::{delete, get, post, put},
 };
-use axum_governor::{GovernorConfigBuilder, GovernorLayer, Quota, nz, extractor::PeerIp};
+use axum_governor::{GovernorConfigBuilder, GovernorLayer, Quota, extractor::PeerIp, nz};
 use oauth2::{AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl, basic::BasicClient};
 use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, HeaderValue};
 use sqlx::postgres::PgPoolOptions;
 use std::env;
-use std::num::NonZeroU32;
 use std::sync::Arc;
 use std::time::Duration;
 use tower_http::cors::CorsLayer;
@@ -103,20 +101,6 @@ async fn main() {
         aws_client,
         network: network::NetworkState::new(),
     };
-    let gc_state = state.clone();
-    tokio::spawn(async move {
-        let mut interval = tokio::time::interval(Duration::from_mins(720));
-        loop {
-            interval.tick().await;
-            println!("Launching flush manager..");
-            if let Err(e) = flush_deleted_albums_task(State(gc_state.clone())).await {
-                eprintln!("Critical: Album deletion task failed completely {e}");
-            }
-            if let Err(e) = flush_deleted_songs_task(gc_state.clone()).await {
-                eprintln!("Critical: Song deletion task failed completely {e}");
-            }
-        }
-    });
     let cors = CorsLayer::new()
         .allow_origin(
             "http://localhost:4200"
@@ -140,15 +124,20 @@ async fn main() {
         .route("/ping", get(ping_handler))
         .route("/search", get(searcher))
         .route(
-            "/catalog/albums/{album_id}",
-            get(get_public_album_by_id_handler),
+            "/artists/{artist_id}",
+            get(get_artist_by_id_handler),
         )
         .route(
-            "/catalog/artists/{artist_id}",
-            get(get_public_artist_by_id_handler),
+            "/albums/{album_id}",
+            get(get_album_by_id_handler).delete(delete_album_handler),
+        )
+        .route(
+            "/songs/{song_id}/stream-url",
+            get(get_song_stream_url_handler),
         )
         .route("/contact", post(contact_handler))
-        .route("/ws", get(ws_handler));
+        .route("/ws", get(ws_handler))
+        .layer(GovernorLayer::new(governor_config));
 
     let protected_routes = Router::<AppState>::new()
         .route(
@@ -171,16 +160,9 @@ async fn main() {
             "/albums",
             get(get_my_albums_handler).post(create_album_handler),
         )
-        .route(
-            "/albums/{album_id}",
-            get(get_album_by_id_handler).delete(delete_album_handler),
-        )
+    
         .route("/songs", post(create_song_handler))
         .route("/songs/{song_id}/verify", put(verify_song_handler))
-        .route(
-            "/songs/{song_id}/stream-url",
-            get(get_song_stream_url_handler),
-        )
         .route("/songs/{id}", delete(delete_song_handler))
         .route(
             "/playlists",
@@ -216,7 +198,6 @@ async fn main() {
         .merge(public_routes)
         .merge(protected_routes)
         .layer(DefaultBodyLimit::max(750 * 1024 * 1024))
-        .layer(GovernorLayer::new(governor_config))
         .layer(cors)
         .with_state(state)
         .merge(
@@ -232,10 +213,10 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind(&listener_addr)
         .await
         .unwrap_or_else(|error| panic!("Tokio bind listener failed for {listener_addr}: {error}"));
-        axum::serve(
-            listener,
-            app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
-        )
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
+    )
     .await
     .expect("Axum failed to server Router with listener.");
 }

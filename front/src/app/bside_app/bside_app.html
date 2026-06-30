@@ -7,28 +7,35 @@
     </main>
     <app-sound-bar></app-sound-bar>
   </div>
-
-  @if (!authService.currentUser()) {
-    <div class="absolute inset-0 z-[900] backdrop-blur-sm bg-[#FFE6DB]/10 flex items-center justify-center pointer-events-auto">
-      <div class="pointer-events-auto flex items-center gap-6 px-8 py-7 text-[#FFE6DB] bg-[#0C060C] rounded-xl">
-        <img src="assets/offline.png" class="w-82 h-82 object-cover rounded-xl" alt="" />
-        <div class="flex flex-col items-center gap-2">
-          <h1 class="font-climate-crisis text-[5rem] leading-none">B-SIDE</h1>
-          <h2 class="font-raleway text-[1rem] font-black text-[#FFE6DB] text-center max-w-sm">
-            Your music, your vibe. Sign up or login to get started!
-          </h2>
-          <div class="flex gap-3 pt-4">
-            <a routerLink="/login"
-               class="cursor-pointer rounded-full px-5 py-2 font-raleway text-[1rem] font-medium bg-[#FFE6DB] text-[#1F0E1C]">
-              Log in
-            </a>
-            <a routerLink="/signup"
-               class="cursor-pointer rounded-full px-5 py-2 font-raleway text-[1rem] font-medium bg-[#FF5500] text-[#FFE6DB]">
-              Create account
-            </a>
+    @if (authService.isTryMePopupOpen()) {
+      <div class="absolute inset-0 z-[9999] backdrop-blur-sm bg-[#FFE6DB]/10 flex items-center justify-center pointer-events-auto"
+          (click)="authService.isTryMePopupOpen.set(false)">
+        <div class="pointer-events-auto flex items-center gap-6 px-8 py-7 text-[#FFE6DB] bg-[#0C060C] rounded-xl"
+            (click)="$event.stopPropagation()">
+          
+          <div class="flex flex-col items-center gap-2 text-center">
+            <h1 class="font-climate-crisis text-[3rem] leading-none">B-SIDE</h1>
+            <h2 class="font-raleway text-[1.2rem] font-black text-[#FFE6DB] max-w-sm mt-2">
+              Mode "Try Me" débloqué !
+            </h2>
+            <p class="font-raleway text-sm text-[#FFE6DB]/70 max-w-sm">
+              Vous découvrez notre catalogue en avant-première. Créez un compte gratuitement pour débloquer le streaming audio illimité.
+            </p>
+            
+            <div class="flex gap-3 pt-4">
+              <button (click)="authService.isTryMePopupOpen.set(false)"
+                      class="cursor-pointer rounded-full px-5 py-2 font-raleway text-[1rem] font-medium border border-[#FFE6DB]/30 text-[#FFE6DB]">
+                Continuer
+              </button>
+              <a routerLink="/signup" (click)="authService.isTryMePopupOpen.set(false)"
+                class="cursor-pointer rounded-full px-5 py-2 font-raleway text-[1rem] font-medium bg-[#FF5500] text-[#FFE6DB]">
+                Créer un compte
+              </a>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  }
+    }
 </div>
+
+

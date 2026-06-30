@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { LucideAngularModule, Play } from 'lucide-angular';
+import { LucideAngularModule, Play, X } from 'lucide-angular';
 import { Subscription } from 'rxjs';
 import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
 import { AlbumService } from '../../services/album.service';
@@ -21,12 +21,14 @@ export class ArtistDetail implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
 
   readonly playIcon = Play;
+  readonly x = X;
 
   artist: ArtistDetailResponse | null = null;
   isLoading = false;
   error = '';
   playbackError = '';
   activeSongId = '';
+  isTryMePopupOpen = false;
 
   private routeSub?: Subscription;
   private artistSub?: Subscription;
@@ -96,7 +98,7 @@ export class ArtistDetail implements OnInit, OnDestroy {
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    this.artistSub = this.artistService.getPublicArtist(artistId).subscribe({
+    this.artistSub = this.artistService.getArtist(artistId).subscribe({
       next: (artist) => {
         this.artist = artist;
         this.isLoading = false;

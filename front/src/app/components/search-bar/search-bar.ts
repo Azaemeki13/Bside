@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { LucideAngularModule, Search } from 'lucide-angular';
+import { LucideAngularModule, Search, X } from 'lucide-angular';
 import { Subject, Subscription, catchError, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
 import { SearchResult, SearchService } from '../../services/search.service';
 import { AlbumService } from '../../services/album.service';
@@ -27,6 +27,8 @@ export class SearchBar implements OnDestroy {
   protected isSearching = false;
   protected isOpen = false;
   protected error = '';
+  readonly x = X;
+  protected isTryMePopupOpen = false;
 
   constructor() {
     this.searchSub = this.query$
