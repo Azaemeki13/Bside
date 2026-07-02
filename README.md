@@ -166,3 +166,26 @@ For read DB example:
 docker exec -it bside_db_dev sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT id, username, email FROM users;"'
 
 docker exec -it bside_db_dev psql -U bside_admin -d bside_db
+
+To get a complete local DB for testing the chat/social features:
+
+1. Run the migrations.
+2. Then run the seed file:
+
+docker exec -i bside_db_dev psql -U bside_admin -d bside_db < back/seeds/chat_seed.sql
+
+Test accounts:
+
+luna.rivera@bside.local / Password123!        <- main account, with complete test data
+alex.martin@bside.local / Password123!
+maya.chen@bside.local / Password123!
+noah.bernard@bside.local / Password123!
+ethan.cole@bside.local / Password123!
+
+With Luna Rivera, you can test:
+- existing friends
+- incoming friend request
+- outgoing friend request
+- conversations
+- unread messages
+- online/offline status when another user opens the Social page
