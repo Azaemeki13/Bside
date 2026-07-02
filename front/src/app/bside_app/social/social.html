@@ -1,127 +1,253 @@
-<div class="py-6">
-  <p class="text-[#FFE6DB]">Social</p>
-</div>
-<div class="text-[#FFE6DB]">
-		
-	<h1>Social Chat Test</h1>
+<div class="social-page">
+  <header class="social-page__header">
+    <div>
+      <p class="social-page__eyebrow">B-Side Social</p>
+      <h1>Friends & Chat Demo</h1>
+    </div>
 
-	<p>
-	Current user:
-	{{ currentUser()?.username || 'Not logged in' }}
-	</p>
+    <button type="button" class="social-page__refresh" (click)="refreshSocialData()">
+      Refresh
+    </button>
+  </header>
 
-	<p>
-	WebSocket status:
-	{{ connectionState() }}
-	</p>
+  <section class="social-page__status">
+    <p>
+      Current user:
+      <strong>{{ currentUser()?.username || 'Not logged in' }}</strong>
+    </p>
 
-	@if (errorMessage) {
-	<p>
-		Error: {{ errorMessage }}
-	</p>
-	}
+    <p>
+      WebSocket:
+      <strong>{{ connectionState() }}</strong>
+    </p>
+  </section>
 
-	<hr />
+  @if (errorMessage) {
+    <p class="social-page__error">
+      {{ errorMessage }}
+    </p>
+  }
 
-	<h2>Users</h2>
+  <div class="social-layout">
+    <aside class="social-sidebar">
+      <section class="social-card">
+        <div class="social-card__header">
+          <h2>Friends</h2>
 
-	@if (isLoadingUsers) {
-	<p>Loading users...</p>
-	}
+          @if (isLoadingFriends) {
+            <span>Loading...</span>
+          }
+        </div>
 
-	@for (user of users; track user.id) {
-	<div>
-		<button type="button" (click)="startConversationWithUser(user)">
-		Talk to {{ user.username }}
-		</button>
+        @for (friend of friends; track friend.user_id) {
+          <div class="social-user-row">
+            <div class="social-user-row__main">
+              <span
+                class="social-user-row__dot"
+                [class.social-user-row__dot--online]="friend.is_online"
+              ></span>
 
-		<span>
-		{{ user.id }}
-		</span>
-	</div>
-	} @empty {
-	<p>No users found.</p>
-	}
+              <div>
+                <strong>{{ friend.username }}</strong>
+                <p>{{ friend.is_online ? 'Online' : 'Offline' }}</p>
+              </div>
+            </div>
 
-	<hr />
+            <div class="social-user-row__actions">
+              <button type="button" (click)="startConversationWithFriend(friend)">
+                Chat
+              </button>
 
-	<h2>Conversations</h2>
+              <button
+                type="button"
+                class="social-user-row__danger"
+                [disabled]="friendActionUserId === friend.user_id"
+                (click)="removeFriend(friend)"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <p class="social-card__empty">No friends yet.</p>
+        }
+      </section>
 
-	<button type="button" (click)="loadConversations()">
-	Reload conversations
-	</button>
+      <section class="social-card">
+        <div class="social-card__header">
+          <h2>Friend requests</h2>
 
-	@if (isLoadingConversations) {
-	<p>Loading conversations...</p>
-	}
+          @if (isLoadingFriendRequests) {
+            <span>Loading...</span>
+          }
+        </div>
 
-	@for (conversation of conversations; track conversation.other_user_id) {
-	<div>
-		<button type="button" (click)="selectConversation(conversation)">
-		{{ conversation.other_username }}
-		</button>
+        <h3>Incoming</h3>
 
-		<span>
-		Last message: {{ conversation.last_message || 'No message' }}
-		</span>
+        @for (request of friendRequests.incoming; track request.friendship_id) {
+          <div class="social-request-row">
+            <div>
+              <strong>{{ request.requester_username }}</strong>
+              <p>wants to add you</p>
+            </div>
 
-		@if (conversation.unread_count > 0) {
-		<strong>
-			Unread: {{ conversation.unread_count }}
-		</strong>
-		}
-	</div>
-	} @empty {
-	<p>No conversation yet.</p>
-	}
+            <div class="social-user-row__actions">
+              <button
+                type="button"
+                [disabled]="friendActionRequestId === request.friendship_id"
+                (click)="acceptFriendRequest(request)"
+              >
+                Accept
+              </button>
 
-	<hr />
+              <button
+                type="button"
+                class="social-user-row__danger"
+                [disabled]="friendActionRequestId === request.friendship_id"
+                (click)="rejectFriendRequest(request)"
+              >
+                Reject
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <p class="social-card__empty">No incoming request.</p>
+        }
 
-	@if (selectedConversation) {
-	<h2>
-		Chat with {{ selectedConversation.other_username }}
-	</h2>
+        <h3>Outgoing</h3>
 
-	@if (isLoadingMessages) {
-		<p>Loading messages...</p>
-	}
+        @for (request of friendRequests.outgoing; track request.friendship_id) {
+          <div class="social-request-row">
+            <div>
+              <strong>{{ request.addressee_username }}</strong>
+              <p>Request sent</p>
+            </div>
+          </div>
+        } @empty {
+          <p class="social-card__empty">No outgoing request.</p>
+        }
+      </section>
 
-	<div>
-		@for (message of messages; track message.id) {
-		<div>
-			@if (isOwnMessage(message)) {
-			<strong>Me:</strong>
-			} @else {
-			<strong>{{ selectedConversation.other_username }}:</strong>
-			}
+      <section class="social-card">
+        <div class="social-card__header">
+          <h2>All users</h2>
 
-			<span>
-			{{ message.content }}
-			</span>
+          @if (isLoadingUsers) {
+            <span>Loading...</span>
+          }
+        </div>
 
-			<small>
-			[{{ message.status }}]
-			</small>
-		</div>
-		} @empty {
-		<p>No message yet.</p>
-		}
-	</div>
+        @for (user of users; track user.id) {
+          <div class="social-user-row">
+            <div>
+              <strong>{{ user.username }}</strong>
+              <p>{{ user.email || user.id }}</p>
+            </div>
 
-	<div>
-		<input
-		type="text"
-		name="draftMessage"
-		[(ngModel)]="draftMessage"
-		placeholder="Type a message"
-		(keydown.enter)="sendMessage()"
-		/>
+            @if (isFriend(user.id)) {
+              <span class="social-badge">Friend</span>
+            } @else if (hasPendingOutgoingRequest(user.id)) {
+              <span class="social-badge">Pending</span>
+            } @else if (hasPendingIncomingRequest(user.id)) {
+              <span class="social-badge">Incoming</span>
+            } @else {
+              <button
+                type="button"
+                [disabled]="friendActionUserId === user.id"
+                (click)="sendFriendRequest(user)"
+              >
+                Add friend
+              </button>
+            }
+          </div>
+        } @empty {
+          <p class="social-card__empty">No users found.</p>
+        }
+      </section>
+    </aside>
 
-		<button type="button" (click)="sendMessage()">
-		Send
-		</button>
-	</div>
-	} @else {
-	<p>Select a user or a conversation to start chatting.</p>
-	}
+    <main class="social-chat">
+      <section class="social-card">
+        <div class="social-card__header">
+          <h2>Conversations</h2>
+
+          <button type="button" (click)="loadConversations()">
+            Reload
+          </button>
+        </div>
+
+        @if (isLoadingConversations) {
+          <p>Loading conversations...</p>
+        }
+
+        @for (conversation of conversations; track conversation.other_user_id) {
+          <button
+            type="button"
+            class="social-conversation"
+            [class.social-conversation--active]="
+              selectedConversation?.other_user_id === conversation.other_user_id
+            "
+            (click)="selectConversation(conversation)"
+          >
+            <div>
+              <strong>{{ conversation.other_username }}</strong>
+              <p>{{ conversation.last_message || 'No message' }}</p>
+            </div>
+
+            @if (conversation.unread_count > 0) {
+              <span class="social-conversation__unread">
+                {{ conversation.unread_count }}
+              </span>
+            }
+          </button>
+        } @empty {
+          <p class="social-card__empty">No conversation yet.</p>
+        }
+      </section>
+
+      <section class="social-card social-chat-box">
+        @if (selectedConversation) {
+          <div class="social-card__header">
+            <h2>Chat with {{ selectedConversation.other_username }}</h2>
+          </div>
+
+          @if (isLoadingMessages) {
+            <p>Loading messages...</p>
+          }
+
+          <div class="social-messages">
+            @for (message of messages; track message.id) {
+              <div
+                class="social-message"
+                [class.social-message--own]="isOwnMessage(message)"
+              >
+                <p>{{ message.content }}</p>
+                <small>{{ message.status }}</small>
+              </div>
+            } @empty {
+              <p class="social-card__empty">No message yet.</p>
+            }
+          </div>
+
+          <div class="social-chat-input">
+            <input
+              type="text"
+              name="draftMessage"
+              [(ngModel)]="draftMessage"
+              placeholder="Type a message"
+              (keydown.enter)="sendMessage()"
+            />
+
+            <button type="button" (click)="sendMessage()">
+              Send
+            </button>
+          </div>
+        } @else {
+          <p class="social-card__empty">
+            Select a friend or a conversation to start chatting.
+          </p>
+        }
+      </section>
+    </main>
+  </div>
 </div>

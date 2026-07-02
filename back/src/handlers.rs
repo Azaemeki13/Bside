@@ -851,11 +851,16 @@ pub async fn get_all_users_handler(
     _claims: Claims,
 ) -> Result<Json<Vec<User>>, BSideError> {
     let users = sqlx::query_as::<_, User>(
-        "SELECT id, username, created_at FROM users ORDER BY created_at ASC",
+        r#"
+        SELECT id, username, email, avatar_url, role, created_at
+        FROM users
+        ORDER BY created_at ASC
+        "#,
     )
-    .fetch_all(&state.db)
-    .await?;
-    Ok(axum::Json(users))
+        .fetch_all(&state.db)
+        .await?;
+
+    Ok(Json(users))
 }
 
 #[utoipa::path(
@@ -870,17 +875,37 @@ pub async fn get_all_users_handler(
     security(("Bearer" = [])),
     tags = ["Users"]
 )]
+// pub async fn get_user_by_id_handler(
+//     State(state): State<AppState>,
+//     Path(user_id): Path<uuid::Uuid>,
+//     _claims: Claims,
+// ) -> Result<Json<User>, BSideError> {
+//     let user =
+//         sqlx::query_as::<_, User>("SELECT id, username, created_at FROM users WHERE id = $1")
+//             .bind(user_id)
+//             .fetch_optional(&state.db)
+//             .await?
+//             .ok_or(BSideError::UserNotFound)?;
+//     Ok(Json(user))
+// }
+
 pub async fn get_user_by_id_handler(
     State(state): State<AppState>,
     Path(user_id): Path<uuid::Uuid>,
     _claims: Claims,
 ) -> Result<Json<User>, BSideError> {
-    let user =
-        sqlx::query_as::<_, User>("SELECT id, username, created_at FROM users WHERE id = $1")
-            .bind(user_id)
-            .fetch_optional(&state.db)
-            .await?
-            .ok_or(BSideError::UserNotFound)?;
+    let user = sqlx::query_as::<_, User>(
+        r#"
+        SELECT id, username, email, avatar_url, role, created_at
+        FROM users
+        WHERE id = $1
+        "#,
+    )
+        .bind(user_id)
+        .fetch_optional(&state.db)
+        .await?
+        .ok_or(BSideError::UserNotFound)?;
+
     Ok(Json(user))
 }
 

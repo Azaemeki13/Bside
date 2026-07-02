@@ -4,13 +4,17 @@ import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { environment } from '../../environment';
 import {
-  ChatConnectionState,
-  ChatMessage,
-  ChatUser,
-  ConversationListItem,
-  MarkMessagesReadResponse,
-  PrivateMessageClientPayload,
-  ServerWsMessage,
+	ChatConnectionState,
+	ChatMessage,
+	ChatUser,
+	ConversationListItem,
+	MarkMessagesReadResponse,
+	PrivateMessageClientPayload,
+	ServerWsMessage,
+	FriendListItem,
+	FriendRequestItem,
+	FriendRequestsResponse,
+	UserStatusResponse,
 } from '../models/chat.model';
 
 @Injectable({ providedIn: 'root' })
@@ -149,4 +153,38 @@ export class ChatService {
     const wsProtocol = protocol === 'https:' ? 'wss:' : 'ws:';
     return `${wsProtocol}//${host}/ws`;
   }
+
+  	getFriends(): Observable<FriendListItem[]> {
+		return this.http.get<FriendListItem[]>(`${this.apiUrl}/friends`);
+	}
+
+	getFriendRequests(): Observable<FriendRequestsResponse> {
+		return this.http.get<FriendRequestsResponse>(`${this.apiUrl}/friend-requests`);
+	}
+
+	sendFriendRequest(userId: string): Observable<FriendRequestItem> {
+		return this.http.post<FriendRequestItem>(`${this.apiUrl}/friends/${userId}`, {});
+	}
+
+	acceptFriendRequest(friendshipId: string): Observable<FriendRequestItem> {
+		return this.http.put<FriendRequestItem>(
+			`${this.apiUrl}/friend-requests/${friendshipId}/accept`,
+			{}
+		);
+	}
+
+	rejectFriendRequest(friendshipId: string): Observable<FriendRequestItem> {
+		return this.http.put<FriendRequestItem>(
+			`${this.apiUrl}/friend-requests/${friendshipId}/reject`,
+			{}
+		);
+	}
+
+	removeFriend(userId: string): Observable<void> {
+		return this.http.delete<void>(`${this.apiUrl}/friends/${userId}`);
+	}
+
+	getUserStatus(userId: string): Observable<UserStatusResponse> {
+		return this.http.get<UserStatusResponse>(`${this.apiUrl}/users/${userId}/status`);
+	}
 }

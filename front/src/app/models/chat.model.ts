@@ -70,3 +70,39 @@ export type ServerWsMessage =
     };
 
 export type ChatConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
+
+export interface FriendListItem {
+  friendship_id: string;
+  user_id: string;
+  username: string;
+  email: string;
+  avatar_url?: string | null;
+  role: string;
+  is_online: boolean;
+  friendship_created_at: string;
+}
+
+export interface FriendRequestItem {
+  friendship_id: string;
+
+  requester_id: string;
+  requester_username: string;
+  requester_avatar_url?: string | null;
+
+  addressee_id: string;
+  addressee_username: string;
+  addressee_avatar_url?: string | null;
+
+  status: string;
+  created_at: string;
+}
+
+export interface FriendRequestsResponse {
+  incoming: FriendRequestItem[];
+  outgoing: FriendRequestItem[];
+}
+
+export interface UserStatusResponse {
+  user_id: string;
+  is_online: boolean;
+}

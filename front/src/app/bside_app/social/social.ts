@@ -7,6 +7,9 @@ import {
   ChatMessage,
   ChatUser,
   ConversationListItem,
+  FriendListItem,
+  FriendRequestItem,
+  FriendRequestsResponse,
   ServerWsMessage,
 } from '../../models/chat.model';
 import { AuthService } from '../../services/auth.service';
@@ -19,37 +22,214 @@ import { ChatService } from '../../services/chat.service';
   imports: [CommonModule, FormsModule],
 })
 export class BsideSocial implements OnInit, OnDestroy {
-  private readonly chatService = inject(ChatService);
-  private readonly authService = inject(AuthService);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly platformId = inject(PLATFORM_ID);
+	private readonly chatService = inject(ChatService);
+	private readonly authService = inject(AuthService);
+	private readonly destroyRef = inject(DestroyRef);
+	private readonly platformId = inject(PLATFORM_ID);
 
-  protected readonly connectionState = this.chatService.connectionState;
-  protected readonly currentUser = this.authService.currentUser;
+	protected readonly connectionState = this.chatService.connectionState;
+	protected readonly currentUser = this.authService.currentUser;
 
-  protected conversations: ConversationListItem[] = [];
-  protected users: ChatUser[] = [];
-  protected selectedConversation: ConversationListItem | null = null;
-  protected messages: ChatMessage[] = [];
-  protected draftMessage = '';
-  protected errorMessage = '';
-  protected isLoadingConversations = false;
-  protected isLoadingMessages = false;
-  protected isLoadingUsers = false;
+	protected conversations: ConversationListItem[] = [];
+	protected users: ChatUser[] = [];
+	protected selectedConversation: ConversationListItem | null = null;
+	protected messages: ChatMessage[] = [];
+	protected draftMessage = '';
+	protected errorMessage = '';
+	protected isLoadingConversations = false;
+	protected isLoadingMessages = false;
+	protected isLoadingUsers = false;
 
-  ngOnInit(): void {
-	if (!isPlatformBrowser(this.platformId)) {
-    	return;
-  	}
-    this.chatService.connect();
-    this.listenToWebSocketMessages();
-    this.loadConversations();
-    //this.loadUsers();
-  }
+	protected friends: FriendListItem[] = [];
+	protected friendRequests: FriendRequestsResponse = {
+	incoming: [],
+	outgoing: [],
+	};
 
-  ngOnDestroy(): void {
-    this.chatService.disconnect();
-  }
+	protected isLoadingFriends = false;
+	protected isLoadingFriendRequests = false;
+	protected friendActionUserId: string | null = null;
+	protected friendActionRequestId: string | null = null;
+
+
+  	ngOnInit(): void {
+		if (!isPlatformBrowser(this.platformId)) {
+			return;
+		}
+
+		this.chatService.connect();
+		this.listenToWebSocketMessages();
+
+		this.loadConversations();
+		this.loadUsers();
+		this.loadFriends();
+		this.loadFriendRequests();
+	}
+
+	ngOnDestroy(): void {
+		this.chatService.disconnect();
+	}
+
+  	protected loadFriends(): void {
+		this.isLoadingFriends = true;
+
+		this.chatService
+			.getFriends()
+			.pipe(
+			finalize(() => {
+				this.isLoadingFriends = false;
+			})
+			)
+			.subscribe({
+			next: (friends) => {
+				this.friends = friends;
+			},
+			error: (error) => {
+				console.error('Failed to load friends:', error);
+				this.errorMessage = 'Failed to load friends.';
+			},
+			});
+	}
+
+	protected loadFriendRequests(): void {
+		this.isLoadingFriendRequests = true;
+
+		this.chatService
+			.getFriendRequests()
+			.pipe(
+			finalize(() => {
+				this.isLoadingFriendRequests = false;
+			})
+			)
+			.subscribe({
+			next: (friendRequests) => {
+				this.friendRequests = friendRequests;
+			},
+			error: (error) => {
+				console.error('Failed to load friend requests:', error);
+				this.errorMessage = 'Failed to load friend requests.';
+			},
+			});
+	}
+
+	protected sendFriendRequest(user: ChatUser): void {
+		this.friendActionUserId = user.id;
+		this.errorMessage = '';
+
+		this.chatService
+			.sendFriendRequest(user.id)
+			.pipe(
+			finalize(() => {
+				this.friendActionUserId = null;
+			})
+			)
+			.subscribe({
+			next: () => {
+				this.loadFriendRequests();
+			},
+			error: (error) => {
+				console.error('Failed to send friend request:', error);
+				this.errorMessage = 'Failed to send friend request.';
+			},
+			});
+	}
+
+	protected acceptFriendRequest(request: FriendRequestItem): void {
+		this.friendActionRequestId = request.friendship_id;
+		this.errorMessage = '';
+
+		this.chatService
+			.acceptFriendRequest(request.friendship_id)
+			.pipe(
+			finalize(() => {
+				this.friendActionRequestId = null;
+			})
+			)
+			.subscribe({
+			next: () => {
+				this.loadFriendRequests();
+				this.loadFriends();
+			},
+			error: (error) => {
+				console.error('Failed to accept friend request:', error);
+				this.errorMessage = 'Failed to accept friend request.';
+			},
+			});
+	}
+
+	protected rejectFriendRequest(request: FriendRequestItem): void {
+		this.friendActionRequestId = request.friendship_id;
+		this.errorMessage = '';
+
+		this.chatService
+			.rejectFriendRequest(request.friendship_id)
+			.pipe(
+			finalize(() => {
+				this.friendActionRequestId = null;
+			})
+			)
+			.subscribe({
+			next: () => {
+				this.loadFriendRequests();
+			},
+			error: (error) => {
+				console.error('Failed to reject friend request:', error);
+				this.errorMessage = 'Failed to reject friend request.';
+			},
+			});
+	}
+
+	protected removeFriend(friend: FriendListItem): void {
+		this.friendActionUserId = friend.user_id;
+		this.errorMessage = '';
+
+		this.chatService
+			.removeFriend(friend.user_id)
+			.pipe(
+			finalize(() => {
+				this.friendActionUserId = null;
+			})
+			)
+			.subscribe({
+			next: () => {
+				this.loadFriends();
+				this.loadFriendRequests();
+			},
+			error: (error) => {
+				console.error('Failed to remove friend:', error);
+				this.errorMessage = 'Failed to remove friend.';
+			},
+			});
+	}
+
+	protected startConversationWithFriend(friend: FriendListItem): void {
+		this.startConversationWithUser({
+			id: friend.user_id,
+			username: friend.username,
+			email: friend.email,
+			avatar_url: friend.avatar_url,
+			role: friend.role,
+		});
+	}
+
+	protected isFriend(userId: string): boolean {
+		return this.friends.some((friend) => friend.user_id === userId);
+	}
+
+	protected hasPendingOutgoingRequest(userId: string): boolean {
+		return this.friendRequests.outgoing.some((request) => request.addressee_id === userId);
+	}
+
+	protected hasPendingIncomingRequest(userId: string): boolean {
+		return this.friendRequests.incoming.some((request) => request.requester_id === userId);
+	}
+
+	protected refreshSocialData(): void {
+		this.loadUsers();
+		this.loadFriends();
+		this.loadFriendRequests();
+		this.loadConversations();
+	}
 
   protected loadConversations(): void {
     this.isLoadingConversations = true;
