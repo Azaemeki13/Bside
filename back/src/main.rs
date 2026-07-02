@@ -25,7 +25,9 @@ use crate::handlers::{
     google_login_handler, google_signup_handler, like_song_handler,
     mark_conversation_messages_as_read_handler, ping_handler, register_handler,
     remove_song_from_pl, review_artist_request_handler, unlike_song_handler,
-    update_playlist_handler, upload_avatar, verify_song_handler,
+    update_playlist_handler, upload_avatar, verify_song_handler, accept_friend_request_handler,
+    get_friend_requests_handler, get_friends_handler, get_user_status_handler,
+    reject_friend_request_handler, remove_friend_handler, send_friend_request_handler,
 };
 use crate::models::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
@@ -181,6 +183,21 @@ async fn main() {
             post(add_song_to_playlist_handler).delete(remove_song_from_pl),
         )
         .route("/users/{id}", get(get_user_by_id_handler))
+        .route("/friends", get(get_friends_handler))
+        .route(
+            "/friends/{user_id}",
+            post(send_friend_request_handler).delete(remove_friend_handler),
+        )
+        .route("/friend-requests", get(get_friend_requests_handler))
+        .route(
+            "/friend-requests/{friendship_id}/accept",
+            put(accept_friend_request_handler),
+        )
+        .route(
+            "/friend-requests/{friendship_id}/reject",
+            put(reject_friend_request_handler),
+        )
+        .route("/users/{id}/status", get(get_user_status_handler))
         .route(
             "/admin/artists/{artist_id}/albums",
             post(admin_create_album_for_artist_handler),

@@ -344,3 +344,43 @@ pub struct ConversationListItem {
 
     pub unread_count: i64,
 }
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct FriendListItem {
+    pub friendship_id: uuid::Uuid,
+    pub user_id: uuid::Uuid,
+    pub username: String,
+    pub email: String,
+    pub avatar_url: Option<String>,
+    pub role: String,
+    pub is_online: bool,
+    pub friendship_created_at: chrono::DateTime<chrono::Utc>,
+}
+
+#[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
+pub struct FriendRequestItem {
+    pub friendship_id: uuid::Uuid,
+
+    pub requester_id: uuid::Uuid,
+    pub requester_username: String,
+    pub requester_avatar_url: Option<String>,
+
+    pub addressee_id: uuid::Uuid,
+    pub addressee_username: String,
+    pub addressee_avatar_url: Option<String>,
+
+    pub status: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct FriendRequestsResponse {
+    pub incoming: Vec<FriendRequestItem>,
+    pub outgoing: Vec<FriendRequestItem>,
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct UserStatusResponse {
+    pub user_id: uuid::Uuid,
+    pub is_online: bool,
+}
