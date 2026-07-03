@@ -1,0 +1,113 @@
+<div class="flex h-full w-full flex-col overflow-hidden rounded-[1.563rem] bg-[#1F0E1C]">
+  <div class="relative p-4">
+    <div class="flex items-center gap-3 rounded-full border-2 border-[#FFE6DB] bg-[#FFE6DB]/10 px-4 py-3">
+      <lucide-icon [img]="search" class="h-5 w-5 shrink-0 text-[#FFE6DB] stroke-2"></lucide-icon>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        placeholder="Search a user"
+        class="min-w-0 flex-1 bg-transparent font-raleway text-sm font-bold text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none"
+        (input)="onSearchInput($event)"
+        (focus)="onSearchFocus()"
+        (blur)="closeSoon()"
+      />
+    </div>
+
+    @if (isSearchOpen) {
+      <div class="absolute left-4 right-4 top-[calc(100%+0.5rem)] z-50 max-h-80 overflow-y-auto rounded-[1.25rem] bg-[#431E3A] p-2 shadow-2xl">
+        @if (isLoadingUsers) {
+          <p class="px-4 py-3 font-raleway text-sm text-[#FFE6DB]/60">Searching users...</p>
+        } @else if (filteredUsers.length === 0) {
+          <p class="px-4 py-3 font-raleway text-sm text-[#FFE6DB]/60">No users found.</p>
+        } @else {
+          @for (user of filteredUsers; track user.id) {
+            <div class="flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-[#FFE6DB]/5">
+              <button
+                type="button"
+                class="flex min-w-0 flex-1 items-center gap-3 text-left"
+                (pointerdown)="openConversationForUser(user)"
+              >
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
+                  @if (user.avatar_url) {
+                    <img [src]="user.avatar_url" [alt]="user.username" class="h-full w-full object-cover" />
+                  } @else {
+                    <span class="font-raleway text-xs font-bold text-[#FFE6DB]">
+                      {{ getAvatarInitials(user.username) || 'U' }}
+                    </span>
+                  }
+                </div>
+
+                <div class="min-w-0 flex-1">
+                  <p class="truncate font-raleway text-sm font-bold text-[#FFE6DB]">{{ user.username }}</p>
+                </div>
+              </button>
+              @if (isFriend(user.id)) {
+                <span class="shrink-0 rounded-full bg-[#FFE6DB]/10 px-3 py-2 font-raleway text-[0.65rem] font-semibold text-[#FFE6DB]/60">
+                  Friends
+                </span>
+              } @else if (hasPendingOutgoingRequest(user.id)) {
+                <span class="shrink-0 rounded-full bg-[#FFE6DB]/10 px-3 py-2 font-raleway text-[0.65rem] font-semibold text-[#FFE6DB]/60">
+                  Pending
+                </span>
+              } @else if (hasPendingIncomingRequest(user.id)) {
+                <span class="shrink-0 rounded-full bg-[#FFE6DB]/10 px-3 py-2 font-raleway text-[0.65rem] font-semibold text-[#FFE6DB]/60">
+                  Invited you
+                </span>
+              } @else {
+                <button
+                  type="button"
+                  class="shrink-0 rounded-full bg-[#FFE6DB] p-2 text-[#1F0E1C] transition-colors hover:bg-[#F7D9C8] disabled:cursor-not-allowed disabled:opacity-50"
+                  [disabled]="friendActionUserId === user.id"
+                  [attr.aria-label]="'Send friend invite to ' + user.username"
+                  (pointerdown)="requestFriend(user)">
+                  <lucide-icon [img]="addFriend" class="h-4 w-4 stroke-[2.5]"></lucide-icon>
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+
+  <div class="flex-1 overflow-y-auto px-4 pb-4 pt-3">
+    @if (isLoadingConversations) {
+      <p class="px-1 pb-3 font-raleway text-sm text-[#FFE6DB]/60">Loading conversations...</p>
+    } @else if (conversationPreviews.length === 0) {
+      <p class="px-1 pb-3 font-raleway text-sm text-[#FFE6DB]/60">No conversations yet.</p>
+    } @else {
+      <div class="flex flex-col gap-2">
+        @for (conversation of conversationPreviews; track trackConversationById($index, conversation)) {
+          <button
+            type="button"
+            class="flex items-center gap-3 rounded-[1rem] px-3 py-3 text-left transition-colors hover:bg-[#FFE6DB]/10"
+            [ngClass]="selectedConversationId === conversation.other_user_id ? 'bg-[#FFE6DB]/10' : 'bg-[#FFE6DB]/5'"
+            (click)="conversationSelected.emit(conversation)"
+          >
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
+              @if (conversation.other_avatar_url) {
+                <img [src]="conversation.other_avatar_url" [alt]="conversation.other_username" class="h-full w-full object-cover" />
+              } @else {
+                <span class="font-raleway text-xs font-bold text-[#FFE6DB]">
+                  {{ getAvatarInitials(conversation.other_username) || 'U' }}
+                </span>
+              }
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <p class="truncate font-raleway text-sm font-bold text-[#FFE6DB]">{{ conversation.other_username }}</p>
+                @if (conversation.unread_count > 0) {
+                  <span class="shrink-0 rounded-full bg-[#FF5500] px-2 py-1 font-raleway text-[0.65rem] font-semibold text-[#FFE6DB]">
+                    {{ conversation.unread_count }}
+                  </span>
+                }
+              </div>
+              <p class="truncate font-raleway text-xs text-[#FFE6DB]/60">{{ conversation.last_message || 'No message yet' }}</p>
+            </div>
+          </button>
+        }
+      </div>
+    }
+  </div>
+</div>

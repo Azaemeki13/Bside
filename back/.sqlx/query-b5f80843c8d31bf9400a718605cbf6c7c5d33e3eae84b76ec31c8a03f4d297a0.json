@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT a.cover_url, ar.user_id\n        FROM albums a\n        JOIN artists ar ON a.artist_id = ar.id\n        WHERE a.id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "cover_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      true
+    ]
+  },
+  "hash": "b5f80843c8d31bf9400a718605cbf6c7c5d33e3eae84b76ec31c8a03f4d297a0"
+}

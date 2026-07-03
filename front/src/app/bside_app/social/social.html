@@ -1,4 +1,4 @@
-<div class="social-page">
+<!--<div class="social-page">
   <header class="social-page__header">
     <div>
       <p class="social-page__eyebrow">B-Side Social</p>
@@ -249,5 +249,36 @@
         }
       </section>
     </main>
+  </div>
+</div>-->
+
+<div class="flex h-full w-full gap-4 overflow-hidden">
+  <div class="h-full w-[22rem] shrink-0 overflow-hidden rounded-[1.563rem]">
+    <app-social-side-bar
+      [users]="users"
+      [conversations]="conversations"
+      [currentUserId]="currentUser()?.id ?? null"
+      [selectedConversationId]="selectedConversation?.other_user_id ?? null"
+      [isLoadingUsers]="isLoadingUsers"
+      [isLoadingConversations]="isLoadingConversations"
+      [friendIds]="friendIds"
+      [friendRequests]="friendRequests"
+      [friendActionUserId]="friendActionUserId"
+      (conversationSelected)="selectConversation($event)"
+      (userSelected)="startConversationWithUser($event)"
+      (friendRequested)="sendFriendRequest($event)"
+    ></app-social-side-bar>
+  </div>
+
+  <div class="min-w-0 flex-1 overflow-hidden rounded-[1.563rem]">
+    <app-social-chat></app-social-chat>
+  </div>
+
+  <div class="h-full w-[17.5rem] shrink-0 overflow-y-auto rounded-[1.563rem]">
+    <div class="flex flex-col gap-3 pr-1">
+      @for (share of [1, 2, 3, 4, 5]; track share) {
+        <app-social-share-card></app-social-share-card>
+      }
+    </div>
   </div>
 </div>

@@ -102,9 +102,9 @@
           <div class="w-[21rem] h-[21rem] rounded-[0.625rem] bg-[#FF5500] flex items-center justify-center">
             <lucide-icon [img]="heart" class="w-[6.5rem] h-[6.5rem] text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
           </div>
-          <div class="w-[21rem]">
+          <div class="w-[21rem] flex flex-col gap-1">
             <h2 class="font-climate-crisis text-[#FFE6DB] text-2xl truncate">Liked Songs</h2>
-            <h2 class="font-raleway text-[#FFE6DB]/70 text-2xl mt-1">Your liked songs</h2>
+            <p class="font-raleway text-[#FFE6DB]/70 text-sm font-bold truncate">Your liked songs</p>
           </div>
         } @else if (playlistService.selectedPlaylist(); as playlist) {
           <div class="w-[21rem] h-[21rem] rounded-[0.625rem] overflow-hidden border border-[#FFE6DB]/15">

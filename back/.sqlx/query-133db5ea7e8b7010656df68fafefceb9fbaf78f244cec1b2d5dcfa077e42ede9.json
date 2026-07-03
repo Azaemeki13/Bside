@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE messages\n        SET\n            status = 'read',\n            delivered_at = COALESCE(delivered_at, NOW()),\n            read_at = NOW()\n        WHERE\n            sender_id = $1\n            AND receiver_id = $2\n            AND read_at IS NULL\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "133db5ea7e8b7010656df68fafefceb9fbaf78f244cec1b2d5dcfa077e42ede9"
+}

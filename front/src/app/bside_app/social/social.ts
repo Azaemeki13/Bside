@@ -2,6 +2,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, DestroyRef, OnDestroy, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { LucideAngularModule} from 'lucide-angular';
 import { finalize } from 'rxjs';
 import {
   ChatMessage,
@@ -14,14 +15,18 @@ import {
 } from '../../models/chat.model';
 import { AuthService } from '../../services/auth.service';
 import { ChatService } from '../../services/chat.service';
+import { SocialSideBar } from '../../components/social-side-bar/social-side-bar';
+import { SocialShareCard } from '../../components/social-share-card/social-share-card';
+import { SocialChat } from '../../components/social-chat/social-chat';
 
 @Component({
   selector: 'app-bside-social',
   templateUrl: './social.html',
   styleUrl: './social.scss',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, SocialSideBar, SocialShareCard, SocialChat],
 })
 export class BsideSocial implements OnInit, OnDestroy {
+
 	private readonly chatService = inject(ChatService);
 	private readonly authService = inject(AuthService);
 	private readonly destroyRef = inject(DestroyRef);
@@ -45,6 +50,10 @@ export class BsideSocial implements OnInit, OnDestroy {
 	incoming: [],
 	outgoing: [],
 	};
+
+	protected get friendIds(): Set<string> {
+		return new Set(this.friends.map((friend) => friend.user_id));
+	}
 
 	protected isLoadingFriends = false;
 	protected isLoadingFriendRequests = false;

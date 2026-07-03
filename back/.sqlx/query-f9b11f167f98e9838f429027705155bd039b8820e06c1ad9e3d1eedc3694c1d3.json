@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            id,\n            title,\n            owner_id,\n            COALESCE(song_count, 0) as \"song_count!\",\n            is_public as \"is_public!\",\n            created_at as \"created_at!\",\n            cover_url\n        FROM playlists\n        WHERE owner_id = $1\n        ORDER BY created_at DESC\n        ",
+  "query": "\n        SELECT\n            id,\n            title,\n            owner_id,\n            COALESCE(song_count, 0) as \"song_count!\",\n            is_public as \"is_public!\",\n            created_at as \"created_at!\",\n            cover_url\n        FROM playlists\n        WHERE owner_id = $1 AND title != 'Liked Songs'\n        ORDER BY created_at DESC\n        ",
   "describe": {
     "columns": [
       {
@@ -54,5 +54,5 @@
       true
     ]
   },
-  "hash": "26e141c839510abd88e347955e5c39517d839b7818fc628bb37db6f029b808d7"
+  "hash": "f9b11f167f98e9838f429027705155bd039b8820e06c1ad9e3d1eedc3694c1d3"
 }

@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE friendships\n        SET status = 'rejected',\n            updated_at = NOW()\n        WHERE\n            id = $1\n            AND addressee_id = $2\n            AND status = 'pending'\n        RETURNING id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "ef1676f521288410351f578b1ad0197bcb81bf736d24a7ed1bacab65cff61c8b"
+}

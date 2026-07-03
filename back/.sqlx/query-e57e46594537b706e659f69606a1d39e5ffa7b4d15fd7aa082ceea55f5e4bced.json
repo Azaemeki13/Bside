@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO playlists (title, description, owner_id, is_public)\n        VALUES ('Liked Songs', 'Songs you liked', $1, false)\n        RETURNING\n            id,\n            title,\n            owner_id,\n            COALESCE(song_count, 0) as \"song_count!\",\n            is_public as \"is_public!\",\n            created_at as \"created_at!\",\n            cover_url\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "owner_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "song_count!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "is_public!",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at!",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "cover_url",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      null,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "e57e46594537b706e659f69606a1d39e5ffa7b4d15fd7aa082ceea55f5e4bced"
+}

@@ -1,0 +1,77 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            p.id,\n            p.title,\n            p.description,\n            p.owner_id,\n            p.cover_url,\n            u.username as owner_username,\n            p.total_duration as \"total_duration!\",\n            p.song_count as \"song_count!\",\n            p.is_public as \"is_public!\",\n            COALESCE(\n                (SELECT json_agg(json_build_object(\n                    'link_id', ps.id,\n                    'song_id', s.id,\n                    'title', s.title,\n                    'duration_seconds', s.duration_seconds,\n                    'position', ps.position,\n                    'audio_url', s.audio_url,\n                    'status', s.status,\n                    'artist_name', ar.name,\n                    'cover_url', a.cover_url\n                ) ORDER BY ps.position)\n                 FROM playlist_songs ps\n                 JOIN songs s ON ps.song_id = s.id\n                 JOIN albums a ON s.album_id = a.id\n                 JOIN artists ar ON a.artist_id = ar.id\n                 WHERE ps.playlist_id = p.id\n                ), '[]'\n            ) as \"songs!: sqlx::types::Json<Vec<PlaylistSongItem>>\"\n        FROM playlists p\n        JOIN users u ON p.owner_id = u.id\n        WHERE p.id = $1 AND p.owner_id = $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "owner_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "cover_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "owner_username",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "total_duration!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "song_count!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "is_public!",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 9,
+        "name": "songs!: sqlx::types::Json<Vec<PlaylistSongItem>>",
+        "type_info": "Json"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      null
+    ]
+  },
+  "hash": "f7d9753fd17a5eb96919f649bc35493c818411b7fac79bc754a41d7eb92ae2e1"
+}
