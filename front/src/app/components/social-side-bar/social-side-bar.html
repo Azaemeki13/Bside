@@ -1,17 +1,93 @@
 <div class="flex h-full w-full flex-col overflow-hidden rounded-[1.563rem] bg-[#1F0E1C]">
   <div class="relative p-4">
-    <div class="flex items-center gap-3 rounded-full border-2 border-[#FFE6DB] bg-[#FFE6DB]/10 px-4 py-3">
-      <lucide-icon [img]="search" class="h-5 w-5 shrink-0 text-[#FFE6DB] stroke-2"></lucide-icon>
-      <input
-        type="text"
-        [(ngModel)]="searchQuery"
-        placeholder="Search a user"
-        class="min-w-0 flex-1 bg-transparent font-raleway text-sm font-bold text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none"
-        (input)="onSearchInput($event)"
-        (focus)="onSearchFocus()"
-        (blur)="closeSoon()"
-      />
+    <div class="flex items-center gap-2">
+      <div class="flex min-w-0 flex-1 items-center gap-3 rounded-full border-2 border-[#FFE6DB] bg-[#FFE6DB]/10 px-4 py-3">
+        <lucide-icon [img]="search" class="h-5 w-5 shrink-0 text-[#FFE6DB] stroke-2"></lucide-icon>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          placeholder="Search a user"
+          class="min-w-0 flex-1 bg-transparent font-raleway text-sm font-bold text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none"
+          (input)="onSearchInput($event)"
+          (focus)="onSearchFocus()"
+          (blur)="closeSoon()"
+        />
+      </div>
+
+      <button
+        type="button"
+        class="relative flex h-[2.875rem] w-[2.875rem] shrink-0 items-center justify-center rounded-full border-2 border-[#FFE6DB] bg-[#FFE6DB]/10 text-[#FFE6DB] transition-colors hover:bg-[#FFE6DB]/20"
+        aria-label="Friend requests"
+        [attr.aria-expanded]="isRequestsOpen"
+        (click)="toggleRequests()"
+      >
+        <lucide-icon [img]="bell" class="h-5 w-5 stroke-2"></lucide-icon>
+
+        @if (friendRequests.incoming.length > 0) {
+          <span class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FF5500] px-1 font-raleway text-[0.65rem] font-bold text-[#FFE6DB]">
+            {{ friendRequests.incoming.length }}
+          </span>
+        }
+      </button>
     </div>
+
+    @if (isRequestsOpen) {
+      <div class="absolute right-4 top-[calc(100%+0.5rem)] z-50 w-80 max-h-96 overflow-y-auto rounded-[1.25rem] bg-[#431E3A] p-2 shadow-2xl">
+        <p class="px-3 pb-2 pt-1 font-raleway text-xs font-bold uppercase tracking-wide text-[#FFE6DB]/50">
+          Friend requests
+        </p>
+
+        @if (friendRequests.incoming.length === 0) {
+          <p class="px-4 py-3 font-raleway text-sm text-[#FFE6DB]/60">No pending requests.</p>
+        } @else {
+          @for (request of friendRequests.incoming; track request.friendship_id) {
+            <div class="flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-[#FFE6DB]/5">
+              <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
+                @if (request.requester_avatar_url && !brokenAvatarIds.has(request.requester_id)) {
+                  <img
+                    [src]="request.requester_avatar_url"
+                    [alt]="request.requester_username"
+                    class="h-full w-full object-cover"
+                    (error)="onAvatarError(request.requester_id)"
+                  />
+                } @else {
+                  <span class="font-raleway text-xs font-bold text-[#FFE6DB]">
+                    {{ getAvatarInitials(request.requester_username) || 'U' }}
+                  </span>
+                }
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <p class="truncate font-raleway text-sm font-bold text-[#FFE6DB]">{{ request.requester_username }}</p>
+                <p class="truncate font-raleway text-xs text-[#FFE6DB]/60">wants to be friends</p>
+              </div>
+
+              <div class="flex shrink-0 items-center gap-2">
+                <button
+                  type="button"
+                  class="flex h-8 w-8 items-center justify-center rounded-full bg-[#FFE6DB] text-[#1F0E1C] transition-colors hover:bg-[#F7D9C8] disabled:cursor-not-allowed disabled:opacity-50"
+                  [disabled]="friendActionRequestId === request.friendship_id"
+                  [attr.aria-label]="'Accept ' + request.requester_username"
+                  (click)="acceptRequest(request)"
+                >
+                  <lucide-icon [img]="check" class="h-4 w-4 stroke-[2.5]"></lucide-icon>
+                </button>
+
+                <button
+                  type="button"
+                  class="flex h-8 w-8 items-center justify-center rounded-full bg-[#FFE6DB]/10 text-[#FFE6DB] transition-colors hover:bg-[#FFE6DB]/20 disabled:cursor-not-allowed disabled:opacity-50"
+                  [disabled]="friendActionRequestId === request.friendship_id"
+                  [attr.aria-label]="'Reject ' + request.requester_username"
+                  (click)="rejectRequest(request)"
+                >
+                  <lucide-icon [img]="x" class="h-4 w-4 stroke-[2.5]"></lucide-icon>
+                </button>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    }
 
     @if (isSearchOpen) {
       <div class="absolute left-4 right-4 top-[calc(100%+0.5rem)] z-50 max-h-80 overflow-y-auto rounded-[1.25rem] bg-[#431E3A] p-2 shadow-2xl">
@@ -28,8 +104,13 @@
                 (pointerdown)="openConversationForUser(user)"
               >
                 <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
-                  @if (user.avatar_url) {
-                    <img [src]="user.avatar_url" [alt]="user.username" class="h-full w-full object-cover" />
+                  @if (user.avatar_url && !brokenAvatarIds.has(user.id)) {
+                    <img
+                      [src]="user.avatar_url"
+                      [alt]="user.username"
+                      class="h-full w-full object-cover"
+                      (error)="onAvatarError(user.id)"
+                    />
                   } @else {
                     <span class="font-raleway text-xs font-bold text-[#FFE6DB]">
                       {{ getAvatarInitials(user.username) || 'U' }}
@@ -80,30 +161,50 @@
         @for (conversation of conversationPreviews; track trackConversationById($index, conversation)) {
           <button
             type="button"
-            class="flex items-center gap-3 rounded-[1rem] px-3 py-3 text-left transition-colors hover:bg-[#FFE6DB]/10"
-            [ngClass]="selectedConversationId === conversation.other_user_id ? 'bg-[#FFE6DB]/10' : 'bg-[#FFE6DB]/5'"
+            class="flex items-center gap-3 rounded-[1rem] px-3 py-3 text-left transition-colors hover:bg-[#170814] cursor-pointer"
+            [ngClass]="selectedConversationId === conversation.other_user_id ? 'bg-[#170814]' : 'bg-transparent'"
             (click)="conversationSelected.emit(conversation)"
           >
-            <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
-              @if (conversation.other_avatar_url) {
-                <img [src]="conversation.other_avatar_url" [alt]="conversation.other_username" class="h-full w-full object-cover" />
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
+              @if (conversation.other_avatar_url && !brokenAvatarIds.has(conversation.other_user_id)) {
+                <img
+                  [src]="conversation.other_avatar_url"
+                  [alt]="conversation.other_username"
+                  class="h-full w-full object-cover"
+                  (error)="onAvatarError(conversation.other_user_id)"
+                />
               } @else {
-                <span class="font-raleway text-xs font-bold text-[#FFE6DB]">
+                <span class="font-raleway text-sm font-bold text-[#FFE6DB]">
                   {{ getAvatarInitials(conversation.other_username) || 'U' }}
                 </span>
               }
             </div>
 
             <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <p class="truncate font-raleway text-sm font-bold text-[#FFE6DB]">{{ conversation.other_username }}</p>
+              <p class="truncate font-raleway text-sm font-bold text-[#FFE6DB]">
+                {{ conversation.other_username }}
+              </p>
+
+              <div class="flex min-w-0 gap-1">
+                <p
+                  class="min-w-0 flex-1 whitespace-nowrap font-raleway text-xs font-bold text-[#FFE6DB] truncate"
+                  [ngClass]="conversation.unread_count > 0 ? 'font-bold' : 'font-normal'"
+                >
+                  {{ conversation.last_message || 'No message yet' }}
+                </p>
+
+                @if (conversation.last_message) {
+                  <p class="shrink-0 whitespace-nowrap font-raleway text-xs font-bold text-[#FFE6DB]/50">
+                    | {{ timeAgo(conversation.last_message_at) }}
+                  </p>
+                }
+
                 @if (conversation.unread_count > 0) {
                   <span class="shrink-0 rounded-full bg-[#FF5500] px-2 py-1 font-raleway text-[0.65rem] font-semibold text-[#FFE6DB]">
                     {{ conversation.unread_count }}
                   </span>
                 }
               </div>
-              <p class="truncate font-raleway text-xs text-[#FFE6DB]/60">{{ conversation.last_message || 'No message yet' }}</p>
             </div>
           </button>
         }

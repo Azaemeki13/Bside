@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Search, UserRoundPlus } from 'lucide-angular';
+import { Bell, Check, LucideAngularModule, Search, UserRoundPlus, X } from 'lucide-angular';
 import {
   ChatUser,
   ConversationListItem,
+  FriendRequestItem,
   FriendRequestsResponse,
 } from '../../models/chat.model';
 
@@ -25,16 +26,33 @@ export class SocialSideBar {
   @Input() friendIds: Set<string> = new Set();
   @Input() friendRequests: FriendRequestsResponse = { incoming: [], outgoing: [] };
   @Input() friendActionUserId: string | null = null;
+  @Input() friendActionRequestId: string | null = null;
 
   @Output() conversationSelected = new EventEmitter<ConversationListItem>();
   @Output() userSelected = new EventEmitter<ChatUser>();
   @Output() friendRequested = new EventEmitter<ChatUser>();
+  @Output() friendAccepted = new EventEmitter<FriendRequestItem>();
+  @Output() friendRejected = new EventEmitter<FriendRequestItem>();
+
+  private readonly elementRef = inject(ElementRef<HTMLElement>);
 
   searchQuery = '';
   isSearchOpen = false;
+  isRequestsOpen = false;
+  brokenAvatarIds = new Set<string>();
 
   protected readonly search = Search;
   protected readonly addFriend = UserRoundPlus;
+  protected readonly bell = Bell;
+  protected readonly check = Check;
+  protected readonly x = X;
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.isRequestsOpen && !this.elementRef.nativeElement.contains(event.target as Node)) {
+      this.isRequestsOpen = false;
+    }
+  }
 
   get filteredUsers(): ChatUser[] {
     const query = this.searchQuery.trim().toLowerCase();
@@ -100,6 +118,23 @@ export class SocialSideBar {
     this.clearSearch();
   }
 
+  toggleRequests(): void {
+    this.isRequestsOpen = !this.isRequestsOpen;
+
+    if (this.isRequestsOpen) {
+      this.isSearchOpen = false;
+    }
+  }
+
+  acceptRequest(request: FriendRequestItem): void {
+    this.friendAccepted.emit(request);
+    this.isRequestsOpen = false;
+  }
+
+  rejectRequest(request: FriendRequestItem): void {
+    this.friendRejected.emit(request);
+  }
+
   isFriend(userId: string): boolean {
     return this.friendIds.has(userId);
   }
@@ -121,8 +156,37 @@ export class SocialSideBar {
       .join('');
   }
 
+  onAvatarError(id: string): void {
+    this.brokenAvatarIds.add(id);
+  }
+
   trackConversationById(_: number, conversation: ConversationListItem): string {
     return conversation.other_user_id;
   }
 
+  timeAgo(dateString: string): string {
+    const then = new Date(dateString).getTime();
+
+    if (Number.isNaN(then)) return '';
+
+    const seconds = Math.max(0, Math.floor((Date.now() - then) / 1000));
+
+    if (seconds < 60) return 'just now';
+
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 5) return 'a few minutes ago';
+    if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days} day${days === 1 ? '' : 's'} ago`;
+
+    const months = Math.floor(days / 30);
+    if (months < 12) return `${months} month${months === 1 ? '' : 's'} ago`;
+
+    const years = Math.floor(months / 12);
+    return `${years} year${years === 1 ? '' : 's'} ago`;
+  }
 }

@@ -264,14 +264,23 @@
       [friendIds]="friendIds"
       [friendRequests]="friendRequests"
       [friendActionUserId]="friendActionUserId"
+      [friendActionRequestId]="friendActionRequestId"
       (conversationSelected)="selectConversation($event)"
       (userSelected)="startConversationWithUser($event)"
       (friendRequested)="sendFriendRequest($event)"
+      (friendAccepted)="acceptFriendRequest($event)"
+      (friendRejected)="rejectFriendRequest($event)"
     ></app-social-side-bar>
   </div>
 
   <div class="min-w-0 flex-1 overflow-hidden rounded-[1.563rem]">
-    <app-social-chat></app-social-chat>
+    <app-social-chat
+      [selectedConversation]="selectedConversation"
+      [messages]="messages"
+      [currentUserId]="currentUser()?.id ?? null"
+      [isLoadingMessages]="isLoadingMessages"
+      (messageSent)="sendMessage($event)"
+    ></app-social-chat>
   </div>
 
   <div class="h-full w-[17.5rem] shrink-0 overflow-y-auto rounded-[1.563rem]">

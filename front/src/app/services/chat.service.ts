@@ -25,6 +25,9 @@ export class ChatService {
   private readonly wsMessagesSubject = new Subject<ServerWsMessage>();
 
   private socket: WebSocket | null = null;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private reconnectAttempts = 0;
+  private shouldReconnect = true;
 
   readonly connectionState = signal<ChatConnectionState>('disconnected');
   readonly wsMessages$ = this.wsMessagesSubject.asObservable();
@@ -48,6 +51,13 @@ export class ChatService {
   connect(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
+    this.shouldReconnect = true;
+
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+
     if (
       this.socket?.readyState === WebSocket.OPEN ||
       this.socket?.readyState === WebSocket.CONNECTING
@@ -68,6 +78,7 @@ export class ChatService {
     this.socket = socket;
 
     socket.onopen = () => {
+      this.reconnectAttempts = 0;
       this.connectionState.set('connected');
     };
 
@@ -89,13 +100,36 @@ export class ChatService {
       }
 
       this.connectionState.set('disconnected');
+      this.scheduleReconnect();
     };
   }
 
   disconnect(): void {
+    this.shouldReconnect = false;
+
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+
+    this.reconnectAttempts = 0;
     this.socket?.close();
     this.socket = null;
     this.connectionState.set('disconnected');
+  }
+
+  private scheduleReconnect(): void {
+    if (!this.shouldReconnect || !isPlatformBrowser(this.platformId)) return;
+    if (this.reconnectTimer) return;
+    if (!localStorage.getItem('auth_token')) return;
+
+    const delay = Math.min(1000 * 2 ** this.reconnectAttempts, 15000);
+    this.reconnectAttempts++;
+
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+      this.connect();
+    }, delay);
   }
 
   sendPrivateMessage(toUserId: string, content: string): boolean {

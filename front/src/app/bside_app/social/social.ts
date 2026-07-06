@@ -1,5 +1,5 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, DestroyRef, OnDestroy, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule} from 'lucide-angular';
@@ -31,6 +31,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 	private readonly authService = inject(AuthService);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly platformId = inject(PLATFORM_ID);
+	private readonly cdr = inject(ChangeDetectorRef);
 
 	protected readonly connectionState = this.chatService.connectionState;
 	protected readonly currentUser = this.authService.currentUser;
@@ -39,7 +40,6 @@ export class BsideSocial implements OnInit, OnDestroy {
 	protected users: ChatUser[] = [];
 	protected selectedConversation: ConversationListItem | null = null;
 	protected messages: ChatMessage[] = [];
-	protected draftMessage = '';
 	protected errorMessage = '';
 	protected isLoadingConversations = false;
 	protected isLoadingMessages = false;
@@ -87,6 +87,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 			.pipe(
 			finalize(() => {
 				this.isLoadingFriends = false;
+				this.cdr.detectChanges();
 			})
 			)
 			.subscribe({
@@ -108,6 +109,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 			.pipe(
 			finalize(() => {
 				this.isLoadingFriendRequests = false;
+				this.cdr.detectChanges();
 			})
 			)
 			.subscribe({
@@ -130,6 +132,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 			.pipe(
 			finalize(() => {
 				this.friendActionUserId = null;
+				this.cdr.detectChanges();
 			})
 			)
 			.subscribe({
@@ -152,12 +155,18 @@ export class BsideSocial implements OnInit, OnDestroy {
 			.pipe(
 			finalize(() => {
 				this.friendActionRequestId = null;
+				this.cdr.detectChanges();
 			})
 			)
 			.subscribe({
 			next: () => {
 				this.loadFriendRequests();
 				this.loadFriends();
+				this.startConversationWithUser({
+					id: request.requester_id,
+					username: request.requester_username,
+					avatar_url: request.requester_avatar_url,
+				});
 			},
 			error: (error) => {
 				console.error('Failed to accept friend request:', error);
@@ -175,6 +184,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 			.pipe(
 			finalize(() => {
 				this.friendActionRequestId = null;
+				this.cdr.detectChanges();
 			})
 			)
 			.subscribe({
@@ -197,6 +207,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 			.pipe(
 			finalize(() => {
 				this.friendActionUserId = null;
+				this.cdr.detectChanges();
 			})
 			)
 			.subscribe({
@@ -249,6 +260,7 @@ export class BsideSocial implements OnInit, OnDestroy {
       .pipe(
         finalize(() => {
           this.isLoadingConversations = false;
+          this.cdr.detectChanges();
         })
       )
       .subscribe({
@@ -271,6 +283,7 @@ export class BsideSocial implements OnInit, OnDestroy {
       .pipe(
         finalize(() => {
           this.isLoadingUsers = false;
+          this.cdr.detectChanges();
         })
       )
       .subscribe({
@@ -329,6 +342,7 @@ export class BsideSocial implements OnInit, OnDestroy {
       .pipe(
         finalize(() => {
           this.isLoadingMessages = false;
+          this.cdr.detectChanges();
         })
       )
       .subscribe({
@@ -342,16 +356,16 @@ export class BsideSocial implements OnInit, OnDestroy {
       });
   }
 
-  protected sendMessage(): void {
+  protected sendMessage(content: string): void {
     const selectedConversation = this.selectedConversation;
     const currentUser = this.currentUser();
-    const content = this.draftMessage.trim();
+    const trimmedContent = content.trim();
 
-    if (!selectedConversation || !currentUser || !content) return;
+    if (!selectedConversation || !currentUser || !trimmedContent) return;
 
     const isSentToSocket = this.chatService.sendPrivateMessage(
       selectedConversation.other_user_id,
-      content
+      trimmedContent
     );
 
     if (!isSentToSocket) {
@@ -364,7 +378,7 @@ export class BsideSocial implements OnInit, OnDestroy {
       id: this.createLocalMessageId(),
       sender_id: currentUser.id,
       receiver_id: selectedConversation.other_user_id,
-      content,
+      content: trimmedContent,
       status: 'sent',
       created_at: new Date().toISOString(),
       delivered_at: null,
@@ -372,7 +386,6 @@ export class BsideSocial implements OnInit, OnDestroy {
     };
 
     this.messages = [...this.messages, optimisticMessage];
-    this.draftMessage = '';
     this.upsertConversationAfterLocalSend(selectedConversation, optimisticMessage);
   }
 
@@ -413,6 +426,8 @@ export class BsideSocial implements OnInit, OnDestroy {
         this.errorMessage = message.message;
         break;
     }
+
+    this.cdr.detectChanges();
   }
 
   private handleIncomingPrivateMessage(
@@ -471,6 +486,7 @@ export class BsideSocial implements OnInit, OnDestroy {
         );
 
         this.refreshSelectedConversationReference();
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Failed to mark messages as read:', error);
