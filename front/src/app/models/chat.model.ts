@@ -1,10 +1,27 @@
 export type MessageStatus = 'sent' | 'delivered' | 'read' | 'sending' | string;
 
+export type ChatMessageType = 'text' | 'song';
+
+export interface SharedSong {
+  id: string;
+  title: string;
+  duration_seconds: number;
+  audio_url: string;
+  status: string;
+  artist_name: string;
+  cover_url: string;
+}
+
 export interface ChatMessage {
   id: string;
   sender_id: string;
   receiver_id: string;
   content: string;
+
+  message_type: ChatMessageType;
+  song_id?: string | null;
+  shared_song?: SharedSong | null;
+
   status: MessageStatus;
   created_at: string;
   delivered_at?: string | null;
@@ -42,6 +59,8 @@ export interface PrivateMessageClientPayload {
   type: 'private_message';
   to_user_id: string;
   content: string;
+  message_type: ChatMessageType;
+  song_id: string | null;
 }
 
 export type ServerWsMessage =
@@ -50,6 +69,11 @@ export type ServerWsMessage =
       message_id: string;
       from_user_id: string;
       content: string;
+
+      message_type: ChatMessageType;
+      song_id?: string | null;
+      shared_song?: SharedSong | null;
+
       created_at: string;
     }
   | {

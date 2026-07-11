@@ -12,6 +12,7 @@ import {
   FriendRequestItem,
   FriendRequestsResponse,
   ServerWsMessage,
+  SharedSong,
 } from '../../models/chat.model';
 import { AuthService } from '../../services/auth.service';
 import { ChatService } from '../../services/chat.service';
@@ -23,7 +24,7 @@ import { SocialChat } from '../../components/social-chat/social-chat';
   selector: 'app-bside-social',
   templateUrl: './social.html',
   styleUrl: './social.scss',
-  imports: [CommonModule, FormsModule, LucideAngularModule, SocialSideBar, SocialShareCard, SocialChat],
+  imports: [CommonModule, FormsModule, LucideAngularModule, SocialSideBar, SocialShareCard, SocialChat, ],
 })
 export class BsideSocial implements OnInit, OnDestroy {
 
@@ -78,6 +79,16 @@ export class BsideSocial implements OnInit, OnDestroy {
 	ngOnDestroy(): void {
 		this.chatService.disconnect();
 	}
+
+	protected readonly testSong: SharedSong = {
+		id: '90000000-0000-4000-8000-000000000003',
+		title: 'WebSocket Test Song',
+		duration_seconds: 180,
+		audio_url: 'test/websocket-test-song.wav',
+		status: 'Ready',
+		artist_name: 'WebSocket Test Artist',
+		cover_url: 'http://localhost:9000/bside-covers/default_cover.jpg',
+	};
 
   	protected loadFriends(): void {
 		this.isLoadingFriends = true;
@@ -375,18 +386,69 @@ export class BsideSocial implements OnInit, OnDestroy {
     }
 
     const optimisticMessage: ChatMessage = {
-      id: this.createLocalMessageId(),
-      sender_id: currentUser.id,
-      receiver_id: selectedConversation.other_user_id,
-      content: trimmedContent,
-      status: 'sent',
-      created_at: new Date().toISOString(),
-      delivered_at: null,
-      read_at: null,
-    };
+		id: this.createLocalMessageId(),
+		sender_id: currentUser.id,
+		receiver_id: selectedConversation.other_user_id,
+		content: trimmedContent,
+
+		message_type: 'text',
+		song_id: null,
+		shared_song: null,
+
+		status: 'sent',
+		created_at: new Date().toISOString(),
+		delivered_at: null,
+		read_at: null,
+	};
 
     this.messages = [...this.messages, optimisticMessage];
     this.upsertConversationAfterLocalSend(selectedConversation, optimisticMessage);
+  }
+
+  protected shareTestSong(): void {
+	const selectedConversation = this.selectedConversation;
+	const currentUser = this.currentUser();
+
+	if (!selectedConversation || !currentUser) {
+		this.errorMessage = 'Select a conversation first.';
+		return;
+	}
+
+	const isSentToSocket = this.chatService.sendSongMessage(
+		selectedConversation.other_user_id,
+		this.testSong.id
+	);
+
+	if (!isSentToSocket) {
+		this.errorMessage =
+		'WebSocket is not connected. Please try again.';
+
+		this.chatService.connect();
+		return;
+	}
+
+	const optimisticMessage: ChatMessage = {
+		id: this.createLocalMessageId(),
+		sender_id: currentUser.id,
+		receiver_id: selectedConversation.other_user_id,
+		content: '',
+
+		message_type: 'song',
+		song_id: this.testSong.id,
+		shared_song: this.testSong,
+
+		status: 'sent',
+		created_at: new Date().toISOString(),
+		delivered_at: null,
+		read_at: null,
+	};
+
+	this.messages = [...this.messages, optimisticMessage];
+
+	this.upsertConversationAfterLocalSend(
+		selectedConversation,
+		optimisticMessage
+	);
   }
 
   protected trackConversationById(_: number, conversation: ConversationListItem): string {
@@ -438,15 +500,20 @@ export class BsideSocial implements OnInit, OnDestroy {
     if (!currentUser) return;
 
     const receivedMessage: ChatMessage = {
-      id: message.message_id,
-      sender_id: message.from_user_id,
-      receiver_id: currentUser.id,
-      content: message.content,
-      status: 'delivered',
-      created_at: message.created_at,
-      delivered_at: null,
-      read_at: null,
-    };
+		id: message.message_id,
+		sender_id: message.from_user_id,
+		receiver_id: currentUser.id,
+		content: message.content,
+
+		message_type: message.message_type ?? 'text',
+		song_id: message.song_id ?? null,
+		shared_song: message.shared_song ?? null,
+
+		status: 'delivered',
+		created_at: message.created_at,
+		delivered_at: null,
+		read_at: null,
+	};
 
     if (this.selectedConversation?.other_user_id === message.from_user_id) {
       this.messages = [...this.messages, receivedMessage];
@@ -503,7 +570,10 @@ export class BsideSocial implements OnInit, OnDestroy {
       last_message_id: message.id,
       last_sender_id: message.sender_id,
       last_receiver_id: message.receiver_id,
-      last_message: message.content,
+      last_message:
+		message.message_type === 'song'
+			? 'Shared a song'
+			: message.content,
       last_message_status: message.status,
       last_message_at: message.created_at,
       unread_count: 0,

@@ -133,20 +133,39 @@ export class ChatService {
   }
 
   sendPrivateMessage(toUserId: string, content: string): boolean {
-    const trimmedContent = content.trim();
+	const trimmedContent = content.trim();
 
-    if (!trimmedContent || this.socket?.readyState !== WebSocket.OPEN) {
-      return false;
-    }
+	if (!trimmedContent || this.socket?.readyState !== WebSocket.OPEN) {
+		return false;
+	}
 
-    const payload: PrivateMessageClientPayload = {
-      type: 'private_message',
-      to_user_id: toUserId,
-      content: trimmedContent,
-    };
+	const payload: PrivateMessageClientPayload = {
+		type: 'private_message',
+		to_user_id: toUserId,
+		content: trimmedContent,
+		message_type: 'text',
+		song_id: null,
+	};
 
-    this.socket.send(JSON.stringify(payload));
-    return true;
+	this.socket.send(JSON.stringify(payload));
+	return true;
+  }
+
+  sendSongMessage(toUserId: string, songId: string): boolean {
+	if (this.socket?.readyState !== WebSocket.OPEN) {
+		return false;
+	}
+
+	const payload: PrivateMessageClientPayload = {
+		type: 'private_message',
+		to_user_id: toUserId,
+		content: '',
+		message_type: 'song',
+		song_id: songId,
+	};
+
+	this.socket.send(JSON.stringify(payload));
+	return true;
   }
 
   private parseServerMessage(data: unknown): ServerWsMessage | null {

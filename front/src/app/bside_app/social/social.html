@@ -283,11 +283,52 @@
     ></app-social-chat>
   </div>
 
-  <div class="h-full w-[17.5rem] shrink-0 overflow-y-auto rounded-[1.563rem]">
+  <!-- <div class="h-full w-[17.5rem] shrink-0 overflow-y-auto rounded-[1.563rem]">
     <div class="flex flex-col gap-3 pr-1">
       @for (share of [1, 2, 3, 4, 5]; track share) {
         <app-social-share-card></app-social-share-card>
       }
     </div>
-  </div>
+  </div> -->
+
+  <div
+	class="h-full w-[17.5rem] shrink-0 overflow-y-auto rounded-[1.563rem] bg-[#1F0E1C] p-4"
+	>
+	<p class="font-raleway text-base font-bold text-[#FFE6DB]">
+		Test song sharing
+	</p>
+
+	<div class="mt-4 overflow-hidden rounded-[1rem] bg-[#FFE6DB]/10">
+		<img
+		[src]="testSong.cover_url"
+		[alt]="testSong.title"
+		class="h-[12rem] w-full object-cover"
+		/>
+
+		<div class="p-4">
+		<p class="font-raleway text-sm font-bold text-[#FFE6DB]">
+			{{ testSong.title }}
+		</p>
+
+		<p class="mt-1 font-raleway text-xs text-[#FFE6DB]/60">
+			{{ testSong.artist_name }}
+		</p>
+
+		<button
+			type="button"
+			class="mt-4 w-full rounded-full bg-[#FF5500] px-4 py-3 font-raleway text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+			[disabled]="!selectedConversation"
+			(click)="shareTestSong()"
+		>
+			Share test song
+		</button>
+		</div>
+	</div>
+
+	@if (!selectedConversation) {
+		<p class="mt-3 font-raleway text-xs text-[#FFE6DB]/50">
+		Select a conversation first.
+		</p>
+	}
+	</div>
 </div>
