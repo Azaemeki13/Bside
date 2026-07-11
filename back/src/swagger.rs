@@ -1,10 +1,12 @@
 use crate::models::{
-    AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem,
-    ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload,
-    ArtistResponse, ArtistSongItem, AuthResponse, ChatMessage, ConversationListItem, LoginPayload,
-    MarkMessagesReadResponse, Playlist, PlaylistDetailedResponse, PlaylistPayload,
-    PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, Song, SongPayload,
-    SongResponse, UpdateStructurePayload, User, UserPayload,
+    AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse,
+    AlbumSongItem, ArtistDetailResponse, ArtistRequestPayload,
+    ArtistRequestResponse, ArtistRequestReviewPayload, ArtistResponse,
+    ArtistSongItem, AuthResponse, ChatMessage, ConversationListItem,
+    LoginPayload, MarkMessagesReadResponse, Playlist,
+    PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem,
+    RawSearchResult, RegisterPayload, SearchResult, SharedSong, Song,
+    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use utoipa::OpenApi;
 
@@ -54,7 +56,7 @@ use utoipa::OpenApi;
             AlbumResponse, AlbumListItem, AlbumSongItem, AlbumDetailedResponse,
             ArtistResponse, ArtistSongItem, ArtistDetailResponse, ArtistRequestPayload,
             ArtistRequestReviewPayload, ArtistRequestResponse, PlaylistPayload, AuthResponse,
-            RegisterPayload, LoginPayload, RawSearchResult, SearchResult, ChatMessage, MarkMessagesReadResponse,
+            RegisterPayload, LoginPayload, RawSearchResult, SearchResult, ChatMessage, MarkMessagesReadResponse, SharedSong,
             ConversationListItem,
         )
     ),
