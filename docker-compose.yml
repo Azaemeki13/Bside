@@ -37,9 +37,9 @@ services:
     depends_on:
       - minio
     volumes:
-      - ./scripts/setup-minio.sh:/setup-minio.sh
-      - ./scripts/setup-cors.json:/setup-cors.json
-      - ./scripts/defaults:/defaults
+      - ./scripts/setup-minio.sh:/setup-minio.sh:Z
+      - ./scripts/setup-cors.json:/setup-cors.json:Z
+      - ./scripts/defaults:/defaults:Z
     environment:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}

@@ -81,13 +81,17 @@
                     <span class="absolute right-0 top-9 z-20 min-w-44 rounded-md border border-[#FFE6DB]/10 bg-[#1F0E1C] p-1 shadow-xl">
                       <button type="button"
                               class="w-full rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10"
-                              (click)="removeSong(song); $event.stopPropagation()">
-                        @if (playlistService.likedSongsSelected()) {
-                          Remove from liked songs
-                        } @else {
-                          Remove from playlist
-                        }
+                              [routerLink]="['/bside_app/artist', song.artist_id]"
+                              (click)="$event.stopPropagation(); openMenuLinkId = ''">
+                        Go to artist page
                       </button>
+                      @if (!playlistService.likedSongsSelected()) {
+                        <button type="button"
+                                class="w-full rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10"
+                                (click)="removeSong(song); $event.stopPropagation()">
+                          Remove from playlist
+                        </button>
+                      }
                     </span>
                   }
                 </span>
@@ -105,6 +109,15 @@
           <div class="w-[21rem] flex flex-col gap-1">
             <h2 class="font-climate-crisis text-[#FFE6DB] text-2xl truncate">Liked Songs</h2>
             <p class="font-raleway text-[#FFE6DB]/70 text-sm font-bold truncate">Your liked songs</p>
+            <div class="flex items-center gap-3 mt-2">
+              <button (click)="playPlaylist()" class="cursor-pointer flex items-center justify-center w-10 h-10 rounded-full bg-[#FF5500] hover:bg-[#FF7733] duration-200 shadow-lg" aria-label="Play liked songs">
+                @if (audio.shuffleEnabled()) {
+                  <lucide-icon [img]="shuffle" class="w-5 h-5 text-[#FFE6DB]"></lucide-icon>
+                } @else {
+                  <lucide-icon [img]="play" class="w-5 h-5 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
+                }
+              </button>
+            </div>
           </div>
         } @else if (playlistService.selectedPlaylist(); as playlist) {
           <div class="w-[21rem] h-[21rem] rounded-[0.625rem] overflow-hidden border border-[#FFE6DB]/15">

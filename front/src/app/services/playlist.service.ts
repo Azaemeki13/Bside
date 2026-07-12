@@ -24,6 +24,7 @@ export interface PlaylistSongItem {
   position: number;
   audio_url: string;
   status: string;
+  artist_id: string;
   artist_name: string;
   cover_url: string;
 }

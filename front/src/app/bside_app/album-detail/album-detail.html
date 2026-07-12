@@ -77,6 +77,12 @@
                 <span class="absolute right-0 top-9 z-20 min-w-40 rounded-md border border-[#FFE6DB]/10 bg-[#1F0E1C] p-1 shadow-xl">
                   <button type="button"
                           class="w-full rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10"
+                          [routerLink]="['/bside_app/artist', currentAlbum.artist_id]"
+                          (click)="$event.stopPropagation(); openMenuSongId = ''">
+                    Go to artist page
+                  </button>
+                  <button type="button"
+                          class="w-full rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10"
                           (click)="openAddToPlaylistDialog($event, song)">
                     Add to playlist
                   </button>

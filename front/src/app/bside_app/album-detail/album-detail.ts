@@ -88,6 +88,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
       id: item.id,
       title: item.title,
       artist: this.album?.artist_name ?? '',
+      artistId: this.album?.artist_id,
       format: this.audioFormat(item),
       coverUrl: this.coverUrl(this.album?.cover_url ?? ''),
       onRequestUrl: () => this.albumService.getSongStreamUrl(item.id),

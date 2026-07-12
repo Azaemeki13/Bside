@@ -1,0 +1,119 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            m.id,\n            m.sender_id,\n            m.receiver_id,\n            m.content,\n            m.message_type AS \"message_type!\",\n            m.song_id,\n            m.status,\n            m.created_at,\n            m.delivered_at,\n            m.read_at,\n\n            s.id AS \"shared_song_id?\",\n            s.title AS \"shared_song_title?\",\n            s.duration_seconds AS \"shared_song_duration_seconds?\",\n            s.audio_url AS \"shared_song_audio_url?\",\n            s.status::text AS \"shared_song_status?\",\n            ar.name AS \"shared_song_artist_name?\",\n            a.cover_url AS \"shared_song_cover_url?\"\n\n        FROM messages m\n\n        LEFT JOIN songs s\n            ON s.id = m.song_id\n\n        LEFT JOIN albums a\n            ON a.id = s.album_id\n\n        LEFT JOIN artists ar\n            ON ar.id = a.artist_id\n\n        WHERE\n            (m.sender_id = $1 AND m.receiver_id = $2)\n            OR\n            (m.sender_id = $2 AND m.receiver_id = $1)\n\n        ORDER BY m.created_at ASC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "sender_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "receiver_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "content",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "message_type!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "song_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 6,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "delivered_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "read_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "shared_song_id?",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 11,
+        "name": "shared_song_title?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "shared_song_duration_seconds?",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 13,
+        "name": "shared_song_audio_url?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "shared_song_status?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 15,
+        "name": "shared_song_artist_name?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 16,
+        "name": "shared_song_cover_url?",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      null,
+      false,
+      false
+    ]
+  },
+  "hash": "4ab92e08a8b958547ecba57cec0fc992655c4792b511146c43af25e733b8afad"
+}

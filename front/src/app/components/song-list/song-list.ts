@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { LucideAngularModule, Heart, Play, Trash2, Timer, AudioLines, Shuffle, EllipsisVertical } from 'lucide-angular';
 import { PlaylistService, PlaylistSongItem } from '../../services/playlist.service';
 import { AuthService } from '../../services/auth.service';
@@ -9,7 +10,7 @@ import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-song-list',
-  imports: [LucideAngularModule, DatePipe, NgClass],
+  imports: [LucideAngularModule, DatePipe, NgClass, RouterLink],
   templateUrl: './song-list.html',
   styleUrl: './song-list.scss',
 })
@@ -76,6 +77,7 @@ export class SongList implements OnInit {
         id: item.song_id,
         title: item.title,
         artist: item.artist_name,
+        artistId: item.artist_id,
         format: this.audioFormat(item),
         coverUrl: this.coverUrl(item.cover_url),
         onRequestUrl: () => this.albumService.getSongStreamUrl(item.song_id),
@@ -91,6 +93,7 @@ export class SongList implements OnInit {
       id: item.song_id,
       title: item.title,
       artist: item.artist_name,
+      artistId: item.artist_id,
       format: this.audioFormat(item),
       coverUrl: this.coverUrl(item.cover_url),
       onRequestUrl: () => this.albumService.getSongStreamUrl(item.song_id),

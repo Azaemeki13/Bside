@@ -72,6 +72,10 @@ async fn main() {
         .connect(&db_url)
         .await
         .expect("Database connection established !");
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await
+        .expect("Database migrations applied.");
     if let Err(e) = bootstrap_admin(&pool).await {
         eprintln!("Warning: Failed to bootstrap admin account: {:?}", e);
     }

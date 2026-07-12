@@ -1825,6 +1825,7 @@ async fn get_liked_playlist_details(
                     'position', ps.position,
                     'audio_url', s.audio_url,
                     'status', s.status,
+                    'artist_id', ar.id,
                     'artist_name', ar.name,
                     'cover_url', a.cover_url
                 ) ORDER BY ps.position)
@@ -2110,6 +2111,7 @@ pub async fn get_playlist_by_id_handler(
                     'position', ps.position,
                     'audio_url', s.audio_url,
                     'status', s.status,
+                    'artist_id', ar.id,
                     'artist_name', ar.name,
                     'cover_url', a.cover_url
                 ) ORDER BY ps.position)
@@ -2464,7 +2466,7 @@ pub async fn admin_create_album_for_artist_handler(
                         .send()
                         .await
                         .map_err(|e| BSideError::S3Error(e.to_string()))?;
-                    cover_url = format!("http://minio:9000/bside-covers/{key}");
+                    cover_url = format!("http://localhost:9000/bside-covers/{key}");
                 }
             }
             _ => {}

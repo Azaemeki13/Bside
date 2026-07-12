@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            s.id,\n            s.title,\n            s.duration_seconds,\n            s.audio_url,\n            s.status::text AS \"status!\",\n            ar.name AS \"artist_name!\",\n            a.cover_url AS \"cover_url!\"\n        FROM songs s\n        JOIN albums a ON a.id = s.album_id\n        JOIN artists ar ON ar.id = a.artist_id\n        WHERE\n            s.id = $1\n            AND s.status = 'Ready'\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "duration_seconds",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "audio_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "status!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "artist_name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "cover_url!",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      null,
+      false,
+      false
+    ]
+  },
+  "hash": "96ce5e59205e38eae0f072dc5bf794237b8247043d8628f3ae23e0edd21e9d74"
+}

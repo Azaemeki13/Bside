@@ -1,0 +1,80 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                                INSERT INTO messages (\n                                    sender_id,\n                                    receiver_id,\n                                    content,\n                                    message_type,\n                                    song_id,\n                                    status\n                                )\n                                VALUES ($1, $2, $3, $4, $5, 'sent')\n                                RETURNING\n                                    id,\n                                    sender_id,\n                                    receiver_id,\n                                    content,\n                                    message_type AS \"message_type!\",\n                                    song_id,\n                                    status,\n                                    created_at,\n                                    delivered_at,\n                                    read_at\n                                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "sender_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "receiver_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "content",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "message_type!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "song_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 6,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "delivered_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "read_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Varchar",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "4f654491e1084831b8185b993b84a692da2df78d4710191e405b3520db052f54"
+}

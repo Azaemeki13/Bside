@@ -157,6 +157,7 @@ pub struct PlaylistSongItem {
     pub position: i32,
     pub audio_url: String,
     pub status: String,
+    pub artist_id: uuid::Uuid,
     pub artist_name: String,
     pub cover_url: String,
 }

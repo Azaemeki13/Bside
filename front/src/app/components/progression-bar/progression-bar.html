@@ -60,11 +60,20 @@
               >{{ track.title }}</span>
             </div>
   					<div #artistViewport class="min-w-0 overflow-hidden whitespace-nowrap">
-              <span
-                #artistText
-                class="inline-block font-Raleway text-xs font-normal text-[#FFE6DB] will-change-transform"
-                [style.transform]="'translateX(-' + artistOffset() + 'px)'"
-              >{{ track.artist }}</span>
+              @if (track.artistId) {
+                <a
+                  #artistText
+                  class="inline-block font-Raleway text-xs font-normal text-[#FFE6DB] underline-offset-2 will-change-transform hover:underline"
+                  [routerLink]="['/bside_app/artist', track.artistId]"
+                  [style.transform]="'translateX(-' + artistOffset() + 'px)'"
+                >{{ track.artist }}</a>
+              } @else {
+                <span
+                  #artistText
+                  class="inline-block font-Raleway text-xs font-normal text-[#FFE6DB] will-change-transform"
+                  [style.transform]="'translateX(-' + artistOffset() + 'px)'"
+                >{{ track.artist }}</span>
+              }
             </div>
   				} @else {
   					<p class="font-Raleway text-sm font-semibold text-[#FFE6DB] truncate">No track</p>
