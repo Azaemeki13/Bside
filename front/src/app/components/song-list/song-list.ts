@@ -1,11 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { LucideAngularModule, Heart, Play, Trash2, Timer, AudioLines, Shuffle, EllipsisVertical } from 'lucide-angular';
+import { LucideAngularModule, Heart, Play, Trash2, Timer, AudioLines, Shuffle, EllipsisVertical, Share2 } from 'lucide-angular';
 import { PlaylistService, PlaylistSongItem } from '../../services/playlist.service';
 import { AuthService } from '../../services/auth.service';
 import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
 import { AlbumService } from '../../services/album.service';
+import { ChatService } from '../../services/chat.service';
+import { FriendListItem } from '../../models/chat.model';
 import { NgClass } from '@angular/common';
 
 @Component({
@@ -22,14 +24,22 @@ export class SongList implements OnInit {
   protected readonly audioLines = AudioLines;
   protected readonly shuffle = Shuffle;
   protected readonly ellipsisVertical = EllipsisVertical;
+  protected readonly share2 = Share2;
   protected playlistService = inject(PlaylistService);
   protected authService = inject(AuthService);
   protected readonly audio = inject(AudioPlayerService);
   private readonly albumService = inject(AlbumService);
+  private readonly chatService = inject(ChatService);
   protected openMenuLinkId = '';
+  protected shareMenuLinkId = '';
+  protected friends: FriendListItem[] = [];
+  protected isLoadingFriends = false;
+  protected shareTargetUserId = '';
+  protected shareFeedback = '';
 
   ngOnInit(): void {
     this.playlistService.loadLikedSongs();
+    this.chatService.connect();
   }
 
   deletePlaylist(): void {
@@ -66,6 +76,59 @@ export class SongList implements OnInit {
   toggleSongMenu(event: Event, song: PlaylistSongItem): void {
     event.stopPropagation();
     this.openMenuLinkId = this.openMenuLinkId === song.link_id ? '' : song.link_id;
+    this.shareMenuLinkId = '';
+    this.shareFeedback = '';
+  }
+
+  openShareMenu(event: Event, song: PlaylistSongItem): void {
+    event.stopPropagation();
+    this.shareMenuLinkId = song.link_id;
+    this.shareFeedback = '';
+
+    if (this.friends.length === 0 && !this.isLoadingFriends) {
+      this.loadFriends();
+    }
+  }
+
+  closeShareMenu(event: Event): void {
+    event.stopPropagation();
+    this.shareMenuLinkId = '';
+  }
+
+  loadFriends(): void {
+    this.isLoadingFriends = true;
+
+    this.chatService.getFriends().subscribe({
+      next: (friends) => {
+        this.friends = friends;
+        this.isLoadingFriends = false;
+      },
+      error: (err) => {
+        console.error('Failed to load friends', err);
+        this.isLoadingFriends = false;
+      },
+    });
+  }
+
+  shareSong(event: Event, song: PlaylistSongItem, friend: FriendListItem): void {
+    event.stopPropagation();
+
+    const isSentToSocket = this.chatService.sendSongMessage(friend.user_id, song.song_id);
+
+    if (!isSentToSocket) {
+      this.shareFeedback = 'Reconnecting, please try again.';
+      this.chatService.connect();
+      return;
+    }
+
+    this.shareFeedback = `Shared with ${friend.username}`;
+    this.shareTargetUserId = friend.user_id;
+
+    setTimeout(() => {
+      this.openMenuLinkId = '';
+      this.shareMenuLinkId = '';
+      this.shareFeedback = '';
+    }, 900);
   }
 
   playSong(song: PlaylistSongItem): void {

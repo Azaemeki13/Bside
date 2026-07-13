@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, PLATFORM_I
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule} from 'lucide-angular';
-import { finalize } from 'rxjs';
+import { catchError, finalize, forkJoin, map, of } from 'rxjs';
 import {
   ChatMessage,
   ChatUser,
@@ -12,13 +12,17 @@ import {
   FriendRequestItem,
   FriendRequestsResponse,
   ServerWsMessage,
-  SharedSong,
 } from '../../models/chat.model';
 import { AuthService } from '../../services/auth.service';
 import { ChatService } from '../../services/chat.service';
 import { SocialSideBar } from '../../components/social-side-bar/social-side-bar';
 import { SocialShareCard } from '../../components/social-share-card/social-share-card';
 import { SocialChat } from '../../components/social-chat/social-chat';
+
+interface SharedSongCard {
+  message: ChatMessage;
+  conversation: ConversationListItem;
+}
 
 @Component({
   selector: 'app-bside-social',
@@ -61,6 +65,9 @@ export class BsideSocial implements OnInit, OnDestroy {
 	protected friendActionUserId: string | null = null;
 	protected friendActionRequestId: string | null = null;
 
+	protected receivedSongCards: SharedSongCard[] = [];
+	protected isLoadingSongCards = false;
+
 
   	ngOnInit(): void {
 		if (!isPlatformBrowser(this.platformId)) {
@@ -79,16 +86,6 @@ export class BsideSocial implements OnInit, OnDestroy {
 	ngOnDestroy(): void {
 		this.chatService.disconnect();
 	}
-
-	protected readonly testSong: SharedSong = {
-		id: '90000000-0000-4000-8000-000000000003',
-		title: 'WebSocket Test Song',
-		duration_seconds: 180,
-		audio_url: 'test/websocket-test-song.wav',
-		status: 'Ready',
-		artist_name: 'WebSocket Test Artist',
-		cover_url: 'http://localhost:9000/bside-covers/default_cover.jpg',
-	};
 
   	protected loadFriends(): void {
 		this.isLoadingFriends = true;
@@ -278,12 +275,68 @@ export class BsideSocial implements OnInit, OnDestroy {
         next: (conversations) => {
           this.conversations = conversations;
           this.refreshSelectedConversationReference();
+          this.loadReceivedSongCards();
         },
         error: (error) => {
           console.error('Failed to load conversations:', error);
           this.errorMessage = 'Failed to load conversations.';
         },
       });
+  }
+
+  protected loadReceivedSongCards(): void {
+    if (this.conversations.length === 0) {
+      this.receivedSongCards = [];
+      return;
+    }
+
+    this.isLoadingSongCards = true;
+
+    forkJoin(
+      this.conversations.map((conversation) =>
+        this.chatService.getConversationMessages(conversation.other_user_id).pipe(
+          map((messages) => ({ conversation, messages })),
+          catchError(() => of({ conversation, messages: [] as ChatMessage[] }))
+        )
+      )
+    )
+      .pipe(
+        finalize(() => {
+          this.isLoadingSongCards = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe((results) => {
+        const cards = results.flatMap(({ conversation, messages }) =>
+          messages
+            .filter(
+              (message) =>
+                message.message_type === 'song' &&
+                !!message.shared_song &&
+                message.sender_id === conversation.other_user_id
+            )
+            .map((message) => ({ message, conversation }))
+        );
+
+        cards.sort(
+          (a, b) => new Date(b.message.created_at).getTime() - new Date(a.message.created_at).getTime()
+        );
+
+        this.receivedSongCards = cards;
+      });
+  }
+
+  protected openSongCard(card: SharedSongCard): void {
+    const conversation =
+      this.conversations.find(
+        (conversation) => conversation.other_user_id === card.conversation.other_user_id
+      ) ?? card.conversation;
+
+    this.selectConversation(conversation);
+  }
+
+  protected trackSongCardById(_: number, card: SharedSongCard): string {
+    return card.message.id;
   }
 
   protected loadUsers(): void {
@@ -405,52 +458,6 @@ export class BsideSocial implements OnInit, OnDestroy {
     this.upsertConversationAfterLocalSend(selectedConversation, optimisticMessage);
   }
 
-  protected shareTestSong(): void {
-	const selectedConversation = this.selectedConversation;
-	const currentUser = this.currentUser();
-
-	if (!selectedConversation || !currentUser) {
-		this.errorMessage = 'Select a conversation first.';
-		return;
-	}
-
-	const isSentToSocket = this.chatService.sendSongMessage(
-		selectedConversation.other_user_id,
-		this.testSong.id
-	);
-
-	if (!isSentToSocket) {
-		this.errorMessage =
-		'WebSocket is not connected. Please try again.';
-
-		this.chatService.connect();
-		return;
-	}
-
-	const optimisticMessage: ChatMessage = {
-		id: this.createLocalMessageId(),
-		sender_id: currentUser.id,
-		receiver_id: selectedConversation.other_user_id,
-		content: '',
-
-		message_type: 'song',
-		song_id: this.testSong.id,
-		shared_song: this.testSong,
-
-		status: 'sent',
-		created_at: new Date().toISOString(),
-		delivered_at: null,
-		read_at: null,
-	};
-
-	this.messages = [...this.messages, optimisticMessage];
-
-	this.upsertConversationAfterLocalSend(
-		selectedConversation,
-		optimisticMessage
-	);
-  }
-
   protected trackConversationById(_: number, conversation: ConversationListItem): string {
     return conversation.other_user_id;
   }
@@ -518,9 +525,22 @@ export class BsideSocial implements OnInit, OnDestroy {
     if (this.selectedConversation?.other_user_id === message.from_user_id) {
       this.messages = [...this.messages, receivedMessage];
       this.markSelectedConversationAsRead(message.from_user_id);
+      this.prependReceivedSongCard(receivedMessage);
     } else {
       this.loadConversations();
     }
+  }
+
+  private prependReceivedSongCard(message: ChatMessage): void {
+    if (message.message_type !== 'song' || !message.shared_song) return;
+
+    const conversation =
+      this.conversations.find((conversation) => conversation.other_user_id === message.sender_id) ??
+      this.selectedConversation;
+
+    if (!conversation) return;
+
+    this.receivedSongCards = [{ message, conversation }, ...this.receivedSongCards];
   }
 
   private handleMessageSaved(

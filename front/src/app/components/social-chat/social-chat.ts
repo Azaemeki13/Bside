@@ -12,11 +12,12 @@ import {
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, MessageCircle, Send } from 'lucide-angular';
 import { ChatMessage, ConversationListItem } from '../../models/chat.model';
+import { SocialShareCard } from '../social-share-card/social-share-card';
 
 @Component({
   selector: 'app-social-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, DatePipe],
+  imports: [CommonModule, FormsModule, LucideAngularModule, DatePipe, SocialShareCard],
   templateUrl: './social-chat.html',
   styleUrl: './social-chat.scss',
 })

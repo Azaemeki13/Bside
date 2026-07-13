@@ -39,48 +39,32 @@
         <div class="flex flex-col gap-2">
           @for (message of messages; track trackMessageById($index, message)) {
             <div class="flex" [ngClass]="isOwnMessage(message) ? 'justify-end' : 'justify-start'">
-              <div
-                class="max-w-[70%] px-4 py-2.5"
-                [ngClass]="isOwnMessage(message) ? 'bg-[#FF5500] text-[#FFE6DB] rounded-tl-[1.25rem] rounded-bl-[1.25rem] rounded-br-[1.25rem]' : 'bg-[#FFE6DB]/10 text-[#FFE6DB] rounded-tr-[1.25rem] rounded-bl-[1.25rem] rounded-br-[1.25rem]'"
-              >
-                <!-- <p class="whitespace-pre-wrap break-words font-raleway text-sm">{{ message.content }}</p> -->
-				 @if (
-					message.message_type === 'song' &&
-					message.shared_song
-					) {
-					<div class="w-[15rem] overflow-hidden rounded-[1rem]">
-						<img
-						[src]="message.shared_song.cover_url"
-						[alt]="message.shared_song.title"
-						class="h-[9rem] w-full object-cover"
-						/>
-
-						<div class="pt-3">
-						<p class="font-raleway text-sm font-bold text-[#FFE6DB]">
-							{{ message.shared_song.title }}
-						</p>
-
-						<p class="mt-1 font-raleway text-xs text-[#FFE6DB]/60">
-							{{ message.shared_song.artist_name }}
-						</p>
-
-						<p class="mt-2 font-raleway text-[0.65rem] font-bold uppercase text-[#FFE6DB]/50">
-							Shared song
-						</p>
-						</div>
-					</div>
-					} @else {
-					<p class="whitespace-pre-wrap break-words font-raleway text-sm">
-						{{ message.content }}
-					</p>
-					}
-                <p
-                  class="mt-1 font-raleway text-[0.65rem]"
-                  [ngClass]="isOwnMessage(message) ? 'text-[#FFE6DB]/70 text-right' : 'text-[#FFE6DB]/50'"
+              @if (message.message_type === 'song' && message.shared_song) {
+                <div class="flex flex-col gap-1" [ngClass]="isOwnMessage(message) ? 'items-end' : 'items-start'">
+                  <app-social-share-card [song]="message.shared_song"></app-social-share-card>
+                  <p
+                    class="font-raleway text-[0.65rem]"
+                    [ngClass]="isOwnMessage(message) ? 'text-[#FFE6DB]/70 text-right' : 'text-[#FFE6DB]/50'"
+                  >
+                    {{ message.created_at | date: 'HH:mm' }}
+                  </p>
+                </div>
+              } @else {
+                <div
+                  class="max-w-[70%] px-4 py-2.5"
+                  [ngClass]="isOwnMessage(message) ? 'bg-[#170814] text-[#FFE6DB] rounded-tl-[1.25rem] rounded-bl-[1.25rem] rounded-br-[1.25rem]' : 'bg-[#FFE6DB]/10 text-[#FFE6DB] rounded-tr-[1.25rem] rounded-bl-[1.25rem] rounded-br-[1.25rem]'"
                 >
-                  {{ message.created_at | date: 'HH:mm' }}
-                </p>
-              </div>
+                  <p class="whitespace-pre-wrap break-words font-raleway text-sm">
+                    {{ message.content }}
+                  </p>
+                  <p
+                    class="mt-1 font-raleway text-[0.65rem]"
+                    [ngClass]="isOwnMessage(message) ? 'text-[#FFE6DB]/70 text-right' : 'text-[#FFE6DB]/50'"
+                  >
+                    {{ message.created_at | date: 'HH:mm' }}
+                  </p>
+                </div>
+              }
             </div>
           }
         </div>
