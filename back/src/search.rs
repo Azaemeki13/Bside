@@ -1,4 +1,4 @@
-use crate::{AppState, AnyAuth, BSideError, RawSearchResult, SearchResult};
+use crate::{AnyAuth, AppState, BSideError, RawSearchResult, SearchResult};
 use axum::Json;
 use axum::extract::{Query, State};
 use std::collections::HashMap;

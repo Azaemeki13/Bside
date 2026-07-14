@@ -1,7 +1,7 @@
 use crate::auth::create_jwt;
 use crate::models::{
-    ChatMessage, ConversationListItem, FriendListItem, FriendRequestItem,
-    FriendRequestsResponse, MarkMessagesReadResponse, UserStatusResponse,
+    ChatMessage, ConversationListItem, FriendListItem, FriendRequestItem, FriendRequestsResponse,
+    MarkMessagesReadResponse, UserStatusResponse,
 };
 use crate::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AnyAuth,
@@ -857,8 +857,8 @@ pub async fn get_all_users_handler(
         ORDER BY created_at ASC
         "#,
     )
-        .fetch_all(&state.db)
-        .await?;
+    .fetch_all(&state.db)
+    .await?;
 
     Ok(Json(users))
 }
@@ -901,10 +901,10 @@ pub async fn get_user_by_id_handler(
         WHERE id = $1
         "#,
     )
-        .bind(user_id)
-        .fetch_optional(&state.db)
-        .await?
-        .ok_or(BSideError::UserNotFound)?;
+    .bind(user_id)
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::UserNotFound)?;
 
     Ok(Json(user))
 }
@@ -2702,8 +2702,8 @@ pub async fn get_friends_handler(
         "#,
         current_user_id
     )
-        .fetch_all(&state.db)
-        .await?;
+    .fetch_all(&state.db)
+    .await?;
 
     let online_users = state.network.online_users.lock().await;
 
@@ -2741,9 +2741,9 @@ pub async fn send_friend_request_handler(
         "SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)",
         target_user_id
     )
-        .fetch_one(&state.db)
-        .await?
-        .unwrap_or(false);
+    .fetch_one(&state.db)
+    .await?
+    .unwrap_or(false);
 
     if !target_exists {
         return Err(BSideError::UserNotFound);
@@ -2761,8 +2761,8 @@ pub async fn send_friend_request_handler(
         current_user_id,
         target_user_id
     )
-        .fetch_optional(&state.db)
-        .await?;
+    .fetch_optional(&state.db)
+    .await?;
 
     if let Some(friendship) = existing {
         if friendship.status == "accepted" {
@@ -2788,10 +2788,12 @@ pub async fn send_friend_request_handler(
             target_user_id,
             friendship.id
         )
-            .execute(&state.db)
-            .await?;
+        .execute(&state.db)
+        .await?;
 
-        return fetch_friend_request_item(&state, friendship.id).await.map(Json);
+        return fetch_friend_request_item(&state, friendship.id)
+            .await
+            .map(Json);
     }
 
     let friendship_id = Uuid::new_v4();
@@ -2805,10 +2807,12 @@ pub async fn send_friend_request_handler(
         current_user_id,
         target_user_id
     )
-        .execute(&state.db)
-        .await?;
+    .execute(&state.db)
+    .await?;
 
-    fetch_friend_request_item(&state, friendship_id).await.map(Json)
+    fetch_friend_request_item(&state, friendship_id)
+        .await
+        .map(Json)
 }
 
 pub async fn get_friend_requests_handler(
@@ -2842,8 +2846,8 @@ pub async fn get_friend_requests_handler(
         "#,
         current_user_id
     )
-        .fetch_all(&state.db)
-        .await?;
+    .fetch_all(&state.db)
+    .await?;
 
     let mut incoming = Vec::new();
     let mut outgoing = Vec::new();
@@ -2880,14 +2884,16 @@ pub async fn accept_friend_request_handler(
         friendship_id,
         current_user_id
     )
-        .fetch_optional(&state.db)
-        .await?;
+    .fetch_optional(&state.db)
+    .await?;
 
     if updated.is_none() {
         return Err(BSideError::NotFound);
     }
 
-    fetch_friend_request_item(&state, friendship_id).await.map(Json)
+    fetch_friend_request_item(&state, friendship_id)
+        .await
+        .map(Json)
 }
 
 pub async fn reject_friend_request_handler(
@@ -2911,14 +2917,16 @@ pub async fn reject_friend_request_handler(
         friendship_id,
         current_user_id
     )
-        .fetch_optional(&state.db)
-        .await?;
+    .fetch_optional(&state.db)
+    .await?;
 
     if updated.is_none() {
         return Err(BSideError::NotFound);
     }
 
-    fetch_friend_request_item(&state, friendship_id).await.map(Json)
+    fetch_friend_request_item(&state, friendship_id)
+        .await
+        .map(Json)
 }
 
 pub async fn remove_friend_handler(
@@ -2940,8 +2948,8 @@ pub async fn remove_friend_handler(
         current_user_id,
         other_user_id
     )
-        .fetch_optional(&state.db)
-        .await?;
+    .fetch_optional(&state.db)
+    .await?;
 
     if deleted.is_none() {
         return Err(BSideError::NotFound);
@@ -2955,13 +2963,11 @@ pub async fn get_user_status_handler(
     Path(user_id): Path<Uuid>,
     _claims: Claims,
 ) -> Result<Json<UserStatusResponse>, BSideError> {
-    let user_exists = sqlx::query_scalar!(
-        "SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)",
-        user_id
-    )
-        .fetch_one(&state.db)
-        .await?
-        .unwrap_or(false);
+    let user_exists =
+        sqlx::query_scalar!("SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)", user_id)
+            .fetch_one(&state.db)
+            .await?
+            .unwrap_or(false);
 
     if !user_exists {
         return Err(BSideError::UserNotFound);
@@ -3001,9 +3007,9 @@ async fn fetch_friend_request_item(
         "#,
         friendship_id
     )
-        .fetch_optional(&state.db)
-        .await?
-        .ok_or(BSideError::NotFound)?;
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::NotFound)?;
 
     Ok(request)
 }
