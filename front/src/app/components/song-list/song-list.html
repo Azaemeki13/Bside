@@ -18,7 +18,7 @@
             <p class="font-raleway text-[#FFE6DB]/50 text-sm pt-4">No songs yet.</p>
           } @else {
             @for (song of playlistService.selectedSongs(); track song.link_id) {
-              <div class="grid items-center py-2 rounded-lg hover:bg-[#FFE6DB]/5 duration-200 group cursor-pointer"
+              <div class="grid items-center py-2 rounded-lg hover:bg-[#FFE6DB]/5 duration-200"
                    style="grid-template-columns: 2rem 2.5rem minmax(0,1fr) 5rem 2.5rem 2.5rem"
                    role="button"
                    (click)="playSong(song)"
@@ -78,16 +78,63 @@
                   </button>
 
                   @if (openMenuLinkId === song.link_id) {
-                    <span class="absolute right-0 top-9 z-20 min-w-44 rounded-md border border-[#FFE6DB]/10 bg-[#1F0E1C] p-1 shadow-xl">
+                    <span class="absolute right-0 top-9 z-20 min-w-44 rounded-md bg-[#431E3A] p-2 shadow-2xl">
                       <button type="button"
-                              class="w-full rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10"
-                              (click)="removeSong(song); $event.stopPropagation()">
-                        @if (playlistService.likedSongsSelected()) {
-                          Remove from liked songs
-                        } @else {
-                          Remove from playlist
-                        }
+                              class="w-full rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10 cursor-pointer"
+                              [routerLink]="['/bside_app/artist', song.artist_id]"
+                              (click)="$event.stopPropagation(); openMenuLinkId = ''">
+                        Go to artist page
                       </button>
+                      <button type="button"
+                              class="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10 cursor-pointer"
+                              (click)="openShareMenu($event, song)">
+                        Share
+                      </button>
+                      @if (!playlistService.likedSongsSelected()) {
+                        <button type="button"
+                                class="w-full rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10 cursor-pointer"
+                                (click)="removeSong(song); $event.stopPropagation()">
+                          Remove from playlist
+                        </button>
+                      }
+                    </span>
+                  }
+
+                  @if (shareMenuLinkId === song.link_id) {
+                    <span class="absolute right-0 top-9 z-30 flex max-h-64 w-56 flex-col overflow-hidden rounded-md bg-[#431E3A] p-2 shadow-2xl">
+                      <span class="flex items-center justify-between border-b border-[#FFE6DB]/10 px-3 py-2">
+                        <span class="font-raleway text-xs font-bold uppercase text-[#FFE6DB]/50">Share with a friend</span>
+                        <button type="button" aria-label="Close share menu" (click)="closeShareMenu($event)">
+                          <span class="font-raleway text-xs text-[#FFE6DB]/50 hover:text-[#FFE6DB]">✕</span>
+                        </button>
+                      </span>
+
+                      <span class="flex-1 overflow-y-auto p-1">
+                        @if (isLoadingFriends) {
+                          <span class="block px-3 py-2 font-raleway text-xs text-[#FFE6DB]/50">Loading friends...</span>
+                        } @else if (shareFeedback) {
+                          <span class="block px-3 py-2 font-raleway text-xs font-semibold text-[#FF5500]">{{ shareFeedback }}</span>
+                        } @else if (friends.length === 0) {
+                          <span class="block px-3 py-2 font-raleway text-xs text-[#FFE6DB]/50">Add friends to share songs.</span>
+                        } @else {
+                          @for (friend of friends; track friend.user_id) {
+                            <button type="button"
+                                    class="flex w-full items-center gap-2 rounded px-2 py-2 text-left hover:bg-[#FFE6DB]/10"
+                                    (click)="shareSong($event, song, friend)">
+                              <span class="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
+                                @if (friend.avatar_url) {
+                                  <img [src]="friend.avatar_url" [alt]="friend.username" class="h-full w-full object-cover" />
+                                } @else {
+                                  <span class="font-raleway text-[0.65rem] font-bold text-[#FFE6DB]">
+                                    {{ friend.username.slice(0, 2).toUpperCase() }}
+                                  </span>
+                                }
+                              </span>
+                              <span class="truncate font-raleway text-sm font-semibold text-[#FFE6DB]">{{ friend.username }}</span>
+                            </button>
+                          }
+                        }
+                      </span>
                     </span>
                   }
                 </span>
@@ -105,6 +152,15 @@
           <div class="w-[21rem] flex flex-col gap-1">
             <h2 class="font-climate-crisis text-[#FFE6DB] text-2xl truncate">Liked Songs</h2>
             <p class="font-raleway text-[#FFE6DB]/70 text-sm font-bold truncate">Your liked songs</p>
+            <div class="flex items-center gap-3 mt-2">
+              <button (click)="playPlaylist()" class="cursor-pointer flex items-center justify-center w-10 h-10 rounded-full bg-[#FF5500] hover:bg-[#FF7733] duration-200 shadow-lg" aria-label="Play liked songs">
+                @if (audio.shuffleEnabled()) {
+                  <lucide-icon [img]="shuffle" class="w-5 h-5 text-[#FFE6DB]"></lucide-icon>
+                } @else {
+                  <lucide-icon [img]="play" class="w-5 h-5 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
+                }
+              </button>
+            </div>
           </div>
         } @else if (playlistService.selectedPlaylist(); as playlist) {
           <div class="w-[21rem] h-[21rem] rounded-[0.625rem] overflow-hidden border border-[#FFE6DB]/15">

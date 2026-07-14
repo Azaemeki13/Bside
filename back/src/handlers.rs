@@ -1,7 +1,7 @@
 use crate::auth::create_jwt;
 use crate::models::{
-    ChatMessage, ConversationListItem, FriendListItem, FriendRequestItem, FriendRequestsResponse,
-    MarkMessagesReadResponse, UserStatusResponse,
+    ChatMessage, ConversationListItem, FriendListItem, FriendRequestItem,
+    FriendRequestsResponse, MarkMessagesReadResponse, UserStatusResponse, SharedSong,
 };
 use crate::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AnyAuth,
@@ -1825,6 +1825,7 @@ async fn get_liked_playlist_details(
                     'position', ps.position,
                     'audio_url', s.audio_url,
                     'status', s.status,
+                    'artist_id', ar.id,
                     'artist_name', ar.name,
                     'cover_url', a.cover_url
                 ) ORDER BY ps.position)
@@ -2110,6 +2111,7 @@ pub async fn get_playlist_by_id_handler(
                     'position', ps.position,
                     'audio_url', s.audio_url,
                     'status', s.status,
+                    'artist_id', ar.id,
                     'artist_name', ar.name,
                     'cover_url', a.cover_url
                 ) ORDER BY ps.position)
@@ -2464,7 +2466,7 @@ pub async fn admin_create_album_for_artist_handler(
                         .send()
                         .await
                         .map_err(|e| BSideError::S3Error(e.to_string()))?;
-                    cover_url = format!("http://minio:9000/bside-covers/{key}");
+                    cover_url = format!("http://localhost:9000/bside-covers/{key}");
                 }
             }
             _ => {}
@@ -2518,46 +2520,131 @@ pub async fn get_conversation_messages_handler(
 ) -> Result<Json<Vec<ChatMessage>>, BSideError> {
     let current_user_id = claims.sub;
 
-    let messages = sqlx::query_as!(
-        ChatMessage,
+    let rows = sqlx::query!(
         r#"
         SELECT
-            id,
-            sender_id,
-            receiver_id,
-            content,
-            status,
-            created_at,
-            delivered_at,
-            read_at
-        FROM messages
+            m.id,
+            m.sender_id,
+            m.receiver_id,
+            m.content,
+            m.message_type AS "message_type!",
+            m.song_id,
+            m.status,
+            m.created_at,
+            m.delivered_at,
+            m.read_at,
+
+            s.id AS "shared_song_id?",
+            s.title AS "shared_song_title?",
+            s.duration_seconds AS "shared_song_duration_seconds?",
+            s.audio_url AS "shared_song_audio_url?",
+            s.status::text AS "shared_song_status?",
+            ar.name AS "shared_song_artist_name?",
+            a.cover_url AS "shared_song_cover_url?"
+
+        FROM messages m
+
+        LEFT JOIN songs s
+            ON s.id = m.song_id
+
+        LEFT JOIN albums a
+            ON a.id = s.album_id
+
+        LEFT JOIN artists ar
+            ON ar.id = a.artist_id
+
         WHERE
-            (sender_id = $1 AND receiver_id = $2)
+            (m.sender_id = $1 AND m.receiver_id = $2)
             OR
-            (sender_id = $2 AND receiver_id = $1)
-        ORDER BY created_at ASC
+            (m.sender_id = $2 AND m.receiver_id = $1)
+
+        ORDER BY m.created_at ASC
         "#,
         current_user_id,
         other_user_id
     )
-    .fetch_all(&state.db)
-    .await?;
+        .fetch_all(&state.db)
+        .await?;
+
+    let messages = rows
+        .into_iter()
+        .map(|row| {
+            let shared_song = match (
+                row.shared_song_id,
+                row.shared_song_title,
+                row.shared_song_duration_seconds,
+                row.shared_song_audio_url,
+                row.shared_song_status,
+                row.shared_song_artist_name,
+                row.shared_song_cover_url,
+            ) {
+                (
+                    Some(id),
+                    Some(title),
+                    Some(duration_seconds),
+                    Some(audio_url),
+                    Some(status),
+                    Some(artist_name),
+                    Some(cover_url),
+                ) => Some(SharedSong {
+                    id,
+                    title,
+                    duration_seconds,
+                    audio_url,
+                    status,
+                    artist_name,
+                    cover_url,
+                }),
+
+                _ => None,
+            };
+
+            ChatMessage {
+                id: row.id,
+                sender_id: row.sender_id,
+                receiver_id: row.receiver_id,
+                content: row.content,
+                message_type: row.message_type,
+                song_id: row.song_id,
+                shared_song,
+                status: row.status,
+                created_at: row.created_at,
+                delivered_at: row.delivered_at,
+                read_at: row.read_at,
+            }
+        })
+        .collect();
 
     Ok(Json(messages))
 }
-
 #[utoipa::path(
     put,
     path = "/messages/{other_user_id}/read",
     params(
-        ("other_user_id" = uuid::Uuid, Path, description = "The other user ID in the conversation")
+        (
+            "other_user_id" = Uuid,
+            Path,
+            description = "ID of the other user in the conversation"
+        )
     ),
     responses(
-        (status = 200, description = "Messages marked as read", body = MarkMessagesReadResponse),
-        (status = 401, description = "Unauthorized"),
-        (status = 500, description = "Internal server error")
+        (
+            status = 200,
+            description = "Conversation messages marked as read",
+            body = MarkMessagesReadResponse
+        ),
+        (
+            status = 401,
+            description = "Unauthorized"
+        ),
+        (
+            status = 500,
+            description = "Internal server error"
+        )
     ),
-    security(("Bearer" = [])),
+    security(
+        ("bearer_auth" = [])
+    ),
     tags = ["Messages"]
 )]
 pub async fn mark_conversation_messages_as_read_handler(
@@ -2615,7 +2702,10 @@ pub async fn get_conversations_handler(
                 m.id,
                 m.sender_id,
                 m.receiver_id,
-                m.content,
+                CASE
+                    WHEN m.message_type = 'song' THEN 'Shared a song'
+                    ELSE m.content
+                END AS content,
                 m.status,
                 m.created_at,
                 CASE

@@ -109,6 +109,7 @@ export class SearchBar implements OnDestroy {
             id: s.id,
             title: s.title,
             artist: album.artist_name,
+            artistId: album.artist_id,
             format: (s.audio_url.includes('.flac') ? 'flac' : 'wav') as 'flac' | 'wav',
             coverUrl: album.cover_url,
             onRequestUrl: () => this.albumService.getSongStreamUrl(s.id),

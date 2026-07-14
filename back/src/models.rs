@@ -157,6 +157,7 @@ pub struct PlaylistSongItem {
     pub position: i32,
     pub audio_url: String,
     pub status: String,
+    pub artist_id: uuid::Uuid,
     pub artist_name: String,
     pub cover_url: String,
 }
@@ -311,16 +312,72 @@ pub enum SearchResult {
     },
 }
 
-#[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Clone,
+    Debug,
+    sqlx::FromRow,
+    utoipa::ToSchema,
+)]
+pub struct SharedSong {
+    pub id: uuid::Uuid,
+    pub title: String,
+    pub duration_seconds: i32,
+    pub audio_url: String,
+    pub status: String,
+    pub artist_name: String,
+    pub cover_url: String,
+}
+
+#[derive(sqlx::FromRow)]
+pub struct ChatMessageRecord {
+    pub id: uuid::Uuid,
+    pub sender_id: uuid::Uuid,
+    pub receiver_id: uuid::Uuid,
+    pub content: String,
+    pub message_type: String,
+    pub song_id: Option<uuid::Uuid>,
+    pub status: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub delivered_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub read_at: Option<chrono::DateTime<chrono::Utc>>,
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct ChatMessage {
     pub id: uuid::Uuid,
     pub sender_id: uuid::Uuid,
     pub receiver_id: uuid::Uuid,
     pub content: String,
+    pub message_type: String,
+    pub song_id: Option<uuid::Uuid>,
+    pub shared_song: Option<SharedSong>,
     pub status: String,
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub delivered_at: Option<chrono::DateTime<chrono::Utc>>,
     pub read_at: Option<chrono::DateTime<chrono::Utc>>,
+}
+
+impl ChatMessage {
+    pub fn from_record(
+        record: ChatMessageRecord,
+        shared_song: Option<SharedSong>,
+    ) -> Self {
+        Self {
+            id: record.id,
+            sender_id: record.sender_id,
+            receiver_id: record.receiver_id,
+            content: record.content,
+            message_type: record.message_type,
+            song_id: record.song_id,
+            shared_song,
+            status: record.status,
+            created_at: record.created_at,
+            delivered_at: record.delivered_at,
+            read_at: record.read_at,
+        }
+    }
 }
 
 #[derive(serde::Serialize, utoipa::ToSchema)]

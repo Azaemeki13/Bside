@@ -44,12 +44,13 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { LucideAngularModule, Pause, Play, SkipBack, SkipForward } from 'lucide-angular';
 import { AudioPlayerService } from '../../services/audio.player.service';
 
   @Component({
     selector: 'app-progression-bar',
-    imports: [LucideAngularModule],
+    imports: [LucideAngularModule, RouterLink],
     templateUrl: './progression-bar.html',
   })
   

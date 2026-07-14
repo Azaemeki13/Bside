@@ -11,6 +11,7 @@ export type AudioTrack = {
     id: string;
     title: string;
     artist: string;
+    artistId?: string;
     src: string;
     format: AudioFormat;
     coverUrl?: string;
@@ -20,6 +21,7 @@ export type QueueEntry = {
     id: string;
     title: string;
     artist: string;
+    artistId?: string;
     format: AudioFormat;
     coverUrl?: string;
     onRequestUrl: () => Observable<{ url: string }>;
@@ -204,6 +206,7 @@ export class AudioPlayerService {
                     id: entry.id,
                     title: entry.title,
                     artist: entry.artist,
+                    artistId: entry.artistId,
                     src: response.url,
                     format: entry.format,
                     coverUrl: entry.coverUrl,
