@@ -11,13 +11,6 @@
   <span class="font-raleway text-[1rem] font-bold text-[#FFE6DB]">ACTIVITY</span>
 
   <div class="flex flex-row items-center justify-between">
-    <span class="font-raleway text-[1rem] font-medium text-[#FFE6DB]/50">Share your listening activity</span>
-    <button type="button" [class]="isListeningOn ? 'bg-[#FF5500]' : 'bg-slate-600'" class="flex w-10 h-6 p-1 rounded-full overflow-hidden outline-none cursor-pointer" (click)="isListeningOn = !isListeningOn">
-      <span [class]="isListeningOn ? 'translate-x-4' : 'translate-x-0'" class="w-4 h-4 rounded-full bg-white transition-transform duration-300"></span>
-    </button>
-  </div>
-
-  <div class="flex flex-row items-center justify-between">
     <span class="font-raleway text-[1rem] font-medium text-[#FFE6DB]/50">Allow notifications</span>
     <button type="button" [class]="isNotificationsOn ? 'bg-[#FF5500]' : 'bg-slate-600'" class="flex w-10 h-6 p-1 rounded-full overflow-hidden outline-none cursor-pointer" (click)="isNotificationsOn = !isNotificationsOn">
       <span [class]="isNotificationsOn ? 'translate-x-4' : 'translate-x-0'" class="w-4 h-4 rounded-full bg-white transition-transform duration-300"></span>

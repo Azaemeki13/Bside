@@ -7,6 +7,8 @@ import { Subscription, switchMap } from 'rxjs';
 import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
 import { AlbumDetailedResponse, AlbumService, AlbumSongItem } from '../../services/album.service';
 import { Playlist, PlaylistService } from '../../services/playlist.service';
+import { ChatService } from '../../services/chat.service';
+import { FriendListItem } from '../../models/chat.model';
 
 @Component({
   selector: 'app-album-detail',
@@ -20,6 +22,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
   protected readonly playlistService = inject(PlaylistService);
   private readonly audio = inject(AudioPlayerService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly chatService = inject(ChatService);
 
   readonly playIcon = Play;
   readonly timer = Timer;
@@ -40,6 +43,11 @@ export class AlbumDetail implements OnInit, OnDestroy {
   newPlaylistName = '';
   isAddingToPlaylist = false;
   isTryMePopupOpen = false;
+  shareMenuSongId = '';
+  friends: FriendListItem[] = [];
+  isLoadingFriends = false;
+  shareTargetUserId = '';
+  shareFeedback = '';
 
   private routeSub?: Subscription;
   private albumSub?: Subscription;
@@ -53,6 +61,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.playlistService.loadPlaylists();
     this.playlistService.loadLikedSongs();
+    this.chatService.connect();
     this.routeSub = this.route.paramMap.subscribe((params) => {
       const albumId = params.get('albumId');
       if (!albumId) {
@@ -101,6 +110,59 @@ export class AlbumDetail implements OnInit, OnDestroy {
   toggleSongMenu(event: Event, song: AlbumSongItem): void {
     event.stopPropagation();
     this.openMenuSongId = this.openMenuSongId === song.id ? '' : song.id;
+    this.shareMenuSongId = '';
+    this.shareFeedback = '';
+  }
+
+  openShareMenu(event: Event, song: AlbumSongItem): void {
+    event.stopPropagation();
+    this.shareMenuSongId = song.id;
+    this.shareFeedback = '';
+
+    if (this.friends.length === 0 && !this.isLoadingFriends) {
+      this.loadFriends();
+    }
+  }
+
+  closeShareMenu(event: Event): void {
+    event.stopPropagation();
+    this.shareMenuSongId = '';
+  }
+
+  loadFriends(): void {
+    this.isLoadingFriends = true;
+
+    this.chatService.getFriends().subscribe({
+      next: (friends) => {
+        this.friends = friends;
+        this.isLoadingFriends = false;
+      },
+      error: (err) => {
+        console.error('Failed to load friends', err);
+        this.isLoadingFriends = false;
+      },
+    });
+  }
+
+  shareSong(event: Event, song: AlbumSongItem, friend: FriendListItem): void {
+    event.stopPropagation();
+
+    const isSentToSocket = this.chatService.sendSongMessage(friend.user_id, song.id);
+
+    if (!isSentToSocket) {
+      this.shareFeedback = 'Reconnecting, please try again.';
+      this.chatService.connect();
+      return;
+    }
+
+    this.shareFeedback = `Shared with ${friend.username}`;
+    this.shareTargetUserId = friend.user_id;
+
+    setTimeout(() => {
+      this.openMenuSongId = '';
+      this.shareMenuSongId = '';
+      this.shareFeedback = '';
+    }, 900);
   }
 
   openAddToPlaylistDialog(event: Event, song: AlbumSongItem): void {
