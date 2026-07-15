@@ -18,6 +18,7 @@ import { ChatService } from '../../services/chat.service';
 import { SocialSideBar } from '../../components/social-side-bar/social-side-bar';
 import { SocialShareCard } from '../../components/social-share-card/social-share-card';
 import { SocialChat } from '../../components/social-chat/social-chat';
+import { PlaylistService } from '../../services/playlist.service';
 
 interface SharedSongCard {
   message: ChatMessage;
@@ -55,6 +56,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 	incoming: [],
 	outgoing: [],
 	};
+  private readonly playlistService = inject(PlaylistService);
 
 	protected get friendIds(): Set<string> {
 		return new Set(this.friends.map((friend) => friend.user_id));
@@ -69,18 +71,19 @@ export class BsideSocial implements OnInit, OnDestroy {
 	protected isLoadingSongCards = false;
 
 
-  	ngOnInit(): void {
-		if (!isPlatformBrowser(this.platformId)) {
-			return;
-		}
+  ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
 
-		this.chatService.connect();
-		this.listenToWebSocketMessages();
+    this.playlistService.loadLikedSongs();
 
-		this.loadConversations();
-		this.loadUsers();
-		this.loadFriends();
-		this.loadFriendRequests();
+    this.chatService.connect();
+    this.listenToWebSocketMessages();
+    this.loadConversations();
+    this.loadUsers();
+    this.loadFriends();
+    this.loadFriendRequests();
 	}
 
 	ngOnDestroy(): void {
