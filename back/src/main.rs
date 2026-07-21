@@ -25,17 +25,18 @@ use crate::handlers::{
     get_my_playlists_handler, get_playlist_by_id_handler, get_song_stream_url_handler,
     get_user_by_id_handler, get_user_status_handler, google_callback_handler, google_login_handler,
     google_signup_handler, like_song_handler, mark_conversation_messages_as_read_handler,
-    ping_handler, register_handler, reject_friend_request_handler, remove_friend_handler,
-    remove_song_from_pl, review_artist_request_handler, send_friend_request_handler,
-    unlike_song_handler, update_playlist_handler, upload_avatar, verify_song_handler,
+    ml_callback_handler, ping_handler, register_handler, reject_friend_request_handler,
+    remove_friend_handler, remove_song_from_pl, review_artist_request_handler,
+    send_friend_request_handler, unlike_song_handler, update_playlist_handler, upload_avatar,
+    verify_song_handler,
 };
 use crate::models::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
     ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload,
     ArtistResponse, ArtistSongItem, AuthRequest, AuthResponse, ContactPayload, GoogleUserProfile,
-    LoginPayload, Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem,
-    RawSearchResult, RegisterPayload, SearchResult, Song, SongPayload, SongResponse,
-    UpdateStructurePayload, User, UserPayload,
+    LoginPayload, MlCallbackPayload, Playlist, PlaylistDetailedResponse, PlaylistPayload,
+    PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, Song, SongPayload,
+    SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use crate::search::searcher;
 
@@ -63,7 +64,7 @@ async fn main() {
     //tracing_subscriber::fmt()
     //  .with_max_level(tracing::Level::DEBUG)
     //.init(); WHEN DOING DEBUGING
-    dotenvy::dotenv().expect("Failed to read .env file");
+    dotenvy::dotenv().ok();
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
 
     println!("Connecting to the database ...");
@@ -100,12 +101,20 @@ async fn main() {
     ensure_storage_buckets(&aws_client)
         .await
         .expect("Storage buckets must be available.");
+    let public_endpoint = env::var("AWS_PUBLIC_ENDPOINT_URL")
+        .unwrap_or_else(|_| env::var("AWS_ENDPOINT_URL").unwrap_or_default());
+    let public_s3_config = aws_sdk_s3::config::Builder::from(&config_aws)
+        .force_path_style(true)
+        .endpoint_url(public_endpoint)
+        .build();
+    let public_aws_client = aws_sdk_s3::Client::from_conf(public_s3_config);
     let state = AppState {
         db: pool,
         oauth_client: client,
         http_client: reqwest::Client::new(),
         jwt: Arc::new(secrecy::SecretBox::new(jwt_secret.into())),
         aws_client,
+        public_aws_client,
         network: network::NetworkState::new(),
     };
     let cors = CorsLayer::new()
@@ -141,6 +150,7 @@ async fn main() {
         )
         .route("/contact", post(contact_handler))
         .route("/ws", get(ws_handler))
+        .route("/internal/songs/features", post(ml_callback_handler))
         .layer(GovernorLayer::new(governor_config));
 
     let protected_routes = Router::<AppState>::new()

@@ -38,13 +38,62 @@ services:
       - minio
     volumes:
       - ./scripts/setup-minio.sh:/setup-minio.sh:Z
-      - ./scripts/setup-cors.json:/setup-cors.json:Z
+      - ./scripts/setup-cors.xml:/setup-cors.xml:Z
       - ./scripts/defaults:/defaults:Z
     environment:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     entrypoint: /bin/sh /setup-minio.sh
+  ml_service:
+    build:
+      context: ./ml_engine
+      dockerfile: Dockerfile
+    container_name: bside_ml_service
+    restart: always
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - MINI_IO_ENDPOINT=http://minio:9000
+      - PUBLIC_API_KEY=${PUBLIC_API_KEY}
+    depends_on:
+      - minio
+    volumes:
+      - ./ml_engine:/app:Z
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: bside_rust_backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@bside_db_dev:5432/${DB_NAME}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ENDPOINT_URL=http://minio:9000
+      - AWS_PUBLIC_ENDPOINT_URL=http://localhost:9000
+      - OAUTH_ID=${OAUTH_ID}
+      - OAUTH_PW=${OAUTH_PW}
+      - G_AUTH_URL=${G_AUTH_URL}
+      - G_TOKEN_URL=${G_TOKEN_URL}
+      - OAUTH_URL=${OAUTH_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - PUBLIC_API_KEY=${PUBLIC_API_KEY}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
 
+    depends_on:
+      - db
+      - minio
 volumes:
   minio_data:
   postgres_data:

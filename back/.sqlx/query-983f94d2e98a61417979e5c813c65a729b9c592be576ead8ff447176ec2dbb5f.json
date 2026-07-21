@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE songs SET status = 'Ready'::song_status WHERE id = $1",
+  "query": "UPDATE songs SET status = 'Pending'::song_status WHERE id = $1",
   "describe": {
     "columns": [],
     "parameters": {
@@ -10,5 +10,5 @@
     },
     "nullable": []
   },
-  "hash": "eb65dfad67e63f3129df58058b65c1e9fb84e5408b79a63f9eb92b4da7f0d6aa"
+  "hash": "983f94d2e98a61417979e5c813c65a729b9c592be576ead8ff447176ec2dbb5f"
 }

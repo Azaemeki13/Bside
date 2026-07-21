@@ -104,6 +104,14 @@ pub struct SongPayload {
     pub ml_features: Option<serde_json::Value>,
 }
 
+#[derive(serde::Deserialize)]
+pub struct MlCallbackPayload {
+    pub track_id: uuid::Uuid,
+    pub dsp_analysis: serde_json::Value,
+    pub ml_features: serde_json::Value,
+    pub normalized_vector: Vec<f32>,
+}
+
 #[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct SongResponse {
     pub song: Song,
@@ -228,6 +236,9 @@ pub struct AppState {
     pub http_client: reqwest::Client,
     pub jwt: Arc<SecretString>,
     pub aws_client: aws_sdk_s3::Client,
+    // Same bucket, but reachable from outside the Docker network: used only
+    // to build presigned URLs that a browser or external script will call.
+    pub public_aws_client: aws_sdk_s3::Client,
     //for user status -> online/offline
     pub network: NetworkState,
 }
@@ -312,14 +323,7 @@ pub enum SearchResult {
     },
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Clone,
-    Debug,
-    sqlx::FromRow,
-    utoipa::ToSchema,
-)]
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug, sqlx::FromRow, utoipa::ToSchema)]
 pub struct SharedSong {
     pub id: uuid::Uuid,
     pub title: String,
@@ -360,10 +364,7 @@ pub struct ChatMessage {
 }
 
 impl ChatMessage {
-    pub fn from_record(
-        record: ChatMessageRecord,
-        shared_song: Option<SharedSong>,
-    ) -> Self {
+    pub fn from_record(record: ChatMessageRecord, shared_song: Option<SharedSong>) -> Self {
         Self {
             id: record.id,
             sender_id: record.sender_id,

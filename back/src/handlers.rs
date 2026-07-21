@@ -1,14 +1,14 @@
-use crate::auth::create_jwt;
+use crate::auth::{PublicApiKey, create_jwt};
 use crate::models::{
-    ChatMessage, ConversationListItem, FriendListItem, FriendRequestItem,
-    FriendRequestsResponse, MarkMessagesReadResponse, UserStatusResponse, SharedSong,
+    ChatMessage, ConversationListItem, FriendListItem, FriendRequestItem, FriendRequestsResponse,
+    MarkMessagesReadResponse, SharedSong, UserStatusResponse,
 };
 use crate::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AnyAuth,
     AppState, ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse,
     ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem, AuthRequest, AuthResponse,
-    BSideError, Claims, ContactPayload, GoogleUserProfile, LoginPayload, Playlist,
-    PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RegisterPayload, Song,
+    BSideError, Claims, ContactPayload, GoogleUserProfile, LoginPayload, MlCallbackPayload,
+    Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RegisterPayload, Song,
     SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
 };
 use argon2::{
@@ -1271,7 +1271,7 @@ pub async fn create_song_handler(
     let expires_in = PresigningConfig::expires_in(Duration::from_secs(300))
         .map_err(|e| BSideError::S3Error(format!("Presigning config failure: {e}")))?;
     let presigned_request = state
-        .aws_client
+        .public_aws_client
         .put_object()
         .bucket("bside-tracks")
         .key(&s3_key)
@@ -1324,12 +1324,6 @@ pub async fn verify_song_handler(
     )
     .fetch_one(&state.db)
     .await?;
-    // old version:
-    // let is_owner = sqlx::query_scalar!(
-    //     "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND artist_id = $2)",
-    //     song.album_id,
-    //     claims.sub
-    // )
     let is_owner = sqlx::query_scalar!(
         r#"
         SELECT EXISTS(
@@ -1401,13 +1395,56 @@ pub async fn verify_song_handler(
             .await?;
         return Err(BSideError::InvalidFormat);
     }
+    let ml_client = state.http_client.clone();
+    let track_id_clone = song_id;
+    let s3_key_clone = song.audio_url.clone();
+    tokio::spawn(async move {
+        let payload = serde_json::json!({
+            "track_id": track_id_clone,
+            "object_key": s3_key_clone
+        });
+        let res = ml_client
+            .post("http://bside_ml_service:8000/analyze")
+            .json(&payload)
+            .send()
+            .await;
+        if let Err(e) = res {
+            tracing::error!(
+                "Failed to notify ML Microservice for song {}: {:?}",
+                track_id_clone,
+                e
+            );
+        }
+    });
     let _response = sqlx::query!(
-        "UPDATE songs SET status = 'Ready'::song_status WHERE id = $1",
+        "UPDATE songs SET status = 'Pending'::song_status WHERE id = $1",
         song_id
     )
     .execute(&state.db)
     .await?;
-    Ok(axum::Json(serde_json::json!({"status": "verified"})))
+    Ok(axum::Json(serde_json::json!({"status": "processing_ml"})))
+}
+
+pub async fn ml_callback_handler(
+    State(state): State<AppState>,
+    _key: PublicApiKey,
+    axum::extract::Json(payload): axum::extract::Json<MlCallbackPayload>,
+) -> Result<axum::Json<serde_json::Value>, BSideError> {
+    sqlx::query!(
+        r#"
+        UPDATE songs
+        SET status = 'Ready'::song_status,
+            ml_features = $2,
+            normalized_vector = $3
+        WHERE id = $1
+        "#,
+        payload.track_id,
+        payload.ml_features,
+        &payload.normalized_vector as &[f32]
+    )
+    .execute(&state.db)
+    .await?;
+    Ok(axum::Json(serde_json::json!({"status": "processed"})))
 }
 
 pub async fn get_song_stream_url_handler(
@@ -1435,7 +1472,7 @@ pub async fn get_song_stream_url_handler(
             let expires_in = PresigningConfig::expires_in(Duration::from_secs(300))
                 .map_err(|e| BSideError::S3Error(format!("Presigning config failure: {e}")))?;
             let presigned_request = state
-                .aws_client
+                .public_aws_client
                 .get_object()
                 .bucket("bside-tracks")
                 .key(&song.audio_url)
@@ -2563,8 +2600,8 @@ pub async fn get_conversation_messages_handler(
         current_user_id,
         other_user_id
     )
-        .fetch_all(&state.db)
-        .await?;
+    .fetch_all(&state.db)
+    .await?;
 
     let messages = rows
         .into_iter()

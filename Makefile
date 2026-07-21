@@ -4,13 +4,18 @@ ifneq (,$(wildcard ./.env))
 endif
 
 COMPOSE = sudo docker compose -p bside
+COMPOSE_GPU = sudo docker compose -p bside -f docker-compose.yml -f docker-compose.gpu.yml
 DOCKER_DB = bside_db_dev
 SQLX = sqlx
 
-.PHONY: up down re clean logs status db-shell db-reset migrate prepare
+.PHONY: up up-gpu down re re-gpu clean logs status db-shell db-reset migrate prepare
 
 up:
 	$(COMPOSE) up -d
+
+# Requires the NVIDIA Container Toolkit on the host, see docker-compose.gpu.yml
+up-gpu:
+	$(COMPOSE_GPU) up -d --build
 
 down:
 	$(COMPOSE) down
@@ -23,6 +28,13 @@ re:
 	$(COMPOSE) up -d --build --force-recreate
 	@sleep 3
 	$(MAKE) migrate
+
+re-gpu:
+	$(COMPOSE_GPU) down --remove-orphans
+	$(COMPOSE_GPU) up -d --build --force-recreate
+	@sleep 3
+	$(MAKE) migrate
+
 logs:
 	$(COMPOSE) logs -f
 

@@ -1,0 +1,20 @@
+fastapi
+uvicorn
+librosa
+numpy
+essentia-tensorflow==2.1b6.dev1389
+minio
+requests
+
+# CUDA 11 runtime libraries for the TensorFlow graphs bundled inside
+# essentia-tensorflow. Harmless to install even without a GPU: TensorFlow
+# already falls back to CPU at runtime if no NVIDIA driver/device is found
+# (see the "Ignore above cudart dlerror" log line). Only loaded from
+# LD_LIBRARY_PATH set in the Dockerfile when a GPU is actually passed through.
+nvidia-cuda-runtime-cu11==11.8.89
+nvidia-cublas-cu11==11.10.3.66
+nvidia-cudnn-cu11==8.6.0.163
+nvidia-cufft-cu11==10.9.0.58
+nvidia-curand-cu11==10.2.10.91
+nvidia-cusolver-cu11==11.4.1.48
+nvidia-cusparse-cu11==11.7.5.86

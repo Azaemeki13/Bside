@@ -29,4 +29,6 @@ if [ -d "/defaults" ]; then
     fi
 fi
 
-mc --config-dir "$MC_CONFIG_DIR" cors set bside_minio/bside-tracks /setup-cors.json
+# Standalone MinIO returns 501 NotImplemented for bucket-level PutBucketCors;
+# cross-origin access is already granted server-wide via the default
+# `api cors_allow_origin=*` config, so no per-bucket call is needed here.

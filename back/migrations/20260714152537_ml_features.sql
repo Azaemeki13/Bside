@@ -1,0 +1,4 @@
+ALTER TABLE songs
+    ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'Processing',
+    ADD COLUMN IF NOT EXISTS ml_features JSONB,
+    ADD COLUMN IF NOT EXISTS normalized_vector FLOAT4[];

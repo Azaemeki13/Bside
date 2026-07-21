@@ -1,0 +1,20 @@
+# Optional GPU acceleration for the ML analyzer.
+#
+# Requires the NVIDIA Container Toolkit installed on the host and the
+# "nvidia" runtime registered with Docker:
+#   https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+#
+# Usage (layer on top of the base file, do not use standalone):
+#   sudo docker compose -f docker-compose.yml -f docker-compose.gpu.yml up --build
+#
+# Without this file, ml_service runs on CPU only — the default
+# `docker compose up --build` is unaffected and works with no GPU present.
+services:
+  ml_service:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
