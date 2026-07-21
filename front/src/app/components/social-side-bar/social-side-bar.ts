@@ -5,6 +5,7 @@ import { Bell, Check, LucideAngularModule, Search, UserRoundPlus, X } from 'luci
 import {
   ChatUser,
   ConversationListItem,
+  FriendListItem,
   FriendRequestItem,
   FriendRequestsResponse,
 } from '../../models/chat.model';
@@ -24,6 +25,7 @@ export class SocialSideBar {
   @Input() isLoadingUsers = false;
   @Input() isLoadingConversations = false;
   @Input() friendIds: Set<string> = new Set();
+  @Input() friends: FriendListItem[] = [];
   @Input() friendRequests: FriendRequestsResponse = { incoming: [], outgoing: [] };
   @Input() friendActionUserId: string | null = null;
   @Input() friendActionRequestId: string | null = null;
@@ -137,6 +139,10 @@ export class SocialSideBar {
 
   isFriend(userId: string): boolean {
     return this.friendIds.has(userId);
+  }
+
+  isUserOnline(userId: string): boolean {
+    return this.friends.some((friend) => friend.user_id === userId && friend.is_online);
   }
 
   hasPendingOutgoingRequest(userId: string): boolean {

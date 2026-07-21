@@ -165,18 +165,26 @@
             [ngClass]="selectedConversationId === conversation.other_user_id ? 'bg-[#170814]' : 'bg-transparent'"
             (click)="conversationSelected.emit(conversation)"
           >
-            <div class="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
-              @if (conversation.other_avatar_url && !brokenAvatarIds.has(conversation.other_user_id)) {
-                <img
-                  [src]="conversation.other_avatar_url"
-                  [alt]="conversation.other_username"
-                  class="h-full w-full object-cover"
-                  (error)="onAvatarError(conversation.other_user_id)"
-                />
-              } @else {
-                <span class="font-raleway text-sm font-bold text-[#FFE6DB]">
-                  {{ getAvatarInitials(conversation.other_username) || 'U' }}
-                </span>
+            <div class="relative h-14 w-14 shrink-0">
+              <div class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
+                @if (conversation.other_avatar_url && !brokenAvatarIds.has(conversation.other_user_id)) {
+                  <img
+                    [src]="conversation.other_avatar_url"
+                    [alt]="conversation.other_username"
+                    class="h-full w-full object-cover"
+                    (error)="onAvatarError(conversation.other_user_id)"
+                  />
+                } @else {
+                  <span class="font-raleway text-sm font-bold text-[#FFE6DB]">
+                    {{ getAvatarInitials(conversation.other_username) || 'U' }}
+                  </span>
+                }
+              </div>
+              @if (isUserOnline(conversation.other_user_id) === true) {
+                <span
+                  class="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#1F0E1C] bg-emerald-400"
+                  aria-hidden="true"
+                ></span>
               }
             </div>
 

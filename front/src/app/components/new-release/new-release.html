@@ -1,3 +1,19 @@
-<div class="relative flex items-end">
-  <img src="assets/new-bg.png" alt="New release cover" />
+<div class="relative flex h-full w-full items-end overflow-hidden rounded-[1.5rem]">
+  <img src="assets/new-bg.png" alt="New release cover" class="h-full w-full object-cover" />
+
+  <div class="absolute left-0 top-0 z-10 flex flex-col items-start gap-3 p-6">
+    <p class="font-climate-crisis text-[2rem] leading-[0.9] text-[#FFE6DB]">
+      NEW<br />RELEASE
+    </p>
+
+    <div class="font-raleway text-[#FFE6DB]">
+      <p class="text-md font-semibold text-[#FFE6DB]/80">Mitski's latest</p>
+      <p class="text-xl font-black">Nothing's About<br />to Happen to Me</p>
+    </div>
+
+    <button type="button"
+            class="mt-1 rounded-full border border-[#FFE6DB] px-5 py-2 font-raleway text-sm font-semibold text-[#FFE6DB] cursor-pointer hover:bg-[#FFE6DB]/10 duration-300">
+      Play now
+    </button>
+  </div>
 </div>

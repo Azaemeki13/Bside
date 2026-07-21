@@ -1,6 +1,6 @@
 <div class="flex h-full w-full gap-4 overflow-hidden">
   <div class="h-full w-[22rem] shrink-0 overflow-hidden rounded-[1.563rem]">
-    <app-social-side-bar
+  <app-social-side-bar
       [users]="users"
       [conversations]="conversations"
       [currentUserId]="currentUser()?.id ?? null"
@@ -8,6 +8,7 @@
       [isLoadingUsers]="isLoadingUsers"
       [isLoadingConversations]="isLoadingConversations"
       [friendIds]="friendIds"
+      [friends]="friends"
       [friendRequests]="friendRequests"
       [friendActionUserId]="friendActionUserId"
       [friendActionRequestId]="friendActionRequestId"
@@ -20,13 +21,14 @@
   </div>
 
   <div class="min-w-0 flex-1 overflow-hidden rounded-[1.563rem]">
-    <app-social-chat
-      [selectedConversation]="selectedConversation"
-      [messages]="messages"
-      [currentUserId]="currentUser()?.id ?? null"
-      [isLoadingMessages]="isLoadingMessages"
-      (messageSent)="sendMessage($event)"
-    ></app-social-chat>
+  <app-social-chat
+        [selectedConversation]="selectedConversation"
+        [messages]="messages"
+        [currentUserId]="currentUser()?.id ?? null"
+        [isLoadingMessages]="isLoadingMessages"
+        [isOtherUserOnline]="isSelectedConversationUserOnline"
+        (messageSent)="sendMessage($event)"
+      ></app-social-chat>
   </div>
 
   <div class="h-full w-[17.5rem] shrink-0 overflow-y-auto rounded-[1.563rem]">

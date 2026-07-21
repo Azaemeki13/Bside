@@ -10,18 +10,34 @@
     </div>
 
     <div class="mt-3 flex w-full items-center justify-between gap-3">
-      <button
-        type="button"
-        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#FF5500] hover:bg-[#FF7733] duration-200 shadow-lg"
-        [attr.aria-label]="isPlaying() ? 'Pause song' : 'Play song'"
-        (click)="togglePlay($event)"
-      >
-        @if (isPlaying()) {
-          <lucide-icon [img]="pause" class="h-5 w-5 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
-        } @else {
-          <lucide-icon [img]="play" class="h-5 w-5 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
-        }
-      </button>
+      <div class="flex shrink-0 items-center gap-2">
+        <button
+          type="button"
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#FF5500] hover:bg-[#FF7733] duration-200 shadow-lg"
+          [attr.aria-label]="isPlaying() ? 'Pause song' : 'Play song'"
+          (click)="togglePlay($event)"
+        >
+          @if (isPlaying()) {
+            <lucide-icon [img]="pause" class="h-5 w-5 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
+          } @else {
+            <lucide-icon [img]="play" class="h-5 w-5 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
+          }
+        </button>
+
+        <button
+          type="button"
+          class="flex h-8 w-8 items-center justify-center"
+          [attr.aria-label]="isLiked() ? 'Unlike song' : 'Like song'"
+          [attr.aria-pressed]="isLiked()"
+          [disabled]="isLikePending"
+          (click)="toggleLike($event)"
+        >
+          <lucide-icon
+            [img]="heart"
+            [class]="isLiked() ? 'h-[1.25rem] w-[1.25rem] text-[#FF5500] fill-[#FF5500] cursor-pointer' : 'h-[1.25rem] w-[1.25rem] text-[#FFE6DB] cursor-pointer'"
+          ></lucide-icon>
+        </button>
+      </div>
 
       <div class="min-w-0 max-w-[11rem] flex-1 text-right">
         <p class="truncate font-raleway text-[1rem] font-bold text-[#FFE6DB]">{{ song.title }}</p>

@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, PLATFORM_I
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule} from 'lucide-angular';
-import { catchError, finalize, forkJoin, map, of } from 'rxjs';
+import { catchError, finalize, forkJoin, interval, map, of, Subscription } from 'rxjs';
 import {
   ChatMessage,
   ChatUser,
@@ -70,6 +70,9 @@ export class BsideSocial implements OnInit, OnDestroy {
 	protected receivedSongCards: SharedSongCard[] = [];
 	protected isLoadingSongCards = false;
 
+	protected isSelectedConversationUserOnline: boolean | null = null;
+	private statusPollSubscription: Subscription | null = null;
+
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) {
@@ -88,6 +91,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 
 	ngOnDestroy(): void {
 		this.chatService.disconnect();
+		this.statusPollSubscription?.unsubscribe();
 	}
 
   	protected loadFriends(): void {
@@ -368,6 +372,7 @@ export class BsideSocial implements OnInit, OnDestroy {
     this.selectedConversation = conversation;
     this.loadMessages(conversation.other_user_id);
     this.markSelectedConversationAsRead(conversation.other_user_id);
+    this.watchOnlineStatus(conversation.other_user_id);
   }
 
   protected startConversationWithUser(user: ChatUser): void {
@@ -398,6 +403,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 
     this.selectedConversation = temporaryConversation;
     this.messages = [];
+    this.watchOnlineStatus(user.id);
   }
 
   protected loadMessages(otherUserId: string): void {
@@ -627,6 +633,31 @@ export class BsideSocial implements OnInit, OnDestroy {
     if (refreshedConversation) {
       this.selectedConversation = refreshedConversation;
     }
+  }
+
+  private watchOnlineStatus(otherUserId: string): void {
+    this.statusPollSubscription?.unsubscribe();
+    this.isSelectedConversationUserOnline = null;
+
+    this.loadOnlineStatus(otherUserId);
+
+    this.statusPollSubscription = interval(15000).subscribe(() => {
+      this.loadOnlineStatus(otherUserId);
+    });
+  }
+
+  private loadOnlineStatus(otherUserId: string): void {
+    this.chatService.getUserStatus(otherUserId).subscribe({
+      next: (status) => {
+        if (this.selectedConversation?.other_user_id !== otherUserId) return;
+
+        this.isSelectedConversationUserOnline = status.is_online;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Failed to load user status:', error);
+      },
+    });
   }
 
   private findLastPendingMessageIndex(toUserId: string): number {

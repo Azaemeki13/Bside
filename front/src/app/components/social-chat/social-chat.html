@@ -10,24 +10,34 @@
     </div>
   } @else {
     <div class="flex shrink-0 items-center gap-3 border-b border-[#FFE6DB]/10 px-6 py-4">
-      <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
-        @if (selectedConversation.other_avatar_url && !headerAvatarBroken) {
-          <img
-            [src]="selectedConversation.other_avatar_url"
-            [alt]="selectedConversation.other_username"
-            class="h-full w-full object-cover"
-            (error)="onHeaderAvatarError()"
-          />
-        } @else {
-          <span class="font-raleway text-xs font-bold text-[#FFE6DB]">
-            {{ getAvatarInitials(selectedConversation.other_username) || 'U' }}
-          </span>
+      <div class="relative h-11 w-11 shrink-0">
+        <div class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
+          @if (selectedConversation.other_avatar_url && !headerAvatarBroken) {
+            <img
+              [src]="selectedConversation.other_avatar_url"
+              [alt]="selectedConversation.other_username"
+              class="h-full w-full object-cover"
+              (error)="onHeaderAvatarError()"
+            />
+          } @else {
+            <span class="font-raleway text-xs font-bold text-[#FFE6DB]">
+              {{ getAvatarInitials(selectedConversation.other_username) || 'U' }}
+            </span>
+          }
+        </div>
+        @if (isOtherUserOnline === true) {
+          <span
+            class="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#1F0E1C] bg-emerald-400"
+            aria-hidden="true"
+          ></span>
         }
       </div>
 
-      <p class="truncate font-raleway text-base font-bold text-[#FFE6DB]">
-        {{ selectedConversation.other_username }}
-      </p>
+      <div class="flex min-w-0 flex-1 items-center gap-2">
+        <p class="truncate font-raleway text-base font-bold text-[#FFE6DB]">
+          {{ selectedConversation.other_username }}
+        </p>
+      </div>
     </div>
 
     <div class="min-h-0 flex-1 overflow-y-auto px-6 py-4" #messagesContainer>

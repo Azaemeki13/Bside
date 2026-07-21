@@ -26,6 +26,7 @@ export class SocialChat implements OnChanges {
   @Input() messages: ChatMessage[] = [];
   @Input() currentUserId: string | null = null;
   @Input() isLoadingMessages = false;
+  @Input() isOtherUserOnline: boolean | null = null;
 
   @Output() messageSent = new EventEmitter<string>();
 
