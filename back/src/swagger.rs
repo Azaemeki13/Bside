@@ -2,9 +2,10 @@ use crate::models::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem,
     ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload,
     ArtistResponse, ArtistSongItem, AuthResponse, ChatMessage, ConversationListItem, LoginPayload,
-    MarkMessagesReadResponse, Playlist, PlaylistDetailedResponse, PlaylistPayload,
-    PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, SharedSong, Song,
-    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
+    MarkMessagesReadResponse, PlaybackInteractionType, Playlist, PlaylistDetailedResponse,
+    PlaylistPayload, PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, SharedSong,
+    Song, SongInteractionPayload, SongPayload, SongResponse, UpdateStructurePayload, User,
+    UserPayload,
 };
 use utoipa::OpenApi;
 
@@ -46,11 +47,12 @@ use utoipa::OpenApi;
         crate::handlers::get_conversation_messages_handler,
         crate::handlers::mark_conversation_messages_as_read_handler,
         crate::handlers::get_conversations_handler,
+        crate::handlers::record_song_interaction_handler,
     ),
     components(
         schemas(
-            User, UserPayload, Song, SongPayload, SongResponse, AddSongResponse,
-            Playlist, UpdateStructurePayload, PlaylistDetailedResponse, PlaylistSongItem,
+            User, UserPayload, Song, SongPayload, SongResponse, AddSongResponse, SongInteractionPayload,
+            PlaybackInteractionType, Playlist, UpdateStructurePayload, PlaylistDetailedResponse, PlaylistSongItem,
             AlbumResponse, AlbumListItem, AlbumSongItem, AlbumDetailedResponse,
             ArtistResponse, ArtistSongItem, ArtistDetailResponse, ArtistRequestPayload,
             ArtistRequestReviewPayload, ArtistRequestResponse, PlaylistPayload, AuthResponse,

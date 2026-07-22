@@ -104,6 +104,23 @@ pub struct SongPayload {
     pub ml_features: Option<serde_json::Value>,
 }
 
+#[derive(Debug, serde::Deserialize, utoipa::ToSchema)]
+#[serde(rename_all = "lowercase")]
+pub enum PlaybackInteractionType {
+    Play,
+    Complete,
+    Skip,
+    Replay,
+}
+
+#[derive(Debug, serde::Deserialize, utoipa::ToSchema)]
+pub struct SongInteractionPayload {
+    pub interaction_type: PlaybackInteractionType,
+
+    #[schema(example = 12)]
+    pub listened_seconds: Option<i32>,
+}
+
 #[derive(serde::Deserialize)]
 pub struct MlCallbackPayload {
     pub track_id: uuid::Uuid,

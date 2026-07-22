@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO user_song_interactions (\n            user_id,\n            song_id,\n            interaction_type\n        )\n        VALUES ($1, $2, 'unlike')\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2bf0036defb660f5c697921efba3e3e9d743e9b4ca14ca1fced183612c5b707a"
+}

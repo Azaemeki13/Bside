@@ -25,10 +25,10 @@ use crate::handlers::{
     get_my_playlists_handler, get_playlist_by_id_handler, get_song_stream_url_handler,
     get_user_by_id_handler, get_user_status_handler, google_callback_handler, google_login_handler,
     google_signup_handler, like_song_handler, mark_conversation_messages_as_read_handler,
-    ml_callback_handler, ping_handler, register_handler, reject_friend_request_handler,
-    remove_friend_handler, remove_song_from_pl, review_artist_request_handler,
-    send_friend_request_handler, unlike_song_handler, update_playlist_handler, upload_avatar,
-    verify_song_handler,
+    ml_callback_handler, ping_handler, record_song_interaction_handler, register_handler,
+    reject_friend_request_handler, remove_friend_handler, remove_song_from_pl,
+    review_artist_request_handler, send_friend_request_handler, unlike_song_handler,
+    update_playlist_handler, upload_avatar, verify_song_handler,
 };
 use crate::models::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
@@ -179,6 +179,10 @@ async fn main() {
         .route(
             "/songs/{song_id}/like",
             post(like_song_handler).delete(unlike_song_handler),
+        )
+        .route(
+            "/songs/{song_id}/interactions",
+            post(record_song_interaction_handler),
         )
         .route("/songs/{id}", delete(delete_song_handler))
         .route("/liked-songs", get(get_liked_songs_handler))
