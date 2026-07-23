@@ -6,96 +6,35 @@
 ## Web
 | Module | Type | Status | Owner | Notes |
 |---|---|---|---|---|
-| Frontend + backend framework (both) | Major (2) | | | |
-| Frontend framework only | Minor (1) | | | |
-| Backend framework only | Minor (1) | | | |
-| Real-time features (WebSockets) | Major (2) | | | |
-| User interaction (chat + profile + friends) | Major (2) | | | |
-| Public API (secured, rate-limited, documented, 5+ endpoints) | Major (2) | | | |
-| ORM for database | Minor (1) | | | |
-| Full notification system (CRUD actions) | Minor (1) | | | |
-| Real-time collaborative features | Minor (1) | | | |
-| Server-Side Rendering (SSR) | Minor (1) | | | |
-| Progressive Web App (PWA) | Minor (1) | | | |
-| Custom design system (10+ reusable components) | Minor (1) | | | |
-| Advanced search (filters, sort, pagination) | Minor (1) | | | |
-| File upload & management system | Minor (1) | | | |
-
-## Accessibility & Internationalization
-| Module | Type | Status | Owner | Notes |
-|---|---|---|---|---|
-| Full WCAG 2.1 AA accessibility compliance | Major (2) | | | |
-| Multi-language support (i18n, 3+ languages) | Minor (1) | | | |
-| RTL language support | Minor (1) | | | |
-| Additional browser support (2+ browsers) | Minor (1) | | | |
+| Frontend + backend framework (both) | Major (2) |Done| | |
+| Real-time features (WebSockets) | Major (2) |Verify but done| | |
+| User interaction (chat + profile + friends) | Major (2) |To verify remove friends| | |
+| Public API (secured, rate-limited, documented, 5+ endpoints) | Major (2) |Verify| | |
+| Custom design system (10+ reusable components) | Minor (1) | |Pas sûr mais insh ça passe| |
+| Advanced search (filters, sort, pagination) | Minor (1) |WIP| | |
+| File upload & management system | Minor (1) |Verify client side vérifier delete back & front| | |
 
 ## User Management
 | Module | Type | Status | Owner | Notes |
 |---|---|---|---|---|
-| Standard user management & auth (profile, avatar, friends, online status) | Major (2) | | | |
-| Game stats & match history | Minor (1) | | | |
-| Remote auth (OAuth 2.0) | Minor (1) | | | |
-| Advanced permissions system (roles/CRUD) | Major (2) | | | |
-| Organization system | Major (2) | | | |
-| 2FA | Minor (1) | | | |
-| User activity analytics dashboard | Minor (1) | | | |
+| Standard user management & auth (profile, avatar, friends, online status) | Major (2) |Les users doivent pouvoir update leurs infos et changer avatar On doit aussi relier les settings a des trucs qui marchent| | |
+| Remote auth (OAuth 2.0) | Minor (1) |Done| | |
+| Advanced permissions system (roles/CRUD) | Major (2) |Admin qui peut ban des users mais mis a part ça done | | |
+| User activity analytics dashboard | Minor (1) |avec ai plus postgresql a vérifier dans le back dans le front c good | | |
 
 ## Artificial Intelligence
 | Module | Type | Status | Owner | Notes |
 |---|---|---|---|---|
-| AI opponent for games | Major (2) | | | |
-| RAG system | Major (2) | | | |
-| LLM system interface | Major (2) | | | |
-| ML recommendation system | Major (2) | | | |
-| Content moderation AI | Minor (1) | | | |
-| Voice/speech integration | Minor (1) | | | |
-| Sentiment analysis | Minor (1) | | | |
-| Image recognition/tagging | Minor (1) | | | |
-
-## Cybersecurity
-| Module | Type | Status | Owner | Notes |
-|---|---|---|---|---|
-| WAF/ModSecurity (hardened) + HashiCorp Vault for secrets | Major (2) | | | |
-
-## Gaming & User Experience
-| Module | Type | Status | Owner | Notes |
-|---|---|---|---|---|
-| Complete web-based game (live matches, clear rules) | Major (2) | | | |
-| Remote players (real-time, separate computers) | Major (2) | | | |
-| Multiplayer game (3+ players) | Major (2) | | | |
-| Second game w/ history & matchmaking | Major (2) | | | |
-| Advanced 3D graphics (Three.js/Babylon.js) | Major (2) | | | |
-| Advanced chat features | Minor (1) | | | |
-| Tournament system | Minor (1) | | | |
-| Game customization options | Minor (1) | | | |
-| Gamification system (3+ of: achievements/badges/leaderboard/XP/challenges/rewards) | Minor (1) | | | |
-| Spectator mode | Minor (1) | | | |
+| ML recommendation system | Major (2) | collecter les interactions utilisateur, stocker les préférences, calculer les poids, choisir quand mettre à jour la matrice de préférence et concevoir l’API de recommandation + cronjob| | |
 
 ## DevOps
 | Module | Type | Status | Owner | Notes |
 |---|---|---|---|---|
-| ELK log management | Major (2) | | | |
-| Prometheus + Grafana monitoring | Major (2) | | | |
-| Backend as microservices | Major (2) | | | |
-| Health check/status page + automated backups | Minor (1) | | | |
-
-## Data & Analytics
-| Module | Type | Status | Owner | Notes |
-|---|---|---|---|---|
-| Advanced analytics dashboard | Major (2) | | | |
-| Data export/import | Minor (1) | | | |
-| GDPR compliance features | Minor (1) | | | |
-
-## Blockchain
-| Module | Type | Status | Owner | Notes |
-|---|---|---|---|---|
-| Tournament scores on blockchain (Avalanche/Solidity) | Major (2) | | | |
-| ICP backend | Minor (1) | | | |
-
+| Backend as microservices | Major (2) |A verifier| | |
 ---
 
 ## Score Tally
-- **Majors claimed × 2:** ___
-- **Minors claimed × 1:** ___
-- **Total:** ___ / 14 required
-- **Bonus beyond 14** (max +5): ___
+- **Majors claimed × 2:** 8
+- **Minors claimed × 1:** 5
+- **Total:** 23 / 14 required
+- **Bonus beyond 14** (max +5): 19
