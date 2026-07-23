@@ -2,6 +2,6 @@
   type="button"
   [class.is-active]="isActive()"
   (click)="navigate()"
-  class="flex h-[3.125rem] appearance-none border-0 w-[3.125rem] items-center justify-center rounded-full bg-[#431E3A] hover:bg-[#FF5500] focus:outline-2 focus:outline-offset-4 focus:outline-[#FFE6DB] active:bg-[#431E3A] [&.is-active]:bg-[#FF5500]">
+  class="flex h-[3.125rem] appearance-none cursor-pointer border-0 w-[3.125rem] items-center justify-center rounded-full bg-[#431E3A] hover:bg-[#FF5500] focus:outline-2 focus:outline-offset-4 focus:outline-[#FFE6DB] active:bg-[#431E3A] [&.is-active]:bg-[#FF5500] [&.is-active]:outline-2 [&.is-active]:outline-offset-4 [&.is-active]:outline-[#FFE6DB]">
   <ng-content></ng-content>
 </button>

@@ -18,7 +18,7 @@
             <p class="font-raleway text-[#FFE6DB]/50 text-sm pt-4">No songs yet.</p>
           } @else {
             @for (song of playlistService.selectedSongs(); track song.link_id) {
-              <div class="grid items-center py-2 rounded-lg hover:bg-[#FFE6DB]/5 duration-200"
+              <div class="cursor-pointer grid items-center py-2 rounded-lg hover:bg-[#FFE6DB]/5 duration-200"
                    style="grid-template-columns: 2rem 2.5rem minmax(0,1fr) 5rem 2.5rem 2.5rem"
                    role="button"
                    (click)="playSong(song)"
@@ -57,7 +57,7 @@
 
                 <span class="flex justify-end">
                   <button type="button"
-                          class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[#FFE6DB]/10"
+                          class="cursor-pointer flex h-8 w-8 items-center justify-center rounded-full hover:bg-[#FFE6DB]/10"
                           [attr.aria-label]="playlistService.isLiked(song.song_id) ? 'Unlike song' : 'Like song'"
                           [attr.aria-pressed]="playlistService.isLiked(song.song_id)"
                           (click)="toggleLike($event, song)">
@@ -71,7 +71,7 @@
 
                 <span class="relative flex justify-end">
                   <button type="button"
-                          class="flex h-8 w-8 items-center justify-center rounded-full text-[#FFE6DB]/50 hover:bg-[#FFE6DB]/10 hover:text-[#FFE6DB]"
+                          class="cursor-pointer flex h-8 w-8 items-center justify-center rounded-full text-[#FFE6DB]/50 hover:bg-[#FFE6DB]/10 hover:text-[#FFE6DB]"
                           aria-label="Song options"
                           (click)="toggleSongMenu($event, song)">
                     <lucide-icon [img]="ellipsisVertical" class="h-4 w-4"></lucide-icon>
