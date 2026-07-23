@@ -10,7 +10,6 @@
 | Real-time features (WebSockets) | Major (2) |Verify but done| | |
 | User interaction (chat + profile + friends) | Major (2) |To verify remove friends| | |
 | Public API (secured, rate-limited, documented, 5+ endpoints) | Major (2) |Verify| | |
-| Custom design system (10+ reusable components) | Minor (1) | |Pas sûr mais insh ça passe| |
 | Advanced search (filters, sort, pagination) | Minor (1) |WIP| | |
 | File upload & management system | Minor (1) |Verify client side vérifier delete back & front| | |
 
