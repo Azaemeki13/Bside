@@ -1,8 +1,12 @@
 use crate::auth::{PublicApiKey, create_jwt};
+use crate::ws::{
+    notify_friend_removed, notify_friend_request_accepted, notify_friend_request_received,
+    notify_friend_request_rejected,
+};
 use crate::models::{
     ChatMessage, ConversationListItem, FriendListItem, FriendRequestItem, FriendRequestsResponse,
     MarkMessagesReadResponse, PlaybackInteractionType, SharedSong, SongInteractionPayload,
-    UserStatusResponse,
+    UpdateProfilePayload, UserStatusResponse,
 };
 use crate::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AnyAuth,
@@ -143,7 +147,7 @@ pub async fn register_handler(
         r#"
         INSERT INTO users (id, username, email, role)
         VALUES($1, $2, $3, 'User')
-        RETURNING id, username, email, role, created_at as "created_at!", avatar_url
+        RETURNING id, username, display_name, email, role, is_banned, created_at as "created_at!", avatar_url
         "#,
         user_id,
         payload.username,
@@ -270,6 +274,57 @@ pub async fn upload_avatar(
 }
 
 #[utoipa::path(
+    patch,
+    path = "/users/me",
+    request_body = UpdateProfilePayload,
+    responses(
+        (status = 200, description = "Profile updated successfully", body = User),
+        (status = 400, description = "Bad Request - Display name too long"),
+        (status = 401, description = "Unauthorized - Missing or invalid token"),
+    ),
+    security(
+        ("bearer_auth" = [])
+    ),
+    tags = ["Authentication"]
+)]
+pub async fn update_profile_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    Json(payload): Json<UpdateProfilePayload>,
+) -> Result<Json<User>, BSideError> {
+    let trimmed = payload.display_name.trim();
+
+    if trimmed.len() > 50 {
+        return Err(BSideError::BadRequest(
+            "Display name must be 50 characters or fewer.".into(),
+        ));
+    }
+
+    let display_name = if trimmed.is_empty() {
+        None
+    } else {
+        Some(trimmed.to_string())
+    };
+
+    let user = sqlx::query_as!(
+        User,
+        r#"
+        UPDATE users
+        SET display_name = $2
+        WHERE id = $1
+        RETURNING id, username, display_name, email, avatar_url, role, is_banned, created_at as "created_at!"
+        "#,
+        claims.sub,
+        display_name
+    )
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::UserNotFound)?;
+
+    Ok(Json(user))
+}
+
+#[utoipa::path(
     get,
     path = "/login",
     request_body = LoginPayload,
@@ -287,12 +342,17 @@ pub async fn classic_auth_handler(
     let password = payload.password.expose_secret().to_string();
     let user = sqlx::query!(
         r#"
-        SELECT id, username, email, role, created_at as "created_at!", avatar_url, c.password_hash FROM users u INNER JOIN local_credentials c ON u.id = c.user_id WHERE u.username = $1 OR u.email=$1"#,
+        SELECT id, username, display_name, email, role, is_banned, created_at as "created_at!", avatar_url, c.password_hash FROM users u INNER JOIN local_credentials c ON u.id = c.user_id WHERE u.username = $1 OR u.email=$1"#,
         payload.identifier,
         )
         .fetch_optional(&state.db)
         .await?
         .ok_or_else(|| BSideError::UnauthorizedProfile)?;
+
+    if user.is_banned {
+        return Err(BSideError::Banned);
+    }
+
     let saved_hash_string = user.password_hash.clone();
     tokio::task::spawn_blocking(move || -> Result<(), BSideError> {
         let pw_hash = PasswordHash::new(&saved_hash_string)
@@ -308,9 +368,11 @@ pub async fn classic_auth_handler(
     let user = User {
         id: user.id,
         username: user.username,
+        display_name: user.display_name,
         email: user.email,
         role: user.role,
         avatar_url: user.avatar_url,
+        is_banned: user.is_banned,
         created_at: user.created_at,
     };
 
@@ -605,6 +667,58 @@ async fn ensure_admin(state: &AppState, user_id: Uuid) -> Result<(), BSideError>
     Ok(())
 }
 
+pub async fn ban_user_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    Path(user_id): Path<Uuid>,
+) -> Result<Json<User>, BSideError> {
+    ensure_admin(&state, claims.sub).await?;
+
+    if user_id == claims.sub {
+        return Err(BSideError::BadRequest("You cannot ban yourself.".into()));
+    }
+
+    let user = sqlx::query_as!(
+        User,
+        r#"
+        UPDATE users
+        SET is_banned = TRUE
+        WHERE id = $1
+        RETURNING id, username, display_name, email, avatar_url, role, is_banned, created_at as "created_at!"
+        "#,
+        user_id
+    )
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::UserNotFound)?;
+
+    Ok(Json(user))
+}
+
+pub async fn unban_user_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    Path(user_id): Path<Uuid>,
+) -> Result<Json<User>, BSideError> {
+    ensure_admin(&state, claims.sub).await?;
+
+    let user = sqlx::query_as!(
+        User,
+        r#"
+        UPDATE users
+        SET is_banned = FALSE
+        WHERE id = $1
+        RETURNING id, username, display_name, email, avatar_url, role, is_banned, created_at as "created_at!"
+        "#,
+        user_id
+    )
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::UserNotFound)?;
+
+    Ok(Json(user))
+}
+
 #[utoipa::path(
     post,
     path = "/artist-requests",
@@ -828,7 +942,7 @@ pub async fn get_me_handler(
 ) -> Result<Json<User>, BSideError> {
     let result = sqlx::query_as!(
         User,
-        r#"SELECT id, username, email, role, created_at as "created_at!", avatar_url FROM users WHERE id = $1"#,
+        r#"SELECT id, username, display_name, email, role, is_banned, created_at as "created_at!", avatar_url FROM users WHERE id = $1"#,
         claims.sub
     )
     .fetch_optional(&state.db)
@@ -853,7 +967,7 @@ pub async fn get_all_users_handler(
 ) -> Result<Json<Vec<User>>, BSideError> {
     let users = sqlx::query_as::<_, User>(
         r#"
-        SELECT id, username, email, avatar_url, role, created_at
+        SELECT id, username, display_name, email, avatar_url, role, is_banned, created_at
         FROM users
         ORDER BY created_at ASC
         "#,
@@ -897,7 +1011,7 @@ pub async fn get_user_by_id_handler(
 ) -> Result<Json<User>, BSideError> {
     let user = sqlx::query_as::<_, User>(
         r#"
-        SELECT id, username, email, avatar_url, role, created_at
+        SELECT id, username, display_name, email, avatar_url, role, is_banned, created_at
         FROM users
         WHERE id = $1
         "#,
@@ -2909,6 +3023,7 @@ pub async fn get_conversations_handler(
         SELECT
             u.id AS "other_user_id!",
             u.username AS "other_username!",
+            u.display_name AS other_display_name,
             u.email AS "other_email!",
             u.avatar_url AS other_avatar_url,
 
@@ -2945,6 +3060,7 @@ pub async fn get_friends_handler(
             f.id AS "friendship_id!",
             u.id AS "user_id!",
             u.username AS "username!",
+            u.display_name,
             u.email AS "email!",
             u.avatar_url,
             u.role AS "role!",
@@ -2972,6 +3088,7 @@ pub async fn get_friends_handler(
             friendship_id: row.friendship_id,
             user_id: row.user_id,
             username: row.username,
+            display_name: row.display_name,
             email: row.email,
             avatar_url: row.avatar_url,
             role: row.role,
@@ -3050,9 +3167,10 @@ pub async fn send_friend_request_handler(
         .execute(&state.db)
         .await?;
 
-        return fetch_friend_request_item(&state, friendship.id)
-            .await
-            .map(Json);
+        let item = fetch_friend_request_item(&state, friendship.id).await?;
+        notify_friend_request_received(&state, target_user_id, item.friendship_id, current_user_id)
+            .await;
+        return Ok(Json(item));
     }
 
     let friendship_id = Uuid::new_v4();
@@ -3069,9 +3187,9 @@ pub async fn send_friend_request_handler(
     .execute(&state.db)
     .await?;
 
-    fetch_friend_request_item(&state, friendship_id)
-        .await
-        .map(Json)
+    let item = fetch_friend_request_item(&state, friendship_id).await?;
+    notify_friend_request_received(&state, target_user_id, item.friendship_id, current_user_id).await;
+    Ok(Json(item))
 }
 
 pub async fn get_friend_requests_handler(
@@ -3087,10 +3205,12 @@ pub async fn get_friend_requests_handler(
             f.id AS "friendship_id!",
             f.requester_id AS "requester_id!",
             requester.username AS "requester_username!",
+            requester.display_name AS requester_display_name,
             requester.avatar_url AS requester_avatar_url,
 
             f.addressee_id AS "addressee_id!",
             addressee.username AS "addressee_username!",
+            addressee.display_name AS addressee_display_name,
             addressee.avatar_url AS addressee_avatar_url,
 
             f.status AS "status!",
@@ -3150,9 +3270,10 @@ pub async fn accept_friend_request_handler(
         return Err(BSideError::NotFound);
     }
 
-    fetch_friend_request_item(&state, friendship_id)
-        .await
-        .map(Json)
+    let item = fetch_friend_request_item(&state, friendship_id).await?;
+    notify_friend_request_accepted(&state, item.requester_id, item.friendship_id, current_user_id)
+        .await;
+    Ok(Json(item))
 }
 
 pub async fn reject_friend_request_handler(
@@ -3183,9 +3304,10 @@ pub async fn reject_friend_request_handler(
         return Err(BSideError::NotFound);
     }
 
-    fetch_friend_request_item(&state, friendship_id)
-        .await
-        .map(Json)
+    let item = fetch_friend_request_item(&state, friendship_id).await?;
+    notify_friend_request_rejected(&state, item.requester_id, item.friendship_id, current_user_id)
+        .await;
+    Ok(Json(item))
 }
 
 pub async fn remove_friend_handler(
@@ -3194,6 +3316,8 @@ pub async fn remove_friend_handler(
     Path(other_user_id): Path<Uuid>,
 ) -> Result<impl IntoResponse, BSideError> {
     let current_user_id = claims.sub;
+
+    let mut tx = state.db.begin().await?;
 
     let deleted = sqlx::query!(
         r#"
@@ -3207,12 +3331,30 @@ pub async fn remove_friend_handler(
         current_user_id,
         other_user_id
     )
-    .fetch_optional(&state.db)
+    .fetch_optional(&mut *tx)
     .await?;
 
     if deleted.is_none() {
         return Err(BSideError::NotFound);
     }
+
+    sqlx::query!(
+        r#"
+        DELETE FROM messages
+        WHERE
+            (sender_id = $1 AND receiver_id = $2)
+            OR
+            (sender_id = $2 AND receiver_id = $1)
+        "#,
+        current_user_id,
+        other_user_id
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    tx.commit().await?;
+
+    notify_friend_removed(&state, other_user_id, current_user_id).await;
 
     Ok(StatusCode::NO_CONTENT)
 }
@@ -3251,10 +3393,12 @@ async fn fetch_friend_request_item(
             f.id AS "friendship_id!",
             f.requester_id AS "requester_id!",
             requester.username AS "requester_username!",
+            requester.display_name AS requester_display_name,
             requester.avatar_url AS requester_avatar_url,
 
             f.addressee_id AS "addressee_id!",
             addressee.username AS "addressee_username!",
+            addressee.display_name AS addressee_display_name,
             addressee.avatar_url AS addressee_avatar_url,
 
             f.status AS "status!",

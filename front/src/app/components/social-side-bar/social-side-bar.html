@@ -46,19 +46,19 @@
                 @if (request.requester_avatar_url && !brokenAvatarIds.has(request.requester_id)) {
                   <img
                     [src]="request.requester_avatar_url"
-                    [alt]="request.requester_username"
+                    [alt]="nameForRequester(request)"
                     class="h-full w-full object-cover"
                     (error)="onAvatarError(request.requester_id)"
                   />
                 } @else {
                   <span class="font-raleway text-xs font-bold text-[#FFE6DB]">
-                    {{ getAvatarInitials(request.requester_username) || 'U' }}
+                    {{ getAvatarInitials(nameForRequester(request)) || 'U' }}
                   </span>
                 }
               </div>
 
               <div class="min-w-0 flex-1">
-                <p class="truncate font-raleway text-sm font-bold text-[#FFE6DB]">{{ request.requester_username }}</p>
+                <p class="truncate font-raleway text-sm font-bold text-[#FFE6DB]">{{ nameForRequester(request) }}</p>
                 <p class="truncate font-raleway text-xs text-[#FFE6DB]/60">wants to be friends</p>
               </div>
 
@@ -67,7 +67,7 @@
                   type="button"
                   class="flex h-8 w-8 items-center justify-center rounded-full bg-[#FFE6DB] text-[#1F0E1C] transition-colors hover:bg-[#F7D9C8] disabled:cursor-not-allowed disabled:opacity-50"
                   [disabled]="friendActionRequestId === request.friendship_id"
-                  [attr.aria-label]="'Accept ' + request.requester_username"
+                  [attr.aria-label]="'Accept ' + nameForRequester(request)"
                   (click)="acceptRequest(request)"
                 >
                   <lucide-icon [img]="check" class="h-4 w-4 stroke-[2.5]"></lucide-icon>
@@ -77,7 +77,7 @@
                   type="button"
                   class="flex h-8 w-8 items-center justify-center rounded-full bg-[#FFE6DB]/10 text-[#FFE6DB] transition-colors hover:bg-[#FFE6DB]/20 disabled:cursor-not-allowed disabled:opacity-50"
                   [disabled]="friendActionRequestId === request.friendship_id"
-                  [attr.aria-label]="'Reject ' + request.requester_username"
+                  [attr.aria-label]="'Reject ' + nameForRequester(request)"
                   (click)="rejectRequest(request)"
                 >
                   <lucide-icon [img]="x" class="h-4 w-4 stroke-[2.5]"></lucide-icon>
@@ -107,19 +107,19 @@
                   @if (user.avatar_url && !brokenAvatarIds.has(user.id)) {
                     <img
                       [src]="user.avatar_url"
-                      [alt]="user.username"
+                      [alt]="nameForUser(user)"
                       class="h-full w-full object-cover"
                       (error)="onAvatarError(user.id)"
                     />
                   } @else {
                     <span class="font-raleway text-xs font-bold text-[#FFE6DB]">
-                      {{ getAvatarInitials(user.username) || 'U' }}
+                      {{ getAvatarInitials(nameForUser(user)) || 'U' }}
                     </span>
                   }
                 </div>
 
                 <div class="min-w-0 flex-1">
-                  <p class="truncate font-raleway text-sm font-bold text-[#FFE6DB]">{{ user.username }}</p>
+                  <p class="truncate font-raleway text-sm font-bold text-[#FFE6DB]">{{ nameForUser(user) }}</p>
                 </div>
               </button>
               @if (isFriend(user.id)) {
@@ -139,7 +139,7 @@
                   type="button"
                   class="shrink-0 rounded-full bg-[#FFE6DB] p-2 text-[#1F0E1C] transition-colors hover:bg-[#F7D9C8] disabled:cursor-not-allowed disabled:opacity-50"
                   [disabled]="friendActionUserId === user.id"
-                  [attr.aria-label]="'Send friend invite to ' + user.username"
+                  [attr.aria-label]="'Send friend invite to ' + nameForUser(user)"
                   (pointerdown)="requestFriend(user)">
                   <lucide-icon [img]="addFriend" class="h-4 w-4 stroke-[2.5]"></lucide-icon>
                 </button>
@@ -170,13 +170,13 @@
                 @if (conversation.other_avatar_url && !brokenAvatarIds.has(conversation.other_user_id)) {
                   <img
                     [src]="conversation.other_avatar_url"
-                    [alt]="conversation.other_username"
+                    [alt]="nameForConversation(conversation)"
                     class="h-full w-full object-cover"
                     (error)="onAvatarError(conversation.other_user_id)"
                   />
                 } @else {
                   <span class="font-raleway text-sm font-bold text-[#FFE6DB]">
-                    {{ getAvatarInitials(conversation.other_username) || 'U' }}
+                    {{ getAvatarInitials(nameForConversation(conversation)) || 'U' }}
                   </span>
                 }
               </div>
@@ -190,7 +190,7 @@
 
             <div class="min-w-0 flex-1">
               <p class="truncate font-raleway text-sm font-bold text-[#FFE6DB]">
-                {{ conversation.other_username }}
+                {{ nameForConversation(conversation) }}
               </p>
 
               <div class="flex min-w-0 gap-1">

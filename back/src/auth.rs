@@ -4,10 +4,10 @@ use argon2::{
     password_hash::{PasswordHasher, SaltString, rand_core::OsRng},
 };
 use axum::{
-    extract::{FromRef, FromRequestParts, Request},
+    extract::{FromRef, FromRequestParts, Request, State},
     http::{StatusCode, request::Parts},
     middleware::Next,
-    response::Response,
+    response::{IntoResponse, Response},
 };
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
 use secrecy::ExposeSecret;
@@ -117,8 +117,22 @@ where
     }
 }
 
-pub async fn auth_gate(_claims: Claims, request: Request, next: Next) -> Response {
-    next.run(request).await
+pub async fn auth_gate(
+    State(state): State<AppState>,
+    claims: Claims,
+    request: Request,
+    next: Next,
+) -> Response {
+    match sqlx::query_scalar!("SELECT is_banned FROM users WHERE id = $1", claims.sub)
+        .fetch_optional(&state.db)
+        .await
+    {
+        Ok(Some(true)) => BSideError::Banned.into_response(),
+        Ok(Some(false)) => next.run(request).await,
+        Ok(None) => StatusCode::UNAUTHORIZED.into_response(),
+        Err(_) => BSideError::InternalServerError("Failed to verify account status.".into())
+            .into_response(),
+    }
 }
 
 pub struct PublicApiKey;

@@ -5,6 +5,7 @@ import { Bell, Check, LucideAngularModule, Search, UserRoundPlus, X } from 'luci
 import {
   ChatUser,
   ConversationListItem,
+  displayName,
   FriendListItem,
   FriendRequestItem,
   FriendRequestsResponse,
@@ -151,6 +152,18 @@ export class SocialSideBar {
 
   hasPendingIncomingRequest(userId: string): boolean {
     return this.friendRequests.incoming.some((request) => request.requester_id === userId);
+  }
+
+  nameForUser(user: ChatUser): string {
+    return displayName(user.username, user.display_name);
+  }
+
+  nameForRequester(request: FriendRequestItem): string {
+    return displayName(request.requester_username, request.requester_display_name);
+  }
+
+  nameForConversation(conversation: ConversationListItem): string {
+    return displayName(conversation.other_username, conversation.other_display_name);
   }
 
   getAvatarInitials(name: string): string {

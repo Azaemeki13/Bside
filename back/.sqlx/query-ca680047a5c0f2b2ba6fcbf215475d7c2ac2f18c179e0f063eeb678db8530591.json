@@ -1,0 +1,82 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            f.id AS \"friendship_id!\",\n            f.requester_id AS \"requester_id!\",\n            requester.username AS \"requester_username!\",\n            requester.display_name AS requester_display_name,\n            requester.avatar_url AS requester_avatar_url,\n\n            f.addressee_id AS \"addressee_id!\",\n            addressee.username AS \"addressee_username!\",\n            addressee.display_name AS addressee_display_name,\n            addressee.avatar_url AS addressee_avatar_url,\n\n            f.status AS \"status!\",\n            f.created_at AS \"created_at!\"\n        FROM friendships f\n        JOIN users requester ON requester.id = f.requester_id\n        JOIN users addressee ON addressee.id = f.addressee_id\n        WHERE\n            f.status = 'pending'\n            AND (f.requester_id = $1 OR f.addressee_id = $1)\n        ORDER BY f.created_at DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "friendship_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "requester_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "requester_username!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "requester_display_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "requester_avatar_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "addressee_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 6,
+        "name": "addressee_username!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "addressee_display_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "addressee_avatar_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "status!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "created_at!",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "ca680047a5c0f2b2ba6fcbf215475d7c2ac2f18c179e0f063eeb678db8530591"
+}

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        DELETE FROM messages\n        WHERE\n            (sender_id = $1 AND receiver_id = $2)\n            OR\n            (sender_id = $2 AND receiver_id = $1)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "454a020eadeab1b00533722a4edf4e4482a5685e6d99ea1fc81c2c8841d640b0"
+}

@@ -5,6 +5,7 @@ import { SearchBar } from '../search-bar/search-bar';
 import { ProfileCard } from '../profile-card/profile-card';
 import { AuthService } from '../../services/auth.service';
 import { LoginPayload, AuthResponse, RegisterPayload, UserProfile } from '../../models/auth.model';
+import { displayName } from '../../models/chat.model';
 
 @Component({
   selector: 'app-nav-bar',
@@ -37,5 +38,10 @@ export class NavBar implements OnInit {
 
   get showGreeting(): boolean {
     return this.router.url.includes('home');
+  }
+
+  get greetingName(): string {
+    const user = this.authService.currentUser() ?? this.user;
+    return user ? displayName(user.username, user.display_name) : '';
   }
 }

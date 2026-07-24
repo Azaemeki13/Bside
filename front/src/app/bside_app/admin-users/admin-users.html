@@ -1,0 +1,56 @@
+<section class="mx-auto flex w-full max-w-5xl flex-col gap-4 py-6 text-[#FFE6DB]">
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <h1 class="font-climate-crisis text-4xl font-bold">USERS</h1>
+      <p class="font-raleway text-sm mt-1 text-[#FFE6DB]/60">Ban or unban users.</p>
+    </div>
+      <button class="font-raleway font-bold text-[#FFE6DB] hover:underline" type="button" (click)="load()">Refresh</button>
+  </div>
+
+  @if (isLoading) {
+    <p class="font-raleway text-sm text-[#FFE6DB]/70">Loading users...</p>
+  }
+  @if (message) {
+    <p class="font-raleway text-sm text-green-300">{{ message }}</p>
+  }
+  @if (error) {
+    <p class="font-raleway text-sm text-red-300">{{ error }}</p>
+  }
+
+  <div class="flex flex-col gap-3">
+    @for (user of users; track user.id) {
+      <article class="rounded-lg bg-[#1F0E1C] p-5">
+        <div class="flex items-center justify-between gap-4">
+          <div class="min-w-0">
+            <h2 class="truncate font-raleway text-xl font-bold">
+              {{ nameFor(user) }}
+              @if (user.is_banned) {
+                <span class="ml-2 rounded-full bg-red-500/20 px-2 py-1 font-raleway text-xs font-semibold text-red-300">Banned</span>
+              }
+            </h2>
+            <p class="font-raleway text-sm text-[#FFE6DB]/60">{{ user.username }} | {{ user.email }} | {{ user.role }}</p>
+          </div>
+          <div class="flex shrink-0 gap-2">
+            @if (isSelf(user)) {
+              <span class="font-raleway text-sm text-[#FFE6DB]/40">This is you</span>
+            } @else {
+              <button
+                class="rounded-full px-4 py-2 font-raleway font-bold disabled:cursor-not-allowed disabled:opacity-50"
+                [class]="user.is_banned ? 'bg-[#FFE6DB] text-[#1F0E1C]' : 'bg-[#FF5500] text-[#FFE6DB]'"
+                type="button"
+                [disabled]="actingUserId === user.id"
+                (click)="toggleBan(user)"
+              >
+                {{ user.is_banned ? 'Unban' : 'Ban' }}
+              </button>
+            }
+          </div>
+        </div>
+      </article>
+    } @empty {
+      @if (!isLoading) {
+        <p class="font-raleway text-sm text-[#FFE6DB]/60">No users found.</p>
+      }
+    }
+  </div>
+</section>

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id, username, email, role, created_at as \"created_at!\", avatar_url, c.password_hash FROM users u INNER JOIN local_credentials c ON u.id = c.user_id WHERE u.username = $1 OR u.email=$1",
+  "query": "\n        INSERT INTO users (id, username, email, role)\n        VALUES($1, $2, $3, 'User')\n        RETURNING id, username, display_name, email, role, is_banned, created_at as \"created_at!\", avatar_url\n        ",
   "describe": {
     "columns": [
       {
@@ -15,44 +15,52 @@
       },
       {
         "ordinal": 2,
+        "name": "display_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
         "name": "email",
         "type_info": "Text"
       },
       {
-        "ordinal": 3,
+        "ordinal": 4,
         "name": "role",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
+        "name": "is_banned",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
         "name": "created_at!",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 5,
+        "ordinal": 7,
         "name": "avatar_url",
-        "type_info": "Varchar"
-      },
-      {
-        "ordinal": 6,
-        "name": "password_hash",
         "type_info": "Varchar"
       }
     ],
     "parameters": {
       "Left": [
+        "Uuid",
+        "Text",
         "Text"
       ]
     },
     "nullable": [
       false,
       false,
+      true,
+      false,
       false,
       false,
       true,
-      true,
-      false
+      true
     ]
   },
-  "hash": "724ea6e0c7407154cd2109a0d62ec7dc66fa488375d9ca5e54f9414ba45fcfb4"
+  "hash": "70ded6e28d5fac27e6310e6b0541d99cc6ab2eaadcbca8791c5524d6066a108a"
 }

@@ -13,6 +13,7 @@ export interface AuthResponse {
     user: {
         id: string;
         username: string;
+        display_name?: string | null;
         email: string;
         role: string;
         avatar_url: string;
@@ -23,7 +24,9 @@ export interface AuthResponse {
 export interface UserProfile {
     id: string;
     username: string;
+    display_name?: string | null;
     email: string;
     role: string;
     avatar_url?: string;
+    is_banned?: boolean;
 }

@@ -72,6 +72,27 @@ enum ServerWsMessage {
 
     #[serde(rename = "invalid_message")]
     InvalidMessage { message: String },
+
+    #[serde(rename = "friend_request_received")]
+    FriendRequestReceived {
+        friendship_id: Uuid,
+        from_user_id: Uuid,
+    },
+
+    #[serde(rename = "friend_request_accepted")]
+    FriendRequestAccepted {
+        friendship_id: Uuid,
+        by_user_id: Uuid,
+    },
+
+    #[serde(rename = "friend_request_rejected")]
+    FriendRequestRejected {
+        friendship_id: Uuid,
+        by_user_id: Uuid,
+    },
+
+    #[serde(rename = "friend_removed")]
+    FriendRemoved { by_user_id: Uuid },
 }
 
 async fn find_shareable_song(
@@ -123,6 +144,66 @@ async fn send_server_message(state: &AppState, target_user_id: Uuid, message: &S
     }
 }
 
+pub async fn notify_friend_request_received(
+    state: &AppState,
+    target_user_id: Uuid,
+    friendship_id: Uuid,
+    from_user_id: Uuid,
+) {
+    send_server_message(
+        state,
+        target_user_id,
+        &ServerWsMessage::FriendRequestReceived {
+            friendship_id,
+            from_user_id,
+        },
+    )
+    .await;
+}
+
+pub async fn notify_friend_request_accepted(
+    state: &AppState,
+    target_user_id: Uuid,
+    friendship_id: Uuid,
+    by_user_id: Uuid,
+) {
+    send_server_message(
+        state,
+        target_user_id,
+        &ServerWsMessage::FriendRequestAccepted {
+            friendship_id,
+            by_user_id,
+        },
+    )
+    .await;
+}
+
+pub async fn notify_friend_request_rejected(
+    state: &AppState,
+    target_user_id: Uuid,
+    friendship_id: Uuid,
+    by_user_id: Uuid,
+) {
+    send_server_message(
+        state,
+        target_user_id,
+        &ServerWsMessage::FriendRequestRejected {
+            friendship_id,
+            by_user_id,
+        },
+    )
+    .await;
+}
+
+pub async fn notify_friend_removed(state: &AppState, target_user_id: Uuid, by_user_id: Uuid) {
+    send_server_message(
+        state,
+        target_user_id,
+        &ServerWsMessage::FriendRemoved { by_user_id },
+    )
+    .await;
+}
+
 pub async fn ws_handler(
     ws: WebSocketUpgrade,
     State(state): State<AppState>,
@@ -136,6 +217,15 @@ pub async fn ws_handler(
     .map_err(|_| StatusCode::UNAUTHORIZED)?;
 
     let user_id = token_data.claims.sub;
+
+    let is_banned = sqlx::query_scalar!("SELECT is_banned FROM users WHERE id = $1", user_id)
+        .fetch_optional(&state.db)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    if !matches!(is_banned, Some(false)) {
+        return Err(StatusCode::FORBIDDEN);
+    }
 
     Ok(ws.on_upgrade(move |socket| handle_socket(socket, state, user_id)))
 }

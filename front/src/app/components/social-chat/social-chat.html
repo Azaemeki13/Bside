@@ -15,13 +15,13 @@
           @if (selectedConversation.other_avatar_url && !headerAvatarBroken) {
             <img
               [src]="selectedConversation.other_avatar_url"
-              [alt]="selectedConversation.other_username"
+              [alt]="nameForConversation(selectedConversation)"
               class="h-full w-full object-cover"
               (error)="onHeaderAvatarError()"
             />
           } @else {
             <span class="font-raleway text-xs font-bold text-[#FFE6DB]">
-              {{ getAvatarInitials(selectedConversation.other_username) || 'U' }}
+              {{ getAvatarInitials(nameForConversation(selectedConversation)) || 'U' }}
             </span>
           }
         </div>
@@ -35,7 +35,7 @@
 
       <div class="flex min-w-0 flex-1 items-center gap-2">
         <p class="truncate font-raleway text-base font-bold text-[#FFE6DB]">
-          {{ selectedConversation.other_username }}
+          {{ nameForConversation(selectedConversation) }}
         </p>
       </div>
     </div>

@@ -1,12 +1,70 @@
 <div class="flex flex-row items-center gap-4 pb-6">
-    <img 
-    class="h-[10rem] w-[10rem] rounded-full object-cover" 
-    [src]="avatarUrl()" 
-    alt="Profile picture"
-    referrerpolicy="no-referrer" 
+    <button
+        type="button"
+        class="relative h-[10rem] w-[10rem] shrink-0 cursor-pointer rounded-full disabled:cursor-not-allowed"
+        [disabled]="isUploadingAvatar()"
+        (click)="triggerAvatarUpload()"
+    >
+        <img
+        class="h-full w-full rounded-full object-cover"
+        [src]="avatarUrl()"
+        alt="Profile picture"
+        referrerpolicy="no-referrer"
+        />
+        <span class="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 font-raleway text-sm font-bold text-[#FFE6DB] opacity-0 transition-opacity hover:opacity-100">
+            {{ isUploadingAvatar() ? 'Uploading...' : 'Change photo' }}
+        </span>
+    </button>
+    <input
+        #avatarInput
+        type="file"
+        accept="image/png,image/jpeg"
+        class="hidden"
+        (change)="onAvatarSelected($event)"
     />
-    <div class="flex flex-col">
-        <span class="font-climate-crisis text-[2.5rem] text-[#FFE6DB] text-nowrap">{{ username() }} </span>
+    <div class="flex flex-col gap-2">
+        @if (isEditingName()) {
+            <div class="flex items-center gap-2">
+                <input
+                    type="text"
+                    [ngModel]="nameInput()"
+                    (ngModelChange)="nameInput.set($event)"
+                    maxlength="50"
+                    placeholder="Display name"
+                    class="rounded-full border border-[#FFE6DB] bg-transparent px-4 py-2 font-raleway font-bold text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none"
+                />
+                <button
+                    type="button"
+                    class="rounded-full bg-[#FF5500] px-4 py-2 font-raleway font-bold text-[#FFE6DB] disabled:cursor-not-allowed disabled:opacity-50"
+                    [disabled]="isSavingName()"
+                    (click)="saveDisplayName()"
+                >
+                    {{ isSavingName() ? 'Saving...' : 'Save' }}
+                </button>
+                <button
+                    type="button"
+                    class="rounded-full border border-[#FFE6DB]/40 px-4 py-2 font-raleway font-bold text-[#FFE6DB]"
+                    [disabled]="isSavingName()"
+                    (click)="cancelEditingName()"
+                >
+                    Cancel
+                </button>
+            </div>
+        } @else {
+            <div class="flex items-center gap-3">
+                <span class="font-climate-crisis text-[2.5rem] text-[#FFE6DB] text-nowrap">{{ effectiveName() }}</span>
+                <button
+                    type="button"
+                    class="font-raleway text-sm font-bold text-[#FFE6DB]/60 underline cursor-pointer"
+                    (click)="startEditingName()"
+                >
+                    Edit
+                </button>
+            </div>
+        }
+        @if (errorMessage()) {
+            <p class="font-raleway text-sm font-bold text-red-500">{{ errorMessage() }}</p>
+        }
     </div>
 </div>
 <div>

@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            f.id AS \"friendship_id!\",\n            u.id AS \"user_id!\",\n            u.username AS \"username!\",\n            u.display_name,\n            u.email AS \"email!\",\n            u.avatar_url,\n            u.role AS \"role!\",\n            f.created_at AS \"friendship_created_at!\"\n        FROM friendships f\n        JOIN users u ON u.id = CASE\n            WHEN f.requester_id = $1 THEN f.addressee_id\n            ELSE f.requester_id\n        END\n        WHERE\n            (f.requester_id = $1 OR f.addressee_id = $1)\n            AND f.status = 'accepted'\n        ORDER BY u.username ASC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "friendship_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "username!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "display_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "email!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "avatar_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "role!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "friendship_created_at!",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "11c6300dea7af631d88b202f14427e87b169c4f310a351c81fff05670b1641ae"
+}

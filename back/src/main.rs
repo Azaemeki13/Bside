@@ -15,7 +15,7 @@ use crate::auth::{AnyAuth, Claims, auth_gate, bootstrap_admin};
 use crate::error::BSideError;
 use crate::handlers::{
     accept_friend_request_handler, add_song_to_playlist_handler,
-    admin_create_album_for_artist_handler, classic_auth_handler, contact_handler,
+    admin_create_album_for_artist_handler, ban_user_handler, classic_auth_handler, contact_handler,
     create_album_handler, create_artist_handler, create_artist_request_handler,
     create_playlist_handler, create_song_handler, create_user_handler, delete_album_handler,
     delete_playlist_handler, delete_song_handler, get_album_by_id_handler, get_all_users_handler,
@@ -27,8 +27,9 @@ use crate::handlers::{
     google_signup_handler, like_song_handler, mark_conversation_messages_as_read_handler,
     ml_callback_handler, ping_handler, record_song_interaction_handler, register_handler,
     reject_friend_request_handler, remove_friend_handler, remove_song_from_pl,
-    review_artist_request_handler, send_friend_request_handler, unlike_song_handler,
-    update_playlist_handler, upload_avatar, verify_song_handler,
+    review_artist_request_handler, send_friend_request_handler, unban_user_handler,
+    unlike_song_handler, update_playlist_handler, update_profile_handler, upload_avatar,
+    verify_song_handler,
 };
 use crate::models::{
     AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AppState,
@@ -158,7 +159,7 @@ async fn main() {
             "/users",
             post(create_user_handler).get(get_all_users_handler),
         )
-        .route("/users/me", get(get_me_handler))
+        .route("/users/me", get(get_me_handler).patch(update_profile_handler))
         .route("/users/me/avatar", post(upload_avatar))
         .route(
             "/artists",
@@ -220,6 +221,8 @@ async fn main() {
             "/admin/artists/{artist_id}/albums",
             post(admin_create_album_for_artist_handler),
         )
+        .route("/admin/users/{user_id}/ban", put(ban_user_handler))
+        .route("/admin/users/{user_id}/unban", put(unban_user_handler))
         .route(
             "/messages/{other_user_id}",
             get(get_conversation_messages_handler),

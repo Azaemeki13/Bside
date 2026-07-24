@@ -1,7 +1,7 @@
 import { Component, HostListener, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser, NgIf } from '@angular/common';
 import { SideBarButton } from '../side-bar-button/side-bar-button';
-import { LucideAngularModule, House, Disc3, Heart, UsersRound, LogOut, Settings, Upload, Library, ShieldCheck} from 'lucide-angular';
+import { LucideAngularModule, House, Disc3, Heart, UsersRound, LogOut, Settings, Upload, Library, ShieldCheck, Ban} from 'lucide-angular';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
@@ -26,6 +26,7 @@ export class SideBar {
   protected readonly upload = Upload;
   protected readonly library = Library;
   protected readonly shieldCheck = ShieldCheck;
+  protected readonly ban = Ban;
 
   protected isLogoutConfirmOpen = false;
 

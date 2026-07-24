@@ -31,6 +31,7 @@ export interface ChatMessage {
 export interface ConversationListItem {
   other_user_id: string;
   other_username: string;
+  other_display_name?: string | null;
   other_email: string;
   other_avatar_url?: string | null;
   last_message_id: string;
@@ -49,6 +50,7 @@ export interface MarkMessagesReadResponse {
 export interface ChatUser {
   id: string;
   username: string;
+  display_name?: string | null;
   email?: string;
   avatar_url?: string | null;
   role?: string;
@@ -91,6 +93,25 @@ export type ServerWsMessage =
   | {
       type: 'invalid_message';
       message: string;
+    }
+  | {
+      type: 'friend_request_received';
+      friendship_id: string;
+      from_user_id: string;
+    }
+  | {
+      type: 'friend_request_accepted';
+      friendship_id: string;
+      by_user_id: string;
+    }
+  | {
+      type: 'friend_request_rejected';
+      friendship_id: string;
+      by_user_id: string;
+    }
+  | {
+      type: 'friend_removed';
+      by_user_id: string;
     };
 
 export type ChatConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
@@ -99,6 +120,7 @@ export interface FriendListItem {
   friendship_id: string;
   user_id: string;
   username: string;
+  display_name?: string | null;
   email: string;
   avatar_url?: string | null;
   role: string;
@@ -111,10 +133,12 @@ export interface FriendRequestItem {
 
   requester_id: string;
   requester_username: string;
+  requester_display_name?: string | null;
   requester_avatar_url?: string | null;
 
   addressee_id: string;
   addressee_username: string;
+  addressee_display_name?: string | null;
   addressee_avatar_url?: string | null;
 
   status: string;
@@ -129,4 +153,9 @@ export interface FriendRequestsResponse {
 export interface UserStatusResponse {
   user_id: string;
   is_online: boolean;
+}
+
+export function displayName(username: string, displayNameValue?: string | null): string {
+  const trimmed = displayNameValue?.trim();
+  return trimmed ? trimmed : username;
 }

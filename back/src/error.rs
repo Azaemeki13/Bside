@@ -34,6 +34,8 @@ pub enum BSideError {
     SongNotReady,
     #[error("Internal server error: {0}.")]
     InternalServerError(String),
+    #[error("Your account has been banned.")]
+    Banned,
 }
 
 impl IntoResponse for BSideError {
@@ -46,7 +48,7 @@ impl IntoResponse for BSideError {
             }
             Self::Conflict(ref msg) => (StatusCode::CONFLICT, msg.clone()),
             Self::AuthError(ref msg) => (StatusCode::UNAUTHORIZED, msg.clone()),
-            Self::UnauthorizedProfile => (StatusCode::FORBIDDEN, self.to_string()),
+            Self::UnauthorizedProfile | Self::Banned => (StatusCode::FORBIDDEN, self.to_string()),
             Self::NotFound | Self::UserNotFound => (StatusCode::NOT_FOUND, self.to_string()),
             Self::PayloadTooLarge => (StatusCode::PAYLOAD_TOO_LARGE, self.to_string()),
             Self::SqlxError(ref e) => {

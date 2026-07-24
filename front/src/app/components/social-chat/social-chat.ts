@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, MessageCircle, Send } from 'lucide-angular';
-import { ChatMessage, ConversationListItem } from '../../models/chat.model';
+import { ChatMessage, ConversationListItem, displayName } from '../../models/chat.model';
 import { SocialShareCard } from '../social-share-card/social-share-card';
 
 @Component({
@@ -59,6 +59,10 @@ export class SocialChat implements OnChanges {
 
   isOwnMessage(message: ChatMessage): boolean {
     return message.sender_id === this.currentUserId;
+  }
+
+  nameForConversation(conversation: ConversationListItem): string {
+    return displayName(conversation.other_username, conversation.other_display_name);
   }
 
   getAvatarInitials(name: string): string {

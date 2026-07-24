@@ -60,4 +60,23 @@ export class AuthService {
 	getCurrentUser(): Observable<UserProfile> {
 		return this.http.get<UserProfile>(`${this.apiUrl}/users/me`);
 	}
+
+	updateDisplayName(displayName: string): Observable<UserProfile> {
+		return this.http.patch<UserProfile>(`${this.apiUrl}/users/me`, { display_name: displayName }).pipe(
+			tap((user) => this.currentUser.set(user))
+		);
+	}
+
+	uploadAvatar(file: File): Observable<{ avatar_url: string | null }> {
+		const formData = new FormData();
+		formData.append('avatar', file);
+		return this.http.post<{ avatar_url: string | null }>(`${this.apiUrl}/users/me/avatar`, formData).pipe(
+			tap(({ avatar_url }) => {
+				const current = this.currentUser();
+				if (current) {
+					this.currentUser.set({ ...current, avatar_url: avatar_url ?? undefined });
+				}
+			})
+		);
+	}
 }

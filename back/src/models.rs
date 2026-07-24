@@ -7,15 +7,23 @@ use std::sync::Arc;
 pub struct User {
     pub id: uuid::Uuid,
     pub username: String,
+    pub display_name: Option<String>,
     pub email: String,
     pub avatar_url: Option<String>,
     pub role: String,
+    pub is_banned: bool,
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(serde::Deserialize, utoipa::ToSchema)]
 pub struct UserPayload {
     pub username: String,
+}
+
+#[derive(serde::Deserialize, utoipa::ToSchema)]
+pub struct UpdateProfilePayload {
+    /// New display name. Send an empty string to clear it and fall back to the username.
+    pub display_name: String,
 }
 
 #[derive(serde::Serialize, utoipa::ToSchema)]
@@ -407,6 +415,7 @@ pub struct MarkMessagesReadResponse {
 pub struct ConversationListItem {
     pub other_user_id: uuid::Uuid,
     pub other_username: String,
+    pub other_display_name: Option<String>,
     pub other_email: String,
     pub other_avatar_url: Option<String>,
 
@@ -425,6 +434,7 @@ pub struct FriendListItem {
     pub friendship_id: uuid::Uuid,
     pub user_id: uuid::Uuid,
     pub username: String,
+    pub display_name: Option<String>,
     pub email: String,
     pub avatar_url: Option<String>,
     pub role: String,
@@ -438,10 +448,12 @@ pub struct FriendRequestItem {
 
     pub requester_id: uuid::Uuid,
     pub requester_username: String,
+    pub requester_display_name: Option<String>,
     pub requester_avatar_url: Option<String>,
 
     pub addressee_id: uuid::Uuid,
     pub addressee_username: String,
+    pub addressee_display_name: Option<String>,
     pub addressee_avatar_url: Option<String>,
 
     pub status: String,

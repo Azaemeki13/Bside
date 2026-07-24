@@ -503,6 +503,19 @@ export class BsideSocial implements OnInit, OnDestroy {
       case 'invalid_message':
         this.errorMessage = message.message;
         break;
+      case 'friend_request_received':
+        this.loadFriendRequests();
+        break;
+      case 'friend_request_accepted':
+        this.loadFriends();
+        this.loadFriendRequests();
+        break;
+      case 'friend_request_rejected':
+        this.loadFriendRequests();
+        break;
+      case 'friend_removed':
+        this.loadFriends();
+        break;
     }
 
     this.cdr.detectChanges();
