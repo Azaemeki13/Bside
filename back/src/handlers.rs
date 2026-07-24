@@ -2823,9 +2823,20 @@ pub async fn google_callback_handler(
         .await?;
         new_id
     };
-    let jwt = crate::auth::create_jwt(user_id)?;
+
     let frontend_url =
         std::env::var("FRONTEND_URL").unwrap_or_else(|_| "http://localhost:4200".to_string());
+
+    let is_banned = sqlx::query_scalar!("SELECT is_banned FROM users WHERE id = $1", user_id)
+        .fetch_one(&state.db)
+        .await?;
+
+    if is_banned {
+        let redirect_url = format!("{frontend_url}/login?error=banned");
+        return Ok(Redirect::to(&redirect_url));
+    }
+
+    let jwt = crate::auth::create_jwt(user_id)?;
     // old version:
     // let redirect_url = format!("{frontend_url}/bside_app?token={jwt}");
     let redirect_url = format!("{frontend_url}/login?token={jwt}");

@@ -15,17 +15,23 @@ export class Login implements OnInit {
   private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
 
+  protected oauthError: string | null = null;
+
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
 
     const token = this.route.snapshot.queryParamMap.get('token');
-    if (!token) {
+    if (token) {
+      localStorage.setItem('auth_token', token);
+      void this.router.navigate(['/bside_app'], { replaceUrl: true });
       return;
     }
 
-    localStorage.setItem('auth_token', token);
-    void this.router.navigate(['/bside_app'], { replaceUrl: true });
+    const error = this.route.snapshot.queryParamMap.get('error');
+    if (error === 'banned') {
+      this.oauthError = 'Your account has been banned.';
+    }
   }
 }

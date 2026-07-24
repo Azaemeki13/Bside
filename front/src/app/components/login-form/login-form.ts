@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { LucideAngularModule, Mail, KeyRound } from 'lucide-angular';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -25,6 +25,12 @@ export class LoginForm {
   errorMessage: string | null = null;
   isLoading = false;
 
+  @Input() set externalError(value: string | null) {
+    if (value) {
+      this.errorMessage = value;
+    }
+  }
+
   onSubmit() {
     if (this.loginForm.invalid) return;
     this.isLoading = true;
@@ -40,7 +46,9 @@ export class LoginForm {
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = 'Invalid username or password.';
+        this.errorMessage = err?.status === 403 && typeof err?.error === 'string'
+          ? err.error
+          : 'Invalid username or password.';
         console.error("Login Failed:", err);
       }
     });
