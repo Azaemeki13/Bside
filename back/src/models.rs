@@ -15,6 +15,14 @@ pub struct User {
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
+#[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
+pub struct PublicUser {
+    pub id: uuid::Uuid,
+    pub username: String,
+    pub display_name: Option<String>,
+    pub avatar_url: Option<String>,
+}
+
 #[derive(serde::Deserialize, utoipa::ToSchema)]
 pub struct UserPayload {
     pub username: String,
@@ -24,6 +32,38 @@ pub struct UserPayload {
 pub struct UpdateProfilePayload {
     /// New display name. Send an empty string to clear it and fall back to the username.
     pub display_name: String,
+}
+
+#[derive(serde::Deserialize, utoipa::ToSchema)]
+pub struct AdminUpdateUserPayload {
+    /// New display name. Omit to leave unchanged, send an empty string to clear it.
+    pub display_name: Option<String>,
+    /// One of "Admin", "Moderator", "User". Omit to leave unchanged.
+    pub role: Option<String>,
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct TopSongStat {
+    pub song_id: uuid::Uuid,
+    pub title: String,
+    pub play_count: i64,
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct DailyActivityStat {
+    pub day: chrono::NaiveDate,
+    pub play_count: i64,
+    pub listened_seconds: i64,
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct UserActivityAnalytics {
+    pub total_plays: i64,
+    pub total_listened_seconds: i64,
+    pub total_likes: i64,
+    pub unique_songs_played: i64,
+    pub top_songs: Vec<TopSongStat>,
+    pub daily_activity: Vec<DailyActivityStat>,
 }
 
 #[derive(serde::Serialize, utoipa::ToSchema)]

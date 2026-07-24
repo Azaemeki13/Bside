@@ -15,6 +15,8 @@ export class AdminUsers implements OnInit {
   private readonly admin = inject(AdminService);
   private readonly authService = inject(AuthService);
 
+  readonly roles: Array<'Admin' | 'Moderator' | 'User'> = ['Admin', 'Moderator', 'User'];
+
   users: UserProfile[] = [];
   isLoading = false;
   message = '';
@@ -65,6 +67,49 @@ export class AdminUsers implements OnInit {
       },
       error: () => {
         this.error = `Could not ${user.is_banned ? 'unban' : 'ban'} this user.`;
+        this.actingUserId = null;
+      },
+    });
+  }
+
+  changeRole(user: UserProfile, role: 'Admin' | 'Moderator' | 'User'): void {
+    if (role === user.role) return;
+    this.message = '';
+    this.error = '';
+    this.actingUserId = user.id;
+
+    this.admin.updateUser(user.id, { role }).subscribe({
+      next: (updated) => {
+        this.users = this.users.map((item) => (item.id === updated.id ? updated : item));
+        this.message = `${this.nameFor(updated)} is now ${updated.role}.`;
+        this.actingUserId = null;
+      },
+      error: () => {
+        this.error = `Could not change role for ${this.nameFor(user)}.`;
+        this.actingUserId = null;
+      },
+    });
+  }
+
+  deleteUser(user: UserProfile): void {
+    if (!confirm(`Permanently delete ${this.nameFor(user)}? This cannot be undone.`)) {
+      return;
+    }
+    this.message = '';
+    this.error = '';
+    this.actingUserId = user.id;
+
+    this.admin.deleteUser(user.id).subscribe({
+      next: () => {
+        this.users = this.users.filter((item) => item.id !== user.id);
+        this.message = `${this.nameFor(user)} was deleted.`;
+        this.actingUserId = null;
+      },
+      error: (err) => {
+        this.error =
+          err?.status === 409
+            ? `${this.nameFor(user)} owns an artist profile and cannot be deleted.`
+            : `Could not delete ${this.nameFor(user)}.`;
         this.actingUserId = null;
       },
     });

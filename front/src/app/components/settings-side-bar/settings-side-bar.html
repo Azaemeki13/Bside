@@ -8,7 +8,11 @@
     <lucide-icon [img]="chevronRight" class="text-[#FFE6DB]"></lucide-icon>
     </button>
 
-  <span class="font-raleway text-[1rem] font-bold text-[#FFE6DB]">ACTIVITY</span>
+  <button class="flex flex-row items-center justify-between cursor-pointer"
+    (click)="openActivityStats.emit()">
+    <span class="font-raleway text-[1rem] font-bold text-[#FFE6DB]">MY ACTIVITY</span>
+    <lucide-icon [img]="chevronRight" class="text-[#FFE6DB]"></lucide-icon>
+  </button>
 
   <div class="flex flex-row items-center justify-between">
     <span class="font-raleway text-[1rem] font-medium text-[#FFE6DB]/50">Allow notifications</span>

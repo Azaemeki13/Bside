@@ -12,6 +12,7 @@ export class SettingsSideBar {
   protected readonly chevronRight = ChevronRight;
   @Output() openArtistForm = new EventEmitter<void>();
   @Output() openProfile = new EventEmitter<void>();
+  @Output() openActivityStats = new EventEmitter<void>();
   isListeningOn = false;
   isNotificationsOn = false;
   isStatusOn = false;

@@ -9,12 +9,13 @@ use crate::models::{
     UpdateProfilePayload, UserStatusResponse,
 };
 use crate::{
-    AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem, AnyAuth,
-    AppState, ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse,
-    ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem, AuthRequest, AuthResponse,
-    BSideError, Claims, ContactPayload, GoogleUserProfile, LoginPayload, MlCallbackPayload,
-    Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, RegisterPayload, Song,
-    SongPayload, SongResponse, UpdateStructurePayload, User, UserPayload,
+    AddSongResponse, AdminUpdateUserPayload, AlbumDetailedResponse, AlbumListItem, AlbumResponse,
+    AlbumSongItem, AnyAuth, AppState, ArtistDetailResponse, ArtistRequestPayload,
+    ArtistRequestResponse, ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem,
+    AuthRequest, AuthResponse, BSideError, Claims, ContactPayload, DailyActivityStat,
+    GoogleUserProfile, LoginPayload, MlCallbackPayload, Playlist, PlaylistDetailedResponse,
+    PlaylistPayload, PlaylistSongItem, PublicUser, RegisterPayload, Song, SongPayload,
+    SongResponse, TopSongStat, UpdateStructurePayload, User, UserActivityAnalytics, UserPayload,
 };
 use argon2::{
     Argon2, PasswordHash, PasswordVerifier,
@@ -654,16 +655,36 @@ pub async fn get_artist_by_id_handler(
     }))
 }
 
-async fn ensure_admin(state: &AppState, user_id: Uuid) -> Result<(), BSideError> {
-    let role = sqlx::query_scalar!("SELECT role FROM users WHERE id = $1", user_id)
-        .fetch_optional(&state.db)
-        .await?
-        .ok_or(BSideError::UserNotFound)?;
+async fn user_role(state: &AppState, user_id: Uuid) -> Result<Option<String>, BSideError> {
+    Ok(
+        sqlx::query_scalar!("SELECT role FROM users WHERE id = $1", user_id)
+            .fetch_optional(&state.db)
+            .await?,
+    )
+}
 
-    if role != "Admin" {
+async fn is_admin(state: &AppState, user_id: Uuid) -> Result<bool, BSideError> {
+    Ok(user_role(state, user_id).await?.as_deref() == Some("Admin"))
+}
+
+async fn is_admin_or_moderator(state: &AppState, user_id: Uuid) -> Result<bool, BSideError> {
+    Ok(matches!(
+        user_role(state, user_id).await?.as_deref(),
+        Some("Admin") | Some("Moderator")
+    ))
+}
+
+async fn ensure_admin(state: &AppState, user_id: Uuid) -> Result<(), BSideError> {
+    if !is_admin(state, user_id).await? {
         return Err(BSideError::UnauthorizedProfile);
     }
+    Ok(())
+}
 
+async fn ensure_admin_or_moderator(state: &AppState, user_id: Uuid) -> Result<(), BSideError> {
+    if !is_admin_or_moderator(state, user_id).await? {
+        return Err(BSideError::UnauthorizedProfile);
+    }
     Ok(())
 }
 
@@ -717,6 +738,236 @@ pub async fn unban_user_handler(
     .ok_or(BSideError::UserNotFound)?;
 
     Ok(Json(user))
+}
+
+#[utoipa::path(
+    get,
+    path = "/admin/users",
+    responses(
+        (status = 200, description = "Full list of all users (admin/moderator only)", body = Vec<User>),
+        (status = 401, description = "Unauthorized"),
+        (status = 403, description = "Requires admin or moderator role"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Admin"]
+)]
+pub async fn admin_get_all_users_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+) -> Result<Json<Vec<User>>, BSideError> {
+    ensure_admin_or_moderator(&state, claims.sub).await?;
+
+    let users = sqlx::query_as::<_, User>(
+        r#"
+        SELECT id, username, display_name, email, avatar_url, role, is_banned, created_at
+        FROM users
+        ORDER BY created_at ASC
+        "#,
+    )
+    .fetch_all(&state.db)
+    .await?;
+
+    Ok(Json(users))
+}
+
+#[utoipa::path(
+    patch,
+    path = "/admin/users/{user_id}",
+    params(("user_id" = uuid::Uuid, Path, description = "User ID")),
+    request_body = AdminUpdateUserPayload,
+    responses(
+        (status = 200, description = "User updated", body = User),
+        (status = 400, description = "Invalid role or display name"),
+        (status = 401, description = "Unauthorized"),
+        (status = 403, description = "Requires admin role"),
+        (status = 404, description = "User not found"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Admin"]
+)]
+pub async fn admin_update_user_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    Path(user_id): Path<Uuid>,
+    Json(payload): Json<AdminUpdateUserPayload>,
+) -> Result<Json<User>, BSideError> {
+    ensure_admin(&state, claims.sub).await?;
+
+    if let Some(ref role) = payload.role {
+        if !matches!(role.as_str(), "Admin" | "Moderator" | "User") {
+            return Err(BSideError::BadRequest(
+                "Role must be one of Admin, Moderator, User.".into(),
+            ));
+        }
+        if user_id == claims.sub {
+            return Err(BSideError::BadRequest(
+                "You cannot change your own role.".into(),
+            ));
+        }
+    }
+
+    let display_name = match payload.display_name {
+        Some(ref raw) => {
+            let trimmed = raw.trim();
+            if trimmed.len() > 50 {
+                return Err(BSideError::BadRequest(
+                    "Display name must be 50 characters or fewer.".into(),
+                ));
+            }
+            Some(if trimmed.is_empty() {
+                None
+            } else {
+                Some(trimmed.to_string())
+            })
+        }
+        None => None,
+    };
+
+    let user = sqlx::query_as!(
+        User,
+        r#"
+        UPDATE users
+        SET
+            display_name = CASE WHEN $2 THEN $3 ELSE display_name END,
+            role = COALESCE($4, role)
+        WHERE id = $1
+        RETURNING id, username, display_name, email, avatar_url, role, is_banned, created_at as "created_at!"
+        "#,
+        user_id,
+        display_name.is_some(),
+        display_name.flatten(),
+        payload.role
+    )
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::UserNotFound)?;
+
+    Ok(Json(user))
+}
+
+#[utoipa::path(
+    delete,
+    path = "/admin/users/{user_id}",
+    params(("user_id" = uuid::Uuid, Path, description = "User ID")),
+    responses(
+        (status = 204, description = "User deleted"),
+        (status = 401, description = "Unauthorized"),
+        (status = 403, description = "Requires admin role"),
+        (status = 404, description = "User not found"),
+        (status = 409, description = "User owns an artist profile and cannot be deleted"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Admin"]
+)]
+pub async fn admin_delete_user_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+    Path(user_id): Path<Uuid>,
+) -> Result<StatusCode, BSideError> {
+    ensure_admin(&state, claims.sub).await?;
+
+    if user_id == claims.sub {
+        return Err(BSideError::BadRequest(
+            "You cannot delete your own account.".into(),
+        ));
+    }
+
+    let owns_artist = sqlx::query_scalar!(
+        "SELECT EXISTS(SELECT 1 FROM artists WHERE user_id = $1)",
+        user_id
+    )
+    .fetch_one(&state.db)
+    .await?
+    .unwrap_or(false);
+
+    if owns_artist {
+        return Err(BSideError::Conflict(
+            "This user owns an artist profile; reassign or remove it before deleting the user."
+                .into(),
+        ));
+    }
+
+    let deleted = sqlx::query!("DELETE FROM users WHERE id = $1", user_id)
+        .execute(&state.db)
+        .await?;
+
+    if deleted.rows_affected() == 0 {
+        return Err(BSideError::UserNotFound);
+    }
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
+#[utoipa::path(
+    get,
+    path = "/users/me/analytics",
+    responses(
+        (status = 200, description = "Current user's activity analytics", body = UserActivityAnalytics),
+        (status = 401, description = "Unauthorized"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Users"]
+)]
+pub async fn get_user_activity_analytics_handler(
+    State(state): State<AppState>,
+    claims: Claims,
+) -> Result<Json<UserActivityAnalytics>, BSideError> {
+    let totals = sqlx::query!(
+        r#"
+        SELECT
+            COUNT(*) FILTER (WHERE interaction_type IN ('play', 'replay')) AS "total_plays!",
+            COALESCE(SUM(listened_seconds) FILTER (WHERE interaction_type IN ('play', 'replay', 'complete')), 0)::BIGINT AS "total_listened_seconds!",
+            COUNT(*) FILTER (WHERE interaction_type = 'like') AS "total_likes!",
+            COUNT(DISTINCT song_id) FILTER (WHERE interaction_type IN ('play', 'replay')) AS "unique_songs_played!"
+        FROM user_song_interactions
+        WHERE user_id = $1
+        "#,
+        claims.sub
+    )
+    .fetch_one(&state.db)
+    .await?;
+
+    let top_songs = sqlx::query_as!(
+        TopSongStat,
+        r#"
+        SELECT s.id AS "song_id!", s.title AS "title!", COUNT(*) AS "play_count!"
+        FROM user_song_interactions i
+        JOIN songs s ON s.id = i.song_id
+        WHERE i.user_id = $1 AND i.interaction_type IN ('play', 'replay')
+        GROUP BY s.id, s.title
+        ORDER BY "play_count!" DESC
+        LIMIT 5
+        "#,
+        claims.sub
+    )
+    .fetch_all(&state.db)
+    .await?;
+
+    let daily_activity = sqlx::query_as!(
+        DailyActivityStat,
+        r#"
+        SELECT
+            created_at::DATE AS "day!",
+            COUNT(*) FILTER (WHERE interaction_type IN ('play', 'replay')) AS "play_count!",
+            COALESCE(SUM(listened_seconds) FILTER (WHERE interaction_type IN ('play', 'replay', 'complete')), 0)::BIGINT AS "listened_seconds!"
+        FROM user_song_interactions
+        WHERE user_id = $1 AND created_at >= NOW() - INTERVAL '30 days'
+        GROUP BY created_at::DATE
+        ORDER BY "day!" ASC
+        "#,
+        claims.sub
+    )
+    .fetch_all(&state.db)
+    .await?;
+
+    Ok(Json(UserActivityAnalytics {
+        total_plays: totals.total_plays,
+        total_listened_seconds: totals.total_listened_seconds,
+        total_likes: totals.total_likes,
+        unique_songs_played: totals.unique_songs_played,
+        top_songs,
+        daily_activity,
+    }))
 }
 
 #[utoipa::path(
@@ -955,7 +1206,7 @@ pub async fn get_me_handler(
     get,
     path = "/users",
     responses(
-        (status = 200, description = "List of all users", body = Vec<User>),
+        (status = 200, description = "Public list of all users (no email/role/ban data)", body = Vec<PublicUser>),
         (status = 401, description = "Unauthorized"),
     ),
     security(("Bearer" = [])),
@@ -964,10 +1215,10 @@ pub async fn get_me_handler(
 pub async fn get_all_users_handler(
     State(state): State<AppState>,
     _claims: Claims,
-) -> Result<Json<Vec<User>>, BSideError> {
-    let users = sqlx::query_as::<_, User>(
+) -> Result<Json<Vec<PublicUser>>, BSideError> {
+    let users = sqlx::query_as::<_, PublicUser>(
         r#"
-        SELECT id, username, display_name, email, avatar_url, role, is_banned, created_at
+        SELECT id, username, display_name, avatar_url
         FROM users
         ORDER BY created_at ASC
         "#,
@@ -983,35 +1234,21 @@ pub async fn get_all_users_handler(
     path = "/users/{id}",
     params(("id" = uuid::Uuid, Path, description = "User ID")),
     responses(
-        (status = 200, description = "User found", body = User),
+        (status = 200, description = "Public profile for the given user", body = PublicUser),
         (status = 401, description = "Unauthorized"),
         (status = 404, description = "User not found"),
     ),
     security(("Bearer" = [])),
     tags = ["Users"]
 )]
-// pub async fn get_user_by_id_handler(
-//     State(state): State<AppState>,
-//     Path(user_id): Path<uuid::Uuid>,
-//     _claims: Claims,
-// ) -> Result<Json<User>, BSideError> {
-//     let user =
-//         sqlx::query_as::<_, User>("SELECT id, username, created_at FROM users WHERE id = $1")
-//             .bind(user_id)
-//             .fetch_optional(&state.db)
-//             .await?
-//             .ok_or(BSideError::UserNotFound)?;
-//     Ok(Json(user))
-// }
-
 pub async fn get_user_by_id_handler(
     State(state): State<AppState>,
     Path(user_id): Path<uuid::Uuid>,
     _claims: Claims,
-) -> Result<Json<User>, BSideError> {
-    let user = sqlx::query_as::<_, User>(
+) -> Result<Json<PublicUser>, BSideError> {
+    let user = sqlx::query_as::<_, PublicUser>(
         r#"
-        SELECT id, username, display_name, email, avatar_url, role, is_banned, created_at
+        SELECT id, username, display_name, avatar_url
         FROM users
         WHERE id = $1
         "#,
@@ -1291,12 +1528,8 @@ pub async fn delete_album_handler(
     .fetch_optional(&state.db)
     .await?
     .ok_or(BSideError::NotFound)?;
-    let is_admin = sqlx::query_scalar!("SELECT role FROM users WHERE id = $1", claims.sub)
-        .fetch_optional(&state.db)
-        .await?
-        .map(|role| role == "Admin")
-        .unwrap_or(false);
-    if album.user_id != Some(claims.sub) || !is_admin {
+    let caller_is_admin = is_admin(&state, claims.sub).await?;
+    if album.user_id != Some(claims.sub) && !caller_is_admin {
         return Err(BSideError::UnauthorizedProfile);
     }
     let songs = sqlx::query!("SELECT audio_url FROM songs WHERE album_id = $1", album_id)
@@ -1372,13 +1605,9 @@ pub async fn create_song_handler(
     )
     .fetch_one(&state.db)
     .await?;
-    let is_admin = sqlx::query_scalar!("SELECT role FROM users WHERE id = $1", claims.sub)
-        .fetch_optional(&state.db)
-        .await?
-        .map(|role| role == "Admin")
-        .unwrap_or(false);
+    let caller_is_admin = is_admin(&state, claims.sub).await?;
 
-    if !is_owner.unwrap_or(false) && !is_admin {
+    if !is_owner.unwrap_or(false) && !caller_is_admin {
         return Err(BSideError::UnauthorizedProfile);
     }
     let song_uid = Uuid::new_v4();
@@ -1454,12 +1683,8 @@ pub async fn verify_song_handler(
     .fetch_one(&state.db)
     .await?
     .unwrap_or(false);
-    let is_admin = sqlx::query_scalar!("SELECT role FROM users WHERE id = $1", claims.sub)
-        .fetch_optional(&state.db)
-        .await?
-        .map(|role| role == "Admin")
-        .unwrap_or(false);
-    if !is_owner && !is_admin {
+    let caller_is_admin = is_admin(&state, claims.sub).await?;
+    if !is_owner && !caller_is_admin {
         return Err(BSideError::UnauthorizedProfile);
     }
     let get_request = state
@@ -1637,12 +1862,8 @@ pub async fn delete_song_handler(
     .fetch_optional(&mut *tx)
     .await?
     .ok_or(BSideError::NotFound)?;
-    let is_admin = sqlx::query_scalar!("SELECT role FROM users WHERE id = $1", claims.sub)
-        .fetch_optional(&state.db)
-        .await?
-        .map(|role| role == "Admin")
-        .unwrap_or(false);
-    if owner.artist_id != claims.sub && !is_admin {
+    let caller_is_admin = is_admin(&state, claims.sub).await?;
+    if owner.artist_id != claims.sub && !caller_is_admin {
         return Err(BSideError::UnauthorizedProfile);
     }
     sqlx::query!(

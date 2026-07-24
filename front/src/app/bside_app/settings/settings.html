@@ -1,7 +1,8 @@
 <div class="flex flex-row gap-4 h-full overflow-hidden">
   <app-settings-side-bar
-    (openArtistForm)="showArtistForm = !showArtistForm; showProfile = false"
-    (openProfile)="showProfile = !showProfile; showArtistForm = false"
+    (openArtistForm)="showArtistForm = !showArtistForm; showProfile = false; showActivityStats = false"
+    (openProfile)="showProfile = !showProfile; showArtistForm = false; showActivityStats = false"
+    (openActivityStats)="showActivityStats = !showActivityStats; showProfile = false; showArtistForm = false"
     class="min-h-0 overflow-y-auto">
   </app-settings-side-bar>
 
@@ -10,5 +11,8 @@
   }
   @if (showArtistForm) {
     <app-artist-form (close)="showArtistForm = false" class="flex-1 overflow-y-auto min-w-0"/>
+  }
+  @if (showActivityStats) {
+    <app-activity-stats (close)="showActivityStats = false" class="flex-1 overflow-y-auto min-w-0"/>
   }
 </div>

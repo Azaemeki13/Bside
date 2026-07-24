@@ -1,11 +1,12 @@
 use crate::models::{
-    AddSongResponse, AlbumDetailedResponse, AlbumListItem, AlbumResponse, AlbumSongItem,
-    ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse, ArtistRequestReviewPayload,
-    ArtistResponse, ArtistSongItem, AuthResponse, ChatMessage, ConversationListItem, LoginPayload,
-    MarkMessagesReadResponse, PlaybackInteractionType, Playlist, PlaylistDetailedResponse,
-    PlaylistPayload, PlaylistSongItem, RawSearchResult, RegisterPayload, SearchResult, SharedSong,
-    Song, SongInteractionPayload, SongPayload, SongResponse, UpdateStructurePayload, User,
-    UserPayload,
+    AddSongResponse, AdminUpdateUserPayload, AlbumDetailedResponse, AlbumListItem, AlbumResponse,
+    AlbumSongItem, ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse,
+    ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem, AuthResponse, ChatMessage,
+    ConversationListItem, DailyActivityStat, LoginPayload, MarkMessagesReadResponse,
+    PlaybackInteractionType, Playlist, PlaylistDetailedResponse, PlaylistPayload,
+    PlaylistSongItem, PublicUser, RawSearchResult, RegisterPayload, SearchResult, SharedSong,
+    Song, SongInteractionPayload, SongPayload, SongResponse, TopSongStat, UpdateStructurePayload,
+    User, UserActivityAnalytics, UserPayload,
 };
 use utoipa::OpenApi;
 
@@ -48,16 +49,20 @@ use utoipa::OpenApi;
         crate::handlers::mark_conversation_messages_as_read_handler,
         crate::handlers::get_conversations_handler,
         crate::handlers::record_song_interaction_handler,
+        crate::handlers::admin_get_all_users_handler,
+        crate::handlers::admin_update_user_handler,
+        crate::handlers::admin_delete_user_handler,
+        crate::handlers::get_user_activity_analytics_handler,
     ),
     components(
         schemas(
-            User, UserPayload, Song, SongPayload, SongResponse, AddSongResponse, SongInteractionPayload,
+            User, UserPayload, PublicUser, AdminUpdateUserPayload, Song, SongPayload, SongResponse, AddSongResponse, SongInteractionPayload,
             PlaybackInteractionType, Playlist, UpdateStructurePayload, PlaylistDetailedResponse, PlaylistSongItem,
             AlbumResponse, AlbumListItem, AlbumSongItem, AlbumDetailedResponse,
             ArtistResponse, ArtistSongItem, ArtistDetailResponse, ArtistRequestPayload,
             ArtistRequestReviewPayload, ArtistRequestResponse, PlaylistPayload, AuthResponse,
             RegisterPayload, LoginPayload, RawSearchResult, SearchResult, ChatMessage, MarkMessagesReadResponse, SharedSong,
-            ConversationListItem,
+            ConversationListItem, TopSongStat, DailyActivityStat, UserActivityAnalytics,
         )
     ),
     info(title = "B-Side API", version = "0.1.0", description = "Music production and artist platform API"),

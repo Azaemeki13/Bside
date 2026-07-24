@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            COUNT(*) FILTER (WHERE interaction_type IN ('play', 'replay')) AS \"total_plays!\",\n            COALESCE(SUM(listened_seconds) FILTER (WHERE interaction_type IN ('play', 'replay', 'complete')), 0)::BIGINT AS \"total_listened_seconds!\",\n            COUNT(*) FILTER (WHERE interaction_type = 'like') AS \"total_likes!\",\n            COUNT(DISTINCT song_id) FILTER (WHERE interaction_type IN ('play', 'replay')) AS \"unique_songs_played!\"\n        FROM user_song_interactions\n        WHERE user_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total_plays!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "total_listened_seconds!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "total_likes!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "unique_songs_played!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "766c96399e9c69c2488c282f76129c20220c8f7a51823def4ca75b4283fe3a2f"
+}

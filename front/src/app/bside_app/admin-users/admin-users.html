@@ -30,10 +30,20 @@
             </h2>
             <p class="font-raleway text-sm text-[#FFE6DB]/60">{{ user.username }} | {{ user.email }} | {{ user.role }}</p>
           </div>
-          <div class="flex shrink-0 gap-2">
+          <div class="flex shrink-0 items-center gap-2">
             @if (isSelf(user)) {
               <span class="font-raleway text-sm text-[#FFE6DB]/40">This is you</span>
             } @else {
+              <select
+                class="rounded-full bg-[#1F0E1C] border border-[#FFE6DB]/30 px-3 py-2 font-raleway text-sm text-[#FFE6DB] disabled:cursor-not-allowed disabled:opacity-50"
+                [disabled]="actingUserId === user.id"
+                [value]="user.role"
+                (change)="changeRole(user, $any($event.target).value)"
+              >
+                @for (role of roles; track role) {
+                  <option [value]="role">{{ role }}</option>
+                }
+              </select>
               <button
                 class="rounded-full px-4 py-2 font-raleway font-bold disabled:cursor-not-allowed disabled:opacity-50"
                 [class]="user.is_banned ? 'bg-[#FFE6DB] text-[#1F0E1C]' : 'bg-[#FF5500] text-[#FFE6DB]'"
@@ -42,6 +52,14 @@
                 (click)="toggleBan(user)"
               >
                 {{ user.is_banned ? 'Unban' : 'Ban' }}
+              </button>
+              <button
+                class="rounded-full bg-red-500/20 px-4 py-2 font-raleway font-bold text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+                type="button"
+                [disabled]="actingUserId === user.id"
+                (click)="deleteUser(user)"
+              >
+                Delete
               </button>
             }
           </div>

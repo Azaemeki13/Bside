@@ -1,0 +1,70 @@
+<section class="mx-auto flex w-full max-w-3xl flex-col gap-4 py-6 text-[#FFE6DB]">
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <h1 class="font-climate-crisis text-4xl font-bold">MY ACTIVITY</h1>
+      <p class="font-raleway text-sm mt-1 text-[#FFE6DB]/60">Your listening activity over the last 30 days.</p>
+    </div>
+    <button class="font-raleway font-bold text-[#FFE6DB] hover:underline" type="button" (click)="close.emit()">Close</button>
+  </div>
+
+  @if (isLoading()) {
+    <p class="font-raleway text-sm text-[#FFE6DB]/70">Loading your activity...</p>
+  }
+  @if (error()) {
+    <p class="font-raleway text-sm text-red-300">{{ error() }}</p>
+  }
+
+  @if (stats(); as data) {
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div class="rounded-lg bg-[#1F0E1C] p-4">
+        <p class="font-raleway text-xs uppercase text-[#FFE6DB]/50">Plays</p>
+        <p class="font-climate-crisis text-2xl">{{ data.total_plays }}</p>
+      </div>
+      <div class="rounded-lg bg-[#1F0E1C] p-4">
+        <p class="font-raleway text-xs uppercase text-[#FFE6DB]/50">Listened</p>
+        <p class="font-climate-crisis text-2xl">{{ formatDuration(data.total_listened_seconds) }}</p>
+      </div>
+      <div class="rounded-lg bg-[#1F0E1C] p-4">
+        <p class="font-raleway text-xs uppercase text-[#FFE6DB]/50">Likes</p>
+        <p class="font-climate-crisis text-2xl">{{ data.total_likes }}</p>
+      </div>
+      <div class="rounded-lg bg-[#1F0E1C] p-4">
+        <p class="font-raleway text-xs uppercase text-[#FFE6DB]/50">Unique songs</p>
+        <p class="font-climate-crisis text-2xl">{{ data.unique_songs_played }}</p>
+      </div>
+    </div>
+
+    <div class="rounded-lg bg-[#1F0E1C] p-5">
+      <h2 class="font-raleway text-sm font-bold uppercase text-[#FFE6DB]/60 mb-3">Last 30 days</h2>
+      @if (data.daily_activity.length === 0) {
+        <p class="font-raleway text-sm text-[#FFE6DB]/50">No listening activity yet.</p>
+      } @else {
+        <div class="flex items-end gap-1 h-24">
+          @for (day of data.daily_activity; track day.day) {
+            <div
+              class="flex-1 rounded-t bg-[#FF5500] min-w-[2px]"
+              [style.height.%]="barHeight(day.play_count)"
+              [title]="day.day + ': ' + day.play_count + ' plays'"
+            ></div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="rounded-lg bg-[#1F0E1C] p-5">
+      <h2 class="font-raleway text-sm font-bold uppercase text-[#FFE6DB]/60 mb-3">Top songs</h2>
+      @if (data.top_songs.length === 0) {
+        <p class="font-raleway text-sm text-[#FFE6DB]/50">Play some songs to see your top tracks here.</p>
+      } @else {
+        <ol class="flex flex-col gap-2">
+          @for (song of data.top_songs; track song.song_id) {
+            <li class="flex items-center justify-between font-raleway text-sm">
+              <span class="truncate">{{ song.title }}</span>
+              <span class="text-[#FFE6DB]/60">{{ song.play_count }} plays</span>
+            </li>
+          }
+        </ol>
+      }
+    </div>
+  }
+</section>
