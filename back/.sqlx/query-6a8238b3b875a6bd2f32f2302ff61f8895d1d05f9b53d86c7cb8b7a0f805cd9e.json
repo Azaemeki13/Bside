@@ -26,7 +26,7 @@
       {
         "ordinal": 4,
         "name": "requester_avatar_url",
-        "type_info": "Varchar"
+        "type_info": "Text"
       },
       {
         "ordinal": 5,
@@ -46,7 +46,7 @@
       {
         "ordinal": 8,
         "name": "addressee_avatar_url",
-        "type_info": "Varchar"
+        "type_info": "Text"
       },
       {
         "ordinal": 9,

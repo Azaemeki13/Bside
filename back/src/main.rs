@@ -7,6 +7,7 @@ mod error;
 mod handlers;
 mod models;
 mod network;
+mod preferences;
 mod search;
 mod swagger;
 mod ws;
@@ -15,23 +16,22 @@ use crate::auth::{AnyAuth, Claims, auth_gate, bootstrap_admin};
 use crate::error::BSideError;
 use crate::handlers::{
     accept_friend_request_handler, add_song_to_playlist_handler,
-    admin_create_album_for_artist_handler, admin_delete_user_handler,
-    admin_get_all_users_handler, admin_update_user_handler, ban_user_handler,
-    classic_auth_handler, contact_handler, create_album_handler, create_artist_handler,
-    create_artist_request_handler, create_playlist_handler, create_song_handler,
-    create_user_handler, delete_album_handler, delete_playlist_handler, delete_song_handler,
-    get_album_by_id_handler, get_all_users_handler, get_artist_by_id_handler,
-    get_artist_requests_handler, get_artists_handler, get_conversation_messages_handler,
-    get_conversations_handler, get_friend_requests_handler, get_friends_handler,
-    get_liked_songs_handler, get_me_handler, get_my_albums_handler, get_my_playlists_handler,
-    get_playlist_by_id_handler, get_song_stream_url_handler, get_user_activity_analytics_handler,
-    get_user_by_id_handler, get_user_status_handler, google_callback_handler, google_login_handler,
-    google_signup_handler, like_song_handler, mark_conversation_messages_as_read_handler,
-    ml_callback_handler, ping_handler, record_song_interaction_handler, register_handler,
-    reject_friend_request_handler, remove_friend_handler, remove_song_from_pl,
-    review_artist_request_handler, send_friend_request_handler, unban_user_handler,
-    unlike_song_handler, update_playlist_handler, update_profile_handler, upload_avatar,
-    verify_song_handler,
+    admin_create_album_for_artist_handler, admin_delete_user_handler, admin_get_all_users_handler,
+    admin_update_user_handler, ban_user_handler, classic_auth_handler, contact_handler,
+    create_album_handler, create_artist_handler, create_artist_request_handler,
+    create_playlist_handler, create_song_handler, create_user_handler, delete_album_handler,
+    delete_playlist_handler, delete_song_handler, get_album_by_id_handler, get_all_users_handler,
+    get_artist_by_id_handler, get_artist_requests_handler, get_artists_handler,
+    get_conversation_messages_handler, get_conversations_handler, get_friend_requests_handler,
+    get_friends_handler, get_liked_songs_handler, get_me_handler, get_my_albums_handler,
+    get_my_playlists_handler, get_playlist_by_id_handler, get_song_stream_url_handler,
+    get_user_activity_analytics_handler, get_user_by_id_handler, get_user_status_handler,
+    google_callback_handler, google_login_handler, google_signup_handler, like_song_handler,
+    mark_conversation_messages_as_read_handler, ml_callback_handler, ping_handler,
+    record_song_interaction_handler, register_handler, reject_friend_request_handler,
+    remove_friend_handler, remove_song_from_pl, review_artist_request_handler,
+    send_friend_request_handler, unban_user_handler, unlike_song_handler, update_playlist_handler,
+    update_profile_handler, upload_avatar, verify_song_handler,
 };
 use crate::models::{
     AddSongResponse, AdminUpdateUserPayload, AlbumDetailedResponse, AlbumListItem, AlbumResponse,
@@ -162,7 +162,10 @@ async fn main() {
             "/users",
             post(create_user_handler).get(get_all_users_handler),
         )
-        .route("/users/me", get(get_me_handler).patch(update_profile_handler))
+        .route(
+            "/users/me",
+            get(get_me_handler).patch(update_profile_handler),
+        )
         .route("/users/me/avatar", post(upload_avatar))
         .route(
             "/artists",
@@ -220,17 +223,17 @@ async fn main() {
             put(reject_friend_request_handler),
         )
         .route("/users/{id}/status", get(get_user_status_handler))
-        .route("/users/me/analytics", get(get_user_activity_analytics_handler))
+        .route(
+            "/users/me/analytics",
+            get(get_user_activity_analytics_handler),
+        )
         .route(
             "/admin/artists/{artist_id}/albums",
             post(admin_create_album_for_artist_handler),
         )
         .route("/admin/users/{user_id}/ban", put(ban_user_handler))
         .route("/admin/users/{user_id}/unban", put(unban_user_handler))
-        .route(
-            "/admin/users",
-            get(admin_get_all_users_handler),
-        )
+        .route("/admin/users", get(admin_get_all_users_handler))
         .route(
             "/admin/users/{user_id}",
             patch(admin_update_user_handler).delete(admin_delete_user_handler),

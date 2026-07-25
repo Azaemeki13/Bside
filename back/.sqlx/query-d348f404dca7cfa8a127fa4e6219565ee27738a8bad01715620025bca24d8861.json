@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT song_id, interaction_type\n        FROM user_song_interactions\n        WHERE user_id = $1\n          AND interaction_type IN ('play', 'complete', 'skip', 'replay')\n        ORDER BY created_at ASC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "song_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "interaction_type",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "d348f404dca7cfa8a127fa4e6219565ee27738a8bad01715620025bca24d8861"
+}

@@ -1,21 +1,22 @@
 use crate::auth::{PublicApiKey, create_jwt};
-use crate::ws::{
-    notify_friend_removed, notify_friend_request_accepted, notify_friend_request_received,
-    notify_friend_request_rejected,
-};
 use crate::models::{
     ChatMessage, ConversationListItem, FriendListItem, FriendRequestItem, FriendRequestsResponse,
     MarkMessagesReadResponse, PlaybackInteractionType, SharedSong, SongInteractionPayload,
     UpdateProfilePayload, UserStatusResponse,
 };
+use crate::preferences::refresh_user_preference;
+use crate::ws::{
+    notify_friend_removed, notify_friend_request_accepted, notify_friend_request_received,
+    notify_friend_request_rejected,
+};
 use crate::{
     AddSongResponse, AdminUpdateUserPayload, AlbumDetailedResponse, AlbumListItem, AlbumResponse,
     AlbumSongItem, AnyAuth, AppState, ArtistDetailResponse, ArtistRequestPayload,
-    ArtistRequestResponse, ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem,
-    AuthRequest, AuthResponse, BSideError, Claims, ContactPayload, DailyActivityStat,
-    GoogleUserProfile, LoginPayload, MlCallbackPayload, Playlist, PlaylistDetailedResponse,
-    PlaylistPayload, PlaylistSongItem, PublicUser, RegisterPayload, Song, SongPayload,
-    SongResponse, TopSongStat, UpdateStructurePayload, User, UserActivityAnalytics, UserPayload,
+    ArtistRequestResponse, ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem, AuthRequest,
+    AuthResponse, BSideError, Claims, ContactPayload, DailyActivityStat, GoogleUserProfile,
+    LoginPayload, MlCallbackPayload, Playlist, PlaylistDetailedResponse, PlaylistPayload,
+    PlaylistSongItem, PublicUser, RegisterPayload, Song, SongPayload, SongResponse, TopSongStat,
+    UpdateStructurePayload, User, UserActivityAnalytics, UserPayload,
 };
 use argon2::{
     Argon2, PasswordHash, PasswordVerifier,
@@ -2344,6 +2345,14 @@ pub async fn like_song_handler(
     .execute(&mut *tx)
     .await?;
     tx.commit().await?;
+    if let Err(error) = refresh_user_preference(&state.db, claims.sub).await {
+        tracing::error!(
+            "Failed to refresh preference for user {} after liking song {}: {:?}",
+            claims.sub,
+            song_id,
+            error
+        );
+    }
     Ok((
         axum::http::StatusCode::CREATED,
         axum::Json(AddSongResponse {
@@ -2414,6 +2423,14 @@ pub async fn unlike_song_handler(
     .execute(&mut *tx)
     .await?;
     tx.commit().await?;
+    if let Err(error) = refresh_user_preference(&state.db, claims.sub).await {
+        tracing::error!(
+            "Failed to refresh preference for user {} after unliking song {}: {:?}",
+            claims.sub,
+            song_id,
+            error
+        );
+    }
     Ok(axum::http::StatusCode::NO_CONTENT)
 }
 
@@ -2516,7 +2533,15 @@ pub async fn record_song_interaction_handler(
     )
     .execute(&state.db)
     .await?;
-
+    if let Err(error) = refresh_user_preference(&state.db, claims.sub).await {
+        tracing::error!(
+            "Failed to refresh preference for user {} after '{}' interaction on song {}: {:?}",
+            claims.sub,
+            interaction_type,
+            song_id,
+            error
+        );
+    }
     Ok(axum::http::StatusCode::CREATED)
 }
 
@@ -3420,7 +3445,8 @@ pub async fn send_friend_request_handler(
     .await?;
 
     let item = fetch_friend_request_item(&state, friendship_id).await?;
-    notify_friend_request_received(&state, target_user_id, item.friendship_id, current_user_id).await;
+    notify_friend_request_received(&state, target_user_id, item.friendship_id, current_user_id)
+        .await;
     Ok(Json(item))
 }
 
@@ -3503,8 +3529,13 @@ pub async fn accept_friend_request_handler(
     }
 
     let item = fetch_friend_request_item(&state, friendship_id).await?;
-    notify_friend_request_accepted(&state, item.requester_id, item.friendship_id, current_user_id)
-        .await;
+    notify_friend_request_accepted(
+        &state,
+        item.requester_id,
+        item.friendship_id,
+        current_user_id,
+    )
+    .await;
     Ok(Json(item))
 }
 
@@ -3537,8 +3568,13 @@ pub async fn reject_friend_request_handler(
     }
 
     let item = fetch_friend_request_item(&state, friendship_id).await?;
-    notify_friend_request_rejected(&state, item.requester_id, item.friendship_id, current_user_id)
-        .await;
+    notify_friend_request_rejected(
+        &state,
+        item.requester_id,
+        item.friendship_id,
+        current_user_id,
+    )
+    .await;
     Ok(Json(item))
 }
 

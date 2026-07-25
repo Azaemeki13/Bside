@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO user_preferences (\n            user_id,\n            preference_vector,\n            updated_at\n        )\n        VALUES ($1, $2, NOW())\n        ON CONFLICT (user_id)\n        DO UPDATE SET\n            preference_vector = EXCLUDED.preference_vector,\n            updated_at = NOW()\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Float4Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d333feb57b3e951ef3f8c73666d94ddfd4c36298d5761f68e7dd18a89cddac0b"
+}

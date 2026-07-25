@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT DISTINCT ps.song_id\n        FROM playlist_songs ps\n        JOIN playlists p ON p.id = ps.playlist_id\n        WHERE p.owner_id = $1\n          AND p.title = 'Liked Songs'\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "song_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "edabc44678bac1dfa558b4dba3fc571d80c8976182acd55be272bcc6d6177e70"
+}
