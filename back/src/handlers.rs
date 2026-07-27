@@ -694,7 +694,7 @@ pub async fn ban_user_handler(
     claims: Claims,
     Path(user_id): Path<Uuid>,
 ) -> Result<Json<User>, BSideError> {
-    ensure_admin(&state, claims.sub).await?;
+    ensure_admin_or_moderator(&state, claims.sub).await?;
 
     if user_id == claims.sub {
         return Err(BSideError::BadRequest("You cannot ban yourself.".into()));
@@ -722,7 +722,7 @@ pub async fn unban_user_handler(
     claims: Claims,
     Path(user_id): Path<Uuid>,
 ) -> Result<Json<User>, BSideError> {
-    ensure_admin(&state, claims.sub).await?;
+    ensure_admin_or_moderator(&state, claims.sub).await?;
 
     let user = sqlx::query_as!(
         User,

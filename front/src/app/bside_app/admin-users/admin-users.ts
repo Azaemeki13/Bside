@@ -50,6 +50,10 @@ export class AdminUsers implements OnInit {
     return user.id === this.authService.currentUser()?.id;
   }
 
+  get isAdmin(): boolean {
+    return this.authService.currentUser()?.role === 'Admin';
+  }
+
   toggleBan(user: UserProfile): void {
     this.message = '';
     this.error = '';
@@ -73,7 +77,7 @@ export class AdminUsers implements OnInit {
   }
 
   changeRole(user: UserProfile, role: 'Admin' | 'Moderator' | 'User'): void {
-    if (role === user.role) return;
+    if (!this.isAdmin || role === user.role) return;
     this.message = '';
     this.error = '';
     this.actingUserId = user.id;
@@ -92,6 +96,7 @@ export class AdminUsers implements OnInit {
   }
 
   deleteUser(user: UserProfile): void {
+    if (!this.isAdmin) return;
     if (!confirm(`Permanently delete ${this.nameFor(user)}? This cannot be undone.`)) {
       return;
     }

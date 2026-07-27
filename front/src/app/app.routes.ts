@@ -12,6 +12,7 @@ import { AlbumDetail } from './bside_app/album-detail/album-detail';
 import { ArtistDetail } from './bside_app/artist-detail/artist-detail';
 import { artistGuard } from './guards/artist.guard';
 import { adminGuard } from './guards/admin.guard';
+import { adminOrModeratorGuard } from './guards/admin-or-moderator.guard';
 import { AdminArtistRequests } from './bside_app/admin-artist-requests/admin-artist-requests';
 import { AdminUsers } from './bside_app/admin-users/admin-users';
 import { Forbidden } from './errors/forbidden/forbidden';
@@ -36,7 +37,7 @@ export const routes: Routes = [
             { path: 'social', component: BsideSocial },
             { path: 'upload', component: BsideUpload, canActivate: [artistGuard] },
             { path: 'admin/artist-requests', component: AdminArtistRequests, canActivate: [adminGuard] },
-            { path: 'admin/users', component: AdminUsers, canActivate: [adminGuard] },
+            { path: 'admin/users', component: AdminUsers, canActivate: [adminOrModeratorGuard] },
             { path: 'settings', component: BsideSettings },
         ],
     },
