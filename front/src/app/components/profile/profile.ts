@@ -5,15 +5,17 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PlaylistService, Playlist } from '../../services/playlist.service';
 import { displayName } from '../../models/chat.model';
+import { LucideAngularModule, SquarePen } from 'lucide-angular';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
 export class Profile {
+  protected readonly squarePen = SquarePen;
   protected readonly authService = inject(AuthService);
   protected readonly playlistService = inject(PlaylistService);
   private readonly router = inject(Router);

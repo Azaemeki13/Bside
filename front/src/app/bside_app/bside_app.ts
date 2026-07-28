@@ -6,6 +6,7 @@ import { NavBar } from '../components/nav-bar/nav-bar';
 import { SideBar } from '../components/side-bar/side-bar';
 import { SoundBar } from './sound-bar/sound-bar';
 import { AuthService } from '../services/auth.service';
+import { ChatService } from '../services/chat.service';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -20,6 +21,7 @@ export class BsideApp implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   protected readonly authService = inject(AuthService);
+  private readonly chatService = inject(ChatService);
 
   async ngOnInit(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -53,6 +55,7 @@ export class BsideApp implements OnInit {
       this.cdr.markForCheck();
       this.name = data.username ?? data.email ?? '';
       console.log('Name set to:', this.name);
+      this.chatService.connect();
     } catch (e) {
       console.error('Failed to fetch user profile', e);
     }

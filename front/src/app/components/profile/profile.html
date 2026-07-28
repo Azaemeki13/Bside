@@ -51,13 +51,14 @@
                 </button>
             </div>
         } @else {
-            <div class="flex items-center gap-3">
+            <div class="flex flex-col items-start gap-1">
                 <span class="font-climate-crisis text-[2.5rem] text-[#FFE6DB] text-nowrap">{{ effectiveName() }}</span>
                 <button
                     type="button"
-                    class="font-raleway text-sm font-bold text-[#FFE6DB]/60 underline cursor-pointer"
+                    class="flex items-center gap-1 font-raleway text-sm font-bold text-[#FF5500] underline cursor-pointer"
                     (click)="startEditingName()"
                 >
+                    <lucide-icon [img]="squarePen" class="w-4 h-4"></lucide-icon>
                     Edit
                 </button>
             </div>

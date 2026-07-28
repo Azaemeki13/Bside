@@ -2,6 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, tap, throwError } from 'rxjs';
 import { environment } from '../../environment';
+import { AuthService } from './auth.service';
 
 export interface Playlist {
   id: string;
@@ -41,7 +42,13 @@ export interface AddSongResponse {
 @Injectable({ providedIn: 'root' })
 export class PlaylistService {
   private http = inject(HttpClient);
+  private authService = inject(AuthService);
   private apiUrl = environment.apiUrl;
+
+  private isLoggedIn(): boolean {
+    if (this.authService.currentUser()) return true;
+    return typeof localStorage !== 'undefined' && !!localStorage.getItem('auth_token');
+  }
 
   playlists = signal<Playlist[]>([]);
   selectedPlaylist = signal<(Playlist & { songs?: PlaylistSongItem[] }) | null>(null);
@@ -49,6 +56,10 @@ export class PlaylistService {
   likedSongIds = signal<Set<string>>(new Set<string>());
 
   loadPlaylists(): void {
+    if (!this.isLoggedIn()) {
+      this.playlists.set([]);
+      return;
+    }
     this.http.get<Playlist[]>(`${this.apiUrl}/playlists`).subscribe({
       next: (playlists) => this.playlists.set(playlists),
       error: (err) => console.error('Failed to load playlists', err)
@@ -147,6 +158,10 @@ export class PlaylistService {
   }
 
   loadLikedSongs(): void {
+    if (!this.isLoggedIn()) {
+      this.likedSongIds.set(new Set<string>());
+      return;
+    }
     this.getLikedSongs().subscribe({
       next: (playlist) => this.setLikedSongsFromPlaylist(playlist),
       error: (err) => console.error('Failed to load liked songs', err)

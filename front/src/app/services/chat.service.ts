@@ -1,8 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
+import { Injectable, PLATFORM_ID, effect, inject, signal } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { environment } from '../../environment';
+import { PreferencesService } from './preferences.service';
 import {
 	ChatConnectionState,
 	ChatMessage,
@@ -23,6 +24,7 @@ export class ChatService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly apiUrl = environment.apiUrl;
   private readonly wsMessagesSubject = new Subject<ServerWsMessage>();
+  private readonly preferences = inject(PreferencesService);
 
   private socket: WebSocket | null = null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -31,6 +33,14 @@ export class ChatService {
 
   readonly connectionState = signal<ChatConnectionState>('disconnected');
   readonly wsMessages$ = this.wsMessagesSubject.asObservable();
+
+  constructor() {
+    effect(() => {
+      if (!this.preferences.shareOnlineStatus() && this.socket) {
+        this.disconnect();
+      }
+    });
+  }
 
   getConversations(): Observable<ConversationListItem[]> {
     return this.http.get<ConversationListItem[]>(`${this.apiUrl}/conversations`);
@@ -50,6 +60,10 @@ export class ChatService {
 
   connect(): void {
     if (!isPlatformBrowser(this.platformId)) return;
+    if (!this.preferences.shareOnlineStatus()) {
+      this.connectionState.set('disconnected');
+      return;
+    }
 
     this.shouldReconnect = true;
 
@@ -86,6 +100,14 @@ export class ChatService {
       const message = this.parseServerMessage(event.data);
 
       if (!message) return;
+
+      if (message.type === 'private_message') {
+        console.log('[chat] private_message received:', message);
+        this.preferences.notify('New message on B-SIDE', {
+          body: message.content,
+          tag: `chat-${message.from_user_id}`,
+        });
+      }
 
       this.wsMessagesSubject.next(message);
     };

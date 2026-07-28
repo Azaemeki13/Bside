@@ -21,12 +21,11 @@ export class NavBar implements OnInit {
   protected user: UserProfile | null = null;
 
   ngOnInit() {
-    if (isPlatformBrowser(this.platformId)) {
+    if (isPlatformBrowser(this.platformId) && localStorage.getItem('auth_token')) {
       this.authService.getCurrentUser().subscribe({
         next: (res) => {
           this.user = res;
           this.authService.currentUser.set(res);
-          console.log('this.user', this.user);
         },
         error: (err) => {
           console.error('Failed to load current user:', err);
@@ -42,6 +41,6 @@ export class NavBar implements OnInit {
 
   get greetingName(): string {
     const user = this.authService.currentUser() ?? this.user;
-    return user ? displayName(user.username, user.display_name) : '';
+    return user ? displayName(user.username, user.display_name) : 'Anonymous';
   }
 }
