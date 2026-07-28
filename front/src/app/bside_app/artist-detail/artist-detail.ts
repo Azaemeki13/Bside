@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { LucideAngularModule, Play, X } from 'lucide-angular';
+import { Disc3, LucideAngularModule, Play, X } from 'lucide-angular';
 import { Subscription } from 'rxjs';
 import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
 import { AlbumService } from '../../services/album.service';
@@ -22,6 +22,7 @@ export class ArtistDetail implements OnInit, OnDestroy {
 
   readonly playIcon = Play;
   readonly x = X;
+  readonly disc3 = Disc3;
 
   artist: ArtistDetailResponse | null = null;
   isLoading = false;

@@ -15,7 +15,18 @@
 
         <div class="flex-1 overflow-y-auto pb-4">
           @if (playlistService.selectedSongs().length === 0) {
-            <p class="font-raleway text-[#FFE6DB]/50 text-sm pt-4">No songs yet.</p>
+            <div class="flex h-full w-full flex-col items-center justify-center gap-3 px-8 pt-8 text-center">
+              <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#FFE6DB]/10">
+                <lucide-icon [img]="playlistService.likedSongsSelected() ? heart : listMusic" class="h-7 w-7 text-[#FFE6DB]/60 stroke-[1.75]"></lucide-icon>
+              </div>
+              <p class="font-raleway text-sm font-semibold text-[#FFE6DB]/60">
+                @if (playlistService.likedSongsSelected()) {
+                  You haven't liked any songs yet.
+                } @else {
+                  This playlist has no songs yet.
+                }
+              </p>
+            </div>
           } @else {
             @for (song of playlistService.selectedSongs(); track song.link_id) {
               <div class="cursor-pointer grid items-center py-2 rounded-lg hover:bg-[#FFE6DB]/5 duration-200"

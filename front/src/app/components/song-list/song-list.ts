@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { LucideAngularModule, Heart, Play, Trash2, Timer, AudioLines, Shuffle, EllipsisVertical, Share2 } from 'lucide-angular';
+import { LucideAngularModule, Heart, Play, Trash2, Timer, AudioLines, Shuffle, EllipsisVertical, Share2, ListMusic } from 'lucide-angular';
 import { PlaylistService, PlaylistSongItem } from '../../services/playlist.service';
 import { AuthService } from '../../services/auth.service';
 import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
@@ -25,6 +25,7 @@ export class SongList implements OnInit {
   protected readonly shuffle = Shuffle;
   protected readonly ellipsisVertical = EllipsisVertical;
   protected readonly share2 = Share2;
+  protected readonly listMusic = ListMusic;
   protected playlistService = inject(PlaylistService);
   protected authService = inject(AuthService);
   protected readonly audio = inject(AudioPlayerService);

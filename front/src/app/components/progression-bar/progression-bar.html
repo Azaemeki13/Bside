@@ -47,7 +47,9 @@
   				@if (audio.currentTrack(); as track) {
   					<img [src]="track.coverUrl || 'assets/cover1.png'" alt="" class="w-full h-full object-cover" />
   				} @else {
-  					<img src="assets/cover1.png" alt="" class="w-full h-full object-cover" />
+  					<div class="flex h-full w-full items-center justify-center bg-[#FFE6DB]/10">
+  						<lucide-icon [img]="musicIcon" class="h-5 w-5 text-[#FFE6DB]/60 stroke-[1.75]"></lucide-icon>
+  					</div>
   				}
   			</button>
   			<div class="flex min-w-0 flex-col justify-center">

@@ -134,7 +134,14 @@
             </span>
           </div>
         } @empty {
-          <p class="py-5 font-raleway text-sm text-[#FFE6DB]/60">No songs in this album.</p>
+          <div class="flex h-full w-full flex-col items-center justify-center gap-3 px-8 py-8 text-center">
+            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#FFE6DB]/10">
+              <lucide-icon [img]="disc3" class="h-7 w-7 text-[#FFE6DB]/60 stroke-[1.75]"></lucide-icon>
+            </div>
+            <p class="font-raleway text-sm font-semibold text-[#FFE6DB]/60">
+              This album has no songs yet.
+            </p>
+          </div>
         }
       </div>
     </div>

@@ -37,9 +37,14 @@
       @if (isLoadingSongCards && receivedSongCards.length === 0) {
         <p class="font-raleway text-xs text-[#FFE6DB]/50">Loading cards...</p>
       } @else if (receivedSongCards.length === 0) {
-        <p class="font-raleway text-xs text-[#FFE6DB]/50">
-          Songs your friends share with you will show up here.
-        </p>
+        <div class="flex flex-col items-center justify-center gap-3 px-4 py-10 text-center">
+          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#FFE6DB]/10">
+            <lucide-icon [img]="musicIcon" class="h-7 w-7 text-[#FFE6DB]/60 stroke-[1.75]"></lucide-icon>
+          </div>
+          <p class="font-raleway text-sm font-semibold text-[#FFE6DB]/60">
+            Songs your friends share with you will show up here.
+          </p>
+        </div>
       } @else {
         @for (card of receivedSongCards; track trackSongCardById($index, card)) {
           <button

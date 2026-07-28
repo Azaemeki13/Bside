@@ -2,7 +2,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule} from 'lucide-angular';
+import { LucideAngularModule, Music } from 'lucide-angular';
 import { catchError, finalize, forkJoin, interval, map, of, Subscription } from 'rxjs';
 import {
   ChatMessage,
@@ -41,6 +41,8 @@ export class BsideSocial implements OnInit, OnDestroy {
 
 	protected readonly connectionState = this.chatService.connectionState;
 	protected readonly currentUser = this.authService.currentUser;
+
+	protected readonly musicIcon = Music;
 
 	protected conversations: ConversationListItem[] = [];
 	protected users: ChatUser[] = [];

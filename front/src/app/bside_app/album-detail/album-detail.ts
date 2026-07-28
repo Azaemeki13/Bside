@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { EllipsisVertical, Heart, LucideAngularModule, Play, Timer, X } from 'lucide-angular';
+import { Disc3, EllipsisVertical, Heart, LucideAngularModule, Play, Timer, X } from 'lucide-angular';
 import { Subscription, switchMap } from 'rxjs';
 import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
 import { AlbumDetailedResponse, AlbumService, AlbumSongItem } from '../../services/album.service';
@@ -29,6 +29,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
   readonly ellipsisVertical = EllipsisVertical;
   readonly heart = Heart;
   readonly x = X;
+  readonly disc3 = Disc3;
 
   album: AlbumDetailedResponse | null = null;
   isLoading = false;

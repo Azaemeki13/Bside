@@ -45,7 +45,7 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { LucideAngularModule, Pause, Play, SkipBack, SkipForward } from 'lucide-angular';
+import { LucideAngularModule, Music, Pause, Play, SkipBack, SkipForward } from 'lucide-angular';
 import { AudioPlayerService } from '../../services/audio.player.service';
 
   @Component({
@@ -62,6 +62,7 @@ import { AudioPlayerService } from '../../services/audio.player.service';
     protected readonly skipForwardIcon = SkipForward;
     protected readonly play = Play;
     protected readonly pause = Pause;
+    protected readonly musicIcon = Music;
     protected readonly titleOffset = signal(0);
     protected readonly artistOffset = signal(0);
 
