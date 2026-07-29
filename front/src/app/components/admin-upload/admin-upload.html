@@ -9,10 +9,10 @@
     <div class="flex items-center justify-between border-b border-[#FFE6DB]/10 pb-4">
       <p class="font-raleway text-lg font-bold">Artist</p>
       <div class="flex gap-2">
-        <button type="button" class="rounded-full px-4 py-1.5 font-raleway text-sm font-bold transition border"
+        <button type="button" class="cursor-pointer rounded-full px-4 py-1.5 font-raleway text-sm font-bold transition border"
           [ngClass]="activeTab === 'select' ? 'border-[#FF5500] bg-[#FF5500]/10 text-[#FF5500]' : 'border-[#FFE6DB]/20 text-[#FFE6DB]/60'"
           (click)="setTab('select')">Pick existing</button>
-        <button type="button" class="rounded-full px-4 py-1.5 font-raleway text-sm font-bold transition border"
+        <button type="button" class="cursor-pointer rounded-full px-4 py-1.5 font-raleway text-sm font-bold transition border"
           [ngClass]="activeTab === 'create' ? 'border-[#FF5500] bg-[#FF5500]/10 text-[#FF5500]' : 'border-[#FFE6DB]/20 text-[#FFE6DB]/60'"
           (click)="setTab('create')">Create new</button>
       </div>

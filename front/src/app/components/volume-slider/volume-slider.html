@@ -2,7 +2,7 @@
   <button
     type="button"
     (click)="volumeService.toggleMute()"
-    class="text-[#FFE6DB]"
+    class="cursor-pointer text-[#FFE6DB]"
     [attr.aria-label]="volumeService.muted() ? 'Unmute' : 'Mute'"
     [attr.aria-pressed]="volumeService.muted()">
     @if (!volumeService.muted()) {

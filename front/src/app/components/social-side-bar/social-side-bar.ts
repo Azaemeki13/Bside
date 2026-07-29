@@ -42,7 +42,7 @@ export class SocialSideBar {
   searchQuery = '';
   isSearchOpen = false;
   isRequestsOpen = false;
-  brokenAvatarIds = new Set<string>();
+  brokenAvatarUrls = new Set<string>();
 
   protected readonly search = Search;
   protected readonly addFriend = UserRoundPlus;
@@ -175,8 +175,12 @@ export class SocialSideBar {
       .join('');
   }
 
-  onAvatarError(id: string): void {
-    this.brokenAvatarIds.add(id);
+  onAvatarError(url: string): void {
+    this.brokenAvatarUrls.add(url);
+  }
+
+  isAvatarBroken(url: string | null | undefined): boolean {
+    return !!url && this.brokenAvatarUrls.has(url);
   }
 
   trackConversationById(_: number, conversation: ConversationListItem): string {

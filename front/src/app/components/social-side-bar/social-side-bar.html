@@ -16,7 +16,7 @@
 
       <button
         type="button"
-        class="relative flex h-[2.875rem] w-[2.875rem] shrink-0 items-center justify-center rounded-full border-2 border-[#FFE6DB] bg-[#FFE6DB]/10 text-[#FFE6DB] transition-colors hover:bg-[#FFE6DB]/20"
+        class="cursor-pointer relative flex h-[2.875rem] w-[2.875rem] shrink-0 items-center justify-center rounded-full border-2 border-[#FFE6DB] bg-[#FFE6DB]/10 text-[#FFE6DB] transition-colors hover:bg-[#FFE6DB]/20"
         aria-label="Friend requests"
         [attr.aria-expanded]="isRequestsOpen"
         (click)="toggleRequests()"
@@ -43,12 +43,12 @@
           @for (request of friendRequests.incoming; track request.friendship_id) {
             <div class="flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-[#FFE6DB]/5">
               <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
-                @if (request.requester_avatar_url && !brokenAvatarIds.has(request.requester_id)) {
+                @if (request.requester_avatar_url && !isAvatarBroken(request.requester_avatar_url)) {
                   <img
                     [src]="request.requester_avatar_url"
                     [alt]="nameForRequester(request)"
                     class="h-full w-full object-cover"
-                    (error)="onAvatarError(request.requester_id)"
+                    (error)="onAvatarError(request.requester_avatar_url!)"
                   />
                 } @else {
                   <span class="font-raleway text-xs font-bold text-[#FFE6DB]">
@@ -104,12 +104,12 @@
                 (pointerdown)="openConversationForUser(user)"
               >
                 <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
-                  @if (user.avatar_url && !brokenAvatarIds.has(user.id)) {
+                  @if (user.avatar_url && !isAvatarBroken(user.avatar_url)) {
                     <img
                       [src]="user.avatar_url"
                       [alt]="nameForUser(user)"
                       class="h-full w-full object-cover"
-                      (error)="onAvatarError(user.id)"
+                      (error)="onAvatarError(user.avatar_url!)"
                     />
                   } @else {
                     <span class="font-raleway text-xs font-bold text-[#FFE6DB]">
@@ -137,7 +137,7 @@
               } @else {
                 <button
                   type="button"
-                  class="shrink-0 rounded-full bg-[#FFE6DB] p-2 text-[#1F0E1C] transition-colors hover:bg-[#F7D9C8] disabled:cursor-not-allowed disabled:opacity-50"
+                  class="cursor-pointer shrink-0 rounded-full bg-[#FFE6DB] p-2 text-[#1F0E1C] transition-colors hover:bg-[#F7D9C8] disabled:cursor-not-allowed disabled:opacity-50"
                   [disabled]="friendActionUserId === user.id"
                   [attr.aria-label]="'Send friend invite to ' + nameForUser(user)"
                   (pointerdown)="requestFriend(user)">
@@ -167,12 +167,12 @@
           >
             <div class="relative h-14 w-14 shrink-0">
               <div class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
-                @if (conversation.other_avatar_url && !brokenAvatarIds.has(conversation.other_user_id)) {
+                @if (conversation.other_avatar_url && !isAvatarBroken(conversation.other_avatar_url)) {
                   <img
                     [src]="conversation.other_avatar_url"
                     [alt]="nameForConversation(conversation)"
                     class="h-full w-full object-cover"
-                    (error)="onAvatarError(conversation.other_user_id)"
+                    (error)="onAvatarError(conversation.other_avatar_url!)"
                   />
                 } @else {
                   <span class="font-raleway text-sm font-bold text-[#FFE6DB]">
