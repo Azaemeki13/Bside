@@ -19,6 +19,8 @@ import { AdminUsers } from './bside_app/admin-users/admin-users';
 import { Forbidden } from './errors/forbidden/forbidden';
 import { ServerError } from './errors/server-error/server-error';
 import { NotFound } from './errors/not-found/not-found';
+import { AboutUs } from './about-us/about-us';
+
 
 export const routes: Routes = [
     { path: '403', component: Forbidden },
@@ -26,6 +28,7 @@ export const routes: Routes = [
     { path: '', component: LandingComponent },
     { path: 'login', component: Login },
     { path: 'signup', component: Signup },
+    { path: 'about-us', component: AboutUs},
     {
         path: 'bside_app',
         component: BsideApp,
