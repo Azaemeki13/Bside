@@ -56,7 +56,14 @@
       @if (isLoadingMessages) {
         <p class="px-1 py-3 font-raleway text-sm text-[#FFE6DB]/60">Loading messages...</p>
       } @else if (messages.length === 0) {
-        <p class="px-1 py-3 font-raleway text-sm text-[#FFE6DB]/60">No messages yet. Say hi!</p>
+        <div class="flex h-full w-full flex-col items-center justify-center gap-3 px-8 text-center">
+          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#FFE6DB]/10">
+            <lucide-icon [img]="messagesSquare" class="h-7 w-7 text-[#FFE6DB]/60 stroke-[1.75]"></lucide-icon>
+          </div>
+          <p class="font-raleway text-sm font-semibold text-[#FFE6DB]/60">
+            No messages yet. Say hi!
+          </p>
+        </div>
       } @else {
         <div class="flex flex-col gap-2">
           @for (message of messages; track trackMessageById($index, message)) {

@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, MessageCircle, Send, UserRoundX } from 'lucide-angular';
+import { LucideAngularModule, MessageCircle, MessagesSquare, Send, UserRoundX } from 'lucide-angular';
 import { ChatMessage, ConversationListItem, displayName } from '../../models/chat.model';
 import { SocialShareCard } from '../social-share-card/social-share-card';
 
@@ -38,6 +38,7 @@ export class SocialChat implements OnChanges {
   headerAvatarBroken = false;
 
   protected readonly messageCircle = MessageCircle;
+  protected readonly messagesSquare = MessagesSquare;
   protected readonly send = Send;
   protected readonly userRoundX = UserRoundX;
 

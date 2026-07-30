@@ -182,6 +182,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 				this.startConversationWithUser({
 					id: request.requester_id,
 					username: request.requester_username,
+					display_name: request.requester_display_name,
 					avatar_url: request.requester_avatar_url,
 				});
 			},
@@ -238,6 +239,19 @@ export class BsideSocial implements OnInit, OnDestroy {
 				this.errorMessage = 'Failed to remove friend.';
 			},
 			});
+	}
+
+	/**
+	 * Called when the other party accepts our friend request. Creates the
+	 * conversation locally so it shows up in real time, mirroring how
+	 * `clearConversationWithUser` removes it in real time when unfriended.
+	 */
+	private createConversationForAcceptedFriend(otherUserId: string): void {
+		const user = this.users.find((user) => user.id === otherUserId);
+
+		if (!user) return;
+
+		this.upsertConversationForUser(user);
 	}
 
 	private clearConversationWithUser(otherUserId: string): void {
@@ -408,20 +422,34 @@ export class BsideSocial implements OnInit, OnDestroy {
   }
 
   protected startConversationWithUser(user: ChatUser): void {
+    const conversation = this.upsertConversationForUser(user);
+
+    this.selectedConversation = conversation;
+    this.messages = [];
+    this.watchOnlineStatus(user.id);
+  }
+
+  /**
+   * Ensures a conversation entry exists locally for the given user, adding it
+   * to the conversation list if it's not there yet (e.g. right after a
+   * friendship is created, before any message has been exchanged). Returns
+   * the existing or newly created conversation.
+   */
+  private upsertConversationForUser(user: ChatUser): ConversationListItem {
     const existingConversation = this.conversations.find(
       (conversation) => conversation.other_user_id === user.id
     );
 
     if (existingConversation) {
-      this.selectConversation(existingConversation);
-      return;
+      return existingConversation;
     }
 
     const now = new Date().toISOString();
 
-    const temporaryConversation: ConversationListItem = {
+    const newConversation: ConversationListItem = {
       other_user_id: user.id,
       other_username: user.username,
+      other_display_name: user.display_name ?? null,
       other_email: user.email ?? '',
       other_avatar_url: user.avatar_url ?? null,
       last_message_id: '',
@@ -433,9 +461,9 @@ export class BsideSocial implements OnInit, OnDestroy {
       unread_count: 0,
     };
 
-    this.selectedConversation = temporaryConversation;
-    this.messages = [];
-    this.watchOnlineStatus(user.id);
+    this.conversations = [newConversation, ...this.conversations];
+
+    return newConversation;
   }
 
   protected loadMessages(otherUserId: string): void {
@@ -541,6 +569,7 @@ export class BsideSocial implements OnInit, OnDestroy {
       case 'friend_request_accepted':
         this.loadFriends();
         this.loadFriendRequests();
+        this.createConversationForAcceptedFriend(message.by_user_id);
         break;
       case 'friend_request_rejected':
         this.loadFriendRequests();

@@ -49,13 +49,15 @@
         </div>
       } @else {
         @for (card of receivedSongCards; track trackSongCardById($index, card)) {
-          <button
-            type="button"
+          <div
+            role="button"
+            tabindex="0"
             class="cursor-pointer text-left"
             (click)="openSongCard(card)"
+            (keydown.enter)="openSongCard(card)"
           >
             <app-social-share-card [song]="card.message.shared_song!"></app-social-share-card>
-          </button>
+          </div>
         }
       }
     </div>
