@@ -27,7 +27,9 @@
         [currentUserId]="currentUser()?.id ?? null"
         [isLoadingMessages]="isLoadingMessages"
         [isOtherUserOnline]="isSelectedConversationUserOnline"
+        [isFriend]="isFriend(selectedConversation?.other_user_id ?? '')"
         (messageSent)="sendMessage($event)"
+        (friendRemoveRequested)="removeSelectedConversationFriend()"
       ></app-social-chat>
   </div>
 

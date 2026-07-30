@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, MessageCircle, Send } from 'lucide-angular';
+import { LucideAngularModule, MessageCircle, Send, UserRoundX } from 'lucide-angular';
 import { ChatMessage, ConversationListItem, displayName } from '../../models/chat.model';
 import { SocialShareCard } from '../social-share-card/social-share-card';
 
@@ -27,8 +27,10 @@ export class SocialChat implements OnChanges {
   @Input() currentUserId: string | null = null;
   @Input() isLoadingMessages = false;
   @Input() isOtherUserOnline: boolean | null = null;
+  @Input() isFriend = false;
 
   @Output() messageSent = new EventEmitter<string>();
+  @Output() friendRemoveRequested = new EventEmitter<void>();
 
   @ViewChild('messagesContainer') messagesContainer?: ElementRef<HTMLDivElement>;
 
@@ -37,6 +39,7 @@ export class SocialChat implements OnChanges {
 
   protected readonly messageCircle = MessageCircle;
   protected readonly send = Send;
+  protected readonly userRoundX = UserRoundX;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedConversation']) {
@@ -80,6 +83,18 @@ export class SocialChat implements OnChanges {
 
   onHeaderAvatarError(): void {
     this.headerAvatarBroken = true;
+  }
+
+  requestRemoveFriend(): void {
+    if (!this.selectedConversation) return;
+
+    const confirmed = confirm(
+      `Remove ${this.nameForConversation(this.selectedConversation)} as a friend?`
+    );
+
+    if (!confirmed) return;
+
+    this.friendRemoveRequested.emit();
   }
 
   private scrollToBottom(): void {

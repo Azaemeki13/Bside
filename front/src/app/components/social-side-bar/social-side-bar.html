@@ -89,6 +89,12 @@
       </div>
     }
 
+    @if (inviteToastMessage && !isSearchOpen) {
+      <div class="absolute left-4 right-4 top-[calc(100%+0.5rem)] z-50 rounded-[1.25rem] bg-[#431E3A] px-4 py-3 text-center shadow-2xl">
+        <p class="font-raleway text-sm font-semibold text-[#FFE6DB]">{{ inviteToastMessage }}</p>
+      </div>
+    }
+
     @if (isSearchOpen) {
       <div class="absolute left-4 right-4 top-[calc(100%+0.5rem)] z-50 max-h-80 overflow-y-auto rounded-[1.25rem] bg-[#431E3A] p-2 shadow-2xl">
         @if (isLoadingUsers) {

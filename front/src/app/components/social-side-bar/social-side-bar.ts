@@ -43,6 +43,8 @@ export class SocialSideBar {
   isSearchOpen = false;
   isRequestsOpen = false;
   brokenAvatarUrls = new Set<string>();
+  inviteToastMessage: string | null = null;
+  private inviteToastTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly search = Search;
   protected readonly addFriend = UserRoundPlus;
@@ -118,7 +120,21 @@ export class SocialSideBar {
 
   requestFriend(user: ChatUser): void {
     this.friendRequested.emit(user);
+    this.showInviteToast(`Invitation sent to ${this.nameForUser(user)}`);
     this.clearSearch();
+  }
+
+  private showInviteToast(message: string): void {
+    this.inviteToastMessage = message;
+
+    if (this.inviteToastTimeoutId !== null) {
+      clearTimeout(this.inviteToastTimeoutId);
+    }
+
+    this.inviteToastTimeoutId = setTimeout(() => {
+      this.inviteToastMessage = null;
+      this.inviteToastTimeoutId = null;
+    }, 2500);
   }
 
   toggleRequests(): void {

@@ -231,12 +231,30 @@ export class BsideSocial implements OnInit, OnDestroy {
 			next: () => {
 				this.loadFriends();
 				this.loadFriendRequests();
+				this.clearConversationWithUser(friend.user_id);
 			},
 			error: (error) => {
 				console.error('Failed to remove friend:', error);
 				this.errorMessage = 'Failed to remove friend.';
 			},
 			});
+	}
+
+	private clearConversationWithUser(otherUserId: string): void {
+		this.conversations = this.conversations.filter(
+			(conversation) => conversation.other_user_id !== otherUserId
+		);
+
+		if (this.selectedConversation?.other_user_id === otherUserId) {
+			this.selectedConversation = null;
+			this.messages = [];
+			this.statusPollSubscription?.unsubscribe();
+			this.isSelectedConversationUserOnline = null;
+		}
+
+		this.receivedSongCards = this.receivedSongCards.filter(
+			(card) => card.conversation.other_user_id !== otherUserId
+		);
 	}
 
 	protected startConversationWithFriend(friend: FriendListItem): void {
@@ -251,6 +269,18 @@ export class BsideSocial implements OnInit, OnDestroy {
 
 	protected isFriend(userId: string): boolean {
 		return this.friends.some((friend) => friend.user_id === userId);
+	}
+
+	protected removeSelectedConversationFriend(): void {
+		const conversation = this.selectedConversation;
+
+		if (!conversation) return;
+
+		const friend = this.friends.find((item) => item.user_id === conversation.other_user_id);
+
+		if (!friend) return;
+
+		this.removeFriend(friend);
 	}
 
 	protected hasPendingOutgoingRequest(userId: string): boolean {
@@ -517,6 +547,7 @@ export class BsideSocial implements OnInit, OnDestroy {
         break;
       case 'friend_removed':
         this.loadFriends();
+        this.clearConversationWithUser(message.by_user_id);
         break;
     }
 

@@ -38,6 +38,18 @@
           {{ nameForConversation(selectedConversation) }}
         </p>
       </div>
+
+      @if (isFriend) {
+        <button
+          type="button"
+          class="cursor-pointer flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FFE6DB]/10 text-[#FFE6DB]/60 transition-colors hover:bg-[#FF5500]/20 hover:text-[#FF5500]"
+          [attr.aria-label]="'Remove ' + nameForConversation(selectedConversation) + ' as a friend'"
+          title="Remove friend"
+          (click)="requestRemoveFriend()"
+        >
+          <lucide-icon [img]="userRoundX" class="h-5 w-5 stroke-2"></lucide-icon>
+        </button>
+      }
     </div>
 
     <div class="min-h-0 flex-1 overflow-y-auto px-6 py-4" #messagesContainer>
