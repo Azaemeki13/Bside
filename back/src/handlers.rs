@@ -1372,7 +1372,7 @@ pub async fn create_album_handler(
     let album_id = Uuid::new_v4();
     sqlx::query!(
         "INSERT INTO albums (id, artist_id, title, genre, cover_url, status)
-        VALUES ($1, $2, $3, $4, $5, 'Ready')",
+        VALUES ($1, $2, $3, $4, $5, 'Pending')",
         album_id,
         artist_id,
         title,
@@ -1387,7 +1387,7 @@ pub async fn create_album_handler(
         title,
         genre,
         cover_url,
-        status: "Ready".to_string(),
+        status: "Pending".to_string(),
     }))
 }
 
@@ -1785,6 +1785,20 @@ pub async fn ml_callback_handler(
     )
     .execute(&state.db)
     .await?;
+
+    // The album is created as 'Pending' and only becomes visible (in search,
+    // catalog listings, etc.) once it actually has a verified, playable song.
+    sqlx::query!(
+        r#"
+        UPDATE albums
+        SET status = 'Ready'
+        WHERE id = (SELECT album_id FROM songs WHERE id = $1) AND status = 'Pending'
+        "#,
+        payload.track_id
+    )
+    .execute(&state.db)
+    .await?;
+
     Ok(axum::Json(serde_json::json!({"status": "processed"})))
 }
 
@@ -3019,7 +3033,7 @@ pub async fn admin_create_album_for_artist_handler(
 
     sqlx::query!(
         "INSERT INTO albums (id, artist_id, title, genre, cover_url, status)
-         VALUES ($1, $2, $3, $4, $5, 'Ready')",
+         VALUES ($1, $2, $3, $4, $5, 'Pending')",
         album_id,
         artist_id,
         title,
@@ -3035,7 +3049,7 @@ pub async fn admin_create_album_for_artist_handler(
         title,
         genre,
         cover_url,
-        status: "Ready".to_string(),
+        status: "Pending".to_string(),
     }))
 }
 

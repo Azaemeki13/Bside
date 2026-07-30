@@ -31,7 +31,7 @@
       {
         "ordinal": 5,
         "name": "avatar_url",
-        "type_info": "Text"
+        "type_info": "Varchar"
       },
       {
         "ordinal": 6,

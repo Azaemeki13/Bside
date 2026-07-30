@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE albums\n        SET status = 'Ready'\n        WHERE id = (SELECT album_id FROM songs WHERE id = $1) AND status = 'Pending'\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0e34cd192c0feb804fe3f2ef20db0b1c70b4f2516d7ef2bf8ba8666f3718d6c5"
+}

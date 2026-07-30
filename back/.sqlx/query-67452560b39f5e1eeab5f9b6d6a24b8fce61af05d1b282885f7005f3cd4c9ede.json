@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO albums (id, artist_id, title, genre, cover_url, status)\n        VALUES ($1, $2, $3, $4, $5, 'Ready')",
+  "query": "INSERT INTO albums (id, artist_id, title, genre, cover_url, status)\n        VALUES ($1, $2, $3, $4, $5, 'Pending')",
   "describe": {
     "columns": [],
     "parameters": {
@@ -14,5 +14,5 @@
     },
     "nullable": []
   },
-  "hash": "7a2fe14be3604898dffba6ed70b8edc942fda3d2632074f54040881ee3264ee5"
+  "hash": "67452560b39f5e1eeab5f9b6d6a24b8fce61af05d1b282885f7005f3cd4c9ede"
 }

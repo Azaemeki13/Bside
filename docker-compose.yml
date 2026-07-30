@@ -29,7 +29,7 @@ services:
     environment:
       MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID}
       MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY}
-      MINIO_API_CORS_ALLOW_ORIGIN: "http://localhost:4200,http://localhost:4300"
+      MINIO_API_CORS_ALLOW_ORIGIN: "http://localhost:4200,http://localhost:4300,http://localhost:4000"
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
@@ -79,6 +79,7 @@ services:
       - AWS_REGION=${AWS_REGION}
       - AWS_ENDPOINT_URL=http://minio:9000
       - AWS_PUBLIC_ENDPOINT_URL=http://localhost:9000
+      - FRONTEND_URL=http://localhost:4000
       - OAUTH_ID=${OAUTH_ID}
       - OAUTH_PW=${OAUTH_PW}
       - G_AUTH_URL=${G_AUTH_URL}
@@ -95,6 +96,18 @@ services:
     depends_on:
       - db
       - minio
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: bside_frontend
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      - BACKEND_ORIGIN=http://bside_rust_backend:8080
+    depends_on:
+      - backend
 volumes:
   minio_data:
   postgres_data:

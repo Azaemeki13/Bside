@@ -23,41 +23,32 @@ export class BsideApp implements OnInit {
   protected readonly authService = inject(AuthService);
   private readonly chatService = inject(ChatService);
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
+
     let token = localStorage.getItem('auth_token');
-    console.log('Token from localStorage:', token);
+
     if (!token) {
       token = this.route.snapshot.queryParamMap.get('token') ?? null;
-      console.log('Token from query params:', token);
+
       if (token) {
         localStorage.setItem('auth_token', token);
         history.replaceState(null, '', window.location.pathname);
       }
     }
-    if (!token) {
-      console.log('No token found');
-      return;
-    }
-    try {
-      console.log('Fetching user profile...');
-      const res = await fetch('http://localhost:8080/users/me', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log('Response status:', res.status);
-      if (!res.ok) {
-        console.log('Response not ok');
-        return;
-      }
-      const data = await res.json();
-      console.log('User data:', data);
-      this.authService.currentUser.set(data);
-      this.cdr.markForCheck();
-      this.name = data.username ?? data.email ?? '';
-      console.log('Name set to:', this.name);
-      this.chatService.connect();
-    } catch (e) {
-      console.error('Failed to fetch user profile', e);
-    }
+
+    if (!token) return;
+
+    this.authService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.authService.currentUser.set(user);
+        this.name = user.username ?? user.email ?? '';
+        this.cdr.markForCheck();
+        this.chatService.connect();
+      },
+      error: (error) => {
+        console.error('Failed to fetch user profile', error);
+      },
+    });
   }
 }

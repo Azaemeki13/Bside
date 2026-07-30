@@ -4,6 +4,7 @@ import { NavButton } from '../../components/nav-button/nav-button';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../environment';
 
 @Component({
   selector: 'app-footer',
@@ -14,6 +15,7 @@ import { CommonModule } from '@angular/common';
 export class Footer {
   protected readonly chevronDown = ChevronDown;
   private http = inject(HttpClient);
+  private readonly apiUrl = environment.apiUrl;
   contactData = {
     name: '',
     email: '',
@@ -29,7 +31,7 @@ export class Footer {
     }
     this.isSubmitting = true;
     this.errorMessage = '';
-    this.http.post('http://localhost:8080/contact', this.contactData, { responseType: 'text' }).subscribe({
+    this.http.post(`${this.apiUrl}/contact`, this.contactData, { responseType: 'text' }).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.successMessage = "Message sent successfully !";
