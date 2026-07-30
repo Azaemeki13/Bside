@@ -71,7 +71,7 @@
         </label>
         <label class="flex flex-col gap-2 font-raleway text-sm">
           Photo
-          <input class="text-sm text-[#FFE6DB] file:mr-4 file:rounded-full file:border-0 file:bg-[#FF5500] file:px-4 file:py-2 file:font-raleway file:font-bold file:text-[#FFE6DB] cursor-pointer" type="file" accept="image/png,image/jpeg,image/webp" (change)="onArtistPhotoSelected($event)" />
+          <input #artistPhotoInput class="text-sm text-[#FFE6DB] file:mr-4 file:rounded-full file:border-0 file:bg-[#FF5500] file:px-4 file:py-2 file:font-raleway file:font-bold file:text-[#FFE6DB] cursor-pointer" type="file" accept="image/png,image/jpeg,image/webp" (change)="onArtistPhotoSelected($event)" />
         </label>
         <label class="flex flex-col gap-2 font-raleway text-sm md:col-span-2">
           Bio
@@ -101,7 +101,7 @@
     <div class="grid gap-4 md:grid-cols-2">
       <label class="flex flex-col gap-2 font-raleway text-sm">
         Track files
-        <input class="text-sm text-[#FFE6DB] file:mr-4 file:rounded-full file:border-0 file:bg-[#FF5500] file:px-4 file:py-2 file:font-raleway file:font-bold file:text-[#FFE6DB] cursor-pointer" type="file" multiple accept=".wav,.flac,audio/wav,audio/flac" (change)="onAlbumSongsSelected($event)" />
+        <input #albumSongsInput class="text-sm text-[#FFE6DB] file:mr-4 file:rounded-full file:border-0 file:bg-[#FF5500] file:px-4 file:py-2 file:font-raleway file:font-bold file:text-[#FFE6DB] cursor-pointer" type="file" multiple accept=".wav,.flac,audio/wav,audio/flac" (change)="onAlbumSongsSelected($event)" />
       </label>
       <label class="flex flex-col gap-2 font-raleway text-sm">
         Album title
@@ -109,7 +109,7 @@
       </label>
       <label class="flex flex-col gap-2 font-raleway text-sm">
         Cover image
-        <input class="text-sm text-[#FFE6DB] file:mr-4 file:rounded-full file:border-0 file:bg-[#FF5500] file:px-4 file:py-2 file:font-raleway file:font-bold file:text-[#FFE6DB] cursor-pointer" type="file" accept="image/png,image/jpeg,image/webp" (change)="onAlbumCoverSelected($event)" />
+        <input #albumCoverInput class="text-sm text-[#FFE6DB] file:mr-4 file:rounded-full file:border-0 file:bg-[#FF5500] file:px-4 file:py-2 file:font-raleway file:font-bold file:text-[#FFE6DB] cursor-pointer" type="file" accept="image/png,image/jpeg,image/webp" (change)="onAlbumCoverSelected($event)" />
       </label>
       <div class="flex flex-col gap-2 font-raleway text-sm">
         <span>Genre</span>

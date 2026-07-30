@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environment';
 import { TAGS } from '../tag-list';
+import { AlbumService } from '../../services/album.service';
 
 interface AlbumResponse {
   id: string;
@@ -39,6 +40,7 @@ export class UploadAlbumForm {
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
+  private readonly albumService = inject(AlbumService);
   private readonly apiUrl = environment.apiUrl;
 
   readonly genreOptions = TAGS.filter((genre) => genre !== 'All');
@@ -141,8 +143,21 @@ export class UploadAlbumForm {
       this.albumSongFiles = [];
     } catch (error) {
       this.albumError = this.describeError(error, 'Could not create album. Create an artist profile first.');
+      await this.cleanUpFailedUpload();
     } finally {
+      this.isCreatingAlbum = false;
       this.cdr.detectChanges();
+    }
+  }
+
+  private async cleanUpFailedUpload(): Promise<void> {
+    if (!this.album) return;
+    try {
+      await firstValueFrom(this.albumService.deleteAlbum(this.album.id));
+    } catch (cleanupError) {
+      console.error('Failed to clean up incomplete album upload:', cleanupError);
+    } finally {
+      this.album = null;
     }
   }
 

@@ -45,4 +45,12 @@ export class AlbumService {
   getSongStreamUrl(id: string): Observable<{ url: string; expires_in: number; is_anonymous?: boolean }> {
     return this.http.get<{ url: string; expires_in: number; is_anonymous?: boolean }>(`${this.apiUrl}/songs/${id}/stream-url`);
   }
+
+  deleteAlbum(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/albums/${id}`);
+  }
+
+  deleteSong(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/songs/${id}`);
+  }
 }

@@ -33,4 +33,8 @@ export class AdminService {
   deleteUser(userId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/admin/users/${userId}`);
   }
+
+  deleteArtist(artistId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/admin/artists/${artistId}`);
+  }
 }

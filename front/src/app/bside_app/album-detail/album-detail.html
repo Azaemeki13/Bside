@@ -9,22 +9,50 @@
 
   @if (album; as currentAlbum) {
     <header class="flex flex-col gap-5 border-b border-[#FFE6DB]/15 pb-6 sm:flex-row sm:items-end">
-      <img class="h-52 w-52 shrink-0 rounded-md object-cover" [src]="coverUrl(currentAlbum.cover_url)" alt="" />
+      <img
+        class="h-52 w-52 shrink-0 rounded-md object-cover"
+        [src]="coverUrl(currentAlbum.cover_url)"
+        alt=""
+      />
 
-      <div class="min-w-0">
-        <p class="font-raleway text-xs font-bold uppercase tracking-wide text-[#FFE6DB]/60">Album</p>
-        <h1 class="break-words font-climate-crisis text-4xl font-bold leading-tight">{{ currentAlbum.title }}</h1>
+      <div class="min-w-0 flex-1">
+        <p class="font-raleway text-xs font-bold uppercase tracking-wide text-[#FFE6DB]/60">
+          Album
+        </p>
+
+        <h1 class="break-words font-climate-crisis text-4xl font-bold leading-tight">
+          {{ currentAlbum.title }}
+        </h1>
+
         <p class="mt-2 font-raleway text-sm text-[#FFE6DB]/70">
-          <a class="underline-offset-4 hover:underline" [routerLink]="['/bside_app/artist', currentAlbum.artist_id]">
+          <a
+            class="underline-offset-4 hover:underline"
+            [routerLink]="['/bside_app/artist', currentAlbum.artist_id]">
             {{ currentAlbum.artist_name }}
           </a>
           | {{ currentAlbum.genre }} | {{ currentAlbum.songs.length }} songs
         </p>
       </div>
-    </header>
+
+  @if (isAdmin) {
+    <button
+      type="button"
+      (click)="deleteAlbum()"
+      class="cursor-pointer self-start sm:self-end"
+      aria-label="Delete album">
+      <lucide-icon
+        [img]="trash2"
+        class="h-6 w-6 text-[#FFE6DB]/50 duration-300 hover:text-[#FF5500]">
+      </lucide-icon>
+    </button>
+  }
+</header>
 
     @if (playbackError) {
       <p class="font-raleway text-sm text-red-300">{{ playbackError }}</p>
+    }
+    @if (deleteError) {
+      <p class="font-raleway text-sm text-red-300">{{ deleteError }}</p>
     }
 
     <div class="flex min-h-0 flex-1 flex-col">
@@ -91,6 +119,14 @@
                           (click)="openShareMenu($event, song)">
                     Share
                   </button>
+                  @if (isAdmin) {
+                    <button type="button"
+                            class="w-full rounded px-3 py-2 text-left text-sm font-semibold cursor-pointer text-red-300 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+                            [disabled]="deletingSongId === song.id"
+                            (click)="deleteSong($event, song)">
+                      {{ deletingSongId === song.id ? 'Deleting…' : 'Delete song' }}
+                    </button>
+                  }
                 </span>
               }
 

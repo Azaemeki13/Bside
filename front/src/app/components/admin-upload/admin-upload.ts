@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environment';
 import { TAGS } from '../tag-list';
+import { AlbumService } from '../../services/album.service';
 
 interface Artist {
   id: string;
@@ -49,7 +50,12 @@ export class AdminArtistUpload implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
+  private readonly albumService = inject(AlbumService);
   private readonly apiUrl = environment.apiUrl;
+
+  @ViewChild('artistPhotoInput') artistPhotoInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('albumCoverInput') albumCoverInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('albumSongsInput') albumSongsInput?: ElementRef<HTMLInputElement>;
 
   readonly genreOptions = TAGS.filter((g) => g !== 'All');
 
@@ -156,6 +162,7 @@ export class AdminArtistUpload implements OnInit {
       this.newArtistName = '';
       this.newArtistBio = '';
       this.newArtistPhoto = null;
+      this.clearFileInput(this.artistPhotoInput);
       this.activeTab = 'select';
     } catch (error) {
       this.artistCreateError = this.describeError(error, 'Could not create artist.');
@@ -178,10 +185,12 @@ export class AdminArtistUpload implements OnInit {
     if (this.albumCover) form.append('cover', this.albumCover);
 
     this.isCreatingAlbum = true;
+    let createdAlbum: AlbumResponse | null = null;
     try {
       const album = await firstValueFrom(
         this.http.post<AlbumResponse>(`${this.apiUrl}/admin/artists/${this.selectedArtist.id}/albums`, form)
       );
+      createdAlbum = album;
       this.albumDone = true;
       setTimeout(() => { this.albumDone = false; this.cdr.detectChanges(); }, 5000);
 
@@ -196,11 +205,23 @@ export class AdminArtistUpload implements OnInit {
       this.albumGenre = '';
       this.albumCover = null;
       this.albumSongFiles = [];
+      this.clearFileInput(this.albumCoverInput);
+      this.clearFileInput(this.albumSongsInput);
     } catch (error) {
       this.albumError = this.describeError(error, 'Could not create album.');
+      await this.cleanUpFailedAlbum(createdAlbum);
     } finally {
       this.isCreatingAlbum = false;
       this.cdr.detectChanges();
+    }
+  }
+
+  private async cleanUpFailedAlbum(album: AlbumResponse | null): Promise<void> {
+    if (!album) return;
+    try {
+      await firstValueFrom(this.albumService.deleteAlbum(album.id));
+    } catch (cleanupError) {
+      console.error('Failed to clean up incomplete album upload:', cleanupError);
     }
   }
 
@@ -228,6 +249,10 @@ export class AdminArtistUpload implements OnInit {
     });
     if (!uploadResponse.ok) throw new Error(`Upload failed for ${file.name}: ${uploadResponse.status}`);
     await firstValueFrom(this.http.put(`${this.apiUrl}/songs/${songResponse.song.id}/verify`, {}));
+  }
+
+  private clearFileInput(ref?: ElementRef<HTMLInputElement>): void {
+    if (ref?.nativeElement) ref.nativeElement.value = '';
   }
 
   private isCoverImage(file: File): boolean {

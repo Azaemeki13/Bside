@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environment';
 import { TAGS } from '../tag-list';
+import { AlbumService } from '../../services/album.service';
 
 interface AlbumResponse {
   id: string;
@@ -41,6 +42,7 @@ export class UploadSingleForm {
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
+  private readonly albumService = inject(AlbumService);
   private readonly apiUrl = environment.apiUrl;
 
   readonly tagOptions = TAGS.filter((tag) => tag !== 'All');
@@ -166,8 +168,20 @@ export class UploadSingleForm {
     } catch (error) {
       this.songError = this.describeError(error, 'Upload failed.');
       this.uploadStep = 'idle';
+      await this.cleanUpFailedUpload();
     } finally {
       this.cdr.detectChanges();
+    }
+  }
+
+  private async cleanUpFailedUpload(): Promise<void> {
+    if (!this.album) return;
+    try {
+      await firstValueFrom(this.albumService.deleteAlbum(this.album.id));
+    } catch (cleanupError) {
+      console.error('Failed to clean up incomplete upload:', cleanupError);
+    } finally {
+      this.album = null;
     }
   }
 
