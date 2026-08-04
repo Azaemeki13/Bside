@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Disc3, EllipsisVertical, Heart, LucideAngularModule, Play, Timer, X } from 'lucide-angular';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Disc3, EllipsisVertical, Heart, LucideAngularModule, Play, Timer, X ,Trash2} from 'lucide-angular';
 import { Subscription, switchMap } from 'rxjs';
 import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
 import { AlbumDetailedResponse, AlbumService, AlbumSongItem } from '../../services/album.service';
 import { Playlist, PlaylistService } from '../../services/playlist.service';
 import { ChatService } from '../../services/chat.service';
+import { AuthService } from '../../services/auth.service';
 import { FriendListItem } from '../../models/chat.model';
 
 @Component({
@@ -18,11 +19,13 @@ import { FriendListItem } from '../../models/chat.model';
 })
 export class AlbumDetail implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly albumService = inject(AlbumService);
   protected readonly playlistService = inject(PlaylistService);
   private readonly audio = inject(AudioPlayerService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly chatService = inject(ChatService);
+  private readonly authService = inject(AuthService);
 
   readonly playIcon = Play;
   readonly timer = Timer;
@@ -30,6 +33,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
   readonly heart = Heart;
   readonly x = X;
   readonly disc3 = Disc3;
+  readonly trash2 = Trash2;
 
   album: AlbumDetailedResponse | null = null;
   isLoading = false;
@@ -49,6 +53,9 @@ export class AlbumDetail implements OnInit, OnDestroy {
   isLoadingFriends = false;
   shareTargetUserId = '';
   shareFeedback = '';
+  isDeletingAlbum = false;
+  deletingSongId = '';
+  deleteError = '';
 
   private routeSub?: Subscription;
   private albumSub?: Subscription;
@@ -106,6 +113,55 @@ export class AlbumDetail implements OnInit, OnDestroy {
 
     this.activeSongId = song.id;
     this.audio.setQueue(queue, Math.max(0, startIndex));
+  }
+
+  get isAdmin(): boolean {
+    const role = this.authService.currentUser()?.role;
+    return role === 'Admin' || role === 'Moderator';
+  }
+
+  deleteAlbum(): void {
+    if (!this.album || !this.isAdmin) return;
+    if (!confirm(`Permanently delete "${this.album.title}"? This cannot be undone.`)) {
+      return;
+    }
+    this.deleteError = '';
+    this.isDeletingAlbum = true;
+    this.albumService.deleteAlbum(this.album.id).subscribe({
+      next: () => {
+        this.router.navigate(['/bside_app/library']);
+      },
+      error: () => {
+        this.deleteError = 'Could not delete this album.';
+        this.isDeletingAlbum = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  deleteSong(event: Event, song: AlbumSongItem): void {
+    event.stopPropagation();
+    if (!this.album || !this.isAdmin) return;
+    if (!confirm(`Permanently delete "${song.title}"? This cannot be undone.`)) {
+      return;
+    }
+    this.openMenuSongId = '';
+    this.deleteError = '';
+    this.deletingSongId = song.id;
+    this.albumService.deleteSong(song.id).subscribe({
+      next: () => {
+        if (this.album) {
+          this.album = { ...this.album, songs: this.album.songs.filter((item) => item.id !== song.id) };
+        }
+        this.deletingSongId = '';
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.deleteError = `Could not delete "${song.title}".`;
+        this.deletingSongId = '';
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   toggleSongMenu(event: Event, song: AlbumSongItem): void {

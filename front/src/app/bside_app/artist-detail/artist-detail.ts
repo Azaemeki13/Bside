@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Disc3, LucideAngularModule, Play, X } from 'lucide-angular';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Disc3, LucideAngularModule, Play, X, Trash2 } from 'lucide-angular';
 import { Subscription } from 'rxjs';
 import { AudioFormat, AudioPlayerService } from '../../services/audio.player.service';
 import { AlbumService } from '../../services/album.service';
 import { ArtistDetailResponse, ArtistService, ArtistSongItem } from '../../services/artist.service';
+import { AdminService } from '../../services/admin.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-artist-detail',
@@ -15,14 +17,18 @@ import { ArtistDetailResponse, ArtistService, ArtistSongItem } from '../../servi
 })
 export class ArtistDetail implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly artistService = inject(ArtistService);
   private readonly albumService = inject(AlbumService);
   private readonly audio = inject(AudioPlayerService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly adminService = inject(AdminService);
+  private readonly authService = inject(AuthService);
 
   readonly playIcon = Play;
   readonly x = X;
   readonly disc3 = Disc3;
+  readonly trash2 = Trash2;
 
   artist: ArtistDetailResponse | null = null;
   isLoading = false;
@@ -30,6 +36,8 @@ export class ArtistDetail implements OnInit, OnDestroy {
   playbackError = '';
   activeSongId = '';
   isTryMePopupOpen = false;
+  isDeletingArtist = false;
+  deleteError = '';
 
   private routeSub?: Subscription;
   private artistSub?: Subscription;
@@ -56,6 +64,30 @@ export class ArtistDetail implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.routeSub?.unsubscribe();
     this.artistSub?.unsubscribe();
+  }
+
+  get isAdmin(): boolean {
+    const role = this.authService.currentUser()?.role;
+    return role === 'Admin' || role === 'Moderator';
+  }
+
+  deleteArtist(): void {
+    if (!this.artist || !this.isAdmin) return;
+    if (!confirm(`Permanently delete "${this.artist.name}" and all their albums and songs? This cannot be undone.`)) {
+      return;
+    }
+    this.deleteError = '';
+    this.isDeletingArtist = true;
+    this.adminService.deleteArtist(this.artist.id).subscribe({
+      next: () => {
+        this.router.navigate(['/bside_app/library']);
+      },
+      error: () => {
+        this.deleteError = 'Could not delete this artist.';
+        this.isDeletingArtist = false;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   get playableSongs(): ArtistSongItem[] {

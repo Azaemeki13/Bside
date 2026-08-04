@@ -29,7 +29,6 @@
           class="flex h-8 w-8 items-center justify-center"
           [attr.aria-label]="isLiked() ? 'Unlike song' : 'Like song'"
           [attr.aria-pressed]="isLiked()"
-          [disabled]="isLikePending"
           (click)="toggleLike($event)"
         >
           <lucide-icon

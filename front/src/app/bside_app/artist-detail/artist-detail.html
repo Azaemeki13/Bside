@@ -7,10 +7,18 @@
   }
   @if (artist; as currentArtist) {
     <header class="flex flex-col gap-5 border-b border-[#FFE6DB]/15 pb-6 sm:flex-row sm:items-end">
-      <img class="h-52 w-52 shrink-0 rounded-md object-cover" [src]="coverUrl(currentArtist.photo_url)" [alt]="currentArtist.name" />
-      <div class="min-w-0">
-        <p class="font-raleway text-xs font-bold uppercase tracking-wide text-[#FFE6DB]/60">Artist profile</p>
-        <h1 class="break-words font-climate-crisis text-4xl font-bold leading-tight">{{ currentArtist.name }}</h1>
+      <img
+        class="h-52 w-52 shrink-0 rounded-md object-cover"
+        [src]="coverUrl(currentArtist.photo_url)"
+        [alt]="currentArtist.name" />
+
+      <div class="min-w-0 flex-1">
+        <p class="font-raleway text-xs font-bold uppercase tracking-wide text-[#FFE6DB]/60">
+          Artist profile
+        </p>
+        <h1 class="break-words font-climate-crisis text-4xl font-bold leading-tight">
+          {{ currentArtist.name }}
+        </h1>
         <p class="mt-2 font-raleway text-sm text-[#FFE6DB]/70">
           {{ currentArtist.bio || 'This artist has not shared a bio yet.' }}
         </p>
@@ -18,32 +26,57 @@
           {{ currentArtist.albums.length }} albums | {{ playableSongs.length }} songs
         </p>
       </div>
+      @if (isAdmin) {
+        <button
+          type="button"
+          (click)="deleteArtist()"
+          class="cursor-pointer self-start sm:self-end"
+          aria-label="Delete artist">
+          <lucide-icon
+            [img]="trash2"
+            class="h-6 w-6 text-[#FFE6DB]/50 duration-300 hover:text-[#FF5500]">
+          </lucide-icon>
+        </button>
+      }
     </header>
-
     @if (playbackError) {
       <p class="font-raleway text-sm text-red-300">{{ playbackError }}</p>
     }
-
-    <div class="flex min-h-0 flex-1 flex-col gap-8">
-    @for (album of currentArtist.albums; track album.id) {
-      <a class="flex items-center gap-4 rounded-lg p-3 hover:bg-[#FFE6DB]/5"
-        [routerLink]="['/bside_app/album', album.id]">
-        <img class="h-28 w-28 shrink-0 rounded-md object-cover" [src]="coverUrl(album.cover_url)" [alt]="album.title" />
-        <div class="min-w-0 flex-1">
-          <p class="block break-words font-raleway text-base font-bold leading-tight">{{ album.title }}</p>
-          <p class="mt-1 font-raleway text-xs text-[#FFE6DB]/60">{{ album.genre }} | {{ album.song_count }} songs</p>
-        </div>
-      </a>
-    } @empty {
-      <div class="flex h-full w-full flex-col items-center justify-center gap-3 px-8 py-8 text-center">
-        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#FFE6DB]/10">
-          <lucide-icon [img]="disc3" class="h-7 w-7 text-[#FFE6DB]/60 stroke-[1.75]"></lucide-icon>
-        </div>
-        <p class="font-raleway text-sm font-semibold text-[#FFE6DB]/60">
-          This artist has no albums yet.
-        </p>
-      </div>
+    @if (deleteError) {
+      <p class="font-raleway text-sm text-red-300">{{ deleteError }}</p>
     }
+    <div class="flex min-h-0 flex-1 flex-col gap-8">
+      @for (album of currentArtist.albums; track album.id) {
+        <a
+          class="flex items-center gap-4 rounded-lg p-3 hover:bg-[#FFE6DB]/5"
+          [routerLink]="['/bside_app/album', album.id]">
+          <img
+            class="h-28 w-28 shrink-0 rounded-md object-cover"
+            [src]="coverUrl(album.cover_url)"
+            [alt]="album.title" />
+          <div class="min-w-0 flex-1">
+            <p class="block break-words font-raleway text-base font-bold leading-tight">
+              {{ album.title }}
+            </p>
+            <p class="mt-1 font-raleway text-xs text-[#FFE6DB]/60">
+              {{ album.genre }} | {{ album.song_count }} songs
+            </p>
+          </div>
+        </a>
+      } @empty {
+        <div class="flex h-full w-full flex-col items-center justify-center gap-3 px-8 py-8 text-center">
+          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#FFE6DB]/10">
+            <lucide-icon
+              [img]="disc3"
+              class="h-7 w-7 text-[#FFE6DB]/60 stroke-[1.75]">
+            </lucide-icon>
+          </div>
+
+          <p class="font-raleway text-sm font-semibold text-[#FFE6DB]/60">
+            This artist has no albums yet.
+          </p>
+        </div>
+      }
     </div>
   }
 </section>

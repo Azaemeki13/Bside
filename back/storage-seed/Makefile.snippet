@@ -1,0 +1,10 @@
+.PHONY: minio-seed minio-reset minio-verify
+
+minio-seed:
+	bash back/storage-seed/seed_minio.sh
+
+minio-reset:
+	bash back/storage-seed/seed_minio.sh --reset
+
+minio-verify:
+	bash back/storage-seed/verify_minio.sh

@@ -69,7 +69,7 @@
     </div>
 </div>
 <div>
-    <p class="font-raleway font-bold text-[#FFE6DB] text-[1rem]">Public playlist(s)</p>
+    <p class="font-raleway font-bold text-[#FFE6DB] text-[1rem]">Your playlist(s)</p>
     <div class="grid grid-cols-3 gap-2 pt-2 sm:grid-cols-5 md:grid-cols-7">
         @for (playlist of playlistService.playlists(); track playlist.id) {
             <button (click)="selectPlaylist(playlist)" class="rounded-[0.625rem] cursor-pointer min-w-0 w-full">

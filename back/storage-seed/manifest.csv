@@ -1,0 +1,17 @@
+bucket,object_key,content_type,expected_duration_seconds,size_bytes,sha256
+bside-avatars,default-avatar.jpg,image/jpeg,,13980,94566988683c473d4dd994c5799ee1d70ddd8bc5e318f7661a8b3da62bb006d2
+bside-covers,blue-static.jpg,image/jpeg,,22203,8a602f979577957e6a451963567171a8e04536d703b62735f21ae0fb6043eced
+bside-covers,default_album.jpg,image/jpeg,,26370,d46417a6d7294dac27819195569f634ec96b13df6e0dbe4f59c8b51812162612
+bside-covers,default_artist.jpg,image/jpeg,,21816,96c309471fafd900bae1a063456a5881a33623e7de91ed1e163737acf11a2f82
+bside-covers,default_cover.jpg,image/jpeg,,23885,d9008aa934575d3985f3841ae15a188973f7501706c0f6d9c69e9b8a43a7c73c
+bside-covers,luna.jpg,image/jpeg,,22348,376727f14ae8c04e31de418072b16f9d50c4a5afcef95ec50938e4c30a548cf2
+bside-covers,midnight-signals.jpg,image/jpeg,,25475,c137a5b26edb56b159bd8d2ab0aff37441dec755efc1da7b3aa890b6dc59a463
+bside-covers,night-coding.jpg,image/jpeg,,23201,387fec51b90f5bd9d4b319d2da79fd5a5deb07a0f71cb2fb31b77e82f1c557f4
+bside-covers,noah.jpg,image/jpeg,,23509,67fbaaf21bcf7f0f8cf46c89423ec50f17ced28d716592158361e45082c30443
+bside-tracks,audio/blue-echo.mp3,audio/mpeg,205,820471,be737a8dfa1e7b77b0490400d867b6efea2f893008066ee9441f566a0e1b4b72
+bside-tracks,audio/midnight-drive.mp3,audio/mpeg,210,840533,1fca26bc790d8623526aa2b32149cb261355883f6f8dc666d8da9a44c99c3c80
+bside-tracks,audio/quiet-orbit.mp3,audio/mpeg,195,780451,f74d0281d34a7aa6c518c9cac8fa16fa8142c5e5a24333b13e4b2d4e6be3e683
+bside-tracks,test/preference-song-a.mp3,audio/mpeg,180,720474,81cbc101b923a5d422a409de5dc1763166ea0c936abc05a6fef1225e792f7560
+bside-tracks,test/preference-song-b.mp3,audio/mpeg,180,720474,a1e5fddcfc5c15396e4cfdee4233f0a949c4932ac3013226546cbe95157b40f7
+bside-tracks,test/preference-song-c.mp3,audio/mpeg,180,720474,94932150d84d58b4547735304dc72756b669984b3cf3dd0694ea063a7cce8f28
+bside-tracks,test/websocket-test-song.wav,audio/wav,180,2880078,d79c3f98e74c27815c80315633b751437ff83e3db5a3a81a4d297d482720cba6
