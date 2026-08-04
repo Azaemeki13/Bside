@@ -66,6 +66,26 @@ pub struct UserActivityAnalytics {
     pub daily_activity: Vec<DailyActivityStat>,
 }
 
+#[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
+pub struct RecentPlayItem {
+    pub song_id: uuid::Uuid,
+    pub title: String,
+    pub audio_url: String,
+    pub artist_id: uuid::Uuid,
+    pub artist_name: String,
+    pub album_id: uuid::Uuid,
+    pub cover_url: String,
+    pub last_played_at: chrono::DateTime<chrono::Utc>,
+}
+
+#[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
+pub struct TopSpinItem {
+    pub artist_id: uuid::Uuid,
+    pub artist_name: String,
+    pub photo_url: String,
+    pub listened_seconds: i64,
+}
+
 #[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct ArtistResponse {
     pub id: uuid::Uuid,

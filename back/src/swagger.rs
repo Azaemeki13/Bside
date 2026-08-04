@@ -4,9 +4,9 @@ use crate::models::{
     ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem, AuthResponse, ChatMessage,
     ConversationListItem, DailyActivityStat, LoginPayload, MarkMessagesReadResponse,
     PlaybackInteractionType, Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem,
-    PublicUser, RawSearchResult, RegisterPayload, SearchResult, SharedSong, Song,
-    SongInteractionPayload, SongPayload, SongResponse, TopSongStat, UpdateStructurePayload, User,
-    UserActivityAnalytics, UserPayload,
+    PublicUser, RawSearchResult, RecentPlayItem, RegisterPayload, SearchResult, SharedSong, Song,
+    SongInteractionPayload, SongPayload, SongResponse, TopSongStat, TopSpinItem,
+    UpdateStructurePayload, User, UserActivityAnalytics, UserPayload,
 };
 use utoipa::OpenApi;
 
@@ -53,6 +53,9 @@ use utoipa::OpenApi;
         crate::handlers::admin_update_user_handler,
         crate::handlers::admin_delete_user_handler,
         crate::handlers::get_user_activity_analytics_handler,
+        crate::handlers::get_recent_plays_handler,
+        crate::handlers::get_top_spins_handler,
+        crate::recommendations::get_fresh_picks_handler,
     ),
     components(
         schemas(
@@ -63,6 +66,7 @@ use utoipa::OpenApi;
             ArtistRequestReviewPayload, ArtistRequestResponse, PlaylistPayload, AuthResponse,
             RegisterPayload, LoginPayload, RawSearchResult, SearchResult, ChatMessage, MarkMessagesReadResponse, SharedSong,
             ConversationListItem, TopSongStat, DailyActivityStat, UserActivityAnalytics,
+            RecentPlayItem, TopSpinItem,
         )
     ),
     info(title = "B-Side API", version = "0.1.0", description = "Music production and artist platform API"),

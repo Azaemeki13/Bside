@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment';
@@ -39,6 +39,17 @@ export class AlbumService {
 
   getAlbum(id: string): Observable<AlbumDetailedResponse> {
     return this.http.get<AlbumDetailedResponse>(`${this.apiUrl}/albums/${id}`);
+  }
+
+  getFreshPicks(genre?: string, limit?: number): Observable<AlbumListItem[]> {
+    let params = new HttpParams();
+    if (genre && genre !== 'All') {
+      params = params.set('genre', genre);
+    }
+    if (limit) {
+      params = params.set('limit', limit);
+    }
+    return this.http.get<AlbumListItem[]>(`${this.apiUrl}/fresh-picks`, { params });
   }
 
 

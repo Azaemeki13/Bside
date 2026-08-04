@@ -1,0 +1,41 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            ar.id AS artist_id,\n            ar.name AS artist_name,\n            ar.photo_url,\n            COALESCE(SUM(i.listened_seconds) FILTER (WHERE i.interaction_type IN ('complete', 'skip')), 0)::BIGINT AS \"listened_seconds!\"\n        FROM user_song_interactions i\n        JOIN songs s ON s.id = i.song_id\n        JOIN albums a ON a.id = s.album_id\n        JOIN artists ar ON ar.id = a.artist_id\n        WHERE i.user_id = $1 AND i.created_at >= NOW() - INTERVAL '30 days'\n        GROUP BY ar.id, ar.name, ar.photo_url\n        HAVING COALESCE(SUM(i.listened_seconds) FILTER (WHERE i.interaction_type IN ('complete', 'skip')), 0) > 0\n        ORDER BY \"listened_seconds!\" DESC\n        LIMIT $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "artist_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "artist_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "photo_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "listened_seconds!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "059d6c88f18f2ca7ad8d698cbe320e2d80366e68a9d6ff78a744527bb4a001da"
+}

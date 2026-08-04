@@ -8,6 +8,7 @@ mod handlers;
 mod models;
 mod network;
 mod preferences;
+mod recommendations;
 mod search;
 mod swagger;
 mod ws;
@@ -24,8 +25,9 @@ use crate::handlers::{
     get_artist_by_id_handler, get_artist_requests_handler, get_artists_handler,
     get_conversation_messages_handler, get_conversations_handler, get_friend_requests_handler,
     get_friends_handler, get_liked_songs_handler, get_me_handler, get_my_albums_handler,
-    get_my_playlists_handler, get_playlist_by_id_handler, get_song_stream_url_handler,
-    get_user_activity_analytics_handler, get_user_by_id_handler, get_user_status_handler,
+    get_my_playlists_handler, get_playlist_by_id_handler, get_recent_plays_handler,
+    get_song_stream_url_handler, get_top_spins_handler, get_user_activity_analytics_handler,
+    get_user_by_id_handler, get_user_status_handler,
     google_callback_handler, google_login_handler, google_signup_handler, like_song_handler,
     mark_conversation_messages_as_read_handler, ml_callback_handler, ping_handler,
     record_song_interaction_handler, register_handler, reject_friend_request_handler,
@@ -39,9 +41,11 @@ use crate::models::{
     ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem, AuthRequest, AuthResponse,
     ContactPayload, DailyActivityStat, GoogleUserProfile, LoginPayload, MlCallbackPayload,
     Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, PublicUser,
-    RawSearchResult, RegisterPayload, SearchResult, Song, SongPayload, SongResponse, TopSongStat,
-    UpdateStructurePayload, User, UserActivityAnalytics, UserPayload,
+    RawSearchResult, RecentPlayItem, RegisterPayload, SearchResult, Song, SongPayload,
+    SongResponse, TopSongStat, TopSpinItem, UpdateStructurePayload, User, UserActivityAnalytics,
+    UserPayload,
 };
+use crate::recommendations::get_fresh_picks_handler;
 use crate::search::searcher;
 
 use crate::ws::ws_handler;
@@ -152,6 +156,7 @@ async fn main() {
             "/songs/{song_id}/stream-url",
             get(get_song_stream_url_handler),
         )
+        .route("/fresh-picks", get(get_fresh_picks_handler))
         .route("/contact", post(contact_handler))
         .route("/ws", get(ws_handler))
         .route("/internal/songs/features", post(ml_callback_handler))
@@ -227,6 +232,8 @@ async fn main() {
             "/users/me/analytics",
             get(get_user_activity_analytics_handler),
         )
+        .route("/users/me/recent-plays", get(get_recent_plays_handler))
+        .route("/users/me/top-spins", get(get_top_spins_handler))
         .route(
             "/admin/artists/{artist_id}/albums",
             post(admin_create_album_for_artist_handler),

@@ -1,9 +1,13 @@
 import { isPlatformBrowser } from "@angular/common"
+import { HttpClient } from "@angular/common/http"
 import { Injectable, PLATFORM_ID, computed, effect, inject, signal } from "@angular/core"
 import { Howl } from "howler"
 import { Observable, Subscription } from "rxjs"
+import { environment } from "../../environment"
 import { VolumeService } from "./volume.service"
 import { AuthService } from "./auth.service"
+
+type PlaybackInteractionType = 'play' | 'complete' | 'skip' | 'replay';
 
 export type AudioFormat = 'flac' | 'wav';
 
@@ -35,11 +39,17 @@ export class AudioPlayerService {
     private readonly volumeService = inject(VolumeService);
     private readonly isBrowser = isPlatformBrowser(this.platformId);
     private readonly authService = inject(AuthService);
+    private readonly http = inject(HttpClient);
+    private readonly apiUrl = environment.apiUrl;
 
     private sound?: Howl;
     private progressTimer?: number;
     private urlSub?: Subscription;
     private loadToken = 0;
+
+    private hasRecordedPlay = false;
+    private hasReachedEnd = false;
+    private lastPlayedSongId: string | null = null;
 
     readonly currentTrack = signal<AudioTrack | null>(null);
     readonly isPlaying = signal(false);
@@ -127,6 +137,8 @@ export class AudioPlayerService {
     }
 
     stop(): void {
+        this.recordSkipIfUnfinished();
+
         this.loadToken++;
         this.urlSub?.unsubscribe();
         this.urlSub = undefined;
@@ -232,6 +244,8 @@ export class AudioPlayerService {
         this.currentTrack.set(track);
         this.duration.set(0);
         this.position.set(0);
+        this.hasRecordedPlay = false;
+        this.hasReachedEnd = false;
 
         const sound = new Howl({
             src: [track.src],
@@ -254,6 +268,14 @@ export class AudioPlayerService {
 
                 this.isPlaying.set(true);
                 this.startProgressTimer();
+
+                if (!this.hasRecordedPlay) {
+                    this.hasRecordedPlay = true;
+                    const interactionType: PlaybackInteractionType =
+                        track.id === this.lastPlayedSongId ? 'replay' : 'play';
+                    this.lastPlayedSongId = track.id;
+                    this.recordInteraction(track.id, interactionType);
+                }
             },
 
             onpause: () => {
@@ -281,6 +303,9 @@ export class AudioPlayerService {
                 this.isPlaying.set(false);
                 this.stopProgressTimer();
                 this.position.set(0);
+                this.hasReachedEnd = true;
+                this.recordInteraction(track.id, 'complete', Math.floor(this.duration()));
+
                 if (this.repeatMode() === 'one') {
                     this.playIndex(this.queueIndex());
                     return;
@@ -358,5 +383,27 @@ export class AudioPlayerService {
 
         const next = this.sound.seek();
         this.position.set(typeof next === 'number' ? next : 0);
+    }
+
+    private recordSkipIfUnfinished(): void {
+        const track = this.currentTrack();
+        if (!track || !this.hasRecordedPlay || this.hasReachedEnd)
+            return;
+
+        const listenedSeconds = Math.floor(this.position());
+        if (listenedSeconds <= 0)
+            return;
+
+        this.recordInteraction(track.id, 'skip', listenedSeconds);
+    }
+
+    private recordInteraction(songId: string, interactionType: PlaybackInteractionType, listenedSeconds?: number): void {
+        if (!this.isBrowser)
+            return;
+
+        this.http.post(`${this.apiUrl}/songs/${songId}/interactions`, {
+            interaction_type: interactionType,
+            listened_seconds: listenedSeconds,
+        }).subscribe({ error: () => { /* best-effort tracking, ignore failures */ } });
     }
 }

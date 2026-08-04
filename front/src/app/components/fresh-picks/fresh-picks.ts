@@ -1,31 +1,49 @@
-import { Component, Input, signal, computed } from '@angular/core';
-
-const TAGS = [
-  'All', 'Hip-Hop', 'Jazz', 'Indie', 'Electronic', 'Pop', 'Classical',
-  'Metal', 'R&B', 'Country', 'Reggae', 'Blues', 'Folk', 'Punk', 'Soul',
-  'Funk', 'Disco', 'Gospel', 'Latin', 'World'
-] as const;
+import { Component, Input, OnDestroy, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { AlbumListItem, AlbumService } from '../../services/album.service';
+import { TAGS } from '../tag-list';
 
 type Tag = typeof TAGS[number];
 
 @Component({
   selector: 'app-fresh-picks',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './fresh-picks.html',
   styleUrl: './fresh-picks.scss'
 })
-export class FreshPicks {
+export class FreshPicks implements OnDestroy {
   @Input() set selectedTag(tag: Tag) {
-    this._selectedTag.set(tag);
+    this.fetchPicks(tag);
   }
 
-  private _selectedTag = signal<Tag>('All');
+  private readonly albumService = inject(AlbumService);
+  private subscription: Subscription | null = null;
 
-  // TODO: replace with ML service call
-  albumsByTag: Record<Tag, null[]> = Object.fromEntries(
-    TAGS.map(tag => [tag, Array(15).fill(null)])
-  ) as Record<Tag, null[]>;
+  readonly skeletonSlots = Array.from({ length: 8 });
+  albums = signal<AlbumListItem[]>([]);
+  isLoading = signal(true);
+  error = signal('');
 
-  filteredAlbums = computed(() => this.albumsByTag[this._selectedTag()]);
+  private fetchPicks(tag: Tag): void {
+    this.subscription?.unsubscribe();
+    this.isLoading.set(true);
+    this.error.set('');
+
+    this.subscription = this.albumService.getFreshPicks(tag).subscribe({
+      next: (albums) => {
+        this.albums.set(albums);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.error.set("Couldn't load fresh picks right now.");
+        this.isLoading.set(false);
+      },
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
 }

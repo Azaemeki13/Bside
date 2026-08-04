@@ -1,8 +1,23 @@
 <div class="bg-[#1F0E1C] rounded-[1.5rem] p-[2em] flex flex-col h-full w-full overflow-hidden">
-  <div class="grid grid-cols-2 grid-rows-2 gap-[2rem] flex-1 min-h-0 place-items-center">
-    <app-recent-play-card cover="assets/cover1.png" alt="recent"></app-recent-play-card>
-    <app-recent-play-card cover="assets/cover2.png" alt="recent"></app-recent-play-card>
-    <app-recent-play-card cover="assets/cover3.png" alt="recent"></app-recent-play-card>
-    <app-recent-play-card cover="assets/cover4.png" alt="recent"></app-recent-play-card>
-  </div>
+  @if (isLoading()) {
+    <div class="grid grid-cols-2 grid-rows-2 gap-[2rem] flex-1 min-h-0 place-items-center">
+      @for (slot of [1, 2, 3, 4]; track slot) {
+        <div class="h-full aspect-square rounded-[3.125rem] bg-[#FFE6DB]/5 animate-pulse"></div>
+      }
+    </div>
+  } @else if (isLoggedOut()) {
+    <div class="flex flex-1 items-center justify-center text-center px-4">
+      <p class="font-raleway text-sm text-[#FFE6DB]/50">Log in to see your recent plays.</p>
+    </div>
+  } @else if (items().length === 0) {
+    <div class="flex flex-1 items-center justify-center text-center px-4">
+      <p class="font-raleway text-sm text-[#FFE6DB]/50">Songs you play will show up here.</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-2 grid-rows-2 gap-[2rem] flex-1 min-h-0 place-items-center">
+      @for (item of items(); track item.song_id) {
+        <app-recent-play-card [cover]="item.cover_url" [alt]="item.title" (cardClick)="play(item)"></app-recent-play-card>
+      }
+    </div>
+  }
 </div>

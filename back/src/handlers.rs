@@ -15,8 +15,9 @@ use crate::{
     ArtistRequestResponse, ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem, AuthRequest,
     AuthResponse, BSideError, Claims, ContactPayload, DailyActivityStat, GoogleUserProfile,
     LoginPayload, MlCallbackPayload, Playlist, PlaylistDetailedResponse, PlaylistPayload,
-    PlaylistSongItem, PublicUser, RegisterPayload, Song, SongPayload, SongResponse, TopSongStat,
-    UpdateStructurePayload, User, UserActivityAnalytics, UserPayload,
+    PlaylistSongItem, PublicUser, RecentPlayItem, RegisterPayload, Song, SongPayload,
+    SongResponse, TopSongStat, TopSpinItem, UpdateStructurePayload, User, UserActivityAnalytics,
+    UserPayload,
 };
 use argon2::{
     Argon2, PasswordHash, PasswordVerifier,
@@ -25,7 +26,7 @@ use argon2::{
 use aws_sdk_s3::presigning::PresigningConfig;
 use axum::{
     Json,
-    extract::{Extension, Multipart, Path, State},
+    extract::{Extension, Multipart, Path, Query, State},
     response::{IntoResponse, Redirect},
 };
 use lettre::{
@@ -35,6 +36,7 @@ use lettre::{
 use oauth2::{AuthorizationCode, CsrfToken, Scope, TokenResponse};
 use reqwest::StatusCode;
 use secrecy::ExposeSecret;
+use std::collections::HashMap;
 use std::time::Duration;
 use uuid::Uuid;
 
@@ -969,6 +971,113 @@ pub async fn get_user_activity_analytics_handler(
         top_songs,
         daily_activity,
     }))
+}
+
+#[utoipa::path(
+    get,
+    path = "/users/me/recent-plays",
+    params(("limit" = Option<i64>, Query, description = "Max songs to return (default 4, max 20)")),
+    responses(
+        (status = 200, description = "The user's most recently played songs, most recent first", body = Vec<RecentPlayItem>),
+        (status = 401, description = "Unauthorized"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Users"]
+)]
+pub async fn get_recent_plays_handler(
+    State(state): State<AppState>,
+    Query(params): Query<HashMap<String, String>>,
+    claims: Claims,
+) -> Result<Json<Vec<RecentPlayItem>>, BSideError> {
+    let limit = params
+        .get("limit")
+        .and_then(|value| value.parse::<i64>().ok())
+        .unwrap_or(4)
+        .clamp(1, 20);
+
+    let items = sqlx::query_as!(
+        RecentPlayItem,
+        r#"
+        SELECT
+            s.id AS song_id,
+            s.title,
+            s.audio_url,
+            a.artist_id,
+            ar.name AS "artist_name!",
+            a.id AS album_id,
+            a.cover_url,
+            latest.last_played_at AS "last_played_at!"
+        FROM (
+            SELECT song_id, MAX(created_at) AS last_played_at
+            FROM user_song_interactions
+            WHERE user_id = $1 AND interaction_type IN ('play', 'replay', 'complete')
+            GROUP BY song_id
+        ) latest
+        JOIN songs s ON s.id = latest.song_id
+        JOIN albums a ON a.id = s.album_id
+        JOIN artists ar ON ar.id = a.artist_id
+        WHERE s.status = 'Ready'
+        ORDER BY latest.last_played_at DESC
+        LIMIT $2
+        "#,
+        claims.sub,
+        limit
+    )
+    .fetch_all(&state.db)
+    .await?;
+
+    Ok(Json(items))
+}
+
+#[utoipa::path(
+    get,
+    path = "/users/me/top-spins",
+    params(("limit" = Option<i64>, Query, description = "Max artists to return (default 6, max 20)")),
+    responses(
+        (status = 200, description = "The user's most-listened artists over the last 30 days, ranked by total listened time", body = Vec<TopSpinItem>),
+        (status = 401, description = "Unauthorized"),
+        (status = 500, description = "Internal server error"),
+    ),
+    security(("Bearer" = [])),
+    tags = ["Users"]
+)]
+pub async fn get_top_spins_handler(
+    State(state): State<AppState>,
+    Query(params): Query<HashMap<String, String>>,
+    claims: Claims,
+) -> Result<Json<Vec<TopSpinItem>>, BSideError> {
+    let limit = params
+        .get("limit")
+        .and_then(|value| value.parse::<i64>().ok())
+        .unwrap_or(6)
+        .clamp(1, 20);
+
+    let items = sqlx::query_as!(
+        TopSpinItem,
+        r#"
+        SELECT
+            ar.id AS artist_id,
+            ar.name AS artist_name,
+            ar.photo_url,
+            COALESCE(SUM(i.listened_seconds) FILTER (WHERE i.interaction_type IN ('complete', 'skip')), 0)::BIGINT AS "listened_seconds!"
+        FROM user_song_interactions i
+        JOIN songs s ON s.id = i.song_id
+        JOIN albums a ON a.id = s.album_id
+        JOIN artists ar ON ar.id = a.artist_id
+        WHERE i.user_id = $1 AND i.created_at >= NOW() - INTERVAL '30 days'
+        GROUP BY ar.id, ar.name, ar.photo_url
+        HAVING COALESCE(SUM(i.listened_seconds) FILTER (WHERE i.interaction_type IN ('complete', 'skip')), 0) > 0
+        ORDER BY "listened_seconds!" DESC
+        LIMIT $2
+        "#,
+        claims.sub,
+        limit
+    )
+    .fetch_all(&state.db)
+    .await?;
+
+    Ok(Json(items))
 }
 
 #[utoipa::path(

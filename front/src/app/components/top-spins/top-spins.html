@@ -1,20 +1,34 @@
 <div class="bg-[#1F0E1C] rounded-2xl p-6 flex flex-col gap-4 h-full overflow-hidden">
   <h2 class="font-raleway font-black text-[#FFE6DB] text-[2rem]">Your top spins of the month</h2>
 
-  <div class="grid grid-cols-1 gap-x-5 gap-y-6 xl:grid-cols-2 overflow-hidden">
-
-    @for (artist of artists; track $index) {
-    <button type="button" class="flex items-center gap-5 w-full overflow-hidden self-center bg-none border-none cursor-pointer">
-      <img class="w-[5rem] h-[5rem] rounded-full object-cover shrink-0" [src]="artist.img" [alt]="artist.name" />
-      <div class="flex items-center gap-3 flex-1 rounded-full px-3 py-2 transition-colors hover:bg-[#431E3A]">
-        <div class="flex flex-col min-w-0 flex-1 text-left">
-          <span class="font-raleway font-bold text-[#FFE6DB] text-[0.9rem] truncate leading-tight">{{ artist.name }}</span>
-          <span class="font-raleway text-[#FFE6DB] text-[0.75rem] opacity-70 leading-tight truncate block">{{ artist.minutes }} minutes listened</span>
+  @if (isLoading()) {
+    <div class="grid grid-cols-1 gap-x-5 gap-y-6 xl:grid-cols-2 overflow-hidden">
+      @for (slot of skeletonSlots; track slot) {
+        <div class="flex items-center gap-5 w-full">
+          <div class="w-[5rem] h-[5rem] rounded-full bg-[#FFE6DB]/5 animate-pulse shrink-0"></div>
+          <div class="h-10 flex-1 rounded-full bg-[#FFE6DB]/5 animate-pulse"></div>
         </div>
-        <lucide-icon [img]="chevronRight" class="w-[2rem] h-[2rem] shrink-0 text-[#FFE6DB] opacity-60"></lucide-icon>
-      </div>
-    </button>
-    }
-
-  </div>
+      }
+    </div>
+  } @else if (isLoggedOut()) {
+    <p class="font-raleway text-sm text-[#FFE6DB]/50">Log in to see your top spins.</p>
+  } @else if (artists().length === 0) {
+    <p class="font-raleway text-sm text-[#FFE6DB]/50">Listen to some music to see your top artists here.</p>
+  } @else {
+    <div class="grid grid-cols-1 gap-x-5 gap-y-6 xl:grid-cols-2 overflow-hidden">
+      @for (artist of artists(); track artist.artist_id) {
+        <a [routerLink]="['/bside_app/artist', artist.artist_id]"
+           class="flex items-center gap-5 w-full overflow-hidden self-center bg-none border-none cursor-pointer">
+          <img class="w-[5rem] h-[5rem] rounded-full object-cover shrink-0" [src]="artist.photo_url" [alt]="artist.artist_name" />
+          <div class="flex items-center gap-3 flex-1 rounded-full px-3 py-2 transition-colors hover:bg-[#431E3A]">
+            <div class="flex flex-col min-w-0 flex-1 text-left">
+              <span class="font-raleway font-bold text-[#FFE6DB] text-[0.9rem] truncate leading-tight">{{ artist.artist_name }}</span>
+              <span class="font-raleway text-[#FFE6DB] text-[0.75rem] opacity-70 leading-tight truncate block">{{ formatMinutes(artist.listened_seconds) }} minutes listened</span>
+            </div>
+            <lucide-icon [img]="chevronRight" class="w-[2rem] h-[2rem] shrink-0 text-[#FFE6DB] opacity-60"></lucide-icon>
+          </div>
+        </a>
+      }
+    </div>
+  }
 </div>
