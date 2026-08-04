@@ -1,7 +1,7 @@
 <div class="h-full bg-[#1F0E1C] rounded-[1.563rem] flex flex-col overflow-hidden">
   @if (playlistService.likedSongsSelected() || playlistService.selectedPlaylist()) {
-    <div class="flex flex-1 min-h-0">
-      <div class="flex flex-col flex-1 min-w-0 p-4 overflow-hidden">
+    <div class="flex flex-col lg:flex-row flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
+      <div class="flex flex-col flex-1 min-w-0 p-4 lg:overflow-hidden">
 
         <div class="grid border-b border-[#FFE6DB]/20 pb-2 font-raleway text-sm font-medium text-[#FFE6DB]/70"
              style="grid-template-columns: 2rem 2.5rem minmax(0,1fr) 5rem 2.5rem 2.5rem">
@@ -155,12 +155,12 @@
         </div>
       </div>
 
-      <div class="flex flex-col items-end gap-2 p-4 shrink-0">
+      <div class="flex flex-col items-center gap-2 p-4 shrink-0 lg:items-end">
         @if (playlistService.likedSongsSelected()) {
-          <div class="w-[21rem] h-[21rem] rounded-[0.625rem] bg-[#FF5500] flex items-center justify-center">
+          <div class="w-full max-w-[21rem] aspect-square rounded-[0.625rem] bg-[#FF5500] flex items-center justify-center">
             <lucide-icon [img]="heart" class="w-[6.5rem] h-[6.5rem] text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
           </div>
-          <div class="w-[21rem] flex flex-col gap-1">
+          <div class="w-full max-w-[21rem] flex flex-col gap-1">
             <h2 class="font-climate-crisis text-[#FFE6DB] text-2xl truncate">Liked Songs</h2>
             <p class="font-raleway text-[#FFE6DB]/70 text-sm font-bold truncate">Your liked songs</p>
             <div class="flex items-center gap-3 mt-2">
@@ -174,7 +174,7 @@
             </div>
           </div>
         } @else if (playlistService.selectedPlaylist(); as playlist) {
-          <div class="w-[21rem] h-[21rem] rounded-[0.625rem] overflow-hidden border border-[#FFE6DB]/15">
+          <div class="w-full max-w-[21rem] aspect-square rounded-[0.625rem] overflow-hidden border border-[#FFE6DB]/15">
             @if (playlist.cover_url) {
               <img [src]="coverUrl(playlist.cover_url)" alt="cover" class="w-full h-full object-cover" />
             } @else {
@@ -183,7 +183,7 @@
               </div>
             }
           </div>
-          <div class="w-[21rem] flex flex-col gap-1">
+          <div class="w-full max-w-[21rem] flex flex-col gap-1">
             <h2 class="font-climate-crisis text-[#FFE6DB] text-2xl truncate">{{ playlist.title }}</h2>
             @if (playlist.description) {
               <p class="font-raleway text-[#FFE6DB]/70 text-sm font-bold truncate">{{ playlist.description }}</p>

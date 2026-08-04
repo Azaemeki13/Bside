@@ -1,8 +1,11 @@
-<div class="grid gap-4 grid-cols-[24fr_40fr_36fr] grid-rows-[25rem] w-full min-w-[108rem]">
+<div class="grid gap-4 w-full min-w-0
+            grid-cols-1 auto-rows-[22rem]
+            md:grid-cols-2
+            xl:grid-cols-[24fr_40fr_36fr] xl:grid-rows-[25rem] xl:auto-rows-auto">
   <app-recent-play></app-recent-play>
   <app-top-spins></app-top-spins>
-  <app-new-release class="self-start"></app-new-release>
-  <h2 class="col-span-3 font-raleway text-[1.5rem] font-semibold text-[#FFE6DB]/60 self-end mt-6">Fresh picks, just for you</h2>
-  <app-tag-bar (tagSelected)="onTagSelected($event)" class="col-span-2 block min-w-0 self-end"></app-tag-bar>
-  <app-fresh-picks [selectedTag]="selectedTag()" class="col-span-3 block min-w-0 mt-8"></app-fresh-picks>
+  <app-new-release class="md:col-span-2 xl:col-span-1 xl:self-start"></app-new-release>
+  <h2 class="md:col-span-2 xl:col-span-3 font-raleway text-[1.5rem] font-semibold text-[#FFE6DB]/60 self-end mt-6">Fresh picks, just for you</h2>
+  <app-tag-bar (tagSelected)="onTagSelected($event)" class="md:col-span-2 xl:col-span-2 block min-w-0 self-end"></app-tag-bar>
+  <app-fresh-picks [selectedTag]="selectedTag()" class="md:col-span-2 xl:col-span-3 block min-w-0 mt-8"></app-fresh-picks>
 </div>

@@ -1,6 +1,7 @@
-<div class="flex flex-col items-center h-full w-30 bg-[#0C060C] rounded-[1.5rem]">
+<div class="fixed inset-x-0 bottom-0 z-40 flex h-16 items-center justify-between gap-2 overflow-x-auto bg-[#0C060C] px-3
+            md:static md:z-auto md:h-full md:w-30 md:flex-col md:items-center md:justify-start md:gap-0 md:overflow-visible md:rounded-[1.5rem] md:px-0">
 
-  <div class="flex flex-col items-center gap-4 pt-10">  
+  <div class="flex shrink-0 items-center gap-2 md:flex-col md:gap-4 md:pt-10">
         <app-side-bar-button link="/bside_app/home"><lucide-icon [img]="house" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
       <app-side-bar-button link="/bside_app/library"><lucide-icon [img]="disc3" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
       <app-side-bar-button link="/bside_app/social"><lucide-icon [img]="usersRound" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
@@ -14,7 +15,7 @@
         <app-side-bar-button link="/bside_app/admin/users"><lucide-icon [img]="ban" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
       }
     </div>
-    <div class="flex flex-col items-center gap-4 mt-auto pb-6">
+    <div class="flex shrink-0 items-center gap-2 md:flex-col md:gap-4 md:mt-auto md:pb-6">
       <app-side-bar-button link="/bside_app/settings"><lucide-icon [img]="settings" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon></app-side-bar-button>
         <app-side-bar-button (click)="openLogoutConfirm()">
           <lucide-icon [img]="logout" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]"></lucide-icon>

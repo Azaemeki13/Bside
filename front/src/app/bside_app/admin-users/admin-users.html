@@ -20,7 +20,7 @@
   <div class="flex flex-col gap-3">
     @for (user of users; track user.id) {
       <article class="rounded-lg bg-[#1F0E1C] p-5">
-        <div class="flex items-center justify-between gap-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div class="min-w-0">
             <h2 class="truncate font-raleway text-xl font-bold">
               {{ nameFor(user) }}
@@ -30,7 +30,7 @@
             </h2>
             <p class="font-raleway text-sm text-[#FFE6DB]/60">{{ user.username }} | {{ user.email }} | {{ user.role }}</p>
           </div>
-          <div class="flex shrink-0 items-center gap-2">
+          <div class="flex flex-wrap shrink-0 items-center gap-2">
             @if (isSelf(user)) {
               <span class="font-raleway text-sm text-[#FFE6DB]/40">This is you</span>
             } @else {

@@ -1,7 +1,7 @@
-<div class="bg-[#1F0E1C] rounded-2xl p-6 flex flex-col gap-4 h-full">
+<div class="bg-[#1F0E1C] rounded-2xl p-6 flex flex-col gap-4 h-full overflow-hidden">
   <h2 class="font-raleway font-black text-[#FFE6DB] text-[2rem]">Your top spins of the month</h2>
 
-  <div class="grid grid-cols-2 gap-x-5 gap-y-6">
+  <div class="grid grid-cols-1 gap-x-5 gap-y-6 xl:grid-cols-2 overflow-hidden">
 
     @for (artist of artists; track $index) {
     <button type="button" class="flex items-center gap-5 w-full overflow-hidden self-center bg-none border-none cursor-pointer">
@@ -9,7 +9,7 @@
       <div class="flex items-center gap-3 flex-1 rounded-full px-3 py-2 transition-colors hover:bg-[#431E3A]">
         <div class="flex flex-col min-w-0 flex-1 text-left">
           <span class="font-raleway font-bold text-[#FFE6DB] text-[0.9rem] truncate leading-tight">{{ artist.name }}</span>
-          <span class="font-raleway text-[#FFE6DB] text-[0.75rem] opacity-70 leading-tight whitespace-nowrap">{{ artist.minutes }} minutes listened</span>
+          <span class="font-raleway text-[#FFE6DB] text-[0.75rem] opacity-70 leading-tight truncate block">{{ artist.minutes }} minutes listened</span>
         </div>
         <lucide-icon [img]="chevronRight" class="w-[2rem] h-[2rem] shrink-0 text-[#FFE6DB] opacity-60"></lucide-icon>
       </div>

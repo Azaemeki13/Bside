@@ -1,11 +1,11 @@
-<div class="bg-transparent px-6 py-3">
-	<div class="flex items-center justify-between gap-6">
-		<div class="flex-none w-24">
+<div class="bg-transparent px-3 py-3 sm:px-6">
+	<div class="flex items-center justify-between gap-3 sm:gap-6">
+		<div class="hidden w-24 min-w-[4rem] shrink sm:block">
 			<app-volume-slider></app-volume-slider>
 		</div>
-		<div class="flex-1 flex items-center gap-6">
+		<div class="flex-1 flex items-center gap-3 min-w-0 sm:gap-6">
 			<app-progression-bar class="min-w-0 flex-1"></app-progression-bar>
-			<app-icon-bar class="flex-none"></app-icon-bar>
+			<app-icon-bar class="hidden flex-none sm:block"></app-icon-bar>
 		</div>
 	</div>
 </div>

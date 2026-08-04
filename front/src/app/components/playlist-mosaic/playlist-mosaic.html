@@ -19,11 +19,11 @@
     }
   </div>
   <div class="flex-1 overflow-y-auto p-4 pt-0">
-    <div class="grid grid-cols-3 gap-2">
+    <div class="grid gap-2" style="grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr))">
       <app-heart-card></app-heart-card>
       @for (playlist of filteredPlaylists; track playlist.id) {
         <button (click)="selectPlaylist(playlist)" class="rounded-[0.625rem] border-2 border-transparent hover:border-[#FF5500] duration-300 cursor-pointer">
-          <div class="w-[9rem] h-[9rem] rounded-[calc(0.625rem-2px)] overflow-hidden">
+          <div class="w-full aspect-square rounded-[calc(0.625rem-2px)] overflow-hidden">
             @if (playlist.cover_url) {
               <img [src]="playlist.cover_url" alt="cover" class="w-full h-full object-cover" />
             } @else {

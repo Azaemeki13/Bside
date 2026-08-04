@@ -1,11 +1,11 @@
-<div class="relative flex h-[22rem] w-[17.5rem] overflow-hidden rounded-[1.5rem]">
+<div class="relative flex aspect-[17.5/22] w-[17.5rem] max-w-full overflow-hidden rounded-[1.5rem]">
   <div
     class="absolute inset-0 bg-center bg-cover scale-110 blur-xl"
     [style.background-image]="'url(' + coverUrl(song.cover_url) + ')'"
   ></div>
   <div class="absolute inset-0 bg-[#1F0E1C]/20"></div>
   <div class="relative z-10 flex h-full w-full flex-col items-center justify-start p-[0.875rem]">
-    <div class="h-[15.75rem] w-[15.75rem] overflow-hidden rounded-[1rem]">
+    <div class="w-full aspect-square overflow-hidden rounded-[1rem]">
       <img [src]="coverUrl(song.cover_url)" [alt]="song.title" class="h-full w-full object-cover" />
     </div>
 
