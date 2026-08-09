@@ -20,3 +20,9 @@ export const TAGS = [
   'Latin',
   'World',
 ] as const;
+
+export const ML_MOODS = [
+  'All', 'Happy', 'Sad', 'Relaxed', 'Aggressive', 'Electronic', 'Party'
+] as const;
+
+export type MlMood = typeof ML_MOODS[number];

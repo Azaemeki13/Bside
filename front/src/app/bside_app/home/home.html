@@ -1,11 +1,13 @@
-<div class="grid gap-4 w-full min-w-0
-            grid-cols-1 auto-rows-[22rem]
-            md:grid-cols-2
-            xl:grid-cols-[24fr_40fr_36fr] xl:grid-rows-[clamp(28rem,27vw,30rem)] xl:auto-rows-auto">
-  <app-recent-play class="block min-w-0 overflow-hidden"></app-recent-play>
-  <app-top-spins class="block min-w-0 overflow-hidden"></app-top-spins>
-  <app-new-release class="block min-w-0 overflow-hidden md:col-span-2 xl:col-span-1 xl:self-start"></app-new-release>
-  <h2 class="md:col-span-2 xl:col-span-3 font-raleway text-[1.5rem] font-semibold text-[#FFE6DB]/60 self-end mt-6">Fresh picks, just for you</h2>
-  <app-tag-bar (tagSelected)="onTagSelected($event)" class="md:col-span-2 xl:col-span-2 block min-w-0 self-end"></app-tag-bar>
-  <app-fresh-picks [selectedTag]="selectedTag()" class="md:col-span-2 xl:col-span-3 block min-w-0 mt-8"></app-fresh-picks>
+<div class="flex w-full min-w-0 flex-col gap-8 pb-6">
+  <div class="grid w-full min-w-0 grid-cols-1 items-stretch gap-4 md:grid-cols-2 xl:grid-cols-[24fr_40fr_36fr]">
+    <app-recent-play class="block h-[28rem] min-w-0 overflow-hidden md:h-[30rem] xl:h-[clamp(28rem,27vw,30rem)]"></app-recent-play>
+    <app-top-spins class="block min-h-[22rem] min-w-0 overflow-hidden md:h-[30rem] xl:h-[clamp(28rem,27vw,30rem)]"></app-top-spins>
+    <app-new-release class="block h-[22rem] min-w-0 overflow-hidden md:col-span-2 md:h-[28rem] xl:col-span-1 xl:h-[clamp(28rem,27vw,30rem)]"></app-new-release>
+  </div>
+
+  <section class="flex min-w-0 flex-col gap-5">
+    <h2 class="font-raleway text-[1.5rem] font-semibold text-[#FFE6DB]/60">Fresh picks, just for you</h2>
+    <app-tag-bar (tagSelected)="onMoodSelected($event)" class="block min-w-0"></app-tag-bar>
+    <app-fresh-picks [selectedMood]="selectedMood()" class="block min-w-0"></app-fresh-picks>
+  </section>
 </div>

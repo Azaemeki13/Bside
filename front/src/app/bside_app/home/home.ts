@@ -4,14 +4,7 @@ import { TopSpins } from '../../components/top-spins/top-spins';
 import { NewRelease } from '../../components/new-release/new-release';
 import { TagBar } from '../../components/tag-bar/tag-bar';
 import { FreshPicks } from '../../components/fresh-picks/fresh-picks';
-
-const TAGS = [
-  'All', 'Hip-Hop', 'Jazz', 'Indie', 'Electronic', 'Pop', 'Classical',
-  'Metal', 'R&B', 'Country', 'Reggae', 'Blues', 'Folk', 'Punk', 'Soul',
-  'Funk', 'Disco', 'Gospel', 'Latin', 'World'
-] as const;
-
-type Tag = typeof TAGS[number];
+import type { MlMood } from '../../components/tag-list';
 
 @Component({
   selector: 'app-bside-home',
@@ -20,9 +13,9 @@ type Tag = typeof TAGS[number];
   imports: [RecentPlay, TopSpins, NewRelease, TagBar, FreshPicks],
 })
 export class BsideHome {
-  selectedTag = signal<Tag>('All');
+  selectedMood = signal<MlMood>('All');
 
-  onTagSelected(tag: string): void {
-    this.selectedTag.set(tag as Tag);
+  onMoodSelected(mood: MlMood): void {
+    this.selectedMood.set(mood);
   }
 }

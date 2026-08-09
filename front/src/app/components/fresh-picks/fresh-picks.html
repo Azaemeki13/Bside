@@ -8,7 +8,7 @@
     } @else if (error()) {
       <p class="font-raleway text-sm text-red-300">{{ error() }}</p>
     } @else if (albums().length === 0) {
-      <p class="font-raleway text-sm text-[#FFE6DB]/50">No picks yet for this genre.</p>
+      <p class="font-raleway text-sm text-[#FFE6DB]/50">No picks yet for this mood.</p>
     } @else {
       @for (album of albums(); track album.id) {
         <a [routerLink]="['/bside_app/album', album.id]"

@@ -27,7 +27,7 @@ use crate::handlers::{
     get_friends_handler, get_liked_songs_handler, get_me_handler, get_my_albums_handler,
     get_my_playlists_handler, get_playlist_by_id_handler, get_recent_plays_handler,
     get_song_stream_url_handler, get_top_spins_handler, get_user_activity_analytics_handler,
-    get_user_by_id_handler, get_user_status_handler,
+    get_user_by_id_handler, get_user_status_handler, get_new_release_handler,
     google_callback_handler, google_login_handler, google_signup_handler, like_song_handler,
     mark_conversation_messages_as_read_handler, ml_callback_handler, ping_handler,
     record_song_interaction_handler, register_handler, reject_friend_request_handler,
@@ -40,7 +40,7 @@ use crate::models::{
     AlbumSongItem, AppState, ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse,
     ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem, AuthRequest, AuthResponse,
     ContactPayload, DailyActivityStat, GoogleUserProfile, LoginPayload, MlCallbackPayload,
-    Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, PublicUser,
+    NewReleaseSong, Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem, PublicUser,
     RawSearchResult, RecentPlayItem, RegisterPayload, SearchResult, Song, SongPayload,
     SongResponse, TopSongStat, TopSpinItem, UpdateStructurePayload, User, UserActivityAnalytics,
     UserPayload,
@@ -157,6 +157,7 @@ async fn main() {
             get(get_song_stream_url_handler),
         )
         .route("/fresh-picks", get(get_fresh_picks_handler))
+        .route("/new-release", get(get_new_release_handler))
         .route("/contact", post(contact_handler))
         .route("/ws", get(ws_handler))
         .route("/internal/songs/features", post(ml_callback_handler))

@@ -14,7 +14,7 @@ use crate::{
     AlbumSongItem, AnyAuth, AppState, ArtistDetailResponse, ArtistRequestPayload,
     ArtistRequestResponse, ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem, AuthRequest,
     AuthResponse, BSideError, Claims, ContactPayload, DailyActivityStat, GoogleUserProfile,
-    LoginPayload, MlCallbackPayload, Playlist, PlaylistDetailedResponse, PlaylistPayload,
+    LoginPayload, MlCallbackPayload, NewReleaseSong, Playlist, PlaylistDetailedResponse, PlaylistPayload,
     PlaylistSongItem, PublicUser, RecentPlayItem, RegisterPayload, Song, SongPayload,
     SongResponse, TopSongStat, TopSpinItem, UpdateStructurePayload, User, UserActivityAnalytics,
     UserPayload,
@@ -1955,6 +1955,66 @@ pub async fn get_song_stream_url_handler(
             "is_anonymous": true
         }))),
     }
+}
+
+#[utoipa::path(
+    get,
+    path = "/new-release",
+    params(("exclude_song_id" = Option<uuid::Uuid>, Query, description = "Previously displayed song to avoid when the latest album has another ready track")),
+    responses(
+        (status = 200, description = "Random ready song from the newest ready album", body = NewReleaseSong),
+        (status = 404, description = "No ready song is available"),
+        (status = 500, description = "Internal server error"),
+    ),
+    tags = ["Songs"]
+)]
+pub async fn get_new_release_handler(
+    State(state): State<AppState>,
+    Query(params): Query<HashMap<String, String>>,
+) -> Result<Json<NewReleaseSong>, BSideError> {
+    let excluded_song_id = params
+        .get("exclude_song_id")
+        .and_then(|value| Uuid::parse_str(value).ok());
+
+    let song = sqlx::query_as!(
+        NewReleaseSong,
+        r#"
+        SELECT
+            s.id AS song_id,
+            s.title,
+            s.audio_url,
+            a.id AS album_id,
+            a.title AS album_title,
+            a.cover_url,
+            ar.id AS artist_id,
+            ar.name AS artist_name
+        FROM songs s
+        JOIN albums a ON a.id = s.album_id
+        JOIN artists ar ON ar.id = a.artist_id
+        WHERE s.status = 'Ready'
+          AND a.id = (
+              SELECT latest.id
+              FROM albums latest
+              WHERE latest.status = 'Ready'
+                AND EXISTS (
+                    SELECT 1
+                    FROM songs ready_song
+                    WHERE ready_song.album_id = latest.id
+                      AND ready_song.status = 'Ready'
+                )
+              ORDER BY latest.created_at DESC
+              LIMIT 1
+          )
+        ORDER BY (s.id = $1) ASC NULLS LAST, RANDOM()
+        LIMIT 1
+        "#,
+        excluded_song_id
+    )
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or(BSideError::NotFound)?;
+
+    Ok(Json(song))
 }
 
 #[utoipa::path(

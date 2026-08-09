@@ -34,7 +34,7 @@ fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
 
 async fn load_candidate_songs(
     db: &PgPool,
-    genre: Option<&str>,
+    mood: Option<&str>,
     exclude_song_ids: &[Uuid],
 ) -> Result<Vec<SongCandidate>, sqlx::Error> {
     let rows = sqlx::query!(
@@ -47,10 +47,10 @@ async fn load_candidate_songs(
         WHERE s.status = 'Ready'
           AND a.status = 'Ready'
           AND s.normalized_vector IS NOT NULL
-          AND ($1::text IS NULL OR a.genre = $1)
+          AND ($1::text IS NULL OR s.ml_features ->> 'mood' = $1)
           AND NOT (s.id = ANY($2::uuid[]))
         "#,
-        genre,
+        mood,
         exclude_song_ids
     )
     .fetch_all(db)
@@ -100,7 +100,7 @@ async fn load_albums_by_ids(
 
 async fn load_freshest_albums(
     db: &PgPool,
-    genre: Option<&str>,
+    mood: Option<&str>,
     limit: i64,
 ) -> Result<Vec<AlbumListItem>, sqlx::Error> {
     sqlx::query_as!(
@@ -119,13 +119,23 @@ async fn load_freshest_albums(
         FROM albums a
         JOIN artists ar ON ar.id = a.artist_id
         LEFT JOIN songs s ON s.album_id = a.id AND s.status = 'Ready'
-        WHERE a.status = 'Ready' AND ($1::text IS NULL OR a.genre = $1)
+        WHERE a.status = 'Ready'
+          AND (
+              $1::text IS NULL
+              OR EXISTS (
+                  SELECT 1
+                  FROM songs mood_song
+                  WHERE mood_song.album_id = a.id
+                    AND mood_song.status = 'Ready'
+                    AND mood_song.ml_features ->> 'mood' = $1
+              )
+          )
         GROUP BY a.id, ar.name
         HAVING COUNT(s.id) > 0
         ORDER BY a.created_at DESC
         LIMIT $2
         "#,
-        genre,
+        mood,
         limit
     )
     .fetch_all(db)
@@ -139,12 +149,12 @@ async fn load_freshest_albums(
 /// in the user's Liked Songs.
 ///
 /// Falls back to the most recently released catalog (optionally filtered by
-/// genre) when there's no user, no preference vector yet (new account with no
-/// interaction history), or no scored candidates (e.g. an empty genre).
+/// ML-detected mood) when there's no user, no preference vector yet (new account
+/// with no interaction history), or no scored candidates for the selected mood.
 pub async fn get_fresh_picks(
     db: &PgPool,
     user_id: Option<Uuid>,
-    genre: Option<&str>,
+    mood: Option<&str>,
     limit: Option<i64>,
 ) -> Result<Vec<AlbumListItem>, sqlx::Error> {
     let limit = limit.unwrap_or(DEFAULT_LIMIT).clamp(1, MAX_LIMIT);
@@ -160,7 +170,7 @@ pub async fn get_fresh_picks(
 
         if let Some(preference_vector) = preference_vector {
             let liked_song_ids = load_user_liked_song_ids(db, user_id).await?;
-            let candidates = load_candidate_songs(db, genre, &liked_song_ids).await?;
+            let candidates = load_candidate_songs(db, mood, &liked_song_ids).await?;
 
             let mut best_per_album: HashMap<Uuid, f32> = HashMap::new();
             for candidate in &candidates {
@@ -195,14 +205,14 @@ pub async fn get_fresh_picks(
         }
     }
 
-    load_freshest_albums(db, genre, limit).await
+    load_freshest_albums(db, mood, limit).await
 }
 
 #[utoipa::path(
     get,
     path = "/fresh-picks",
     params(
-        ("genre" = Option<String>, Query, description = "Filter by album genre; omit or pass 'All' for no filter"),
+        ("mood" = Option<String>, Query, description = "Filter by ML-detected song mood: happy, sad, relaxed, aggressive, electronic, or party"),
         ("limit" = Option<i64>, Query, description = "Max albums to return (default 20, max 50)"),
     ),
     responses(
@@ -221,16 +231,18 @@ pub async fn get_fresh_picks_handler(
         AnyAuth::ApiKey | AnyAuth::Anonymous => None,
     };
 
-    let genre = params
-        .get("genre")
-        .map(String::as_str)
-        .filter(|value| !value.is_empty() && *value != "All");
+    let mood = params.get("mood").map(String::as_str).filter(|value| {
+        matches!(
+            *value,
+            "happy" | "sad" | "relaxed" | "aggressive" | "electronic" | "party"
+        )
+    });
 
     let limit = params
         .get("limit")
         .and_then(|value| value.parse::<i64>().ok());
 
-    let albums = get_fresh_picks(&state.db, user_id, genre, limit).await?;
+    let albums = get_fresh_picks(&state.db, user_id, mood, limit).await?;
 
     Ok(Json(albums))
 }

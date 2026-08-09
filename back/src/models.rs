@@ -79,6 +79,18 @@ pub struct RecentPlayItem {
 }
 
 #[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
+pub struct NewReleaseSong {
+    pub song_id: uuid::Uuid,
+    pub title: String,
+    pub audio_url: String,
+    pub album_id: uuid::Uuid,
+    pub album_title: String,
+    pub cover_url: String,
+    pub artist_id: uuid::Uuid,
+    pub artist_name: String,
+}
+
+#[derive(serde::Serialize, sqlx::FromRow, utoipa::ToSchema)]
 pub struct TopSpinItem {
     pub artist_id: uuid::Uuid,
     pub artist_name: String,

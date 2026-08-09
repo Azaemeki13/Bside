@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            a.id AS album_id,\n            s.normalized_vector AS \"normalized_vector!: Vec<f32>\"\n        FROM songs s\n        JOIN albums a ON a.id = s.album_id\n        WHERE s.status = 'Ready'\n          AND a.status = 'Ready'\n          AND s.normalized_vector IS NOT NULL\n          AND ($1::text IS NULL OR s.ml_features ->> 'mood' = $1)\n          AND NOT (s.id = ANY($2::uuid[]))\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "album_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "normalized_vector!: Vec<f32>",
+        "type_info": "Float4Array"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "UuidArray"
+      ]
+    },
+    "nullable": [
+      false,
+      true
+    ]
+  },
+  "hash": "91fbc703d8c59d05162752e2c56a7c0321ec4d0a8386aa6f3a7ac8cd9f17296b"
+}

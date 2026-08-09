@@ -2,9 +2,7 @@ import { Component, Input, OnDestroy, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AlbumListItem, AlbumService } from '../../services/album.service';
-import { TAGS } from '../tag-list';
-
-type Tag = typeof TAGS[number];
+import type { MlMood } from '../tag-list';
 
 @Component({
   selector: 'app-fresh-picks',
@@ -14,8 +12,8 @@ type Tag = typeof TAGS[number];
   styleUrl: './fresh-picks.scss'
 })
 export class FreshPicks implements OnDestroy {
-  @Input() set selectedTag(tag: Tag) {
-    this.fetchPicks(tag);
+  @Input() set selectedMood(mood: MlMood) {
+    this.fetchPicks(mood);
   }
 
   private readonly albumService = inject(AlbumService);
@@ -26,12 +24,12 @@ export class FreshPicks implements OnDestroy {
   isLoading = signal(true);
   error = signal('');
 
-  private fetchPicks(tag: Tag): void {
+  private fetchPicks(mood: MlMood): void {
     this.subscription?.unsubscribe();
     this.isLoading.set(true);
     this.error.set('');
 
-    this.subscription = this.albumService.getFreshPicks(tag).subscribe({
+    this.subscription = this.albumService.getFreshPicks(mood).subscribe({
       next: (albums) => {
         this.albums.set(albums);
         this.isLoading.set(false);

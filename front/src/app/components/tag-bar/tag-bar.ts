@@ -1,7 +1,7 @@
 import { NgFor } from '@angular/common';
 import { Component, EventEmitter, Output, signal } from '@angular/core';
 import { TagCard } from '../tag-card/tag-card';
-import { TAGS } from '../tag-list';
+import { ML_MOODS, type MlMood } from '../tag-list';
 
 @Component({
   selector: 'app-tag-bar',
@@ -10,12 +10,12 @@ import { TAGS } from '../tag-list';
   styleUrl: './tag-bar.scss',
 })
 export class TagBar {
-  tags = [...TAGS];
+  tags = [...ML_MOODS];
 
-  @Output() tagSelected = new EventEmitter<string>();
-  selectedTag = signal('All');
+  @Output() tagSelected = new EventEmitter<MlMood>();
+  selectedTag = signal<MlMood>('All');
 
-  select(tag: string) {
+  select(tag: MlMood) {
     this.selectedTag.set(tag);
     this.tagSelected.emit(tag);
   }

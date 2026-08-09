@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            s.id AS song_id,\n            s.title,\n            s.audio_url,\n            a.id AS album_id,\n            a.title AS album_title,\n            a.cover_url,\n            ar.id AS artist_id,\n            ar.name AS artist_name\n        FROM songs s\n        JOIN albums a ON a.id = s.album_id\n        JOIN artists ar ON ar.id = a.artist_id\n        WHERE s.status = 'Ready'\n          AND a.id = (\n              SELECT latest.id\n              FROM albums latest\n              WHERE latest.status = 'Ready'\n                AND EXISTS (\n                    SELECT 1\n                    FROM songs ready_song\n                    WHERE ready_song.album_id = latest.id\n                      AND ready_song.status = 'Ready'\n                )\n              ORDER BY latest.created_at DESC\n              LIMIT 1\n          )\n        ORDER BY (s.id = $1) ASC NULLS LAST, RANDOM()\n        LIMIT 1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "song_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "audio_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "album_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "album_title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "cover_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "artist_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 7,
+        "name": "artist_name",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "dae24763b0ae8ce006db57b5ccdcaca80b617325c03ee5ec9d8a752c2777b77b"
+}
