@@ -1,8 +1,10 @@
-<div class="bg-[#1F0E1C] rounded-[1.5rem] p-[2em] flex flex-col h-full w-full overflow-hidden">
+<div class="bg-[#1F0E1C] rounded-[1.5rem] p-6 flex flex-col gap-4 h-full w-full overflow-hidden">
+  <h2 class="shrink-0 font-raleway font-black text-[#FFE6DB] text-[1.5rem]">Your last spins</h2>
+
   @if (isLoading()) {
-    <div class="grid grid-cols-2 grid-rows-2 gap-[2rem] flex-1 min-h-0 place-items-center">
+    <div class="grid grid-cols-2 grid-rows-2 gap-5 flex-1 min-h-0 place-items-center">
       @for (slot of [1, 2, 3, 4]; track slot) {
-        <div class="h-full aspect-square rounded-[3.125rem] bg-[#FFE6DB]/5 animate-pulse"></div>
+        <div class="h-full aspect-square max-w-full min-h-0 min-w-0 justify-self-center rounded-[2rem] bg-[#FFE6DB]/5 animate-pulse"></div>
       }
     </div>
   } @else if (isLoggedOut()) {
@@ -14,9 +16,14 @@
       <p class="font-raleway text-sm text-[#FFE6DB]/50">Songs you play will show up here.</p>
     </div>
   } @else {
-    <div class="grid grid-cols-2 grid-rows-2 gap-[2rem] flex-1 min-h-0 place-items-center">
+    <div class="grid grid-cols-2 grid-rows-2 gap-5 flex-1 min-h-0 place-items-center">
       @for (item of items(); track item.song_id) {
-        <app-recent-play-card [cover]="item.cover_url" [alt]="item.title" (cardClick)="play(item)"></app-recent-play-card>
+        <app-recent-play-card class="block h-full aspect-square max-w-full min-h-0 min-w-0 justify-self-center overflow-hidden"
+                              [cover]="item.cover_url"
+                              [alt]="item.title"
+                              [title]="item.title"
+                              [artist]="item.artist_name"
+                              (cardClick)="play(item)"></app-recent-play-card>
       }
     </div>
   }

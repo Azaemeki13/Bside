@@ -1,3 +1,9 @@
-<button type="button" (click)="cardClick.emit()" class="h-full aspect-square overflow-hidden rounded-[3.125rem] p-0 border-0 border-transparent cursor-pointer hover:border-[#FF5500] border-2 duration-300">
+<button type="button"
+        (click)="cardClick.emit()"
+        class="group relative block h-full w-full min-h-0 min-w-0 overflow-hidden rounded-[2rem] p-0 border-0 border-transparent text-left cursor-pointer hover:border-[#FF5500] border-2 duration-300">
 	<img class="w-full h-full object-cover" [src]="cover()" [alt]="alt()" />
+	<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-3 pt-10">
+		<p class="truncate font-raleway text-xs font-bold text-[#FFE6DB]">{{ title() }}</p>
+		<p class="truncate font-raleway text-[0.65rem] text-[#FFE6DB]/70">{{ artist() }}</p>
+	</div>
 </button>

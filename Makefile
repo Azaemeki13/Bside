@@ -3,6 +3,9 @@ ifneq (,$(wildcard ./.env))
     export
 endif
 
+# Cargo-installed tools are not always present in the PATH inherited by make.
+export PATH := $(HOME)/.cargo/bin:$(PATH)
+
 COMPOSE = sudo docker compose -p bside
 COMPOSE_GPU = sudo docker compose -p bside -f docker-compose.yml -f docker-compose.gpu.yml
 DOCKER_DB = bside_db_dev

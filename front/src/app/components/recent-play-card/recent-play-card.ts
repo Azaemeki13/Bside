@@ -9,5 +9,7 @@ import { Component, input, output } from '@angular/core';
 export class RecentPlayCard {
   cover = input<string>('');
   alt = input<string>('recent');
+  title = input<string>('');
+  artist = input<string>('');
   cardClick = output<void>();
 }

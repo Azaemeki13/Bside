@@ -26,7 +26,7 @@ use argon2::{
 use aws_sdk_s3::presigning::PresigningConfig;
 use axum::{
     Json,
-    extract::{Extension, Multipart, Path, Query, State},
+    extract::{Multipart, Path, Query, State},
     response::{IntoResponse, Redirect},
 };
 use lettre::{
@@ -198,7 +198,7 @@ pub struct AvatarUploadSchema {
 #[axum::debug_handler]
 pub async fn upload_avatar(
     State(state): State<AppState>,
-    Extension(claims): Extension<Claims>,
+    claims: Claims,
     mut multipart: Multipart,
 ) -> Result<impl IntoResponse, BSideError> {
     let mut avatar_url: Option<String> = None;
