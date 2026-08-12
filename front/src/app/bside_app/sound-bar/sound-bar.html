@@ -3,9 +3,13 @@
 		<div class="hidden w-24 min-w-[4rem] shrink sm:block">
 			<app-volume-slider></app-volume-slider>
 		</div>
-		<div class="flex-1 flex items-center gap-3 min-w-0 sm:gap-6">
+		<div class="flex min-w-0 flex-1 flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:gap-6">
 			<app-progression-bar class="min-w-0 flex-1"></app-progression-bar>
-			<app-icon-bar class="hidden flex-none sm:block"></app-icon-bar>
+			<div class="flex min-w-0 items-center gap-3 px-2 sm:hidden">
+				<app-volume-slider class="block w-24 min-w-0 shrink"></app-volume-slider>
+				<app-icon-bar class="block min-w-0 flex-1"></app-icon-bar>
+			</div>
+			<app-icon-bar class="hidden min-w-0 flex-none sm:block"></app-icon-bar>
 		</div>
 	</div>
 </div>

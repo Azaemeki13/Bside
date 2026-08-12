@@ -41,7 +41,7 @@
 -->
 
 <div class="w-full rounded-full border border-[#FFE6DB]/15 bg-[#FFE6DB]/10 pl-2 pr-3 py-2 backdrop-blur-sm glass-card sm:pr-6">
-  	<div class="grid w-full min-w-0 items-center gap-3 sm:gap-6" style="grid-template-columns: minmax(3.5rem, 13rem) minmax(2.75rem, 8rem) minmax(3rem, 1fr)">
+	<div class="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 sm:grid-cols-[minmax(3.5rem,13rem)_minmax(7rem,8rem)_minmax(3rem,1fr)] sm:gap-6">
   		<div class="flex min-w-0 items-center gap-3">
   			<button type="button" aria-label="Album cover" class="shrink-0 w-[3rem] h-[3rem] rounded-full overflow-hidden cursor-pointer">
   				@if (audio.currentTrack(); as track) {
@@ -82,19 +82,19 @@
   				}
   			</div>
   		</div>
-  		<div class="flex items-center justify-center gap-4">
-  			<button type="button" aria-label="Track back" class="hidden text-[#FFE6DB] cursor-pointer sm:block" (click)="previousTrack()">
-  				<lucide-icon [img]="skipBackIcon" class="w-[1.25rem] h-[1.25rem]"></lucide-icon>
-  			</button>
+		<div class="flex items-center justify-center gap-3 sm:gap-4">
+			<button type="button" aria-label="Track back" class="inline-flex h-8 w-8 cursor-pointer items-center justify-center text-[#FFE6DB]" (click)="previousTrack()">
+				<lucide-icon [img]="skipBackIcon" class="w-[1.25rem] h-[1.25rem]"></lucide-icon>
+			</button>
   			<button type="button" [attr.aria-label]="audio.isPlaying() ? 'Pause' : 'Play'" (click)="togglePlay()" class="text-[#FFE6DB] cursor-pointer rounded-full bg-[#FF5500] p-2">
   				<lucide-icon [img]="audio.isPlaying() ? pause : play" class="w-[1.75rem] h-[1.75rem] fill-current"></lucide-icon>
   			</button>
-  			<button type="button" aria-label="Track next" class="hidden text-[#FFE6DB] cursor-pointer sm:block" (click)="nextTrack()">
-  				<lucide-icon [img]="skipForwardIcon" class="w-[1.25rem] h-[1.25rem]"></lucide-icon>
-  			</button>
-  		</div>
-  		<div class="relative flex-1 flex items-center min-w-12 h-6 group">
-  			<div class="absolute left-0 top-1/2 w-full -translate-y-1/2 h-[3px] rounded-full bg-[#FFE6DB]"></div>
+			<button type="button" aria-label="Track next" class="inline-flex h-8 w-8 cursor-pointer items-center justify-center text-[#FFE6DB]" (click)="nextTrack()">
+				<lucide-icon [img]="skipForwardIcon" class="w-[1.25rem] h-[1.25rem]"></lucide-icon>
+			</button>
+		</div>
+		<div class="group relative col-span-2 mx-2 flex h-4 min-w-12 flex-1 items-center sm:col-span-1 sm:mx-0 sm:h-6">
+			<div class="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-[#FFE6DB]"></div>
   			<div
   				class="absolute left-0 top-1/2 -translate-y-1/2 h-1 rounded-full bg-[#FF5500] pointer-events-none"
   				[style.width.%]="audio.progressPercent()"
@@ -105,7 +105,7 @@
   				[value]="audio.progressPercent()"
   				(input)="onInput($event)"
   				aria-label="Progress"
-  				class="absolute w-full opacity-0 cursor-pointer h-6"
+				class="absolute inset-x-0 h-6 w-full cursor-pointer opacity-0"
   			/>
   		</div>
   	</div>

@@ -1,10 +1,10 @@
 <div class="relative w-full sm:w-[clamp(9rem,22vw,25rem)]">
-  <div class="flex items-center gap-3 rounded-full border-2 border-[#FFE6DB] bg-transparent px-4 py-3">
-    <lucide-icon [img]="search" class="h-5 w-5 text-[#FFE6DB]/70"></lucide-icon>
+  <div class="flex min-w-0 items-center gap-3 overflow-hidden rounded-full border-2 border-[#FFE6DB] bg-transparent px-4 py-3">
+    <lucide-icon [img]="search" class="h-5 w-5 shrink-0 text-[#FFE6DB]/70"></lucide-icon>
     <input
       type="text"
       placeholder="Search an artist, a song or an album"
-      class="font-raleway flex-1 bg-transparent text-sm font-bold text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none"
+      class="font-raleway min-w-0 flex-1 bg-transparent text-sm font-bold text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none"
       [value]="query"
       (input)="onInput($event)"
       (focus)="onFocus()"
@@ -26,8 +26,8 @@
             class="flex w-full appearance-none flex-col gap-1 border-0 bg-transparent px-4 py-3 text-left hover:bg-[#FFE6DB]/5 disabled:cursor-default disabled:opacity-60"
             [disabled]="!canOpen(result)"
             (pointerdown)="selectResult($event, result)">
-            <span class="font-raleway text-sm font-bold text-[#FFE6DB]">{{ resultTitle(result) }}</span>
-            <span class="font-raleway text-xs text-[#FFE6DB]/60">{{ resultMeta(result) }}</span>
+            <span class="w-full truncate font-raleway text-sm font-bold text-[#FFE6DB]">{{ resultTitle(result) }}</span>
+            <span class="w-full truncate font-raleway text-xs text-[#FFE6DB]/60">{{ resultMeta(result) }}</span>
           </button>
         }
       }
