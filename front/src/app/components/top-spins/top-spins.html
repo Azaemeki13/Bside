@@ -2,7 +2,7 @@
   <h2 class="font-raleway font-black text-[#FFE6DB] text-[clamp(1.5rem,6vw,2rem)] leading-tight">Your top spins of the month</h2>
 
   @if (isLoading()) {
-    <div class="grid grid-cols-1 gap-x-5 gap-y-2 sm:gap-y-4 xl:grid-cols-2 overflow-hidden">
+    <div class="grid gap-x-5 gap-y-2 overflow-hidden sm:gap-y-4" style="grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr))">
       @for (slot of skeletonSlots; track slot) {
         <div class="flex items-center gap-2 sm:gap-4 w-full">
           <div class="h-12 w-12 sm:h-16 sm:w-16 xl:h-20 xl:w-20 rounded-full bg-[#FFE6DB]/5 animate-pulse shrink-0"></div>
@@ -15,10 +15,10 @@
   } @else if (artists().length === 0) {
     <p class="font-raleway text-sm text-[#FFE6DB]/50">Listen to some music to see your top artists here.</p>
   } @else {
-    <div class="grid grid-cols-1 gap-x-5 gap-y-2 sm:gap-y-4 xl:grid-cols-2 overflow-hidden">
+    <div class="grid gap-x-5 gap-y-2 overflow-hidden sm:gap-y-4" style="grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr))">
       @for (artist of artists(); track artist.artist_id) {
         <a [routerLink]="['/bside_app/artist', artist.artist_id]"
-           class="flex items-center gap-2 sm:gap-4 w-full overflow-hidden self-center bg-none border-none cursor-pointer">
+           class="flex min-w-0 items-center gap-2 sm:gap-4 w-full overflow-hidden self-center bg-none border-none cursor-pointer">
           <img class="h-12 w-12 sm:h-16 sm:w-16 xl:h-20 xl:w-20 rounded-full object-cover shrink-0" [src]="artist.photo_url" [alt]="artist.artist_name" />
           <div class="flex items-center gap-2 sm:gap-3 flex-1 rounded-full px-2 sm:px-3 py-1 sm:py-2 transition-colors hover:bg-[#431E3A]">
             <div class="flex flex-col min-w-0 flex-1 text-left">
