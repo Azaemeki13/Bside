@@ -90,6 +90,8 @@ export class AudioPlayerService {
             const volume = this.volumeService.volume01();
             this.sound?.volume(volume);
         });
+
+        this.authService.loggedOut$.subscribe(() => this.resetSession());
     }
 
     setQueue(entries: QueueEntry[], startIndex = 0): void {
@@ -155,6 +157,17 @@ export class AudioPlayerService {
         this.isLoading.set(false);
         this.duration.set(0);
         this.position.set(0);
+    }
+
+    private resetSession(): void {
+        this.stop();
+        this.queue = [];
+        this.queueIndex.set(-1);
+        this.queueLength.set(0);
+        this.shuffleEnabled.set(false);
+        this.repeatMode.set('off');
+        this.lastPlayedSongId = null;
+        this.error.set(null);
     }
 
     toggleShuffle(): void {

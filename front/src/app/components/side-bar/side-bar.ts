@@ -1,5 +1,4 @@
-import { Component, HostListener, PLATFORM_ID, inject } from '@angular/core';
-import { isPlatformBrowser, NgIf } from '@angular/common';
+import { Component, HostListener, inject } from '@angular/core';
 import { SideBarButton } from '../side-bar-button/side-bar-button';
 import { LucideAngularModule, House, Disc3, Heart, UsersRound, LogOut, Settings, Upload, Library, ShieldCheck, Ban} from 'lucide-angular';
 import { Router } from '@angular/router';
@@ -14,7 +13,6 @@ import { AuthService } from '../../services/auth.service';
 
 export class SideBar {
   private readonly router = inject(Router);
-  private readonly platformId = inject(PLATFORM_ID);
   protected readonly authService = inject(AuthService);
 
   protected readonly house = House;
@@ -39,9 +37,7 @@ export class SideBar {
   }
 
   protected confirmLogout(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('auth_token');
-    }
+    this.authService.logout();
     this.isLogoutConfirmOpen = false;
     void this.router.navigate(['/'], { replaceUrl: true });
   }

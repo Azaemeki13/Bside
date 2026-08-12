@@ -3,10 +3,12 @@ import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from "@angular/common";
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
+import { AuthService } from './auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const platformId = inject(PLATFORM_ID);
     const router = inject(Router);
+    const authService = inject(AuthService);
     let token: string | null = null;
     if (isPlatformBrowser(platformId)) {
         token = localStorage.getItem('auth_token');
@@ -18,7 +20,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(clonedReq).pipe(
         catchError((error) => {
             if (isPlatformBrowser(platformId) && error?.status === 403 && error?.error === 'Your account has been banned.') {
-                localStorage.removeItem('auth_token');
+                authService.logout();
                 void router.navigate(['/login'], { queryParams: { error: 'banned' } });
             }
             return throwError(() => error);

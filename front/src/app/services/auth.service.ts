@@ -1,6 +1,6 @@
 import { Injectable, PLATFORM_ID, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, switchMap } from 'rxjs';
+import { Observable, Subject, tap, switchMap } from 'rxjs';
 import { environment } from '../../environment';
 import { LoginPayload, AuthResponse, RegisterPayload, UserProfile } from '../models/auth.model';
 import { isPlatformBrowser } from '@angular/common';
@@ -14,6 +14,8 @@ export class AuthService {
     private readonly platformId = inject(PLATFORM_ID);
     private readonly http = inject(HttpClient);
     readonly isTryMePopupOpen = signal<boolean>(false);
+    private readonly loggedOutSubject = new Subject<void>();
+    readonly loggedOut$ = this.loggedOutSubject.asObservable();
 
     currentUser = signal<UserProfile| null>(null);
 
@@ -27,8 +29,12 @@ export class AuthService {
         );
     }
 
-    logout() {
+    logout(): void {
         this.currentUser.set(null);
+        this.loggedOutSubject.next();
+        if (isPlatformBrowser(this.platformId)) {
+            localStorage.removeItem('auth_token');
+        }
     }
     loadUserProfile() {
         if (this.currentUser() !== null ) return;
