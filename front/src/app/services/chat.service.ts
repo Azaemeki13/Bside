@@ -157,7 +157,7 @@ export class ChatService {
   sendPrivateMessage(toUserId: string, content: string): boolean {
 	const trimmedContent = content.trim();
 
-	if (!trimmedContent || this.socket?.readyState !== WebSocket.OPEN) {
+	if (!trimmedContent || [...trimmedContent].length > 2000 || this.socket?.readyState !== WebSocket.OPEN) {
 		return false;
 	}
 
@@ -216,15 +216,10 @@ export class ChatService {
     }
 
     if (!isPlatformBrowser(this.platformId)) {
-      return 'ws://localhost:8080/ws';
+      return 'wss://localhost/ws';
     }
 
-    const { protocol, hostname, host } = window.location;
-
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'ws://localhost:8080/ws';
-    }
-
+    const { protocol, host } = window.location;
     const wsProtocol = protocol === 'https:' ? 'wss:' : 'ws:';
     return `${wsProtocol}//${host}/ws`;
   }

@@ -14,7 +14,7 @@ VALUES (
            NULL,
            'WebSocket Test Artist',
            'Artist created for WebSocket song-sharing tests.',
-           'http://localhost:9000/bside-covers/default_artist.jpg',
+           'https://localhost/bside-covers/default_artist.jpg',
            'Ready'
        )
     ON CONFLICT (id) DO UPDATE
@@ -38,7 +38,7 @@ VALUES (
            '90000000-0000-4000-8000-000000000001',
            'WebSocket Test Album',
            'Test',
-           'http://localhost:9000/bside-covers/default_cover.jpg',
+           'https://localhost/bside-covers/default_cover.jpg',
            'Ready'
        )
     ON CONFLICT (id) DO UPDATE

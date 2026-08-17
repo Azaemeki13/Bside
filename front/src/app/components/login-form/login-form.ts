@@ -19,8 +19,8 @@ export class LoginForm {
   private authService = inject(AuthService);
   private router = inject(Router);
   loginForm = this.fb.group({
-    identifier: ['', Validators.required],
-    password: ['', Validators.required]
+    identifier: ['', [Validators.required, Validators.maxLength(254)]],
+    password: ['', [Validators.required, Validators.maxLength(128)]]
   });
   errorMessage: string | null = null;
   isLoading = false;
@@ -36,7 +36,7 @@ export class LoginForm {
     this.isLoading = true;
     this.errorMessage = null;
     const payload = {
-      identifier: this.loginForm.value.identifier!,
+      identifier: this.loginForm.value.identifier!.trim(),
       password: this.loginForm.value.password!
     };
     this.authService.login(payload).subscribe({

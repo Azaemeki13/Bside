@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, PLATFORM_ID, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Disc3, EllipsisVertical, Heart, LucideAngularModule, Play, Timer, X ,Trash2} from 'lucide-angular';
@@ -10,6 +10,7 @@ import { Playlist, PlaylistService } from '../../services/playlist.service';
 import { ChatService } from '../../services/chat.service';
 import { AuthService } from '../../services/auth.service';
 import { FriendListItem } from '../../models/chat.model';
+import { browserStorageUrl } from '../../utils/storage-url';
 
 @Component({
   selector: 'app-album-detail',
@@ -26,6 +27,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly chatService = inject(ChatService);
   private readonly authService = inject(AuthService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   readonly playIcon = Play;
   readonly timer = Timer;
@@ -300,7 +302,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
     if (!url)
       return 'assets/cover1.png';
 
-    return url.replace(/^http:\/\/minio:9000/i, 'http://localhost:9000');
+    return browserStorageUrl(url, this.platformId);
   }
 
   formatDuration(seconds: number): string {

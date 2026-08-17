@@ -21,6 +21,7 @@ import json
 import mimetypes
 import os
 import re
+import ssl
 import sys
 import time
 import urllib.error
@@ -333,6 +334,11 @@ def read_flac_duration(path: Path) -> float | None:
 
 
 def upload_library(args: argparse.Namespace) -> None:
+    if args.insecure:
+        context = ssl._create_unverified_context()
+        urllib.request.install_opener(
+            urllib.request.build_opener(urllib.request.HTTPSHandler(context=context))
+        )
     root = Path(args.root).expanduser().resolve()
     token = token_from_args(args)
     api_url = args.api.rstrip("/")
@@ -371,10 +377,19 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Upload local test albums and songs to B-Side.")
     parser.add_argument("--artist-name", required=True, help="Artist name to create and upload albums under.")
     parser.add_argument("--root", default="songs", help="Root folder containing one folder per album. Default: songs")
-    parser.add_argument("--api", default="http://localhost:8080", help="Backend API URL. Default: http://localhost:8080")
+    parser.add_argument(
+        "--api",
+        default="https://localhost/api",
+        help="Backend API URL. Default: https://localhost/api",
+    )
     parser.add_argument("--token", help="JWT auth token. Alternatively set BSIDE_TOKEN.")
     parser.add_argument("--token-file", help="Path to a file containing the JWT auth token.")
     parser.add_argument("--dry-run", action="store_true", help="Print what would be uploaded without calling the API.")
+    parser.add_argument(
+        "--insecure",
+        action="store_true",
+        help="Accept the generated localhost certificate. Use only for local development.",
+    )
     return parser.parse_args()
 
 

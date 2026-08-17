@@ -132,15 +132,13 @@ async fn send_server_message(state: &AppState, target_user_id: Uuid, message: &S
         }
     };
 
-    let target_sender = {
-        let online_users = state.network.online_users.lock().await;
-        online_users.get(&target_user_id).cloned()
-    };
-
-    if let Some(sender) = target_sender {
-        if sender.send(serialized_message).is_err() {
-            println!("Failed to send WebSocket message to user {target_user_id}");
-        }
+    if state
+        .network
+        .send_to_user(target_user_id, &serialized_message)
+        .await
+        == 0
+    {
+        println!("No active WebSocket connection for user {target_user_id}");
     }
 }
 
@@ -227,7 +225,10 @@ pub async fn ws_handler(
         return Err(StatusCode::FORBIDDEN);
     }
 
-    Ok(ws.on_upgrade(move |socket| handle_socket(socket, state, user_id)))
+    Ok(ws
+        .max_message_size(64 * 1024)
+        .max_frame_size(64 * 1024)
+        .on_upgrade(move |socket| handle_socket(socket, state, user_id)))
 }
 
 async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
@@ -235,14 +236,10 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
 
     let (mut sender, mut receiver) = socket.split();
     let (tx, mut rx) = mpsc::unbounded_channel::<String>();
+    let connection_id = Uuid::new_v4();
 
-    {
-        let mut online_users = state.network.online_users.lock().await;
-        online_users.insert(user_id, tx);
-
-        println!("User {user_id} is now online");
-        println!("Online users count: {}", online_users.len());
-    }
+    state.network.register(user_id, connection_id, tx).await;
+    println!("User {user_id} connection {connection_id} is now online");
 
     let mut send_task = tokio::spawn(async move {
         while let Some(message) = rx.recv().await {
@@ -293,9 +290,10 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
 
                             let (normalized_song_id, shared_song) = match message_type.as_str() {
                                 "text" => {
-                                    if content.is_empty() {
+                                    if content.is_empty() || content.chars().count() > 2_000 {
                                         let invalid_message = ServerWsMessage::InvalidMessage {
-                                            message: "Text message cannot be empty.".to_string(),
+                                            message: "Text message must be 1-2000 characters."
+                                                .to_string(),
                                         };
 
                                         send_server_message(
@@ -461,75 +459,44 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
                                 }
                             };
 
-                            let target_sender = {
-                                let online_users =
-                                    state_for_receive.network.online_users.lock().await;
-                                online_users.get(&to_user_id).cloned()
-                            };
+                            let delivered_connections = state_for_receive
+                                .network
+                                .send_to_user(to_user_id, &message_to_send)
+                                .await;
 
-                            match target_sender {
-                                Some(sender) => {
-                                    if sender.send(message_to_send).is_err() {
-                                        println!("Failed to send message to user {to_user_id}");
+                            if delivered_connections == 0 {
+                                let saved_notification = ServerWsMessage::MessageSaved {
+                                    message_id: saved_message.id,
+                                    to_user_id,
+                                    status: saved_message.status.clone(),
+                                    message: "User connection is unavailable. Message saved."
+                                        .to_string(),
+                                };
 
-                                        {
-                                            let mut online_users =
-                                                state_for_receive.network.online_users.lock().await;
-                                            online_users.remove(&to_user_id);
-                                        }
+                                send_server_message(
+                                    &state_for_receive,
+                                    user_id,
+                                    &saved_notification,
+                                )
+                                .await;
+                            } else {
+                                println!("Message sent from {user_id} to {to_user_id}");
 
-                                        let saved_notification = ServerWsMessage::MessageSaved {
-                                            message_id: saved_message.id,
-                                            to_user_id,
-                                            status: saved_message.status.clone(),
-                                            message:
-                                                "User connection is unavailable. Message saved."
-                                                    .to_string(),
-                                        };
-
-                                        send_server_message(
-                                            &state_for_receive,
-                                            user_id,
-                                            &saved_notification,
-                                        )
-                                        .await;
-                                    } else {
-                                        println!("Message sent from {user_id} to {to_user_id}");
-
-                                        let update_result = sqlx::query!(
-                                            r#"
+                                let update_result = sqlx::query!(
+                                    r#"
                                             UPDATE messages
                                             SET
                                                 status = 'delivered',
                                                 delivered_at = NOW()
                                             WHERE id = $1
                                             "#,
-                                            saved_message.id
-                                        )
-                                        .execute(&state_for_receive.db)
-                                        .await;
+                                    saved_message.id
+                                )
+                                .execute(&state_for_receive.db)
+                                .await;
 
-                                        if let Err(error) = update_result {
-                                            println!("Failed to update message status: {error}");
-                                        }
-                                    }
-                                }
-                                None => {
-                                    println!("User {to_user_id} is offline. Message saved.");
-
-                                    let saved_notification = ServerWsMessage::MessageSaved {
-                                        message_id: saved_message.id,
-                                        to_user_id,
-                                        status: saved_message.status.clone(),
-                                        message: "User is offline. Message saved.".to_string(),
-                                    };
-
-                                    send_server_message(
-                                        &state_for_receive,
-                                        user_id,
-                                        &saved_notification,
-                                    )
-                                    .await;
+                                if let Err(error) = update_result {
+                                    println!("Failed to update message status: {error}");
                                 }
                             }
                         }
@@ -570,11 +537,8 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
         }
     }
 
-    {
-        let mut online_users = state.network.online_users.lock().await;
-        online_users.remove(&user_id);
-
+    let is_fully_offline = state.network.unregister(user_id, connection_id).await;
+    if is_fully_offline {
         println!("User {user_id} is now offline");
-        println!("Online users count: {}", online_users.len());
     }
 }

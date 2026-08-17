@@ -9,12 +9,12 @@
 
         <label class="flex flex-col gap-2 font-raleway text-sm text-[#FFE6DB]">
         Artist name
-        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="artistName" [(ngModel)]="artistName" required />
+        <input class="rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="artistName" [(ngModel)]="artistName" maxlength="100" required />
         </label>
 
         <label class="flex flex-col gap-2 font-raleway text-sm text-[#FFE6DB]">
         Bio
-        <textarea class="min-h-28 rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="bio" [(ngModel)]="bio"></textarea>
+        <textarea class="min-h-28 rounded-md bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none" name="bio" [(ngModel)]="bio" maxlength="2000"></textarea>
         </label>
 
         <button class="rounded-md bg-[#FF5500] px-4 py-2 font-raleway font-bold text-[#FFE6DB] disabled:cursor-not-allowed disabled:opacity-50" type="submit" [disabled]="isSubmitting">

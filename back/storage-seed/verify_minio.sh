@@ -5,14 +5,15 @@ BACK_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 PROJECT_DIR="$(cd "$BACK_DIR/.." && pwd)"
 ENV_FILE="${ENV_FILE:-$PROJECT_DIR/.env}"
 [[ -f "$ENV_FILE" ]] && { set -a; source "$ENV_FILE"; set +a; }
-ENDPOINT="${MINIO_SEED_ENDPOINT:-${AWS_PUBLIC_ENDPOINT_URL:-${AWS_ENDPOINT_URL:-http://127.0.0.1:9000}}}"
+ENDPOINT="${MINIO_SEED_ENDPOINT:-${AWS_PUBLIC_ENDPOINT_URL:-https://localhost}}"
 ACCESS_KEY="${AWS_ACCESS_KEY_ID:-${MINIO_ROOT_USER:-minioadmin}}"
 SECRET_KEY="${AWS_SECRET_ACCESS_KEY:-${MINIO_ROOT_PASSWORD:-minioadmin}}"
 [[ "$ENDPOINT" == *"://minio:"* ]] && ENDPOINT="${ENDPOINT/:\/\/minio:/:\/\/127.0.0.1:}"
 
 BODY='set -eu
-mc alias set bside "$ENDPOINT" "$ACCESS_KEY" "$SECRET_KEY" >/dev/null
-check() { mc stat "bside/$1" >/dev/null || { echo "MISSING: $1"; exit 1; }; echo "OK: $1"; }
+MC="mc --insecure"
+$MC alias set bside "$ENDPOINT" "$ACCESS_KEY" "$SECRET_KEY" >/dev/null
+check() { $MC stat "bside/$1" >/dev/null || { echo "MISSING: $1"; exit 1; }; echo "OK: $1"; }
 check bside-tracks/audio/midnight-drive.mp3
 check bside-tracks/audio/quiet-orbit.mp3
 check bside-tracks/audio/blue-echo.mp3

@@ -14,10 +14,10 @@ use crate::{
     AlbumSongItem, AnyAuth, AppState, ArtistDetailResponse, ArtistRequestPayload,
     ArtistRequestResponse, ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem, AuthRequest,
     AuthResponse, BSideError, Claims, ContactPayload, DailyActivityStat, GoogleUserProfile,
-    LoginPayload, MlCallbackPayload, NewReleaseSong, Playlist, PlaylistDetailedResponse, PlaylistPayload,
-    PlaylistSongItem, PublicUser, RecentPlayItem, RegisterPayload, Song, SongPayload,
-    SongResponse, TopSongStat, TopSpinItem, UpdateStructurePayload, User, UserActivityAnalytics,
-    UserPayload,
+    LoginPayload, MlCallbackPayload, NewReleaseSong, Playlist, PlaylistDetailedResponse,
+    PlaylistPayload, PlaylistSongItem, PublicUser, RecentPlayItem, RegisterPayload, Song,
+    SongPayload, SongResponse, TopSongStat, TopSpinItem, UpdateStructurePayload, User,
+    UserActivityAnalytics,
 };
 use argon2::{
     Argon2, PasswordHash, PasswordVerifier,
@@ -27,7 +27,8 @@ use aws_sdk_s3::presigning::PresigningConfig;
 use axum::{
     Json,
     extract::{Multipart, Path, Query, State},
-    response::{IntoResponse, Redirect},
+    http::{HeaderMap, HeaderValue, header},
+    response::{IntoResponse, Redirect, Response},
 };
 use lettre::{
     AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor,
@@ -39,6 +40,177 @@ use secrecy::ExposeSecret;
 use std::collections::HashMap;
 use std::time::Duration;
 use uuid::Uuid;
+
+fn public_storage_url(bucket: &str, key: &str) -> String {
+    let endpoint = std::env::var("AWS_PUBLIC_ENDPOINT_URL")
+        .unwrap_or_else(|_| "https://localhost".to_string());
+    format!("{}/{bucket}/{key}", endpoint.trim_end_matches('/'))
+}
+
+fn valid_email(value: &str) -> bool {
+    if value.is_empty() || value.len() > 254 || value.bytes().any(|byte| byte.is_ascii_whitespace())
+    {
+        return false;
+    }
+    let Some((local, domain)) = value.split_once('@') else {
+        return false;
+    };
+    !local.is_empty()
+        && local.len() <= 64
+        && domain.contains('.')
+        && !domain.contains('@')
+        && !domain.starts_with('.')
+        && !domain.ends_with('.')
+}
+
+fn validate_registration(username: &str, email: &str, password: &str) -> Result<(), BSideError> {
+    if !(3..=30).contains(&username.len())
+        || !username
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'-'))
+    {
+        return Err(BSideError::BadRequest(
+            "Username must be 3-30 characters using letters, numbers, '_' or '-'.".into(),
+        ));
+    }
+    if !valid_email(email) {
+        return Err(BSideError::BadRequest(
+            "A valid email address is required.".into(),
+        ));
+    }
+    if !(8..=128).contains(&password.len())
+        || !password.bytes().any(|byte| byte.is_ascii_lowercase())
+        || !password.bytes().any(|byte| byte.is_ascii_uppercase())
+        || !password.bytes().any(|byte| byte.is_ascii_digit())
+    {
+        return Err(BSideError::BadRequest(
+            "Password must be 8-128 characters and include uppercase, lowercase, and a number."
+                .into(),
+        ));
+    }
+    Ok(())
+}
+
+fn validate_contact(name: &str, email: &str, message: &str) -> Result<(), BSideError> {
+    if !(1..=100).contains(&name.chars().count()) {
+        return Err(BSideError::BadRequest(
+            "Name must be 1-100 characters.".into(),
+        ));
+    }
+    if !valid_email(email) {
+        return Err(BSideError::BadRequest(
+            "A valid email address is required.".into(),
+        ));
+    }
+    if !(10..=5_000).contains(&message.chars().count()) {
+        return Err(BSideError::BadRequest(
+            "Message must be 10-5000 characters.".into(),
+        ));
+    }
+    Ok(())
+}
+
+fn required_text(value: &str, field: &str, max: usize) -> Result<String, BSideError> {
+    let value = value.trim();
+    if value.is_empty() || value.chars().count() > max {
+        return Err(BSideError::BadRequest(format!(
+            "{field} must be 1-{max} characters."
+        )));
+    }
+    Ok(value.to_string())
+}
+
+fn optional_text(
+    value: Option<String>,
+    field: &str,
+    max: usize,
+) -> Result<Option<String>, BSideError> {
+    value
+        .map(|value| {
+            let value = value.trim();
+            if value.chars().count() > max {
+                return Err(BSideError::BadRequest(format!(
+                    "{field} must not exceed {max} characters."
+                )));
+            }
+            Ok((!value.is_empty()).then(|| value.to_string()))
+        })
+        .transpose()
+        .map(Option::flatten)
+}
+
+fn validate_genre(value: &str) -> Result<String, BSideError> {
+    const GENRES: [&str; 19] = [
+        "Hip-Hop",
+        "Jazz",
+        "Indie",
+        "Electronic",
+        "Pop",
+        "Classical",
+        "Metal",
+        "R&B",
+        "Country",
+        "Reggae",
+        "Blues",
+        "Folk",
+        "Punk",
+        "Soul",
+        "Funk",
+        "Disco",
+        "Gospel",
+        "Latin",
+        "World",
+    ];
+    let value = value.trim();
+    if !GENRES.contains(&value) {
+        return Err(BSideError::BadRequest("Unsupported album genre.".into()));
+    }
+    Ok(value.to_string())
+}
+
+fn oauth_state_cookie(state: &str) -> Result<HeaderValue, BSideError> {
+    HeaderValue::from_str(&format!(
+        "bside_oauth_state={state}; Path=/api/auth/google/callback; Max-Age=600; HttpOnly; Secure; SameSite=Lax"
+    ))
+    .map_err(|_| BSideError::AuthError("Failed to create OAuth state cookie.".into()))
+}
+
+fn oauth_redirect_with_state(auth_url: &str, csrf_state: &str) -> Result<Response, BSideError> {
+    let mut response = Redirect::temporary(auth_url).into_response();
+    response
+        .headers_mut()
+        .insert(header::SET_COOKIE, oauth_state_cookie(csrf_state)?);
+    Ok(response)
+}
+
+fn clear_oauth_state_cookie(response: &mut Response) {
+    response.headers_mut().insert(
+        header::SET_COOKIE,
+        HeaderValue::from_static(
+            "bside_oauth_state=; Path=/api/auth/google/callback; Max-Age=0; HttpOnly; Secure; SameSite=Lax",
+        ),
+    );
+}
+
+fn constant_time_equal(left: &str, right: &str) -> bool {
+    if left.len() != right.len() {
+        return false;
+    }
+    left.bytes()
+        .zip(right.bytes())
+        .fold(0_u8, |difference, (a, b)| difference | (a ^ b))
+        == 0
+}
+
+fn oauth_state_from_cookie(headers: &HeaderMap) -> Option<&str> {
+    headers
+        .get(header::COOKIE)?
+        .to_str()
+        .ok()?
+        .split(';')
+        .map(str::trim)
+        .find_map(|cookie| cookie.strip_prefix("bside_oauth_state="))
+}
 
 #[utoipa::path(
     get,
@@ -59,6 +231,7 @@ pub async fn ping_handler() -> &'static str {
     request_body = ContactPayload,
     responses(
         (status = 200, description = "Contacted successfully", body = String),
+        (status = 400, description = "Invalid name, email, or message"),
         (status = 500, description = "Internal server error"),
     ),
     tags = ["Contact"]
@@ -68,15 +241,19 @@ pub async fn contact_handler(
     _auth: AnyAuth,
     Json(payload): Json<ContactPayload>,
 ) -> Result<impl IntoResponse, BSideError> {
+    let name = payload.name.trim();
+    let email_address = payload.email.trim().to_ascii_lowercase();
+    let message = payload.message.trim();
+    validate_contact(name, &email_address, message)?;
     let smtp_user = std::env::var("SMTP_USERNAME")
         .map_err(|_| BSideError::InternalServerError("SMTP config missing".to_string()))?;
     let smtp_pass = std::env::var("SMTP_PASSWORD")
         .map_err(|_| BSideError::InternalServerError("SMTP config missing".to_string()))?;
     sqlx::query!(
         "INSERT INTO contacts (name, email, message) VALUES ($1, $2, $3)",
-        payload.name,
-        payload.email,
-        payload.message
+        name,
+        email_address,
+        message
     )
     .execute(&state.db)
     .await
@@ -84,10 +261,10 @@ pub async fn contact_handler(
     let email = Message::builder()
         .from(format!("BSide App <{}>", smtp_user).parse().unwrap())
         .to(smtp_user.parse().unwrap())
-        .subject(format!("New B-Side contact from {}", payload.name))
+        .subject(format!("New B-Side contact from {name}"))
         .body(format!(
             "Name: {}\nEmail: {}\nMessage: {}",
-            payload.name, payload.email, payload.message
+            name, email_address, message
         ))
         .map_err(|e| BSideError::InternalServerError(e.to_string()))?;
     let creds = Credentials::new(smtp_user, smtp_pass);
@@ -109,7 +286,7 @@ pub async fn contact_handler(
     request_body = RegisterPayload,
     responses(
         (status = 200, description = "User registered successfully", body = User),
-        (status = 400, description = "Username or email already exists"),
+        (status = 400, description = "Invalid registration fields or username/email already exists"),
         (status = 500, description = "Internal server error"),
     ),
     tags = ["Authentication"]
@@ -118,11 +295,14 @@ pub async fn register_handler(
     State(state): State<AppState>,
     Json(payload): Json<RegisterPayload>,
 ) -> Result<Json<User>, BSideError> {
+    let username = payload.username.trim().to_string();
+    let email = payload.email.trim().to_ascii_lowercase();
+    validate_registration(&username, &email, payload.password.expose_secret())?;
     let exists: Option<bool> = Some(
         sqlx::query_scalar!(
             "SELECT EXISTS (SELECT 1  FROM users WHERE email = $1 OR username = $2)",
-            payload.email,
-            payload.username
+            email,
+            username
         )
         .fetch_one(&state.db)
         .await?
@@ -154,8 +334,8 @@ pub async fn register_handler(
         RETURNING id, username, display_name, email, role, is_banned, created_at as "created_at!", avatar_url
         "#,
         user_id,
-        payload.username,
-        payload.email
+        username,
+        email
     )
     .fetch_one(&mut *tx)
     .await?;
@@ -254,7 +434,7 @@ pub async fn upload_avatar(
                 .send()
                 .await
                 .map_err(|e| BSideError::S3Error(e.to_string()))?;
-            avatar_url = Some(format!("http://localhost:9000/bside-avatars/{key}"));
+            avatar_url = Some(public_storage_url("bside-avatars", &key));
         }
     }
     let result = sqlx::query!(
@@ -298,7 +478,7 @@ pub async fn update_profile_handler(
 ) -> Result<Json<User>, BSideError> {
     let trimmed = payload.display_name.trim();
 
-    if trimmed.len() > 50 {
+    if trimmed.chars().count() > 50 {
         return Err(BSideError::BadRequest(
             "Display name must be 50 characters or fewer.".into(),
         ));
@@ -343,15 +523,28 @@ pub async fn classic_auth_handler(
     State(state): State<AppState>,
     axum::extract::Json(payload): axum::extract::Json<LoginPayload>,
 ) -> Result<Json<AuthResponse>, BSideError> {
+    let trimmed_identifier = payload.identifier.trim();
+    let identifier = if trimmed_identifier.contains('@') {
+        trimmed_identifier.to_ascii_lowercase()
+    } else {
+        trimmed_identifier.to_string()
+    };
     let password = payload.password.expose_secret().to_string();
+    if identifier.is_empty()
+        || identifier.chars().count() > 254
+        || password.is_empty()
+        || password.chars().count() > 128
+    {
+        return Err(BSideError::AuthError("Invalid credentials".into()));
+    }
     let user = sqlx::query!(
         r#"
         SELECT id, username, display_name, email, role, is_banned, created_at as "created_at!", avatar_url, c.password_hash FROM users u INNER JOIN local_credentials c ON u.id = c.user_id WHERE u.username = $1 OR u.email=$1"#,
-        payload.identifier,
+        identifier,
         )
         .fetch_optional(&state.db)
         .await?
-        .ok_or_else(|| BSideError::UnauthorizedProfile)?;
+        .ok_or_else(|| BSideError::AuthError("Invalid credentials".into()))?;
 
     if user.is_banned {
         return Err(BSideError::Banned);
@@ -364,7 +557,7 @@ pub async fn classic_auth_handler(
         let verif = Argon2::default;
         verif()
             .verify_password(password.as_bytes(), &pw_hash)
-            .map_err(|_| BSideError::InternalServerError("ID error, please retry.".into()))
+            .map_err(|_| BSideError::AuthError("Invalid credentials".into()))
     })
     .await
     .map_err(|_| BSideError::InternalServerError("Thread panicked.".into()))??;
@@ -381,32 +574,6 @@ pub async fn classic_auth_handler(
     };
 
     Ok(Json(AuthResponse { user, token }))
-}
-
-#[utoipa::path(
-    post,
-    path = "/users",
-    request_body = UserPayload,
-    responses(
-        (status = 200, description = "User created successfully", body = User),
-        (status = 401, description = "Unauthorized"),
-        (status = 500, description = "Internal server error"),
-    ),
-    security(("Bearer" = [])),
-    tags = ["Users"]
-)]
-#[axum::debug_handler]
-pub async fn create_user_handler(
-    State(state): State<AppState>,
-    axum::extract::Json(payload): axum::extract::Json<UserPayload>,
-) -> Result<Json<User>, BSideError> {
-    let user = sqlx::query_as::<_, User>(
-        "INSERT INTO users (username) VALUES ($1) RETURNING id, username, created_at",
-    )
-    .bind(payload.username)
-    .fetch_one(&state.db)
-    .await?;
-    Ok(Json(user))
 }
 
 #[utoipa::path(
@@ -433,7 +600,7 @@ pub async fn create_artist_handler(
     ensure_admin(&state, current_user_id).await?;
     let mut name: Option<String> = None;
     let mut bio: Option<String> = None;
-    let mut photo_url = "http://localhost:9000/bside-covers/default_artist.jpg".to_string();
+    let mut photo_url = public_storage_url("bside-covers", "default_artist.jpg");
     while let Some(field) = multipart
         .next_field()
         .await
@@ -459,8 +626,13 @@ pub async fn create_artist_handler(
             }
             "photo" => {
                 let content_type = field.content_type().unwrap_or("").to_string();
-                if content_type != "image/png" && content_type != "image/jpeg" {
-                    continue;
+                if content_type != "image/png"
+                    && content_type != "image/jpeg"
+                    && content_type != "image/webp"
+                {
+                    return Err(BSideError::BadRequest(
+                        "Artist photo must be a PNG, JPEG, or WebP image.".into(),
+                    ));
                 }
                 let data = field
                     .bytes()
@@ -469,11 +641,15 @@ pub async fn create_artist_handler(
                 if data.len() >= 4 {
                     let png_header = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
                     let jpg_header = [0xFF, 0xD8, 0xFF];
+                    let is_webp =
+                        data.len() >= 12 && data.starts_with(b"RIFF") && &data[8..12] == b"WEBP";
 
                     let (is_valid, extension) = if data.starts_with(&png_header) {
                         (true, "png")
                     } else if data.starts_with(&jpg_header) {
                         (true, "jpg")
+                    } else if is_webp {
+                        (true, "webp")
                     } else {
                         (false, "")
                     };
@@ -481,7 +657,7 @@ pub async fn create_artist_handler(
                         let file_id = Uuid::new_v4();
                         let key = format!("{file_id}.{extension}");
 
-                        if let Err(e) = state
+                        state
                             .aws_client
                             .put_object()
                             .bucket("bside-covers")
@@ -490,18 +666,26 @@ pub async fn create_artist_handler(
                             .content_type(content_type)
                             .send()
                             .await
-                        {
-                            tracing::warn!("Artist photo upload failed, using default cover: {e}");
-                        } else {
-                            photo_url = format!("http://localhost:9000/bside-covers/{key}");
-                        }
+                            .map_err(|e| BSideError::S3Error(e.to_string()))?;
+                        photo_url = public_storage_url("bside-covers", &key);
+                    } else {
+                        return Err(BSideError::BadRequest(
+                            "Artist photo must be a valid PNG/JPEG/WebP under 10MB.".into(),
+                        ));
                     }
+                } else {
+                    return Err(BSideError::BadRequest("Artist photo is invalid.".into()));
                 }
             }
             _ => {}
         }
     }
-    let artist_name = name.ok_or_else(|| BSideError::BadRequest("Missing artist name".into()))?;
+    let artist_name = required_text(
+        &name.ok_or_else(|| BSideError::BadRequest("Missing artist name".into()))?,
+        "Artist name",
+        100,
+    )?;
+    let bio = optional_text(bio, "Artist bio", 2_000)?;
     let mut tx = state.db.begin().await?;
     let artist_id = Uuid::new_v4();
     sqlx::query!(
@@ -812,7 +996,7 @@ pub async fn admin_update_user_handler(
     let display_name = match payload.display_name {
         Some(ref raw) => {
             let trimmed = raw.trim();
-            if trimmed.len() > 50 {
+            if trimmed.chars().count() > 50 {
                 return Err(BSideError::BadRequest(
                     "Display name must be 50 characters or fewer.".into(),
                 ));
@@ -1098,10 +1282,8 @@ pub async fn create_artist_request_handler(
     claims: Claims,
     Json(payload): Json<ArtistRequestPayload>,
 ) -> Result<Json<ArtistRequestResponse>, BSideError> {
-    let artist_name = payload.artist_name.trim();
-    if artist_name.is_empty() {
-        return Err(BSideError::BadRequest("Artist name is required.".into()));
-    }
+    let artist_name = required_text(&payload.artist_name, "Artist name", 100)?;
+    let bio = optional_text(payload.bio, "Artist bio", 2_000)?;
 
     let request_id = Uuid::new_v4();
     let result = sqlx::query_as!(
@@ -1124,7 +1306,7 @@ pub async fn create_artist_request_handler(
         request_id,
         claims.sub,
         artist_name,
-        payload.bio
+        bio
     )
     .fetch_one(&state.db)
     .await
@@ -1243,7 +1425,7 @@ pub async fn review_artist_request_handler(
                 request.user_id,
                 request.artist_name,
                 request.bio,
-                "http://localhost:9000/bside-covers/default_artist.jpg"
+                public_storage_url("bside-covers", "default_artist.jpg")
             )
             .execute(&mut *tx)
             .await?;
@@ -1403,7 +1585,7 @@ pub async fn create_album_handler(
     };
     let mut title: Option<String> = None;
     let mut genre: Option<String> = None;
-    let mut cover_url = "http://localhost:9000/bside-covers/default_cover.jpg".to_string();
+    let mut cover_url = public_storage_url("bside-covers", "default_cover.jpg");
     while let Some(field) = multipart
         .next_field()
         .await
@@ -1470,14 +1652,19 @@ pub async fn create_album_handler(
                         .send()
                         .await
                         .map_err(|e| BSideError::S3Error(e.to_string()))?;
-                    cover_url = format!("http://localhost:9000/bside-covers/{key}");
+                    cover_url = public_storage_url("bside-covers", &key);
                 }
             }
             _ => {}
         }
     }
-    let title = title.ok_or_else(|| BSideError::BadRequest("Missing title".into()))?;
-    let genre = genre.ok_or_else(|| BSideError::BadRequest("Missing genre".into()))?;
+    let title = required_text(
+        &title.ok_or_else(|| BSideError::BadRequest("Missing title".into()))?,
+        "Album title",
+        120,
+    )?;
+    let genre =
+        validate_genre(&genre.ok_or_else(|| BSideError::BadRequest("Missing genre".into()))?)?;
     let album_id = Uuid::new_v4();
     sqlx::query!(
         "INSERT INTO albums (id, artist_id, title, genre, cover_url, status)
@@ -1694,6 +1881,12 @@ pub async fn create_song_handler(
     if !matches!(payload.format.as_str(), "wav" | "flac") {
         return Err(BSideError::InvalidFormat);
     }
+    let title = required_text(&payload.title, "Song title", 120)?;
+    if !(1..=21_600).contains(&payload.duration_seconds) {
+        return Err(BSideError::BadRequest(
+            "Song duration must be 1-21600 seconds.".into(),
+        ));
+    }
     // old version:
     // let is_owner = sqlx::query_scalar!(
     //     "SELECT EXISTS(SELECT 1 FROM albums WHERE id = $1 AND artist_id = $2)",
@@ -1742,11 +1935,11 @@ pub async fn create_song_handler(
         RETURNING id, title, album_id, duration_seconds, audio_url, status::text as "status!", ml_features, created_at as "created_at!" 
         "#,
         song_uid,
-        payload.title,
+        title,
         payload.album_id,
         payload.duration_seconds,
         s3_key,
-        payload.ml_features
+        None::<serde_json::Value>
     )
     .fetch_one(&state.db)
     .await?;
@@ -1797,6 +1990,40 @@ pub async fn verify_song_handler(
     if !is_owner && !caller_is_admin {
         return Err(BSideError::UnauthorizedProfile);
     }
+    let object_metadata = state
+        .aws_client
+        .head_object()
+        .bucket("bside-tracks")
+        .key(&song.audio_url)
+        .send()
+        .await
+        .map_err(|e| {
+            if e.to_string().contains("NoSuchKey") || e.to_string().contains("NotFound") {
+                BSideError::NotFound
+            } else {
+                BSideError::S3Error(format!("S3 metadata error: {e}"))
+            }
+        })?;
+    let content_length = object_metadata
+        .content_length()
+        .filter(|length| *length >= 0)
+        .ok_or_else(|| {
+            BSideError::S3Error("S3 object size metadata is missing or invalid.".into())
+        })?;
+    let max_size = 200 * 1024 * 1024;
+    if content_length > max_size {
+        let _ = state
+            .aws_client
+            .delete_object()
+            .bucket("bside-tracks")
+            .key(&song.audio_url)
+            .send()
+            .await;
+        sqlx::query!("DELETE FROM songs WHERE id = $1", song_id)
+            .execute(&state.db)
+            .await?;
+        return Err(BSideError::PayloadTooLarge);
+    }
     let get_request = state
         .aws_client
         .get_object()
@@ -1812,21 +2039,6 @@ pub async fn verify_song_handler(
                 BSideError::S3Error(format!("S3 Fetch Error: {e}"))
             }
         })?;
-    let content_length = get_request.content_length().unwrap_or(0);
-    let max_size = 200 * 1024 * 1024;
-    if content_length > max_size {
-        let _ = state
-            .aws_client
-            .delete_object()
-            .bucket("bside-tracks")
-            .key(&song.audio_url)
-            .send()
-            .await;
-        let _ = sqlx::query!("DELETE FROM songs WHERE id = $1", song_id)
-            .execute(&state.db)
-            .await?;
-        return Err(BSideError::PayloadTooLarge);
-    }
     let body = get_request.body.collect().await.map_err(|e| {
         tracing::error!("S3 Body Collection Error: {:?}", e);
         BSideError::S3Error(format!("Streaming Error: {e}"))
@@ -2168,13 +2380,18 @@ pub async fn create_playlist_handler(
                     .send()
                     .await
                     .map_err(|e| BSideError::S3Error(e.to_string()))?;
-                cover_url = Some(format!("http://localhost:9000/bside-covers/{key}"));
+                cover_url = Some(public_storage_url("bside-covers", &key));
             }
             _ => {}
         }
     }
 
-    let title = title.ok_or_else(|| BSideError::BadRequest("Missing title".into()))?;
+    let title = required_text(
+        &title.ok_or_else(|| BSideError::BadRequest("Missing title".into()))?,
+        "Playlist title",
+        100,
+    )?;
+    let description = optional_text(description, "Playlist description", 1_000)?;
 
     let playlist = sqlx::query_as!(
         Playlist,
@@ -2879,19 +3096,26 @@ pub async fn update_playlist_handler(
     axum::extract::Path(id): axum::extract::Path<Uuid>,
     axum::extract::Json(payload): axum::extract::Json<UpdateStructurePayload>,
 ) -> Result<axum::Json<serde_json::Value>, BSideError> {
-    let res = sqlx::query!(
+    let title = payload
+        .title
+        .map(|value| required_text(&value, "Playlist title", 100))
+        .transpose()?;
+    let description_was_supplied = payload.description.is_some();
+    let description = optional_text(payload.description, "Playlist description", 1_000)?;
+    let res = sqlx::query(
         "UPDATE playlists
         SET
             title = COALESCE($1, title),
-            description = COALESCE($2, description),
-            is_public = COALESCE($3, is_public)
-        WHERE id = $4 and owner_id = $5",
-        payload.title,
-        payload.description,
-        payload.is_public,
-        id,
-        claims.sub
+            description = CASE WHEN $2 THEN $3 ELSE description END,
+            is_public = COALESCE($4, is_public)
+        WHERE id = $5 and owner_id = $6",
     )
+    .bind(title)
+    .bind(description_was_supplied)
+    .bind(description)
+    .bind(payload.is_public)
+    .bind(id)
+    .bind(claims.sub)
     .execute(&state.db)
     .await?;
     if res.rows_affected() == 0 {
@@ -2938,15 +3162,15 @@ pub async fn delete_playlist_handler(
     ),
     tags = ["Authentication"]
 )]
-pub async fn google_login_handler(State(state): State<AppState>) -> impl IntoResponse {
-    let (auth_url, _cfrs_token) = state
+pub async fn google_login_handler(State(state): State<AppState>) -> Result<Response, BSideError> {
+    let (auth_url, csrf_token) = state
         .oauth_client
         .authorize_url(CsrfToken::new_random)
         .add_scope(Scope::new("openid".to_string()))
         .add_scope(Scope::new("email".to_string()))
         .add_scope(Scope::new("profile".to_string()))
         .url();
-    Redirect::temporary(auth_url.as_str())
+    oauth_redirect_with_state(auth_url.as_str(), csrf_token.secret())
 }
 
 #[utoipa::path(
@@ -2957,8 +3181,8 @@ pub async fn google_login_handler(State(state): State<AppState>) -> impl IntoRes
     ),
     tags = ["Authentication"]
 )]
-pub async fn google_signup_handler(State(state): State<AppState>) -> impl IntoResponse {
-    let (auth_url, _cfrs_token) = state
+pub async fn google_signup_handler(State(state): State<AppState>) -> Result<Response, BSideError> {
+    let (auth_url, csrf_token) = state
         .oauth_client
         .authorize_url(CsrfToken::new_random)
         .add_scope(Scope::new("openid".to_string()))
@@ -2966,7 +3190,7 @@ pub async fn google_signup_handler(State(state): State<AppState>) -> impl IntoRe
         .add_scope(Scope::new("profile".to_string()))
         .add_extra_param("prompt", "select_account")
         .url();
-    Redirect::temporary(auth_url.as_str())
+    oauth_redirect_with_state(auth_url.as_str(), csrf_token.secret())
 }
 
 #[utoipa::path(
@@ -2985,8 +3209,14 @@ pub async fn google_signup_handler(State(state): State<AppState>) -> impl IntoRe
 )]
 pub async fn google_callback_handler(
     State(state): State<AppState>,
+    headers: HeaderMap,
     axum::extract::Query(query): axum::extract::Query<AuthRequest>,
-) -> Result<impl IntoResponse, BSideError> {
+) -> Result<Response, BSideError> {
+    let expected_state = oauth_state_from_cookie(&headers)
+        .ok_or_else(|| BSideError::AuthError("Missing OAuth state cookie.".into()))?;
+    if !constant_time_equal(expected_state, &query.state) {
+        return Err(BSideError::AuthError("Invalid OAuth state.".into()));
+    }
     let code = AuthorizationCode::new(query.code);
 
     let token_result = state
@@ -3004,6 +3234,11 @@ pub async fn google_callback_handler(
         .send()
         .await?;
     let profile: GoogleUserProfile = profile_response.json().await?;
+    if !profile.verified_email {
+        return Err(BSideError::AuthError(
+            "Google account email must be verified.".into(),
+        ));
+    }
     let existing_user = sqlx::query!("SELECT id from users WHERE email = $1", profile.email)
         .fetch_optional(&state.db)
         .await?;
@@ -3033,7 +3268,7 @@ pub async fn google_callback_handler(
     };
 
     let frontend_url =
-        std::env::var("FRONTEND_URL").unwrap_or_else(|_| "http://localhost:4200".to_string());
+        std::env::var("FRONTEND_URL").unwrap_or_else(|_| "https://localhost".to_string());
 
     let is_banned = sqlx::query_scalar!("SELECT is_banned FROM users WHERE id = $1", user_id)
         .fetch_one(&state.db)
@@ -3041,14 +3276,16 @@ pub async fn google_callback_handler(
 
     if is_banned {
         let redirect_url = format!("{frontend_url}/login?error=banned");
-        return Ok(Redirect::to(&redirect_url));
+        let mut response = Redirect::to(&redirect_url).into_response();
+        clear_oauth_state_cookie(&mut response);
+        return Ok(response);
     }
 
     let jwt = crate::auth::create_jwt(user_id)?;
-    // old version:
-    // let redirect_url = format!("{frontend_url}/bside_app?token={jwt}");
-    let redirect_url = format!("{frontend_url}/login?token={jwt}");
-    Ok(Redirect::to(&redirect_url))
+    let redirect_url = format!("{frontend_url}/login#token={jwt}");
+    let mut response = Redirect::to(&redirect_url).into_response();
+    clear_oauth_state_cookie(&mut response);
+    Ok(response)
 }
 
 #[utoipa::path(
@@ -3119,7 +3356,7 @@ pub async fn admin_create_album_for_artist_handler(
 
     let mut title: Option<String> = None;
     let mut genre: Option<String> = None;
-    let mut cover_url = "http://localhost:9000/bside-covers/default_cover.jpg".to_string();
+    let mut cover_url = public_storage_url("bside-covers", "default_cover.jpg");
 
     while let Some(field) = multipart
         .next_field()
@@ -3189,15 +3426,20 @@ pub async fn admin_create_album_for_artist_handler(
                         .send()
                         .await
                         .map_err(|e| BSideError::S3Error(e.to_string()))?;
-                    cover_url = format!("http://localhost:9000/bside-covers/{key}");
+                    cover_url = public_storage_url("bside-covers", &key);
                 }
             }
             _ => {}
         }
     }
 
-    let title = title.ok_or_else(|| BSideError::BadRequest("Missing title".into()))?;
-    let genre = genre.ok_or_else(|| BSideError::BadRequest("Missing genre".into()))?;
+    let title = required_text(
+        &title.ok_or_else(|| BSideError::BadRequest("Missing title".into()))?,
+        "Album title",
+        120,
+    )?;
+    let genre =
+        validate_genre(&genre.ok_or_else(|| BSideError::BadRequest("Missing genre".into()))?)?;
     let album_id = Uuid::new_v4();
 
     sqlx::query!(
@@ -3825,11 +4067,9 @@ pub async fn get_user_status_handler(
         return Err(BSideError::UserNotFound);
     }
 
-    let online_users = state.network.online_users.lock().await;
-
     Ok(Json(UserStatusResponse {
         user_id,
-        is_online: online_users.contains_key(&user_id),
+        is_online: state.network.is_online(user_id).await,
     }))
 }
 
@@ -3866,4 +4106,31 @@ async fn fetch_friend_request_item(
     .ok_or(BSideError::NotFound)?;
 
     Ok(request)
+}
+
+#[cfg(test)]
+mod validation_tests {
+    use super::*;
+
+    #[test]
+    fn registration_accepts_expected_values() {
+        assert!(validate_registration("music_fan-42", "fan@example.com", "Password123").is_ok());
+    }
+
+    #[test]
+    fn registration_rejects_invalid_fields() {
+        assert!(validate_registration("a!", "fan@example.com", "Password123").is_err());
+        assert!(validate_registration("musicfan", "not-an-email", "Password123").is_err());
+        assert!(validate_registration("musicfan", "a@b@c.com", "Password123").is_err());
+        assert!(validate_registration("musicfan", "fan@example.com", "password").is_err());
+    }
+
+    #[test]
+    fn contact_enforces_email_and_bounds() {
+        assert!(validate_contact("Listener", "fan@example.com", "A useful message").is_ok());
+        assert!(validate_contact("", "fan@example.com", "A useful message").is_err());
+        assert!(validate_contact("Listener", "invalid", "A useful message").is_err());
+        assert!(validate_contact("Listener", "fan@example.com", "short").is_err());
+        assert!(validate_contact("é", "fan@example.com", &"🎵".repeat(10)).is_ok());
+    }
 }

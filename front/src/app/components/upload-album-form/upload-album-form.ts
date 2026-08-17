@@ -59,11 +59,22 @@ export class UploadAlbumForm {
   releaseUploadMessage = '';
 
   get canCreateAlbum(): boolean {
-    return this.albumTitle.trim().length > 0 && this.albumGenre.trim().length > 0 && !this.isCreatingAlbum;
+    return this.albumTitle.trim().length > 0 && this.albumGenre.trim().length > 0 && this.selectedTracksAreValid() && !this.isCreatingAlbum;
+  }
+
+  private selectedTracksAreValid(): boolean {
+    return this.albumSongFiles.every((file) => {
+      const title = file.name.replace(/\.[^/.]+$/, '').trim();
+      return this.getAudioFormat(file) !== null && title.length > 0 && [...title].length <= 120;
+    });
   }
 
   onAlbumCoverSelected(event: Event): void {
     this.albumCover = this.fileFromEvent(event);
+    if (this.albumCover && (!this.isCoverImage(this.albumCover) || this.albumCover.size > 10 * 1024 * 1024)) {
+      this.albumError = 'Album cover must be a PNG, JPEG, or WebP image under 10MB.';
+      this.albumCover = null;
+    }
   }
 
   onAlbumSongsSelected(event: Event): void {
@@ -74,6 +85,18 @@ export class UploadAlbumForm {
     const invalid = this.albumSongFiles.find((file) => !this.getAudioFormat(file));
     if (invalid) {
       this.albumError = `${invalid.name} is not a WAV or FLAC file.`;
+      this.albumSongFiles = [];
+      if (input) input.value = '';
+      return;
+    }
+    const invalidTitle = this.albumSongFiles.find((file) => {
+      const title = file.name.replace(/\.[^/.]+$/, '').trim();
+      return title.length === 0 || [...title].length > 120;
+    });
+    if (invalidTitle) {
+      this.albumError = `${invalidTitle.name} must produce a track title between 1 and 120 characters.`;
+      this.albumSongFiles = [];
+      if (input) input.value = '';
     }
   }
 
@@ -185,7 +208,6 @@ export class UploadAlbumForm {
         album_id: albumId,
         duration_seconds: durationSeconds,
         format,
-        ml_features: null,
       })
     );
 

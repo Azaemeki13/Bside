@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LucideAngularModule, Heart, Play, Trash2, Timer, AudioLines, Shuffle, EllipsisVertical, Share2, ListMusic } from 'lucide-angular';
@@ -9,6 +9,7 @@ import { AlbumService } from '../../services/album.service';
 import { ChatService } from '../../services/chat.service';
 import { FriendListItem } from '../../models/chat.model';
 import { NgClass } from '@angular/common';
+import { browserStorageUrl } from '../../utils/storage-url';
 
 @Component({
   selector: 'app-song-list',
@@ -17,6 +18,7 @@ import { NgClass } from '@angular/common';
   styleUrl: './song-list.scss',
 })
 export class SongList implements OnInit {
+  private readonly platformId = inject(PLATFORM_ID);
   protected readonly heart = Heart;
   protected readonly trash2 = Trash2;
   protected readonly play = Play;
@@ -187,7 +189,7 @@ export class SongList implements OnInit {
 
   coverUrl(url: string): string {
     if (!url) return 'assets/cover1.png';
-    return url.replace(/^http:\/\/minio:9000/i, 'http://localhost:9000');
+    return browserStorageUrl(url, this.platformId);
   }
 
   private audioFormat(song: PlaylistSongItem): AudioFormat {

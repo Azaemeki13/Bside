@@ -1,10 +1,11 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, PLATFORM_ID, inject } from '@angular/core';
 import { LucideAngularModule, Pause, Play, Heart } from 'lucide-angular';
 import { SharedSong } from '../../models/chat.model';
 import { AlbumService } from '../../services/album.service';
 import { AudioFormat, AudioPlayerService,} from '../../services/audio.player.service';
 import { PlaylistService } from '../../services/playlist.service';
 import { finalize, Observable } from 'rxjs';
+import { browserStorageUrl } from '../../utils/storage-url';
 
 @Component({
   selector: 'app-social-share-card',
@@ -16,6 +17,7 @@ export class SocialShareCard {
 
   private readonly audio = inject(AudioPlayerService);
   private readonly albumService = inject(AlbumService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   protected readonly playlistService = inject(PlaylistService);
 
@@ -30,10 +32,7 @@ export class SocialShareCard {
       return 'assets/cover1.png';
     }
 
-    return url.replace(
-      /^http:\/\/minio:9000/i,
-      'http://localhost:9000'
-    );
+    return browserStorageUrl(url, this.platformId);
   }
 
   protected isCurrentSong(): boolean {

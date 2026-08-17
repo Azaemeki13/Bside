@@ -1,14 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { ChevronDown, LucideAngularModule } from 'lucide-angular';
-import { NavButton } from '../../components/nav-button/nav-button';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../environment';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-footer',
-  imports: [LucideAngularModule, NavButton, FormsModule, CommonModule],
+  imports: [LucideAngularModule, FormsModule, CommonModule, RouterLink],
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
 })
@@ -25,13 +25,17 @@ export class Footer {
   successMessage = '';
   errorMessage = '';
   onSubmit() {
-    if (!this.contactData.name || !this.contactData.email || !this.contactData.message) {
-      this.errorMessage = "Please fill in all fields.";
+    const name = this.contactData.name.trim();
+    const email = this.contactData.email.trim().toLowerCase();
+    const message = this.contactData.message.trim();
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (name.length < 1 || name.length > 100 || !validEmail || message.length < 10 || message.length > 5000) {
+      this.errorMessage = "Enter a valid name and email, and a message between 10 and 5000 characters.";
       return;
     }
     this.isSubmitting = true;
     this.errorMessage = '';
-    this.http.post(`${this.apiUrl}/contact`, this.contactData, { responseType: 'text' }).subscribe({
+    this.http.post(`${this.apiUrl}/contact`, { name, email, message }, { responseType: 'text' }).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.successMessage = "Message sent successfully !";

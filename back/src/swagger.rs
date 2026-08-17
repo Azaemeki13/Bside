@@ -1,14 +1,33 @@
+use crate::daily_mix::{DailyMixResponse, DailyMixSong};
 use crate::models::{
     AddSongResponse, AdminUpdateUserPayload, AlbumDetailedResponse, AlbumListItem, AlbumResponse,
     AlbumSongItem, ArtistDetailResponse, ArtistRequestPayload, ArtistRequestResponse,
     ArtistRequestReviewPayload, ArtistResponse, ArtistSongItem, AuthResponse, ChatMessage,
     ConversationListItem, DailyActivityStat, LoginPayload, MarkMessagesReadResponse,
-    PlaybackInteractionType, Playlist, PlaylistDetailedResponse, PlaylistPayload, PlaylistSongItem,
-    NewReleaseSong, PublicUser, RawSearchResult, RecentPlayItem, RegisterPayload, SearchResult, SharedSong, Song,
-    SongInteractionPayload, SongPayload, SongResponse, TopSongStat, TopSpinItem,
-    UpdateStructurePayload, User, UserActivityAnalytics, UserPayload,
+    NewReleaseSong, PlaybackInteractionType, Playlist, PlaylistDetailedResponse, PlaylistPayload,
+    PlaylistSongItem, PublicUser, RawSearchResult, RecentPlayItem, RegisterPayload, SearchResponse,
+    SearchResult, SharedSong, Song, SongInteractionPayload, SongPayload, SongResponse, TopSongStat,
+    TopSpinItem, UpdateStructurePayload, User, UserActivityAnalytics,
 };
-use utoipa::OpenApi;
+use crate::public_api::{PublicApiArtist, PublicApiArtistList, PublicApiArtistPayload};
+use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
+use utoipa::{Modify, OpenApi, openapi};
+
+struct SecurityAddon;
+
+impl Modify for SecurityAddon {
+    fn modify(&self, openapi: &mut openapi::OpenApi) {
+        if let Some(components) = openapi.components.as_mut() {
+            components.add_security_scheme(
+                "api_key",
+                SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::with_description(
+                    "X-API-Key",
+                    "B-Side public catalog API key",
+                ))),
+            );
+        }
+    }
+}
 
 #[derive(OpenApi)]
 #[openapi(
@@ -19,7 +38,6 @@ use utoipa::OpenApi;
         crate::handlers::google_login_handler,
         crate::handlers::google_signup_handler,
         crate::handlers::google_callback_handler,
-        crate::handlers::create_user_handler,
         crate::handlers::get_me_handler,
         crate::handlers::get_all_users_handler,
         crate::handlers::get_user_by_id_handler,
@@ -57,23 +75,31 @@ use utoipa::OpenApi;
         crate::handlers::get_top_spins_handler,
         crate::handlers::get_new_release_handler,
         crate::recommendations::get_fresh_picks_handler,
+        crate::daily_mix::get_daily_mix_handler,
+        crate::public_api::list_artists,
+        crate::public_api::create_artist,
+        crate::public_api::get_artist,
+        crate::public_api::update_artist,
+        crate::public_api::delete_artist,
     ),
     components(
         schemas(
-            User, UserPayload, PublicUser, AdminUpdateUserPayload, Song, SongPayload, SongResponse, AddSongResponse, SongInteractionPayload,
+            User, PublicUser, AdminUpdateUserPayload, Song, SongPayload, SongResponse, AddSongResponse, SongInteractionPayload,
             PlaybackInteractionType, Playlist, UpdateStructurePayload, PlaylistDetailedResponse, PlaylistSongItem,
             AlbumResponse, AlbumListItem, AlbumSongItem, AlbumDetailedResponse,
             ArtistResponse, ArtistSongItem, ArtistDetailResponse, ArtistRequestPayload,
             ArtistRequestReviewPayload, ArtistRequestResponse, PlaylistPayload, AuthResponse,
-            RegisterPayload, LoginPayload, RawSearchResult, SearchResult, ChatMessage, MarkMessagesReadResponse, SharedSong,
+            RegisterPayload, LoginPayload, RawSearchResult, SearchResponse, SearchResult, ChatMessage, MarkMessagesReadResponse, SharedSong,
             ConversationListItem, TopSongStat, DailyActivityStat, UserActivityAnalytics,
             RecentPlayItem, TopSpinItem, NewReleaseSong,
+            DailyMixResponse, DailyMixSong,
+            PublicApiArtist, PublicApiArtistList, PublicApiArtistPayload,
         )
     ),
+    modifiers(&SecurityAddon),
     info(title = "B-Side API", version = "0.1.0", description = "Music production and artist platform API"),
     servers(
-        (url = "http://localhost:8080", description = "Local development server"),
-        (url = "http://0.0.0.0:8080", description = "Server endpoint"),
+        (url = "https://localhost/api", description = "Local HTTPS gateway"),
     ),
 )]
 pub struct ApiDoc;

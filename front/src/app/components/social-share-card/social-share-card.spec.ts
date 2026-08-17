@@ -13,6 +13,15 @@ describe('SocialShareCard', () => {
 
     fixture = TestBed.createComponent(SocialShareCard);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('song', {
+      id: 'song-1',
+      title: 'Test song',
+      duration_seconds: 120,
+      audio_url: 'test.flac',
+      status: 'Ready',
+      artist_name: 'Test artist',
+      cover_url: 'cover.jpg',
+    });
     await fixture.whenStable();
   });
 

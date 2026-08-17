@@ -52,10 +52,11 @@
             </div>
           }
         </button>
-        <input #coverInput type="file" accept="image/*" class="hidden" (change)="onCoverSelected($event)">
+        <input #coverInput type="file" accept="image/png,image/jpeg,image/webp" class="hidden" (change)="onCoverSelected($event)">
         <div class="flex flex-col gap-4 justify-center">
-          <input type="text" [(ngModel)]="playlistName" placeholder="Playlist name" class="font-raleway font-bold text-sm text-[#1F0E1C] bg-[#FFE6DB] rounded-[0.625rem] px-4 py-3 focus:outline-none">
-          <input type="text" [(ngModel)]="playlistDescription" placeholder="Playlist description" class="font-raleway font-bold text-sm text-[#1F0E1C] bg-[#FFE6DB] rounded-[0.625rem] px-4 py-3 focus:outline-none">
+          @if (coverError) { <p class="text-sm text-red-400" role="alert">{{ coverError }}</p> }
+          <input type="text" [(ngModel)]="playlistName" maxlength="100" placeholder="Playlist name" class="font-raleway font-bold text-sm text-[#1F0E1C] bg-[#FFE6DB] rounded-[0.625rem] px-4 py-3 focus:outline-none">
+          <input type="text" [(ngModel)]="playlistDescription" maxlength="1000" placeholder="Playlist description" class="font-raleway font-bold text-sm text-[#1F0E1C] bg-[#FFE6DB] rounded-[0.625rem] px-4 py-3 focus:outline-none">
           <button type="button" class="cursor-pointer rounded-full px-4 py-2 font-raleway text-[1rem] font-medium bg-[#FF5500] text-[#FFE6DB] disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="!playlistName.trim()" (click)="confirmCreate()">Create</button>
         </div>
       </div>

@@ -7,9 +7,11 @@ import requests
 import sys
 import time
 
-BASE_URL = "http://localhost:8080"
+BASE_URL = "https://localhost/api"
 REDIRECT_PORT = 8081
 JWT_TOKEN = None
+HTTP = requests.Session()
+HTTP.verify = False  # Generated localhost certificate; local test utility only.
 
 def clear_env():
     print("Clearing DB && Minio...")
@@ -52,16 +54,16 @@ def run_audit():
     headers = {"Authorization": f"Bearer {JWT_TOKEN}"}
     
     print("Auditing User..")
-    me = requests.get(f"{BASE_URL}/users/me", headers=headers).json()
+    me = HTTP.get(f"{BASE_URL}/users/me", headers=headers).json()
     
     print("Creating test album..")
-    album_res = requests.post(f"{BASE_URL}/albums", 
+    album_res = HTTP.post(f"{BASE_URL}/albums",
                               json={"title": "Test Album"}, 
                               headers=headers).json()
     album_id = album_res['id']
 
     print("Auditing good song creation..")
-    song_res = requests.post(f"{BASE_URL}/songs", 
+    song_res = HTTP.post(f"{BASE_URL}/songs",
                               json={
                                   "title": "Good Track",
                                   "album_id": album_id,
@@ -78,11 +80,11 @@ def run_audit():
     print("Uploading real FLAC bytes to MinIO...")
     good_flac = b"fLaC" + b"\x00" * 28
     
-    upload_res = requests.put(upload_url, data=good_flac, headers={"Content-Type": "audio/flac"})
+    upload_res = HTTP.put(upload_url, data=good_flac, headers={"Content-Type": "audio/flac"})
     assert upload_res.status_code == 200
 
     print("Notifying Backend to verify good song...")
-    backend_verify = requests.put(f"{BASE_URL}/songs/{song_id}/verify", headers=headers)
+    backend_verify = HTTP.put(f"{BASE_URL}/songs/{song_id}/verify", headers=headers)
     
     if backend_verify.status_code != 200:
         print(f"Backend failed to verify good song: {backend_verify.status_code}")
@@ -93,7 +95,7 @@ def run_audit():
     print("Good Song verified and persistent.")
 
     print("Auditing bad song rejection..")
-    bad_song_res = requests.post(f"{BASE_URL}/songs",
+    bad_song_res = HTTP.post(f"{BASE_URL}/songs",
                                  json={
                                      "title": "Bad song",
                                      "album_id": album_id,
@@ -108,11 +110,11 @@ def run_audit():
     bad_key = bad_song_res['song']['audio_url']
 
     print("Uploading trash data to MinIO...")
-    bad_upload = requests.put(bad_url, data=b"NOT_A_SONG_JUST_TEXT_TRASH", headers={"Content-Type": "audio/flac"})
+    bad_upload = HTTP.put(bad_url, data=b"NOT_A_SONG_JUST_TEXT_TRASH", headers={"Content-Type": "audio/flac"})
     assert bad_upload.status_code == 200
 
     print("Notifying Backend to verify bad song...")
-    bad_verify = requests.put(f"{BASE_URL}/songs/{bad_id}/verify", headers=headers)
+    bad_verify = HTTP.put(f"{BASE_URL}/songs/{bad_id}/verify", headers=headers)
     if bad_verify.status_code not in [400, 415]:
         print(f"Logic Error: Backend should have rejected trash but returned {bad_verify.status_code}")
         sys.exit(1)

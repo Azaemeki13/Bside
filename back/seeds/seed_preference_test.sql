@@ -12,7 +12,7 @@ VALUES (
            '91000000-0000-4000-8000-000000000001',
            'Preference Test Artist',
            'Test artist used for preference weighting demonstrations.',
-           'http://localhost:9000/bside-covers/default_artist.jpg',
+           'https://localhost/bside-covers/default_artist.jpg',
            'Ready'
        )
     ON CONFLICT (id) DO UPDATE SET
@@ -36,7 +36,7 @@ VALUES (
            '91000000-0000-4000-8000-000000000001',
            'Preference Test Album',
            'Test',
-           'http://localhost:9000/bside-covers/default_album.jpg',
+           'https://localhost/bside-covers/default_album.jpg',
            'Ready'
        )
     ON CONFLICT (id) DO UPDATE SET

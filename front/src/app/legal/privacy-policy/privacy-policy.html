@@ -1,0 +1,189 @@
+<main class="legal-page">
+  <div class="legal-shell">
+    <a routerLink="/" class="back-link" aria-label="Return to the B-Side home page">← Back to B-Side</a>
+
+    <header class="legal-header">
+      <p class="eyebrow">B-Side legal</p>
+      <h1>Privacy Policy</h1>
+      <p class="effective-date">Effective date: 17 August 2026</p>
+    </header>
+
+    <section>
+      <h2>1. Who is responsible for your data?</h2>
+      <p>
+        The B-Side project team operates this educational service and determines how personal data is
+        used within it. You can contact the team, exercise a privacy right, or report a concern using
+        the contact form in the footer of the <a routerLink="/">home page</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>2. Information we process</h2>
+      <h3>Account and profile information</h3>
+      <ul>
+        <li>user ID, username, display name, email address, role, avatar, and account status;</li>
+        <li>a salted password hash for local accounts—we do not store the original password; and</li>
+        <li>Google profile information returned through OAuth, such as name, email, and profile picture, when you choose Google sign-in.</li>
+      </ul>
+
+      <h3>Music and library information</h3>
+      <ul>
+        <li>uploaded audio, cover images, artist and album information, titles, genres, and technical metadata;</li>
+        <li>playlists, likes, recent plays, listening duration, skips, completions, and replays; and</li>
+        <li>audio characteristics produced by the analysis service, including tempo, mood, energy, danceability, and related feature vectors.</li>
+      </ul>
+
+      <h3>Social and communication information</h3>
+      <ul>
+        <li>friend requests, friendship status, online presence, conversations, messages, read or delivery status, and shared songs;</li>
+        <li>artist applications and moderation decisions; and</li>
+        <li>your name, email, message, and delivery metadata when you use the contact form.</li>
+      </ul>
+
+      <h3>Technical information</h3>
+      <p>
+        The service necessarily handles request information such as IP address, request time, browser
+        headers, authentication status, and error information to deliver requests, apply rate limits,
+        diagnose failures, and protect the platform. Not all of this information is stored permanently.
+      </p>
+    </section>
+
+    <section>
+      <h2>3. Why we use this information</h2>
+      <ul>
+        <li>to create accounts, authenticate users, and provide profiles;</li>
+        <li>to store, validate, analyze, stream, organize, and remove music and images;</li>
+        <li>to provide playlists, likes, history, statistics, chat, friendships, and online status;</li>
+        <li>to calculate personalized music recommendations from your interactions and audio features;</li>
+        <li>to process artist applications, administer roles, enforce rules, and respond to messages;</li>
+        <li>to prevent abuse, enforce rate limits, maintain security, and troubleshoot the service; and</li>
+        <li>to meet legal obligations and respond to valid legal requests.</li>
+      </ul>
+      <p>
+        Depending on the context, these uses are based on providing the service you request, our
+        legitimate interest in operating and securing an educational platform, your consent where
+        required, or compliance with a legal obligation.
+      </p>
+    </section>
+
+    <section>
+      <h2>4. Recommendation profiling</h2>
+      <p>
+        B-Side assigns weights to actions such as likes, plays, completions, skips, and replays. It
+        combines those signals into a preference vector and compares it with machine-extracted audio
+        features to rank recommendations. This profiling affects which music suggestions you see. It
+        does not make decisions that produce legal or similarly significant effects about you.
+      </p>
+    </section>
+
+    <section>
+      <h2>5. Where data is stored and who receives it</h2>
+      <p>
+        Account, catalog, social, and activity data is stored in the project's PostgreSQL database.
+        Audio and images are stored in the project's S3-compatible MinIO storage. The separate audio
+        analysis service reads uploaded audio to calculate features and returns those features to the
+        main backend.
+      </p>
+      <p>Data may also be handled by:</p>
+      <ul>
+        <li>Google when you choose Google OAuth, under Google's own privacy terms;</li>
+        <li>the configured email provider when you submit the contact form; and</li>
+        <li>hosting or infrastructure providers used by the team to run the project.</li>
+      </ul>
+      <p>
+        We do not sell personal information. Administrators and moderators receive only the access
+        necessary for their role. Other users see profile, friendship, message, artist, playlist, or
+        catalog information only as required by the relevant feature.
+      </p>
+    </section>
+
+    <section>
+      <h2>6. International transfers</h2>
+      <p>
+        Third-party services such as Google or an email provider may process information outside your
+        country. Their safeguards and transfer mechanisms are described in their own privacy notices.
+        The self-hosted B-Side database, object storage, and analysis services communicate within the
+        project's deployment environment.
+      </p>
+    </section>
+
+    <section>
+      <h2>7. Retention</h2>
+      <p>
+        Account and profile data is generally kept while the account remains active. Uploaded content,
+        playlists, likes, messages, friendships, and activity history are retained while needed to
+        provide those features or until the associated account or content is deleted. Contact requests
+        are retained only as long as reasonably necessary to respond and maintain an appropriate record.
+        Security information may be retained as needed to investigate abuse and protect the service.
+      </p>
+      <p>
+        Because B-Side is an educational project, the deployment or its data may also be removed when
+        the project ends. Users should not treat B-Side as permanent storage.
+      </p>
+    </section>
+
+    <section>
+      <h2>8. Your choices and rights</h2>
+      <p>Subject to applicable law, you may ask to:</p>
+      <ul>
+        <li>access and receive a copy of your personal data;</li>
+        <li>correct inaccurate or incomplete information;</li>
+        <li>delete your account or personal data;</li>
+        <li>restrict or object to certain processing;</li>
+        <li>receive portable data where applicable; or</li>
+        <li>withdraw consent without affecting processing already performed.</li>
+      </ul>
+      <p>
+        Profile information can be corrected in account settings. For access, deletion, portability,
+        objection, or other requests, use the home-page contact form and identify the account concerned.
+        We may need to verify your identity before fulfilling a request. You may also complain to your
+        local supervisory authority; in France, this is the
+        <a href="https://www.cnil.fr/" target="_blank" rel="noopener noreferrer">CNIL</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>9. Browser storage and third-party cookies</h2>
+      <p>
+        B-Side stores the authentication token in your browser's local storage so you remain signed in.
+        Logging out removes that token. Google may use its own cookies or browser storage during OAuth;
+        those technologies are controlled by Google. B-Side does not use advertising cookies or sell
+        data for targeted advertising.
+      </p>
+    </section>
+
+    <section>
+      <h2>10. Security</h2>
+      <p>
+        B-Side uses HTTPS for browser connections, salted Argon2 password hashing, authenticated API
+        routes, role-based permissions, upload validation, private audio storage with time-limited URLs,
+        and container-network isolation. No service is perfectly secure, so you should use a unique
+        password and avoid sharing sensitive information in messages.
+      </p>
+    </section>
+
+    <section>
+      <h2>11. Children</h2>
+      <p>
+        B-Side is not directed to children under 16. If you believe a child has provided personal data
+        without the consent required by law, contact the team so it can be reviewed and removed where appropriate.
+      </p>
+    </section>
+
+    <section>
+      <h2>12. Policy updates</h2>
+      <p>
+        This Policy may be updated when B-Side's features, infrastructure, or legal obligations change.
+        The effective date will be revised, and material changes will be communicated reasonably.
+      </p>
+    </section>
+
+    <section>
+      <h2>13. Contact</h2>
+      <p>
+        Send privacy questions and requests to the B-Side project team through the contact form in the
+        footer of the <a routerLink="/">home page</a>.
+      </p>
+    </section>
+  </div>
+</main>

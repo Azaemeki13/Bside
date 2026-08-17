@@ -11,11 +11,12 @@ COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 COPY migrations ./migrations
 COPY .sqlx ./.sqlx
-RUN cargo build --release
+RUN cargo build --release --bins
 
 FROM debian:trixie-slim
 WORKDIR /app
 RUN apt-get update && apt-get install -y ca-certificates libssl3 && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /app/target/release/bside /app/bside_backend
+COPY --from=builder /app/target/release/daily_mix_worker /app/daily_mix_worker
 EXPOSE 8080
 CMD ["/app/bside_backend"]

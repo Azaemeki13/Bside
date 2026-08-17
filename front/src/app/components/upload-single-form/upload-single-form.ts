@@ -97,6 +97,9 @@ export class UploadSingleForm {
 
     if (this.singleCover && !this.isCoverImage(this.singleCover)) {
       this.songError = 'Single cover must be a PNG, JPEG, or WebP image.';
+    } else if (this.singleCover && this.singleCover.size > 10 * 1024 * 1024) {
+      this.songError = 'Single cover must be under 10MB.';
+      this.singleCover = null;
     }
   }
 
@@ -207,7 +210,6 @@ export class UploadSingleForm {
         album_id: albumId,
         duration_seconds: durationSeconds,
         format,
-        ml_features: null,
       })
     );
 

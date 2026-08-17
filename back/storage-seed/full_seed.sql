@@ -62,17 +62,17 @@ VALUES
 -- =========================================================
 INSERT INTO artists (id, user_id, name, bio, photo_url, status, created_at)
 VALUES
-    ('81000000-0000-4000-8000-000000000001', '11111111-1111-4111-8111-111111111111', 'Luna Rivera', 'Independent electronic artist.', 'http://localhost:9000/bside-covers/luna.jpg', 'Ready', '2026-07-04 10:00:00+00'),
-    ('81000000-0000-4000-8000-000000000002', '44444444-4444-4444-8444-444444444444', 'Noah Bernard', 'Ambient producer and guitarist.', 'http://localhost:9000/bside-covers/noah.jpg', 'Ready', '2026-07-04 10:10:00+00'),
-    ('90000000-0000-4000-8000-000000000001', NULL, 'WebSocket Test Artist', 'Artist used for WebSocket song-sharing tests.', 'http://localhost:9000/bside-covers/default_artist.jpg', 'Ready', '2026-07-04 10:20:00+00'),
-    ('91000000-0000-4000-8000-000000000001', NULL, 'Preference Test Artist', 'Artist used for preference-vector tests.', 'http://localhost:9000/bside-covers/default_artist.jpg', 'Ready', '2026-07-04 10:30:00+00');
+    ('81000000-0000-4000-8000-000000000001', '11111111-1111-4111-8111-111111111111', 'Luna Rivera', 'Independent electronic artist.', 'https://localhost/bside-covers/luna.jpg', 'Ready', '2026-07-04 10:00:00+00'),
+    ('81000000-0000-4000-8000-000000000002', '44444444-4444-4444-8444-444444444444', 'Noah Bernard', 'Ambient producer and guitarist.', 'https://localhost/bside-covers/noah.jpg', 'Ready', '2026-07-04 10:10:00+00'),
+    ('90000000-0000-4000-8000-000000000001', NULL, 'WebSocket Test Artist', 'Artist used for WebSocket song-sharing tests.', 'https://localhost/bside-covers/default_artist.jpg', 'Ready', '2026-07-04 10:20:00+00'),
+    ('91000000-0000-4000-8000-000000000001', NULL, 'Preference Test Artist', 'Artist used for preference-vector tests.', 'https://localhost/bside-covers/default_artist.jpg', 'Ready', '2026-07-04 10:30:00+00');
 
 INSERT INTO albums (id, artist_id, title, genre, cover_url, status, created_at)
 VALUES
-    ('82000000-0000-4000-8000-000000000001', '81000000-0000-4000-8000-000000000001', 'Midnight Signals', 'Electronic', 'http://localhost:9000/bside-covers/midnight-signals.jpg', 'Ready', '2026-07-05 10:00:00+00'),
-    ('82000000-0000-4000-8000-000000000002', '81000000-0000-4000-8000-000000000002', 'Blue Static', 'Ambient', 'http://localhost:9000/bside-covers/blue-static.jpg', 'Ready', '2026-07-05 10:10:00+00'),
-    ('90000000-0000-4000-8000-000000000002', '90000000-0000-4000-8000-000000000001', 'WebSocket Test Album', 'Test', 'http://localhost:9000/bside-covers/default_cover.jpg', 'Ready', '2026-07-05 10:20:00+00'),
-    ('92000000-0000-4000-8000-000000000001', '91000000-0000-4000-8000-000000000001', 'Preference Test Album', 'Test', 'http://localhost:9000/bside-covers/default_album.jpg', 'Ready', '2026-07-05 10:30:00+00');
+    ('82000000-0000-4000-8000-000000000001', '81000000-0000-4000-8000-000000000001', 'Midnight Signals', 'Electronic', 'https://localhost/bside-covers/midnight-signals.jpg', 'Ready', '2026-07-05 10:00:00+00'),
+    ('82000000-0000-4000-8000-000000000002', '81000000-0000-4000-8000-000000000002', 'Blue Static', 'Ambient', 'https://localhost/bside-covers/blue-static.jpg', 'Ready', '2026-07-05 10:10:00+00'),
+    ('90000000-0000-4000-8000-000000000002', '90000000-0000-4000-8000-000000000001', 'WebSocket Test Album', 'Test', 'https://localhost/bside-covers/default_cover.jpg', 'Ready', '2026-07-05 10:20:00+00'),
+    ('92000000-0000-4000-8000-000000000001', '91000000-0000-4000-8000-000000000001', 'Preference Test Album', 'Test', 'https://localhost/bside-covers/default_album.jpg', 'Ready', '2026-07-05 10:30:00+00');
 
 INSERT INTO songs (
     id, album_id, title, duration_seconds, audio_url, ml_features, status, normalized_vector, created_at
@@ -105,7 +105,7 @@ VALUES
     ('84000000-0000-4000-8000-000000000003', '33333333-3333-4333-8333-333333333333', 'Liked Songs', 'Maya''s liked songs.', NULL, FALSE, '2026-07-07 09:10:00+00', 180, 1, '{}'::jsonb),
     ('84000000-0000-4000-8000-000000000004', '44444444-4444-4444-8444-444444444444', 'Liked Songs', 'Noah''s liked songs.', NULL, FALSE, '2026-07-07 09:15:00+00', 205, 1, '{}'::jsonb),
     ('84000000-0000-4000-8000-000000000005', '55555555-5555-4555-8555-555555555555', 'Liked Songs', 'Ethan''s liked songs.', NULL, FALSE, '2026-07-07 09:20:00+00', 0, 0, '{}'::jsonb),
-    ('84000000-0000-4000-8000-000000000006', '11111111-1111-4111-8111-111111111111', 'Night Coding', 'Electronic and ambient tracks for coding.', 'http://localhost:9000/bside-covers/night-coding.jpg', TRUE, '2026-07-07 09:25:00+00', 570, 3, '{}'::jsonb);
+    ('84000000-0000-4000-8000-000000000006', '11111111-1111-4111-8111-111111111111', 'Night Coding', 'Electronic and ambient tracks for coding.', 'https://localhost/bside-covers/night-coding.jpg', TRUE, '2026-07-07 09:25:00+00', 570, 3, '{}'::jsonb);
 
 INSERT INTO playlist_songs (id, playlist_id, song_id, position, added_at)
 VALUES

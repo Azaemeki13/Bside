@@ -2,10 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { LucideAngularModule, Search, X } from 'lucide-angular';
-import { Subject, Subscription, catchError, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
-import { SearchResult, SearchService } from '../../services/search.service';
+import { Subject, Subscription, catchError, debounceTime, of, switchMap } from 'rxjs';
+import { SearchEntityType, SearchResult, SearchService, SearchSort } from '../../services/search.service';
 import { AlbumService } from '../../services/album.service';
 import { AudioPlayerService } from '../../services/audio.player.service';
+import { PlaylistService } from '../../services/playlist.service';
 
 @Component({
   selector: 'app-search-bar',
@@ -18,12 +19,18 @@ export class SearchBar implements OnDestroy {
   private readonly albumService = inject(AlbumService);
   private readonly audio = inject(AudioPlayerService);
   private readonly router = inject(Router);
+  private readonly playlistService = inject(PlaylistService);
   private readonly query$ = new Subject<string>();
   private readonly searchSub: Subscription;
 
   protected readonly search = Search;
   protected query = '';
   protected results: SearchResult[] = [];
+  protected entityType: SearchEntityType = 'all';
+  protected sort: SearchSort = 'relevance';
+  protected page = 1;
+  protected totalPages = 0;
+  protected total = 0;
   protected isSearching = false;
   protected isOpen = false;
   protected error = '';
@@ -34,27 +41,33 @@ export class SearchBar implements OnDestroy {
     this.searchSub = this.query$
       .pipe(
         debounceTime(250),
-        distinctUntilChanged(),
         switchMap((query) => {
           const trimmed = query.trim();
           this.error = '';
 
           if (trimmed.length < 2) {
             this.isSearching = false;
-            return of([]);
+            return of({ results: [], page: 1, page_size: 10, total: 0, total_pages: 0 });
           }
 
           this.isSearching = true;
-          return this.searchService.search(trimmed).pipe(
+          return this.searchService.search(trimmed, {
+            entityType: this.entityType,
+            sort: this.sort,
+            page: this.page,
+          }).pipe(
             catchError(() => {
               this.error = 'Search failed.';
-              return of([]);
+              return of({ results: [], page: 1, page_size: 10, total: 0, total_pages: 0 });
             })
           );
         })
       )
-      .subscribe((results) => {
-        this.results = results;
+      .subscribe((response) => {
+        this.results = response.results;
+        this.page = response.page;
+        this.total = response.total;
+        this.totalPages = response.total_pages;
         this.isSearching = false;
         this.isOpen = this.query.trim().length >= 2;
       });
@@ -67,7 +80,27 @@ export class SearchBar implements OnDestroy {
   protected onInput(event: Event): void {
     const input = event.target as HTMLInputElement | null;
     this.query = input?.value ?? '';
+    this.page = 1;
     this.isOpen = this.query.trim().length >= 2;
+    this.query$.next(this.query);
+  }
+
+  protected updateEntityType(event: Event): void {
+    this.entityType = (event.target as HTMLSelectElement).value as SearchEntityType;
+    this.page = 1;
+    this.query$.next(this.query);
+  }
+
+  protected updateSort(event: Event): void {
+    this.sort = (event.target as HTMLSelectElement).value as SearchSort;
+    this.page = 1;
+    this.query$.next(this.query);
+  }
+
+  protected changePage(delta: number): void {
+    const nextPage = this.page + delta;
+    if (nextPage < 1 || nextPage > this.totalPages) return;
+    this.page = nextPage;
     this.query$.next(this.query);
   }
 
@@ -135,6 +168,21 @@ export class SearchBar implements OnDestroy {
     if (result.type === 'artist') {
       this.clearSearch();
       void this.router.navigate(['/bside_app/artist', result.data.id]);
+      return;
+    }
+
+    if (result.type === 'playlist') {
+      this.playlistService.getById(result.data.id).subscribe({
+        next: (playlist) => {
+          this.playlistService.selectDetailed(playlist);
+          this.clearSearch();
+          void this.router.navigate(['/bside_app/library']);
+        },
+        error: () => {
+          this.error = 'Log in to open this playlist.';
+          this.isOpen = true;
+        },
+      });
     }
   }
 
@@ -142,6 +190,9 @@ export class SearchBar implements OnDestroy {
     this.isOpen = false;
     this.query = '';
     this.results = [];
+    this.page = 1;
+    this.total = 0;
+    this.totalPages = 0;
     this.error = '';
   }
 
@@ -162,6 +213,6 @@ export class SearchBar implements OnDestroy {
   }
 
   protected canOpen(result: SearchResult): boolean {
-    return result.type === 'song' || result.type === 'album' || result.type === 'artist';
+    return result.type === 'song' || result.type === 'album' || result.type === 'artist' || result.type === 'playlist';
   }
 }

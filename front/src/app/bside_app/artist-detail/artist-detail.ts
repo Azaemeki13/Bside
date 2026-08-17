@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, PLATFORM_ID, effect, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Disc3, LucideAngularModule, Play, X, Trash2 } from 'lucide-angular';
 import { Subscription } from 'rxjs';
@@ -8,6 +8,7 @@ import { AlbumService } from '../../services/album.service';
 import { ArtistDetailResponse, ArtistService, ArtistSongItem } from '../../services/artist.service';
 import { AdminService } from '../../services/admin.service';
 import { AuthService } from '../../services/auth.service';
+import { browserStorageUrl } from '../../utils/storage-url';
 
 @Component({
   selector: 'app-artist-detail',
@@ -24,6 +25,7 @@ export class ArtistDetail implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly adminService = inject(AdminService);
   private readonly authService = inject(AuthService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   readonly playIcon = Play;
   readonly x = X;
@@ -113,7 +115,7 @@ export class ArtistDetail implements OnInit, OnDestroy {
     if (!url)
       return 'assets/cover1.png';
 
-    return url.replace(/^http:\/\/minio:9000/i, 'http://localhost:9000');
+    return browserStorageUrl(url, this.platformId);
   }
 
   formatDuration(seconds: number): string {

@@ -52,11 +52,16 @@ export class AuthService {
         }
     }
     registerAndLogin(payload: RegisterPayload): Observable<AuthResponse> {
-        return this.http.post(`${this.apiUrl}/register`, payload).pipe(
-            switchMap(() => {
+        const normalizedPayload = {
+            ...payload,
+            username: payload.username.trim(),
+            email: payload.email.trim().toLowerCase(),
+        };
+        return this.http.post<UserProfile>(`${this.apiUrl}/register`, normalizedPayload).pipe(
+            switchMap((user) => {
                 const loginData: LoginPayload = {
-                    identifier: payload.username,
-                    password: payload.password
+                    identifier: user.username,
+                    password: normalizedPayload.password
                 };
                 return this.login(loginData);
             })

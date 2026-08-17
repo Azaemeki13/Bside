@@ -21,9 +21,9 @@ export class SignForm {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   protected registerForm = this.fb.nonNullable.group({
-    username: ['', [Validators.required, Validators.minLength(3)]],
+    username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern(/^[A-Za-z0-9_-]+$/)]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]]
+    password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(128), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/)]]
   });
   protected errorMessage = '';
   protected onSubmit(): void {

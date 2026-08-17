@@ -1,6 +1,6 @@
 [
   {
-    "AllowedOrigins": ["http://localhost:4200", "http://localhost:4300"],
+    "AllowedOrigins": ["https://localhost"],
     "AllowedMethods": ["GET", "PUT", "HEAD"],
     "AllowedHeaders": ["*"],
     "ExposeHeaders": ["ETag"],

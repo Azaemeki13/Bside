@@ -20,6 +20,8 @@ import { Forbidden } from './errors/forbidden/forbidden';
 import { ServerError } from './errors/server-error/server-error';
 import { NotFound } from './errors/not-found/not-found';
 import { AboutUs } from './about-us/about-us';
+import { PrivacyPolicy } from './legal/privacy-policy/privacy-policy';
+import { TermsOfService } from './legal/terms-of-service/terms-of-service';
 
 
 export const routes: Routes = [
@@ -29,6 +31,8 @@ export const routes: Routes = [
     { path: 'login', component: Login },
     { path: 'signup', component: Signup },
     { path: 'about-us', component: AboutUs},
+    { path: 'terms-of-service', component: TermsOfService },
+    { path: 'privacy-policy', component: PrivacyPolicy },
     {
         path: 'bside_app',
         component: BsideApp,

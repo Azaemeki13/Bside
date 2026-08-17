@@ -24,11 +24,6 @@ pub struct PublicUser {
 }
 
 #[derive(serde::Deserialize, utoipa::ToSchema)]
-pub struct UserPayload {
-    pub username: String,
-}
-
-#[derive(serde::Deserialize, utoipa::ToSchema)]
 pub struct UpdateProfilePayload {
     /// New display name. Send an empty string to clear it and fall back to the username.
     pub display_name: String,
@@ -181,7 +176,6 @@ pub struct SongPayload {
     pub album_id: uuid::Uuid,
     pub duration_seconds: i32,
     pub format: String,
-    pub ml_features: Option<serde_json::Value>,
 }
 
 #[derive(Debug, serde::Deserialize, utoipa::ToSchema)]
@@ -392,6 +386,16 @@ pub struct RawSearchResult {
     pub metadata: Option<String>,
     pub audio_url: Option<String>,
     pub album_id: uuid::Uuid,
+    pub total_count: i64,
+}
+
+#[derive(Debug, serde::Serialize, utoipa::ToSchema)]
+pub struct SearchResponse {
+    pub results: Vec<SearchResult>,
+    pub page: i64,
+    pub page_size: i64,
+    pub total: i64,
+    pub total_pages: i64,
 }
 
 #[derive(Debug, serde::Serialize, utoipa::ToSchema)]

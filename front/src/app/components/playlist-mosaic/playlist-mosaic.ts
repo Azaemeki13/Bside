@@ -40,6 +40,7 @@ export class PlaylistMosaic implements OnInit {
   coverFile: File | null = null;
   playlistName = '';
   playlistDescription = '';
+  coverError = '';
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -58,6 +59,7 @@ export class PlaylistMosaic implements OnInit {
     this.coverFile = null;
     this.playlistName = '';
     this.playlistDescription = '';
+    this.coverError = '';
   }
 
   confirmCreate(): void {
@@ -75,6 +77,13 @@ export class PlaylistMosaic implements OnInit {
   onCoverSelected(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
+      this.coverError = '';
+      const allowed = ['image/png', 'image/jpeg', 'image/webp'].includes(file.type);
+      if (!allowed || file.size > 10 * 1024 * 1024) {
+        this.coverError = 'Cover must be a PNG, JPEG, or WebP image under 10MB.';
+        (event.target as HTMLInputElement).value = '';
+        return;
+      }
       if (this.coverPreview) URL.revokeObjectURL(this.coverPreview);
       this.coverPreview = URL.createObjectURL(file);
       this.coverFile = file;

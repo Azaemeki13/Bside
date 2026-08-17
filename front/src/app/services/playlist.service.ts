@@ -149,6 +149,11 @@ export class PlaylistService {
     this.refreshSelectedPlaylist(playlist.id);
   }
 
+  selectDetailed(playlist: PlaylistDetailedResponse): void {
+    this.selectedPlaylist.set(playlist);
+    this.likedSongsSelected.set(false);
+  }
+
   selectedSongs(): PlaylistSongItem[] {
     return this.selectedPlaylist()?.songs ?? [];
   }

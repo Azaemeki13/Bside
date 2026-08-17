@@ -67,7 +67,7 @@
       <div class="grid gap-4 md:grid-cols-2">
         <label class="flex flex-col gap-2 font-raleway text-sm">
           Artist name
-          <input class="rounded-md border border-[#FFE6DB]/10 bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none focus:border-[#FF5500]" name="newArtistName" [(ngModel)]="newArtistName" />
+          <input class="rounded-md border border-[#FFE6DB]/10 bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none focus:border-[#FF5500]" name="newArtistName" [(ngModel)]="newArtistName" maxlength="100" />
         </label>
         <label class="flex flex-col gap-2 font-raleway text-sm">
           Photo
@@ -75,7 +75,7 @@
         </label>
         <label class="flex flex-col gap-2 font-raleway text-sm md:col-span-2">
           Bio
-          <textarea class="rounded-md border border-[#FFE6DB]/10 bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none focus:border-[#FF5500] resize-none h-20" name="newArtistBio" [(ngModel)]="newArtistBio"></textarea>
+          <textarea class="rounded-md border border-[#FFE6DB]/10 bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none focus:border-[#FF5500] resize-none h-20" name="newArtistBio" [(ngModel)]="newArtistBio" maxlength="2000"></textarea>
         </label>
       </div>
       <div class="flex items-center gap-3 mt-2">
@@ -105,7 +105,7 @@
       </label>
       <label class="flex flex-col gap-2 font-raleway text-sm">
         Album title
-        <input class="rounded-md border border-[#FFE6DB]/10 bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none focus:border-[#FF5500]" name="albumTitle" [(ngModel)]="albumTitle" />
+        <input class="rounded-md border border-[#FFE6DB]/10 bg-[#FFE6DB] px-3 py-2 text-[#1F0E1C] outline-none focus:border-[#FF5500]" name="albumTitle" [(ngModel)]="albumTitle" maxlength="120" />
       </label>
       <label class="flex flex-col gap-2 font-raleway text-sm">
         Cover image

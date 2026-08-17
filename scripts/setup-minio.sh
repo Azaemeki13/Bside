@@ -30,6 +30,5 @@ if [ -d "/defaults" ]; then
 fi
 
 # Standalone MinIO returns 501 NotImplemented for bucket-level PutBucketCors.
-# Cross-origin access (needed for direct browser uploads to presigned URLs) is
-# instead granted server-wide via the MINIO_API_CORS_ALLOW_ORIGIN env var on
-# the `minio` service in docker-compose.yml.
+# Browser access is same-origin through Nginx. The server-wide origin setting
+# remains in Compose for explicit CORS responses from MinIO when required.

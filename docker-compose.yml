@@ -9,27 +9,22 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "${DB_PORT}:5432"
+      - "127.0.0.1:${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
   adminer:
     image: adminer
     container_name: bside_adminer
     restart: always
-    ports:
-      - "8081:8080"
     depends_on:
       - db
   minio:
     image: minio/minio
     container_name: bside_minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
     environment:
       MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID}
       MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY}
-      MINIO_API_CORS_ALLOW_ORIGIN: "http://localhost:4200,http://localhost:4300,http://localhost:4000"
+      MINIO_API_CORS_ALLOW_ORIGIN: "https://localhost"
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
@@ -66,8 +61,6 @@ services:
       dockerfile: Dockerfile
     container_name: bside_rust_backend
     restart: always
-    ports:
-      - "8080:8080"
     environment:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -78,13 +71,13 @@ services:
       - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@bside_db_dev:5432/${DB_NAME}
       - AWS_REGION=${AWS_REGION}
       - AWS_ENDPOINT_URL=http://minio:9000
-      - AWS_PUBLIC_ENDPOINT_URL=http://localhost:9000
-      - FRONTEND_URL=http://localhost:4000
+      - AWS_PUBLIC_ENDPOINT_URL=https://localhost
+      - FRONTEND_URL=https://localhost
       - OAUTH_ID=${OAUTH_ID}
       - OAUTH_PW=${OAUTH_PW}
       - G_AUTH_URL=${G_AUTH_URL}
       - G_TOKEN_URL=${G_TOKEN_URL}
-      - OAUTH_URL=${OAUTH_URL}
+      - OAUTH_URL=https://localhost/api/auth/google/callback
       - JWT_SECRET=${JWT_SECRET}
       - PUBLIC_API_KEY=${PUBLIC_API_KEY}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
@@ -96,18 +89,44 @@ services:
     depends_on:
       - db
       - minio
+  daily-mix-worker:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: bside_daily_mix_worker
+    restart: always
+    command: ["/app/daily_mix_worker"]
+    environment:
+      - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@bside_db_dev:5432/${DB_NAME}
+    depends_on:
+      - db
+      - backend
   frontend:
     build:
       context: ./front
       dockerfile: Dockerfile
     container_name: bside_frontend
     restart: always
-    ports:
-      - "4000:4000"
     environment:
       - BACKEND_ORIGIN=http://bside_rust_backend:8080
     depends_on:
       - backend
+  nginx:
+    build:
+      context: ./infra/nginx
+      dockerfile: Dockerfile
+    container_name: bside_https_gateway
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - nginx_certs:/etc/nginx/certs
+    depends_on:
+      - frontend
+      - backend
+      - minio
 volumes:
   minio_data:
   postgres_data:
+  nginx_certs:

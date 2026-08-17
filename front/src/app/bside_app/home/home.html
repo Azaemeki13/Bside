@@ -5,6 +5,8 @@
     <app-new-release class="block h-[22rem] min-w-0 overflow-hidden md:col-span-2 md:h-[28rem] xl:col-span-1 xl:h-[clamp(28rem,27vw,30rem)]"></app-new-release>
   </div>
 
+  <app-daily-mix></app-daily-mix>
+
   <section class="flex min-w-0 flex-col gap-5">
     <h2 class="font-raleway text-[1.5rem] font-semibold text-[#FFE6DB]/60">Fresh picks, just for you</h2>
     <app-tag-bar (tagSelected)="onMoodSelected($event)" class="block min-w-0"></app-tag-bar>

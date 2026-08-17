@@ -128,11 +128,21 @@ export class AdminArtistUpload implements OnInit {
   onArtistPhotoSelected(event: Event): void {
     const input = event.target as HTMLInputElement | null;
     this.newArtistPhoto = input?.files?.item(0) ?? null;
+    if (this.newArtistPhoto && (!this.isCoverImage(this.newArtistPhoto) || this.newArtistPhoto.size > 10 * 1024 * 1024)) {
+      this.artistCreateError = 'Artist photo must be a PNG, JPEG, or WebP image under 10MB.';
+      this.newArtistPhoto = null;
+      if (input) input.value = '';
+    }
   }
 
   onAlbumCoverSelected(event: Event): void {
     const input = event.target as HTMLInputElement | null;
     this.albumCover = input?.files?.item(0) ?? null;
+    if (this.albumCover && (!this.isCoverImage(this.albumCover) || this.albumCover.size > 10 * 1024 * 1024)) {
+      this.albumError = 'Cover must be a PNG, JPEG, or WebP image under 10MB.';
+      this.albumCover = null;
+      if (input) input.value = '';
+    }
   }
 
   onAlbumSongsSelected(event: Event): void {
@@ -140,7 +150,21 @@ export class AdminArtistUpload implements OnInit {
     this.albumSongFiles = Array.from(input?.files ?? []);
     this.albumError = '';
     const invalid = this.albumSongFiles.find((f) => !this.getAudioFormat(f));
-    if (invalid) this.albumError = `${invalid.name} is not a WAV or FLAC file.`;
+    if (invalid) {
+      this.albumError = `${invalid.name} is not a WAV or FLAC file.`;
+      this.albumSongFiles = [];
+      if (input) input.value = '';
+      return;
+    }
+    const invalidTitle = this.albumSongFiles.find((file) => {
+      const title = file.name.replace(/\.[^/.]+$/, '').trim();
+      return title.length === 0 || [...title].length > 120;
+    });
+    if (invalidTitle) {
+      this.albumError = `${invalidTitle.name} must produce a track title between 1 and 120 characters.`;
+      this.albumSongFiles = [];
+      if (input) input.value = '';
+    }
   }
 
   async createArtist(): Promise<void> {
@@ -241,7 +265,7 @@ export class AdminArtistUpload implements OnInit {
     if (!format) throw new Error(`${file.name} is not a WAV or FLAC file.`);
     const songResponse = await firstValueFrom(
       this.http.post<SongResponse>(`${this.apiUrl}/songs`, {
-        title, album_id: albumId, duration_seconds: durationSeconds, format, ml_features: null,
+        title, album_id: albumId, duration_seconds: durationSeconds, format,
       })
     );
     const uploadResponse = await fetch(songResponse.upload_url, {

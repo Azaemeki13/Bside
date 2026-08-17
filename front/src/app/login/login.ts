@@ -22,7 +22,8 @@ export class Login implements OnInit {
       return;
     }
 
-    const token = this.route.snapshot.queryParamMap.get('token');
+    const fragment = this.route.snapshot.fragment;
+    const token = fragment ? new URLSearchParams(fragment).get('token') : null;
     if (token) {
       localStorage.setItem('auth_token', token);
       void this.router.navigate(['/bside_app'], { replaceUrl: true });

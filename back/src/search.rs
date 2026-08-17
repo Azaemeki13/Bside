@@ -1,14 +1,39 @@
-use crate::{AnyAuth, AppState, BSideError, RawSearchResult, SearchResult};
+use crate::{AnyAuth, AppState, BSideError, RawSearchResult, SearchResponse, SearchResult};
 use axum::Json;
 use axum::extract::{Query, State};
-use std::collections::HashMap;
+
+#[derive(Debug, serde::Deserialize, utoipa::IntoParams)]
+pub struct SearchParams {
+    q: String,
+    #[serde(default = "default_entity_type")]
+    entity_type: String,
+    #[serde(default = "default_sort")]
+    sort: String,
+    #[serde(default = "default_page")]
+    page: i64,
+    #[serde(default = "default_page_size")]
+    page_size: i64,
+}
+
+fn default_entity_type() -> String {
+    "all".into()
+}
+fn default_sort() -> String {
+    "relevance".into()
+}
+const fn default_page() -> i64 {
+    1
+}
+const fn default_page_size() -> i64 {
+    10
+}
 
 #[utoipa::path(
     get,
     path = "/search",
-    params(("q" = String, Query, description = "Search query string")),
+    params(SearchParams),
     responses(
-        (status = 200, description = "Search results from songs, albums, artists, and playlists", body = Vec<SearchResult>),
+        (status = 200, description = "Filtered, sorted, paginated results from songs, albums, artists, and playlists", body = SearchResponse),
         (status = 400, description = "Missing or invalid query parameter"),
         (status = 500, description = "Internal server error"),
     ),
@@ -16,14 +41,33 @@ use std::collections::HashMap;
 )]
 pub async fn searcher(
     State(state): State<AppState>,
-    Query(params): Query<HashMap<String, String>>,
+    Query(params): Query<SearchParams>,
     _auth: AnyAuth,
-) -> Result<Json<Vec<SearchResult>>, BSideError> {
-    let query_str = params
-        .get("q")
-        .ok_or(BSideError::BadRequest("Missing query".into()))?;
-    let rows = sqlx::query_as!(
-    RawSearchResult,
+) -> Result<Json<SearchResponse>, BSideError> {
+    let query = params.q.trim();
+    if !(2..=100).contains(&query.chars().count()) {
+        return Err(BSideError::BadRequest(
+            "Search query must be 2-100 characters.".into(),
+        ));
+    }
+    if !matches!(
+        params.entity_type.as_str(),
+        "all" | "song" | "album" | "artist" | "playlist"
+    ) {
+        return Err(BSideError::BadRequest("Invalid search entity type.".into()));
+    }
+    if !matches!(params.sort.as_str(), "relevance" | "name_asc" | "name_desc") {
+        return Err(BSideError::BadRequest("Invalid search sort.".into()));
+    }
+    if params.page < 1 || !(1..=50).contains(&params.page_size) {
+        return Err(BSideError::BadRequest(
+            "Page must be positive and page_size must be 1-50.".into(),
+        ));
+    }
+    let offset = (params.page - 1)
+        .checked_mul(params.page_size)
+        .ok_or_else(|| BSideError::BadRequest("Pagination is too large.".into()))?;
+    let rows = sqlx::query_as::<_, RawSearchResult>(
     r#"
     WITH candidates AS (
     -- 1 Songs
@@ -62,23 +106,44 @@ pub async fn searcher(
         JOIN users u ON p.owner_id = u.id
         WHERE p.is_public = true
     )
-    SELECT 
-        id as "id!", name as "name!", entity_type as "entity_type!", metadata, audio_url, album_id as "album_id!",
+    , ranked AS (
+        SELECT id, name, entity_type, metadata, audio_url, album_id,
         (
             ts_rank(doc, websearch_to_tsquery('english', $1)) * 0.6 + 
             GREATEST(similarity(raw_text, $1), similarity(COALESCE(metadata, ''), $1)) * 0.4
-        ) as "rank!"
-    FROM candidates
-    WHERE doc @@ websearch_to_tsquery('english', $1)
-        OR name % $1
-        OR COALESCE(metadata, '') % $1
-    ORDER BY "rank!" DESC
-    LIMIT 20
-    "#,
-    query_str
+        )::float8 AS rank
+        FROM candidates
+        WHERE (doc @@ websearch_to_tsquery('english', $1)
+            OR name % $1
+            OR COALESCE(metadata, '') % $1)
+          AND ($2 = 'all' OR entity_type = $2)
     )
+    SELECT id, name, entity_type, metadata, audio_url, album_id, rank,
+           COUNT(*) OVER() AS total_count
+    FROM ranked
+    ORDER BY
+        CASE WHEN $3 = 'relevance' THEN rank END DESC,
+        CASE WHEN $3 = 'name_asc' THEN LOWER(name) END ASC,
+        CASE WHEN $3 = 'name_desc' THEN LOWER(name) END DESC,
+        id
+    LIMIT $4 OFFSET $5
+    "#,
+    )
+    .bind(query)
+    .bind(&params.entity_type)
+    .bind(&params.sort)
+    .bind(params.page_size)
+    .bind(offset)
     .fetch_all(&state.db)
     .await?;
+
+    if rows.is_empty() && params.page > 1 {
+        return Err(BSideError::BadRequest(
+            "Requested page exceeds the available search results.".into(),
+        ));
+    }
+
+    let total = rows.first().map_or(0, |row| row.total_count);
 
     let results = rows
         .into_iter()
@@ -107,5 +172,15 @@ pub async fn searcher(
         })
         .collect();
 
-    Ok(Json(results))
+    Ok(Json(SearchResponse {
+        results,
+        page: params.page,
+        page_size: params.page_size,
+        total,
+        total_pages: if total == 0 {
+            0
+        } else {
+            (total + params.page_size - 1) / params.page_size
+        },
+    }))
 }

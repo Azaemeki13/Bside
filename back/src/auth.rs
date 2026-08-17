@@ -144,20 +144,38 @@ where
     type Rejection = StatusCode;
 
     async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
-        let expected_key = std::env::var("PUBLIC_API_KEY")
-            .unwrap_or_else(|_| "a8e68850-10bd-4791-822b-14bdfc2cfe2b".to_string());
+        let expected_key = std::env::var("PUBLIC_API_KEY").map_err(|_| StatusCode::UNAUTHORIZED)?;
+        if expected_key.len() < 32 {
+            eprintln!("Warning: PUBLIC_API_KEY is missing or shorter than 32 characters.");
+            return Err(StatusCode::UNAUTHORIZED);
+        }
         let api_key_header = parts
             .headers
             .get("X-API-Key")
             .and_then(|value| value.to_str().ok());
         match api_key_header {
-            Some(key) if key == expected_key => Ok(PublicApiKey),
+            Some(key)
+                if key.len() >= 32
+                    && constant_time_equal(key.as_bytes(), expected_key.as_bytes()) =>
+            {
+                Ok(PublicApiKey)
+            }
             _ => {
                 eprintln!("Warning: Public access attempt refused - Invalid or missing key!");
                 Err(StatusCode::UNAUTHORIZED)
             }
         }
     }
+}
+
+fn constant_time_equal(left: &[u8], right: &[u8]) -> bool {
+    if left.len() != right.len() {
+        return false;
+    }
+    left.iter()
+        .zip(right)
+        .fold(0_u8, |difference, (a, b)| difference | (a ^ b))
+        == 0
 }
 
 pub enum AnyAuth {

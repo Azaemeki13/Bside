@@ -21,13 +21,13 @@ if [[ -f "$ENV_FILE" ]]; then
   set +a
 fi
 
-ENDPOINT="${MINIO_SEED_ENDPOINT:-${AWS_PUBLIC_ENDPOINT_URL:-${AWS_ENDPOINT_URL:-http://127.0.0.1:9000}}}"
+ENDPOINT="${MINIO_SEED_ENDPOINT:-${AWS_PUBLIC_ENDPOINT_URL:-https://localhost}}"
 ACCESS_KEY="${AWS_ACCESS_KEY_ID:-${MINIO_ROOT_USER:-minioadmin}}"
 SECRET_KEY="${AWS_SECRET_ACCESS_KEY:-${MINIO_ROOT_PASSWORD:-minioadmin}}"
 
 # This script runs from the host. Internal Docker hostnames such as "minio"
 # are usually not reachable there, so prefer AWS_PUBLIC_ENDPOINT_URL or set:
-# MINIO_SEED_ENDPOINT=http://127.0.0.1:9000
+# MINIO_SEED_ENDPOINT=https://localhost
 if [[ "$ENDPOINT" == *"://minio:"* ]]; then
   ENDPOINT="${ENDPOINT/:\/\/minio:/:\/\/127.0.0.1:}"
 fi
@@ -41,8 +41,9 @@ for dir in "$TRACKS_DIR" "$COVERS_DIR" "$AVATARS_DIR"; do
 done
 
 MC_BODY='set -eu
+MC="mc --insecure"
 for attempt in $(seq 1 20); do
-  if mc alias set bside "$ENDPOINT" "$ACCESS_KEY" "$SECRET_KEY" >/dev/null 2>&1; then
+  if $MC alias set bside "$ENDPOINT" "$ACCESS_KEY" "$SECRET_KEY" >/dev/null 2>&1; then
     break
   fi
   if [ "$attempt" -eq 20 ]; then
@@ -52,31 +53,31 @@ for attempt in $(seq 1 20); do
   sleep 2
 done
 
-mc mb --ignore-existing bside/bside-tracks >/dev/null
-mc mb --ignore-existing bside/bside-covers >/dev/null
-mc mb --ignore-existing bside/bside-avatars >/dev/null
+$MC mb --ignore-existing bside/bside-tracks >/dev/null
+$MC mb --ignore-existing bside/bside-covers >/dev/null
+$MC mb --ignore-existing bside/bside-avatars >/dev/null
 
 MIRROR_FLAGS="--overwrite"
 if [ "$RESET" = "true" ]; then
   MIRROR_FLAGS="--overwrite --remove"
 fi
 
-mc mirror $MIRROR_FLAGS /seed/bside-tracks bside/bside-tracks
-mc mirror $MIRROR_FLAGS /seed/bside-covers bside/bside-covers
-mc mirror $MIRROR_FLAGS /seed/bside-avatars bside/bside-avatars
+$MC mirror $MIRROR_FLAGS /seed/bside-tracks bside/bside-tracks
+$MC mirror $MIRROR_FLAGS /seed/bside-covers bside/bside-covers
+$MC mirror $MIRROR_FLAGS /seed/bside-avatars bside/bside-avatars
 
 # Covers and avatars are referenced by direct public URLs in the database.
-mc anonymous set download bside/bside-covers >/dev/null
-mc anonymous set download bside/bside-avatars >/dev/null
+$MC anonymous set download bside/bside-covers >/dev/null
+$MC anonymous set download bside/bside-avatars >/dev/null
 # Audio remains private and is served through presigned URLs.
-mc anonymous set none bside/bside-tracks >/dev/null || true
+$MC anonymous set none bside/bside-tracks >/dev/null || true
 
 echo ""
 echo "MinIO seed completed."
 echo "Endpoint: $ENDPOINT"
-echo "Tracks:  $(mc find bside/bside-tracks --type f | wc -l | tr -d " ")"
-echo "Covers:  $(mc find bside/bside-covers --type f | wc -l | tr -d " ")"
-echo "Avatars: $(mc find bside/bside-avatars --type f | wc -l | tr -d " ")"
+echo "Tracks:  $($MC find bside/bside-tracks --type f | wc -l | tr -d " ")"
+echo "Covers:  $($MC find bside/bside-covers --type f | wc -l | tr -d " ")"
+echo "Avatars: $($MC find bside/bside-avatars --type f | wc -l | tr -d " ")"
 '
 
 if command -v mc >/dev/null 2>&1; then
