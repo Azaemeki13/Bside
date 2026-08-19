@@ -34,7 +34,7 @@
         </p>
       </div>
 
-  @if (isAdmin) {
+    @if (canDeleteCatalog) {
     <button
       type="button"
       (click)="deleteAlbum()"
@@ -119,7 +119,7 @@
                           (click)="openShareMenu($event, song)">
                     Share
                   </button>
-                  @if (isAdmin) {
+                  @if (canDeleteCatalog) {
                     <button type="button"
                             class="w-full rounded px-3 py-2 text-left text-sm font-semibold cursor-pointer text-red-300 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
                             [disabled]="deletingSongId === song.id"
@@ -131,7 +131,7 @@
               }
 
               @if (shareMenuSongId === song.id) {
-                <span class="absolute right-0 top-9 z-30 flex max-h-64 w-56 flex-col overflow-hidden rounded-md bg-[#431E3A] p-2 shadow-2xl">
+                <span class="absolute right-0 top-9 z-30 flex max-h-64 w-56 flex-col overflow-hidden rounded-md bg-[#431E3A] p-2 shadow-2xl" (click)="$event.stopPropagation()">
                   <span class="flex items-center justify-between border-b border-[#FFE6DB]/10 px-3 py-2">
                     <span class="font-raleway text-xs font-bold uppercase text-[#FFE6DB]/50">Share with a friend</span>
                     <button type="button" aria-label="Close share menu" (click)="closeShareMenu($event)">
@@ -220,11 +220,12 @@
         <input type="text"
                class="min-w-0 flex-1 rounded-md bg-[#FFE6DB] px-3 py-2 font-raleway text-sm font-semibold text-[#1F0E1C] outline-none"
                placeholder="New playlist name"
+               maxlength="100"
                [(ngModel)]="newPlaylistName"
                [disabled]="isAddingToPlaylist">
         <button type="button"
                 class="rounded-full bg-[#FF5500] px-4 py-2 font-raleway text-sm font-bold text-[#FFE6DB] disabled:cursor-not-allowed disabled:opacity-50"
-                [disabled]="isAddingToPlaylist || !newPlaylistName.trim()"
+                [disabled]="isAddingToPlaylist || !newPlaylistName.trim() || newPlaylistName.trim().length > 100"
                 (click)="createPlaylistWithSelectedSong()">
           Create
         </button>

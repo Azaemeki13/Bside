@@ -115,7 +115,8 @@ pub async fn searcher(
         FROM candidates
         WHERE (doc @@ websearch_to_tsquery('english', $1)
             OR name % $1
-            OR COALESCE(metadata, '') % $1)
+            OR COALESCE(metadata, '') % $1
+            OR strpos(lower(raw_text), lower(unaccent($1))) > 0)
           AND ($2 = 'all' OR entity_type = $2)
     )
     SELECT id, name, entity_type, metadata, audio_url, album_id, rank,

@@ -148,6 +148,10 @@
 
     <div class="flex flex-col gap-1 font-raleway text-sm pb-2">
       @if (releaseUploadMessage) { <p class="text-[#FFE6DB]/70">{{ releaseUploadMessage }}</p> }
+      @if (isCreatingAlbum && albumSongFiles.length > 0) {
+        <progress class="h-2 w-full accent-[#FF5500]" max="100" [value]="uploadProgress">{{ uploadProgress }}%</progress>
+        <p class="text-xs text-[#FFE6DB]/60">{{ uploadProgress }}%</p>
+      }
       @if (albumError) { <p class="text-red-300">{{ albumError }}</p> }
     </div>
   </form>

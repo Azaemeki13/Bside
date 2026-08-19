@@ -1,5 +1,6 @@
 import { Component, Input, OnDestroy, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { LucideAngularModule, ListMusic, Sparkles } from 'lucide-angular';
 import { Subscription } from 'rxjs';
 import { AlbumListItem, AlbumService } from '../../services/album.service';
 import type { MlMood } from '../tag-list';
@@ -7,12 +8,13 @@ import type { MlMood } from '../tag-list';
 @Component({
   selector: 'app-fresh-picks',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, LucideAngularModule],
   templateUrl: './fresh-picks.html',
   styleUrl: './fresh-picks.scss'
 })
 export class FreshPicks implements OnDestroy {
   @Input() set selectedMood(mood: MlMood) {
+    this.showDailyMix.set(mood === 'All');
     this.fetchPicks(mood);
   }
 
@@ -23,6 +25,9 @@ export class FreshPicks implements OnDestroy {
   albums = signal<AlbumListItem[]>([]);
   isLoading = signal(true);
   error = signal('');
+  showDailyMix = signal(true);
+  readonly dailyMixIcon = Sparkles;
+  readonly playlistIcon = ListMusic;
 
   private fetchPicks(mood: MlMood): void {
     this.subscription?.unsubscribe();

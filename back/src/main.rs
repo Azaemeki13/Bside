@@ -179,7 +179,10 @@ async fn main() {
         .route("/new-release", get(get_new_release_handler))
         .route("/contact", post(contact_handler))
         .route("/ws", get(ws_handler))
-        .route("/internal/songs/features", post(ml_callback_handler))
+        .route(
+            "/internal/songs/features",
+            post(ml_callback_handler).layer(DefaultBodyLimit::max(72 * 1024)),
+        )
         .layer(GovernorLayer::new(governor_config));
     let public_api_governor = GovernorConfigBuilder::default()
         .with_extractor(PeerIp::default())
@@ -206,10 +209,15 @@ async fn main() {
             "/users/me",
             get(get_me_handler).patch(update_profile_handler),
         )
-        .route("/users/me/avatar", post(upload_avatar))
+        .route(
+            "/users/me/avatar",
+            post(upload_avatar).layer(DefaultBodyLimit::max(16 * 1024 * 1024)),
+        )
         .route(
             "/artists",
-            get(get_artists_handler).post(create_artist_handler),
+            get(get_artists_handler)
+                .post(create_artist_handler)
+                .layer(DefaultBodyLimit::max(12 * 1024 * 1024)),
         )
         .route("/artist-requests", post(create_artist_request_handler))
         .route("/admin/artist-requests", get(get_artist_requests_handler))
@@ -219,7 +227,9 @@ async fn main() {
         )
         .route(
             "/albums",
-            get(get_my_albums_handler).post(create_album_handler),
+            get(get_my_albums_handler)
+                .post(create_album_handler)
+                .layer(DefaultBodyLimit::max(12 * 1024 * 1024)),
         )
         .route("/songs", post(create_song_handler))
         .route("/songs/{song_id}/verify", put(verify_song_handler))
@@ -235,7 +245,9 @@ async fn main() {
         .route("/liked-songs", get(get_liked_songs_handler))
         .route(
             "/playlists",
-            get(get_my_playlists_handler).post(create_playlist_handler),
+            get(get_my_playlists_handler)
+                .post(create_playlist_handler)
+                .layer(DefaultBodyLimit::max(12 * 1024 * 1024)),
         )
         .route(
             "/playlists/{id}",
@@ -272,7 +284,8 @@ async fn main() {
         .route("/users/me/daily-mix", get(get_daily_mix_handler))
         .route(
             "/admin/artists/{artist_id}/albums",
-            post(admin_create_album_for_artist_handler),
+            post(admin_create_album_for_artist_handler)
+                .layer(DefaultBodyLimit::max(12 * 1024 * 1024)),
         )
         .route("/admin/users/{user_id}/ban", put(ban_user_handler))
         .route("/admin/users/{user_id}/unban", put(unban_user_handler))

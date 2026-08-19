@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Plus, Search, X, ImagePlus } from 'lucide-angular';
 import { HeartCard } from '../heart-card/heart-card';
 import { PlaylistService, Playlist } from '../../services/playlist.service';
+import { DailyMixService } from '../../services/daily-mix.service';
 
 @Component({
   selector: 'app-playlist-mosaic',
@@ -18,6 +19,7 @@ export class PlaylistMosaic implements OnInit {
   protected readonly imagePlus = ImagePlus;
 
   protected playlistService = inject(PlaylistService);
+  private readonly dailyMixService = inject(DailyMixService);
   private platformId = inject(PLATFORM_ID);
 
   searchOpen = false;
@@ -52,6 +54,13 @@ export class PlaylistMosaic implements OnInit {
     this.playlistService.select(playlist);
   }
 
+  selectDailyMix(): void {
+    this.dailyMixService.getToday().subscribe({
+      next: (mix) => this.playlistService.selectDailyMix(mix),
+      error: () => this.playlistService.selectedPlaylist.set(null),
+    });
+  }
+
   closeCreateDialog(): void {
     this.isCreateOpen = false;
     if (this.coverPreview) URL.revokeObjectURL(this.coverPreview);
@@ -63,10 +72,16 @@ export class PlaylistMosaic implements OnInit {
   }
 
   confirmCreate(): void {
-    if (!this.playlistName.trim()) return;
+    const title = this.playlistName.trim();
+    const description = this.playlistDescription.trim();
+    if ([...title].length < 1 || [...title].length > 100 || [...description].length > 1000) return;
+    if (this.coverFile && (!['image/png', 'image/jpeg', 'image/webp'].includes(this.coverFile.type) || this.coverFile.size > 10 * 1024 * 1024)) {
+      this.coverError = 'Cover must be a PNG, JPEG, or WebP image under 10MB.';
+      return;
+    }
     this.playlistService.create(
-      this.playlistName.trim(),
-      this.playlistDescription.trim(),
+      title,
+      description,
       this.coverFile ?? undefined
     ).subscribe({
       next: () => this.closeCreateDialog(),

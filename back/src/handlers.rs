@@ -37,9 +37,20 @@ use lettre::{
 use oauth2::{AuthorizationCode, CsrfToken, Scope, TokenResponse};
 use reqwest::StatusCode;
 use secrecy::ExposeSecret;
-use std::collections::HashMap;
 use std::time::Duration;
 use uuid::Uuid;
+
+#[derive(serde::Deserialize, utoipa::IntoParams)]
+#[serde(deny_unknown_fields)]
+pub struct LimitParams {
+    pub limit: Option<i64>,
+}
+
+#[derive(serde::Deserialize, utoipa::IntoParams)]
+#[serde(deny_unknown_fields)]
+pub struct NewReleaseParams {
+    pub exclude_song_id: Option<Uuid>,
+}
 
 fn public_storage_url(bucket: &str, key: &str) -> String {
     let endpoint = std::env::var("AWS_PUBLIC_ENDPOINT_URL")
@@ -78,7 +89,7 @@ fn validate_registration(username: &str, email: &str, password: &str) -> Result<
             "A valid email address is required.".into(),
         ));
     }
-    if !(8..=128).contains(&password.len())
+    if !(8..=128).contains(&password.chars().count())
         || !password.bytes().any(|byte| byte.is_ascii_lowercase())
         || !password.bytes().any(|byte| byte.is_ascii_uppercase())
         || !password.bytes().any(|byte| byte.is_ascii_digit())
@@ -137,6 +148,22 @@ fn optional_text(
         })
         .transpose()
         .map(Option::flatten)
+}
+
+fn validate_ml_json(value: &serde_json::Value, field: &str) -> Result<(), BSideError> {
+    if !value.is_object() {
+        return Err(BSideError::BadRequest(format!(
+            "{field} must be a JSON object."
+        )));
+    }
+    let encoded = serde_json::to_vec(value)
+        .map_err(|_| BSideError::BadRequest(format!("{field} is invalid.")))?;
+    if encoded.len() > 32 * 1024 {
+        return Err(BSideError::BadRequest(format!(
+            "{field} must not exceed 32KB."
+        )));
+    }
+    Ok(())
 }
 
 fn validate_genre(value: &str) -> Result<String, BSideError> {
@@ -392,7 +419,7 @@ pub async fn upload_avatar(
         if field_name.as_str() == "avatar" {
             let content_type = field
                 .content_type()
-                .expect("Content-type empty !")
+                .ok_or_else(|| BSideError::BadRequest("Avatar Content-Type is required.".into()))?
                 .to_string();
             let data = field
                 .bytes()
@@ -436,6 +463,9 @@ pub async fn upload_avatar(
                 .map_err(|e| BSideError::S3Error(e.to_string()))?;
             avatar_url = Some(public_storage_url("bside-avatars", &key));
         }
+    }
+    if avatar_url.is_none() {
+        return Err(BSideError::BadRequest("An avatar file is required.".into()));
     }
     let result = sqlx::query!(
         r#"
@@ -1171,14 +1201,15 @@ pub async fn get_user_activity_analytics_handler(
 )]
 pub async fn get_recent_plays_handler(
     State(state): State<AppState>,
-    Query(params): Query<HashMap<String, String>>,
+    Query(params): Query<LimitParams>,
     claims: Claims,
 ) -> Result<Json<Vec<RecentPlayItem>>, BSideError> {
-    let limit = params
-        .get("limit")
-        .and_then(|value| value.parse::<i64>().ok())
-        .unwrap_or(4)
-        .clamp(1, 20);
+    let limit = params.limit.unwrap_or(4);
+    if !(1..=20).contains(&limit) {
+        return Err(BSideError::BadRequest(
+            "limit must be between 1 and 20.".into(),
+        ));
+    }
 
     let items = sqlx::query_as!(
         RecentPlayItem,
@@ -1228,14 +1259,15 @@ pub async fn get_recent_plays_handler(
 )]
 pub async fn get_top_spins_handler(
     State(state): State<AppState>,
-    Query(params): Query<HashMap<String, String>>,
+    Query(params): Query<LimitParams>,
     claims: Claims,
 ) -> Result<Json<Vec<TopSpinItem>>, BSideError> {
-    let limit = params
-        .get("limit")
-        .and_then(|value| value.parse::<i64>().ok())
-        .unwrap_or(6)
-        .clamp(1, 20);
+    let limit = params.limit.unwrap_or(6);
+    if !(1..=20).contains(&limit) {
+        return Err(BSideError::BadRequest(
+            "limit must be between 1 and 20.".into(),
+        ));
+    }
 
     let items = sqlx::query_as!(
         TopSpinItem,
@@ -2092,20 +2124,37 @@ pub async fn ml_callback_handler(
     _key: PublicApiKey,
     axum::extract::Json(payload): axum::extract::Json<MlCallbackPayload>,
 ) -> Result<axum::Json<serde_json::Value>, BSideError> {
-    sqlx::query!(
+    validate_ml_json(&payload.dsp_analysis, "dsp_analysis")?;
+    validate_ml_json(&payload.ml_features, "ml_features")?;
+    if payload.normalized_vector.len() != 6
+        || payload
+            .normalized_vector
+            .iter()
+            .any(|value| !value.is_finite() || !(0.0..=1.0).contains(value))
+    {
+        return Err(BSideError::BadRequest(
+            "normalized_vector must contain exactly 6 finite values between 0 and 1.".into(),
+        ));
+    }
+
+    let mut tx = state.db.begin().await?;
+    let updated = sqlx::query(
         r#"
         UPDATE songs
         SET status = 'Ready'::song_status,
             ml_features = $2,
             normalized_vector = $3
-        WHERE id = $1
+        WHERE id = $1 AND status = 'Pending'
         "#,
-        payload.track_id,
-        payload.ml_features,
-        &payload.normalized_vector as &[f32]
     )
-    .execute(&state.db)
+    .bind(payload.track_id)
+    .bind(&payload.ml_features)
+    .bind(&payload.normalized_vector)
+    .execute(&mut *tx)
     .await?;
+    if updated.rows_affected() != 1 {
+        return Err(BSideError::NotFound);
+    }
 
     // The album is created as 'Pending' and only becomes visible (in search,
     // catalog listings, etc.) once it actually has a verified, playable song.
@@ -2117,8 +2166,9 @@ pub async fn ml_callback_handler(
         "#,
         payload.track_id
     )
-    .execute(&state.db)
+    .execute(&mut *tx)
     .await?;
+    tx.commit().await?;
 
     Ok(axum::Json(serde_json::json!({"status": "processed"})))
 }
@@ -2182,11 +2232,9 @@ pub async fn get_song_stream_url_handler(
 )]
 pub async fn get_new_release_handler(
     State(state): State<AppState>,
-    Query(params): Query<HashMap<String, String>>,
+    Query(params): Query<NewReleaseParams>,
 ) -> Result<Json<NewReleaseSong>, BSideError> {
-    let excluded_song_id = params
-        .get("exclude_song_id")
-        .and_then(|value| Uuid::parse_str(value).ok());
+    let excluded_song_id = params.exclude_song_id;
 
     let song = sqlx::query_as!(
         NewReleaseSong,
@@ -2248,18 +2296,19 @@ pub async fn delete_song_handler(
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<impl IntoResponse, BSideError> {
     let mut tx = state.db.begin().await?;
-    let owner = sqlx::query!(
-        "SELECT a.artist_id, s.duration_seconds 
+    let owner = sqlx::query_as::<_, (Option<Uuid>, i32, String)>(
+        "SELECT ar.user_id, s.duration_seconds, s.audio_url
         FROM songs s
         JOIN albums a on s.album_id = a.id
+        JOIN artists ar ON ar.id = a.artist_id
         WHERE s.id = $1",
-        id
     )
+    .bind(id)
     .fetch_optional(&mut *tx)
     .await?
     .ok_or(BSideError::NotFound)?;
     let caller_is_admin = is_admin(&state, claims.sub).await?;
-    if owner.artist_id != claims.sub && !caller_is_admin {
+    if owner.0 != Some(claims.sub) && !caller_is_admin {
         return Err(BSideError::UnauthorizedProfile);
     }
     sqlx::query!(
@@ -2275,28 +2324,22 @@ pub async fn delete_song_handler(
             GROUP BY playlist_id
         ) AS sub
             WHERE p.id = sub.playlist_id"#,
-        i64::from(owner.duration_seconds),
+        i64::from(owner.1),
         id
     )
     .execute(&mut *tx)
     .await?;
-    let song_record = sqlx::query!("SELECT audio_url FROM songs WHERE id = $1", id)
-        .fetch_optional(&state.db)
-        .await?;
-    if let Some(song) = song_record {
-        if let Some(key) = song.audio_url.split('/').last() {
-            let _ = state
-                .aws_client
-                .delete_object()
-                .bucket("bside-tracks")
-                .key(key)
-                .send()
-                .await;
-        }
-    }
     sqlx::query!("DELETE FROM songs WHERE id = $1", id)
-        .execute(&state.db)
+        .execute(&mut *tx)
         .await?;
+    tx.commit().await?;
+    let _ = state
+        .aws_client
+        .delete_object()
+        .bucket("bside-tracks")
+        .key(owner.2)
+        .send()
+        .await;
     Ok(axum::http::StatusCode::NO_CONTENT)
 }
 
@@ -3762,11 +3805,9 @@ pub async fn get_friends_handler(
     .fetch_all(&state.db)
     .await?;
 
-    let online_users = state.network.online_users.lock().await;
-
-    let friends = rows
-        .into_iter()
-        .map(|row| FriendListItem {
+    let mut friends = Vec::with_capacity(rows.len());
+    for row in rows {
+        friends.push(FriendListItem {
             friendship_id: row.friendship_id,
             user_id: row.user_id,
             username: row.username,
@@ -3774,10 +3815,10 @@ pub async fn get_friends_handler(
             email: row.email,
             avatar_url: row.avatar_url,
             role: row.role,
-            is_online: online_users.contains_key(&row.user_id),
+            is_online: state.network.is_online(row.user_id).await,
             friendship_created_at: row.friendship_created_at,
-        })
-        .collect();
+        });
+    }
 
     Ok(Json(friends))
 }

@@ -43,6 +43,7 @@ export class SongList implements OnInit {
   ngOnInit(): void {
     this.playlistService.loadLikedSongs();
     this.chatService.connect();
+    this.loadFriends();
   }
 
   deletePlaylist(): void {
@@ -88,7 +89,7 @@ export class SongList implements OnInit {
     this.shareMenuLinkId = song.link_id;
     this.shareFeedback = '';
 
-    if (this.friends.length === 0 && !this.isLoadingFriends) {
+    if (!this.isLoadingFriends) {
       this.loadFriends();
     }
   }
@@ -99,7 +100,7 @@ export class SongList implements OnInit {
   }
 
   loadFriends(): void {
-    this.isLoadingFriends = true;
+    this.isLoadingFriends = this.friends.length === 0;
 
     this.chatService.getFriends().subscribe({
       next: (friends) => {
@@ -114,6 +115,7 @@ export class SongList implements OnInit {
   }
 
   shareSong(event: Event, song: PlaylistSongItem, friend: FriendListItem): void {
+	event.preventDefault();
     event.stopPropagation();
 
     const isSentToSocket = this.chatService.sendSongMessage(friend.user_id, song.song_id);

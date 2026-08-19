@@ -63,6 +63,12 @@
     </div>
 
   <div class="flex flex-col gap-1 font-raleway text-sm">
+    @if (uploadStep === 'uploading-file') {
+      <label class="flex flex-col gap-1 text-xs text-[#FFE6DB]/70">
+        Uploading audio — {{ uploadProgress }}%
+        <progress class="h-2 w-full accent-[#FF5500]" max="100" [value]="uploadProgress">{{ uploadProgress }}%</progress>
+      </label>
+    }
     @if (songMessage) {
       <p class="text-green-300">{{ songMessage }}</p>
     }

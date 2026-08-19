@@ -62,7 +62,7 @@ export class SocialSideBar {
   get filteredUsers(): ChatUser[] {
     const query = this.searchQuery.trim().toLowerCase();
 
-    if (query.length < 2) {
+    if ([...query].length < 2 || [...query].length > 100) {
       return [];
     }
 
@@ -70,9 +70,10 @@ export class SocialSideBar {
       .filter((user) => user.id !== this.currentUserId)
       .filter((user) => {
         const username = user.username.toLowerCase();
+        const userDisplayName = (user.display_name ?? '').trim().toLowerCase();
         const email = (user.email ?? '').toLowerCase();
 
-        return username.includes(query) || email.includes(query);
+        return userDisplayName.includes(query) || username.includes(query) || email.includes(query);
       });
   }
 
@@ -87,7 +88,7 @@ export class SocialSideBar {
   }
 
   onSearchFocus(): void {
-    if (this.searchQuery.trim().length >= 2) {
+    if (this.isValidSearchQuery()) {
       this.isSearchOpen = true;
     }
   }
@@ -95,12 +96,17 @@ export class SocialSideBar {
   onSearchInput(event: Event): void {
     const input = event.target as HTMLInputElement | null;
     this.searchQuery = input?.value ?? '';
-    this.isSearchOpen = this.searchQuery.trim().length >= 2;
+    this.isSearchOpen = this.isValidSearchQuery();
   }
 
   clearSearch(): void {
     this.searchQuery = '';
     this.isSearchOpen = false;
+  }
+
+  private isValidSearchQuery(): boolean {
+    const length = [...this.searchQuery.trim()].length;
+    return length >= 2 && length <= 100;
   }
 
   openConversationForUser(user: ChatUser): void {

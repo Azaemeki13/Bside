@@ -101,7 +101,7 @@
                               (click)="openShareMenu($event, song)">
                         Share
                       </button>
-                      @if (!playlistService.likedSongsSelected()) {
+                      @if (!playlistService.likedSongsSelected() && !playlistService.dailyMixSelected()) {
                         <button type="button"
                                 class="w-full rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10 cursor-pointer"
                                 (click)="removeSong(song); $event.stopPropagation()">
@@ -112,7 +112,7 @@
                   }
 
                   @if (shareMenuLinkId === song.link_id) {
-                    <span class="absolute right-0 top-9 z-30 flex max-h-64 w-56 flex-col overflow-hidden rounded-md bg-[#431E3A] p-2 shadow-2xl">
+                    <span class="absolute right-0 top-9 z-30 flex max-h-64 w-56 flex-col overflow-hidden rounded-md bg-[#431E3A] p-2 shadow-2xl" (click)="$event.stopPropagation()">
                       <span class="flex items-center justify-between border-b border-[#FFE6DB]/10 px-3 py-2">
                         <span class="font-raleway text-xs font-bold uppercase text-[#FFE6DB]/50">Share with a friend</span>
                         <button type="button" aria-label="Close share menu" (click)="closeShareMenu($event)">
@@ -188,11 +188,15 @@
             @if (playlist.description) {
               <p class="font-raleway text-[#FFE6DB]/70 text-sm font-bold truncate">{{ playlist.description }}</p>
             }
-            <p class="font-raleway text-[#FFE6DB]/50 text-xs">
-              Created by
-              <span class="text-[#FF5500]">{{ playlist.owner_username ?? authService.currentUser()?.username ?? 'unknown' }}</span>
-              {{ playlist.created_at | date:'dd/MM/yyyy' }}
-            </p>
+            @if (playlistService.dailyMixSelected()) {
+              <p class="font-raleway text-[#FFE6DB]/50 text-xs">Made for you · refreshed daily</p>
+            } @else {
+              <p class="font-raleway text-[#FFE6DB]/50 text-xs">
+                Created by
+                <span class="text-[#FF5500]">{{ playlist.owner_username ?? authService.currentUser()?.username ?? 'unknown' }}</span>
+                {{ playlist.created_at | date:'dd/MM/yyyy' }}
+              </p>
+            }
             @if (playlist.total_duration || playlist.song_count) {
               <p class="font-raleway text-[#FFE6DB]/50 text-xs">
                 @if (playlist.total_duration) { {{ formatTotalDuration(playlist.total_duration) }} }
@@ -208,9 +212,11 @@
                   <lucide-icon [img]="play" class="w-5 h-5 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
                 }
               </button>
-              <button (click)="deletePlaylist()" class="cursor-pointer" aria-label="Delete playlist">
-                <lucide-icon [img]="trash2" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]/50 hover:text-[#FF5500] duration-300"></lucide-icon>
-              </button>
+              @if (!playlistService.dailyMixSelected()) {
+                <button (click)="deletePlaylist()" class="cursor-pointer" aria-label="Delete playlist">
+                  <lucide-icon [img]="trash2" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]/50 hover:text-[#FF5500] duration-300"></lucide-icon>
+                </button>
+              }
             </div>
           </div>
         }

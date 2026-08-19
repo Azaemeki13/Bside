@@ -21,6 +21,12 @@ use uuid::Uuid;
 #[derive(Deserialize)]
 pub struct WsConnectQuery {
     pub token: String,
+    #[serde(default = "default_presence_visible")]
+    pub visible: bool,
+}
+
+const fn default_presence_visible() -> bool {
+    true
 }
 
 fn default_message_type() -> String {
@@ -30,6 +36,9 @@ fn default_message_type() -> String {
 #[derive(Deserialize)]
 #[serde(tag = "type")]
 enum ClientWsMessage {
+    #[serde(rename = "presence_visibility")]
+    PresenceVisibility { visible: bool },
+
     #[serde(rename = "private_message")]
     PrivateMessage {
         to_user_id: Uuid,
@@ -225,20 +234,24 @@ pub async fn ws_handler(
         return Err(StatusCode::FORBIDDEN);
     }
 
+    let visible = query.visible;
     Ok(ws
         .max_message_size(64 * 1024)
         .max_frame_size(64 * 1024)
-        .on_upgrade(move |socket| handle_socket(socket, state, user_id)))
+        .on_upgrade(move |socket| handle_socket(socket, state, user_id, visible)))
 }
 
-async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
+async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid, visible: bool) {
     println!("New WebSocket connection for user: {user_id}");
 
     let (mut sender, mut receiver) = socket.split();
     let (tx, mut rx) = mpsc::unbounded_channel::<String>();
     let connection_id = Uuid::new_v4();
 
-    state.network.register(user_id, connection_id, tx).await;
+    state
+        .network
+        .register(user_id, connection_id, tx, visible)
+        .await;
     println!("User {user_id} connection {connection_id} is now online");
 
     let mut send_task = tokio::spawn(async move {
@@ -263,11 +276,15 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
 
             match message {
                 Message::Text(text) => {
-                    println!("Message received from user {user_id}: {text}");
-
                     let parsed_message = serde_json::from_str::<ClientWsMessage>(text.as_str());
 
                     match parsed_message {
+                        Ok(ClientWsMessage::PresenceVisibility { visible }) => {
+                            state_for_receive
+                                .network
+                                .set_visibility(user_id, connection_id, visible)
+                                .await;
+                        }
                         Ok(ClientWsMessage::PrivateMessage {
                             to_user_id,
                             content,
@@ -288,12 +305,99 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
                             let content = content.trim().to_string();
                             let message_type = message_type.trim().to_ascii_lowercase();
 
-                            let (normalized_song_id, shared_song) = match message_type.as_str() {
-                                "text" => {
-                                    if content.is_empty() || content.chars().count() > 2_000 {
+                            let (normalized_content, normalized_song_id, shared_song) =
+                                match message_type.as_str() {
+                                    "text" => {
+                                        if content.is_empty() || content.chars().count() > 2_000 {
+                                            let invalid_message = ServerWsMessage::InvalidMessage {
+                                                message: "Text message must be 1-2000 characters."
+                                                    .to_string(),
+                                            };
+
+                                            send_server_message(
+                                                &state_for_receive,
+                                                user_id,
+                                                &invalid_message,
+                                            )
+                                            .await;
+
+                                            continue;
+                                        }
+
+                                        (content, None, None)
+                                    }
+
+                                    "song" => {
+                                        let selected_song_id = match song_id {
+                                            Some(song_id) => song_id,
+                                            None => {
+                                                let invalid_message = ServerWsMessage::InvalidMessage {
+                                                message: "song_id is required for a song message."
+                                                    .to_string(),
+                                            };
+
+                                                send_server_message(
+                                                    &state_for_receive,
+                                                    user_id,
+                                                    &invalid_message,
+                                                )
+                                                .await;
+
+                                                continue;
+                                            }
+                                        };
+
+                                        match find_shareable_song(
+                                            &state_for_receive,
+                                            selected_song_id,
+                                        )
+                                        .await
+                                        {
+                                            Ok(Some(song)) => {
+                                                (String::new(), Some(selected_song_id), Some(song))
+                                            }
+                                            Ok(None) => {
+                                                let invalid_message =
+                                                    ServerWsMessage::InvalidMessage {
+                                                        message: "Song not found or not ready."
+                                                            .to_string(),
+                                                    };
+
+                                                send_server_message(
+                                                    &state_for_receive,
+                                                    user_id,
+                                                    &invalid_message,
+                                                )
+                                                .await;
+
+                                                continue;
+                                            }
+                                            Err(error) => {
+                                                println!("Failed to load shared song: {error}");
+
+                                                let invalid_message =
+                                                    ServerWsMessage::InvalidMessage {
+                                                        message: "Failed to load the shared song."
+                                                            .to_string(),
+                                                    };
+
+                                                send_server_message(
+                                                    &state_for_receive,
+                                                    user_id,
+                                                    &invalid_message,
+                                                )
+                                                .await;
+
+                                                continue;
+                                            }
+                                        }
+                                    }
+
+                                    _ => {
                                         let invalid_message = ServerWsMessage::InvalidMessage {
-                                            message: "Text message must be 1-2000 characters."
-                                                .to_string(),
+                                            message: format!(
+                                                "Unsupported message type: {message_type}"
+                                            ),
                                         };
 
                                         send_server_message(
@@ -305,85 +409,7 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
 
                                         continue;
                                     }
-
-                                    (None, None)
-                                }
-
-                                "song" => {
-                                    let selected_song_id = match song_id {
-                                        Some(song_id) => song_id,
-                                        None => {
-                                            let invalid_message = ServerWsMessage::InvalidMessage {
-                                                message: "song_id is required for a song message."
-                                                    .to_string(),
-                                            };
-
-                                            send_server_message(
-                                                &state_for_receive,
-                                                user_id,
-                                                &invalid_message,
-                                            )
-                                            .await;
-
-                                            continue;
-                                        }
-                                    };
-
-                                    match find_shareable_song(&state_for_receive, selected_song_id)
-                                        .await
-                                    {
-                                        Ok(Some(song)) => (Some(selected_song_id), Some(song)),
-                                        Ok(None) => {
-                                            let invalid_message = ServerWsMessage::InvalidMessage {
-                                                message: "Song not found or not ready.".to_string(),
-                                            };
-
-                                            send_server_message(
-                                                &state_for_receive,
-                                                user_id,
-                                                &invalid_message,
-                                            )
-                                            .await;
-
-                                            continue;
-                                        }
-                                        Err(error) => {
-                                            println!("Failed to load shared song: {error}");
-
-                                            let invalid_message = ServerWsMessage::InvalidMessage {
-                                                message: "Failed to load the shared song."
-                                                    .to_string(),
-                                            };
-
-                                            send_server_message(
-                                                &state_for_receive,
-                                                user_id,
-                                                &invalid_message,
-                                            )
-                                            .await;
-
-                                            continue;
-                                        }
-                                    }
-                                }
-
-                                _ => {
-                                    let invalid_message = ServerWsMessage::InvalidMessage {
-                                        message: format!(
-                                            "Unsupported message type: {message_type}"
-                                        ),
-                                    };
-
-                                    send_server_message(
-                                        &state_for_receive,
-                                        user_id,
-                                        &invalid_message,
-                                    )
-                                    .await;
-
-                                    continue;
-                                }
-                            };
+                                };
 
                             let saved_record = sqlx::query_as!(
                                 ChatMessageRecord,
@@ -411,7 +437,7 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid) {
                                 "#,
                                 user_id,
                                 to_user_id,
-                                &content,
+                                &normalized_content,
                                 &message_type,
                                 normalized_song_id
                             )

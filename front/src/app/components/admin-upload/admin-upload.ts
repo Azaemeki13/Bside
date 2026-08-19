@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environment';
 import { TAGS } from '../tag-list';
 import { AlbumService } from '../../services/album.service';
+import { PresignedUploadService } from '../../services/presigned-upload.service';
 
 interface Artist {
   id: string;
@@ -51,6 +52,7 @@ export class AdminArtistUpload implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
   private readonly albumService = inject(AlbumService);
+  private readonly presignedUpload = inject(PresignedUploadService);
   private readonly apiUrl = environment.apiUrl;
 
   @ViewChild('artistPhotoInput') artistPhotoInput?: ElementRef<HTMLInputElement>;
@@ -83,6 +85,7 @@ export class AdminArtistUpload implements OnInit {
   albumDone = false;
   albumError = '';
   releaseUploadMessage = '';
+  uploadProgress = 0;
 
   get filteredArtists(): Artist[] {
     const q = this.artistSearch.toLowerCase();
@@ -90,11 +93,15 @@ export class AdminArtistUpload implements OnInit {
   }
 
   get canCreateArtist(): boolean {
-    return this.newArtistName.trim().length > 0 && !this.isCreatingArtist;
+    const nameLength = [...this.newArtistName.trim()].length;
+    return nameLength > 0 && nameLength <= 100 && [...this.newArtistBio.trim()].length <= 2000 && !this.isCreatingArtist;
   }
 
   get canCreateAlbum(): boolean {
-    return !!this.selectedArtist && this.albumTitle.trim().length > 0 && this.albumGenre.trim().length > 0 && !this.isCreatingAlbum;
+    const titleLength = [...this.albumTitle.trim()].length;
+    return !!this.selectedArtist && titleLength > 0 && titleLength <= 120 &&
+      this.genreOptions.some((genre) => genre === this.albumGenre) && this.albumSongFiles.every((file) => this.isValidAudio(file)) &&
+      !this.isCreatingAlbum;
   }
 
   ngOnInit(): void {
@@ -149,9 +156,9 @@ export class AdminArtistUpload implements OnInit {
     const input = event.target as HTMLInputElement | null;
     this.albumSongFiles = Array.from(input?.files ?? []);
     this.albumError = '';
-    const invalid = this.albumSongFiles.find((f) => !this.getAudioFormat(f));
+    const invalid = this.albumSongFiles.find((f) => !this.getAudioFormat(f) || f.size > 200 * 1024 * 1024);
     if (invalid) {
-      this.albumError = `${invalid.name} is not a WAV or FLAC file.`;
+      this.albumError = `${invalid.name} must be a WAV or FLAC file no larger than 200MB.`;
       this.albumSongFiles = [];
       if (input) input.value = '';
       return;
@@ -170,10 +177,15 @@ export class AdminArtistUpload implements OnInit {
   async createArtist(): Promise<void> {
     this.artistCreateError = '';
     this.artistCreateSuccess = '';
-    if (!this.newArtistName.trim()) { this.artistCreateError = 'Artist name is required.'; return; }
+    const artistName = this.newArtistName.trim();
+    if ([...artistName].length < 1 || [...artistName].length > 100) { this.artistCreateError = 'Artist name must be between 1 and 100 characters.'; return; }
+    if ([...this.newArtistBio.trim()].length > 2000) { this.artistCreateError = 'Artist bio cannot exceed 2000 characters.'; return; }
+    if (this.newArtistPhoto && (!this.isCoverImage(this.newArtistPhoto) || this.newArtistPhoto.size > 10 * 1024 * 1024)) {
+      this.artistCreateError = 'Artist photo must be a PNG, JPEG, or WebP image under 10MB.'; return;
+    }
 
     const form = new FormData();
-    form.append('name', this.newArtistName.trim());
+    form.append('name', artistName);
     if (this.newArtistBio.trim()) form.append('bio', this.newArtistBio.trim());
     if (this.newArtistPhoto) form.append('photo', this.newArtistPhoto);
 
@@ -199,12 +211,16 @@ export class AdminArtistUpload implements OnInit {
   async createAlbum(): Promise<void> {
     this.albumError = '';
     this.releaseUploadMessage = '';
+    this.uploadProgress = 0;
     if (!this.selectedArtist) { this.albumError = 'Select or create an artist first.'; return; }
-    if (!this.albumTitle.trim() || !this.albumGenre.trim()) { this.albumError = 'Album title and genre are required.'; return; }
-    if (this.albumCover && !this.isCoverImage(this.albumCover)) { this.albumError = 'Cover must be PNG, JPEG, or WebP.'; return; }
+    const albumTitle = this.albumTitle.trim();
+    if ([...albumTitle].length < 1 || [...albumTitle].length > 120) { this.albumError = 'Album title must be between 1 and 120 characters.'; return; }
+    if (!this.genreOptions.some((genre) => genre === this.albumGenre)) { this.albumError = 'Select a valid genre.'; return; }
+    if (this.albumCover && (!this.isCoverImage(this.albumCover) || this.albumCover.size > 10 * 1024 * 1024)) { this.albumError = 'Cover must be PNG, JPEG, or WebP and under 10MB.'; return; }
+    if (this.albumSongFiles.some((file) => !this.isValidAudio(file))) { this.albumError = 'Every track must be WAV or FLAC, under 200MB, with a title of 1 to 120 characters.'; return; }
 
     const form = new FormData();
-    form.append('title', this.albumTitle.trim());
+    form.append('title', albumTitle);
     form.append('genre', this.albumGenre.trim());
     if (this.albumCover) form.append('cover', this.albumCover);
 
@@ -233,6 +249,8 @@ export class AdminArtistUpload implements OnInit {
       this.clearFileInput(this.albumSongsInput);
     } catch (error) {
       this.albumError = this.describeError(error, 'Could not create album.');
+      this.releaseUploadMessage = '';
+      this.uploadProgress = 0;
       await this.cleanUpFailedAlbum(createdAlbum);
     } finally {
       this.isCreatingAlbum = false;
@@ -250,17 +268,27 @@ export class AdminArtistUpload implements OnInit {
   }
 
   private async uploadFilesToAlbum(album: AlbumResponse, files: File[]): Promise<void> {
+    const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+    let completedBytes = 0;
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const title = file.name.replace(/\.[^/.]+$/, '');
       const duration = (await this.readAudioDuration(file)) ?? 180;
-      await this.uploadOneSong(album.id, file, title, Math.ceil(duration));
+      if (!Number.isFinite(duration) || duration < 1 || duration > 21_600) {
+        throw new Error(`${file.name} must be between 1 second and 6 hours long.`);
+      }
+      this.releaseUploadMessage = `Uploading ${i + 1}/${files.length}: ${file.name}`;
+      await this.uploadOneSong(album.id, file, title, Math.ceil(duration), (loaded) => {
+        this.uploadProgress = totalBytes === 0 ? 100 : Math.min(100, Math.floor(100 * (completedBytes + loaded) / totalBytes));
+        this.cdr.detectChanges();
+      });
+      completedBytes += file.size;
       this.releaseUploadMessage = `Uploading ${i + 1}/${files.length} tracks...`;
       this.cdr.detectChanges();
     }
   }
 
-  private async uploadOneSong(albumId: string, file: File, title: string, durationSeconds: number): Promise<void> {
+  private async uploadOneSong(albumId: string, file: File, title: string, durationSeconds: number, onProgress: (loaded: number) => void): Promise<void> {
     const format = this.getAudioFormat(file);
     if (!format) throw new Error(`${file.name} is not a WAV or FLAC file.`);
     const songResponse = await firstValueFrom(
@@ -268,10 +296,7 @@ export class AdminArtistUpload implements OnInit {
         title, album_id: albumId, duration_seconds: durationSeconds, format,
       })
     );
-    const uploadResponse = await fetch(songResponse.upload_url, {
-      method: 'PUT', headers: { 'Content-Type': `audio/${format}` }, body: file,
-    });
-    if (!uploadResponse.ok) throw new Error(`Upload failed for ${file.name}: ${uploadResponse.status}`);
+    await this.presignedUpload.upload(songResponse.upload_url, file, `audio/${format}`, (progress) => onProgress(progress.loaded));
     await firstValueFrom(this.http.put(`${this.apiUrl}/songs/${songResponse.song.id}/verify`, {}));
   }
 
@@ -288,6 +313,11 @@ export class AdminArtistUpload implements OnInit {
     if (file.name.toLowerCase().endsWith('.wav')) return 'wav';
     if (file.name.toLowerCase().endsWith('.flac')) return 'flac';
     return null;
+  }
+
+  private isValidAudio(file: File): boolean {
+    const title = file.name.replace(/\.[^/.]+$/, '').trim();
+    return !!this.getAudioFormat(file) && file.size <= 200 * 1024 * 1024 && [...title].length >= 1 && [...title].length <= 120;
   }
 
   private readAudioDuration(file: File): Promise<number | null> {

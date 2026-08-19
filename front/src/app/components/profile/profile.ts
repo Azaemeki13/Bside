@@ -55,9 +55,14 @@ export class Profile {
   }
 
   protected saveDisplayName(): void {
+	const displayName = this.nameInput().trim();
+	if ([...displayName].length > 50) {
+	  this.errorMessage.set('Display name must be 50 characters or fewer.');
+	  return;
+	}
     this.isSavingName.set(true);
     this.errorMessage.set('');
-    this.authService.updateDisplayName(this.nameInput().trim()).subscribe({
+    this.authService.updateDisplayName(displayName).subscribe({
       next: () => {
         this.isSavingName.set(false);
         this.isEditingName.set(false);
@@ -78,6 +83,11 @@ export class Profile {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
+    if (!['image/png', 'image/jpeg'].includes(file.type) || file.size < 8 || file.size > 15 * 1024 * 1024) {
+      this.errorMessage.set('Avatar must be a PNG or JPEG image between 8 bytes and 15MB.');
+      input.value = '';
+      return;
+    }
 
     this.isUploadingAvatar.set(true);
     this.errorMessage.set('');

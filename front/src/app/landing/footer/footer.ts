@@ -29,7 +29,9 @@ export class Footer {
     const email = this.contactData.email.trim().toLowerCase();
     const message = this.contactData.message.trim();
     const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    if (name.length < 1 || name.length > 100 || !validEmail || message.length < 10 || message.length > 5000) {
+    const nameLength = [...name].length;
+    const messageLength = [...message].length;
+    if (nameLength < 1 || nameLength > 100 || !validEmail || messageLength < 10 || messageLength > 5000) {
       this.errorMessage = "Enter a valid name and email, and a message between 10 and 5000 characters.";
       return;
     }

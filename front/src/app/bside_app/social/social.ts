@@ -74,6 +74,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 
 	protected isSelectedConversationUserOnline: boolean | null = null;
 	private statusPollSubscription: Subscription | null = null;
+	private socialDataPollSubscription: Subscription | null = null;
 
 
   ngOnInit(): void {
@@ -89,11 +90,13 @@ export class BsideSocial implements OnInit, OnDestroy {
     this.loadUsers();
     this.loadFriends();
     this.loadFriendRequests();
+	this.socialDataPollSubscription = interval(15000).subscribe(() => this.refreshSocialData(true));
 	}
 
 	ngOnDestroy(): void {
 		this.chatService.disconnect();
 		this.statusPollSubscription?.unsubscribe();
+		this.socialDataPollSubscription?.unsubscribe();
 	}
 
   	protected loadFriends(): void {
@@ -110,6 +113,10 @@ export class BsideSocial implements OnInit, OnDestroy {
 			.subscribe({
 			next: (friends) => {
 				this.friends = friends;
+				const friendIds = new Set(friends.map((friend) => friend.user_id));
+				this.conversations = this.conversations.filter(
+					(item) => !!item.last_message_id || friendIds.has(item.other_user_id)
+				);
 			},
 			error: (error) => {
 				console.error('Failed to load friends:', error);
@@ -154,7 +161,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 			)
 			.subscribe({
 			next: () => {
-				this.loadFriendRequests();
+				this.refreshSocialData();
 			},
 			error: (error) => {
 				console.error('Failed to send friend request:', error);
@@ -177,8 +184,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 			)
 			.subscribe({
 			next: () => {
-				this.loadFriendRequests();
-				this.loadFriends();
+				this.refreshSocialData();
 				this.startConversationWithUser({
 					id: request.requester_id,
 					username: request.requester_username,
@@ -207,7 +213,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 			)
 			.subscribe({
 			next: () => {
-				this.loadFriendRequests();
+				this.refreshSocialData();
 			},
 			error: (error) => {
 				console.error('Failed to reject friend request:', error);
@@ -230,8 +236,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 			)
 			.subscribe({
 			next: () => {
-				this.loadFriends();
-				this.loadFriendRequests();
+				this.refreshSocialData();
 				this.clearConversationWithUser(friend.user_id);
 			},
 			error: (error) => {
@@ -249,9 +254,21 @@ export class BsideSocial implements OnInit, OnDestroy {
 	private createConversationForAcceptedFriend(otherUserId: string): void {
 		const user = this.users.find((user) => user.id === otherUserId);
 
-		if (!user) return;
+		if (user) {
+			this.startConversationWithUser(user);
+			return;
+		}
 
-		this.upsertConversationForUser(user);
+		this.chatService.getUser(otherUserId).subscribe({
+			next: (acceptedFriend) => {
+				this.users = this.users.some((item) => item.id === acceptedFriend.id)
+					? this.users
+					: [...this.users, acceptedFriend];
+				this.startConversationWithUser(acceptedFriend);
+				this.cdr.detectChanges();
+			},
+			error: () => this.loadConversations(),
+		});
 	}
 
 	private clearConversationWithUser(otherUserId: string): void {
@@ -305,14 +322,19 @@ export class BsideSocial implements OnInit, OnDestroy {
 		return this.friendRequests.incoming.some((request) => request.requester_id === userId);
 	}
 
-	protected refreshSocialData(): void {
+	protected refreshSocialData(skipIfLoading = false): void {
+		if (skipIfLoading && (
+			this.isLoadingUsers || this.isLoadingFriends ||
+			this.isLoadingFriendRequests || this.isLoadingConversations
+		)) return;
+
 		this.loadUsers();
 		this.loadFriends();
 		this.loadFriendRequests();
-		this.loadConversations();
+		this.loadConversations(false);
 	}
 
-  protected loadConversations(): void {
+  protected loadConversations(refreshSongCards = true): void {
     this.isLoadingConversations = true;
     this.errorMessage = '';
 
@@ -326,9 +348,21 @@ export class BsideSocial implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (conversations) => {
-          this.conversations = conversations;
+		  // The backend conversation list is message-derived. Preserve local
+		  // zero-message conversations created as soon as a friendship is
+		  // accepted, otherwise a refresh would hide them until the first message.
+		  const zeroMessageConversations = this.conversations.filter(
+			(item) => !item.last_message_id
+		  );
+		  const serverUserIds = new Set(conversations.map((item) => item.other_user_id));
+		  this.conversations = [
+			...conversations,
+			...zeroMessageConversations.filter((item) => !serverUserIds.has(item.other_user_id)),
+		  ];
           this.refreshSelectedConversationReference();
-          this.loadReceivedSongCards();
+          if (refreshSongCards) {
+            this.loadReceivedSongCards();
+          }
         },
         error: (error) => {
           console.error('Failed to load conversations:', error);
@@ -564,18 +598,17 @@ export class BsideSocial implements OnInit, OnDestroy {
         this.errorMessage = message.message;
         break;
       case 'friend_request_received':
-        this.loadFriendRequests();
+        this.refreshSocialData();
         break;
       case 'friend_request_accepted':
-        this.loadFriends();
-        this.loadFriendRequests();
+        this.refreshSocialData();
         this.createConversationForAcceptedFriend(message.by_user_id);
         break;
       case 'friend_request_rejected':
-        this.loadFriendRequests();
+        this.refreshSocialData();
         break;
       case 'friend_removed':
-        this.loadFriends();
+        this.refreshSocialData();
         this.clearConversationWithUser(message.by_user_id);
         break;
     }

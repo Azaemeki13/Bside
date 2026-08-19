@@ -7,8 +7,8 @@ import { AuthService } from './auth.service';
  * in the settings side bar with real behavior instead of throwaway UI state:
  *  - Notifications are tied to the actual browser Notification permission,
  *    and preferences.notify() is what other services call to fire one.
- *  - Online status is read by ChatService before opening the presence
- *    websocket: turning it off means the user never shows up as online.
+ *  - Online visibility is sent over the existing chat websocket, so hiding
+ *    presence does not disable messages or friendship events.
  * Preferences persist per logged-in user in localStorage.
  */
 @Injectable({ providedIn: 'root' })
@@ -79,19 +79,15 @@ export class PreferencesService {
   notify(title: string, options?: NotificationOptions): void {
     if (!this.isBrowser) return;
     if (!this.allowNotifications()) {
-      console.log('[preferences] notify skipped: allowNotifications is off');
       return;
     }
     if (!('Notification' in window) || Notification.permission !== 'granted') {
-      console.log('[preferences] notify skipped: permission is', 'Notification' in window ? Notification.permission : 'unsupported');
       return;
     }
     if (document.visibilityState === 'visible' && document.hasFocus()) {
-      console.log('[preferences] notify skipped: tab is focused');
       return;
     }
 
-    console.log('[preferences] showing notification:', title);
     new Notification(title, options);
   }
 

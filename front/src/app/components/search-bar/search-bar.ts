@@ -45,7 +45,7 @@ export class SearchBar implements OnDestroy {
           const trimmed = query.trim();
           this.error = '';
 
-          if (trimmed.length < 2) {
+          if (!this.isValidQuery(trimmed)) {
             this.isSearching = false;
             return of({ results: [], page: 1, page_size: 10, total: 0, total_pages: 0 });
           }
@@ -69,7 +69,7 @@ export class SearchBar implements OnDestroy {
         this.total = response.total;
         this.totalPages = response.total_pages;
         this.isSearching = false;
-        this.isOpen = this.query.trim().length >= 2;
+        this.isOpen = this.isValidQuery(this.query);
       });
   }
 
@@ -81,7 +81,7 @@ export class SearchBar implements OnDestroy {
     const input = event.target as HTMLInputElement | null;
     this.query = input?.value ?? '';
     this.page = 1;
-    this.isOpen = this.query.trim().length >= 2;
+    this.isOpen = this.isValidQuery(this.query);
     this.query$.next(this.query);
   }
 
@@ -105,7 +105,7 @@ export class SearchBar implements OnDestroy {
   }
 
   protected onFocus(): void {
-    if (this.query.trim().length >= 2) {
+    if (this.isValidQuery(this.query)) {
       this.isOpen = true;
     }
   }
@@ -214,5 +214,14 @@ export class SearchBar implements OnDestroy {
 
   protected canOpen(result: SearchResult): boolean {
     return result.type === 'song' || result.type === 'album' || result.type === 'artist' || result.type === 'playlist';
+  }
+
+  private isValidQuery(query: string): boolean {
+    const length = this.queryLength(query.trim());
+    return length >= 2 && length <= 100;
+  }
+
+  private queryLength(query: string): number {
+    return [...query].length;
   }
 }

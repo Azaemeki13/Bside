@@ -11,6 +11,7 @@ import { ChatService } from '../../services/chat.service';
 import { AuthService } from '../../services/auth.service';
 import { FriendListItem } from '../../models/chat.model';
 import { browserStorageUrl } from '../../utils/storage-url';
+import { ArtistService } from '../../services/artist.service';
 
 @Component({
   selector: 'app-album-detail',
@@ -22,6 +23,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly albumService = inject(AlbumService);
+  private readonly artistService = inject(ArtistService);
   protected readonly playlistService = inject(PlaylistService);
   private readonly audio = inject(AudioPlayerService);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -58,6 +60,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
   isDeletingAlbum = false;
   deletingSongId = '';
   deleteError = '';
+  private catalogOwnerUserId: string | null = null;
 
   private routeSub?: Subscription;
   private albumSub?: Subscription;
@@ -72,6 +75,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
     this.playlistService.loadPlaylists();
     this.playlistService.loadLikedSongs();
     this.chatService.connect();
+    this.loadFriends();
     this.routeSub = this.route.paramMap.subscribe((params) => {
       const albumId = params.get('albumId');
       if (!albumId) {
@@ -117,13 +121,13 @@ export class AlbumDetail implements OnInit, OnDestroy {
     this.audio.setQueue(queue, Math.max(0, startIndex));
   }
 
-  get isAdmin(): boolean {
+  get canDeleteCatalog(): boolean {
     const role = this.authService.currentUser()?.role;
-    return role === 'Admin' || role === 'Moderator';
+    return role === 'Admin' || this.catalogOwnerUserId === this.authService.currentUser()?.id;
   }
 
   deleteAlbum(): void {
-    if (!this.album || !this.isAdmin) return;
+    if (!this.album || !this.canDeleteCatalog) return;
     if (!confirm(`Permanently delete "${this.album.title}"? This cannot be undone.`)) {
       return;
     }
@@ -143,7 +147,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
 
   deleteSong(event: Event, song: AlbumSongItem): void {
     event.stopPropagation();
-    if (!this.album || !this.isAdmin) return;
+    if (!this.album || !this.canDeleteCatalog) return;
     if (!confirm(`Permanently delete "${song.title}"? This cannot be undone.`)) {
       return;
     }
@@ -178,7 +182,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
     this.shareMenuSongId = song.id;
     this.shareFeedback = '';
 
-    if (this.friends.length === 0 && !this.isLoadingFriends) {
+    if (!this.isLoadingFriends) {
       this.loadFriends();
     }
   }
@@ -189,7 +193,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
   }
 
   loadFriends(): void {
-    this.isLoadingFriends = true;
+    this.isLoadingFriends = this.friends.length === 0;
 
     this.chatService.getFriends().subscribe({
       next: (friends) => {
@@ -204,6 +208,7 @@ export class AlbumDetail implements OnInit, OnDestroy {
   }
 
   shareSong(event: Event, song: AlbumSongItem, friend: FriendListItem): void {
+	event.preventDefault();
     event.stopPropagation();
 
     const isSentToSocket = this.chatService.sendSongMessage(friend.user_id, song.id);
@@ -275,10 +280,10 @@ export class AlbumDetail implements OnInit, OnDestroy {
   }
 
   createPlaylistWithSelectedSong(): void {
-    if (!this.selectedSong || !this.newPlaylistName.trim()) return;
+    const title = this.newPlaylistName.trim();
+    if (!this.selectedSong || !title || [...title].length > 100) return;
 
     const songId = this.selectedSong.id;
-    const title = this.newPlaylistName.trim();
     this.isAddingToPlaylist = true;
     this.playlistActionError = '';
 
@@ -323,6 +328,11 @@ export class AlbumDetail implements OnInit, OnDestroy {
     this.albumSub = this.albumService.getAlbum(albumId).subscribe({
       next: (album) => {
         this.album = album;
+        this.catalogOwnerUserId = null;
+        this.artistService.getArtist(album.artist_id).subscribe({
+          next: (artist) => { this.catalogOwnerUserId = artist.user_id; this.cdr.detectChanges(); },
+          error: () => { this.catalogOwnerUserId = null; },
+        });
         this.isLoading = false;
         this.cdr.detectChanges();
       },

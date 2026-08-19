@@ -11,6 +11,13 @@ pub const DEFAULT_LIMIT: i64 = 20;
 const MAX_LIMIT: i64 = 50;
 const FALLBACK_LIMIT_USIZE: usize = 20;
 
+#[derive(serde::Deserialize, utoipa::IntoParams)]
+#[serde(deny_unknown_fields)]
+pub struct FreshPicksParams {
+    pub mood: Option<String>,
+    pub limit: Option<i64>,
+}
+
 struct SongCandidate {
     album_id: Uuid,
     normalized_vector: Vec<f32>,
@@ -223,7 +230,7 @@ pub async fn get_fresh_picks(
 )]
 pub async fn get_fresh_picks_handler(
     State(state): State<AppState>,
-    Query(params): Query<HashMap<String, String>>,
+    Query(params): Query<FreshPicksParams>,
     auth: AnyAuth,
 ) -> Result<Json<Vec<AlbumListItem>>, BSideError> {
     let user_id = match auth {
@@ -231,18 +238,25 @@ pub async fn get_fresh_picks_handler(
         AnyAuth::ApiKey | AnyAuth::Anonymous => None,
     };
 
-    let mood = params.get("mood").map(String::as_str).filter(|value| {
-        matches!(
-            *value,
+    let mood = params.mood.as_deref();
+    if mood.is_some_and(|value| {
+        !matches!(
+            value,
             "happy" | "sad" | "relaxed" | "aggressive" | "electronic" | "party"
         )
-    });
+    }) {
+        return Err(BSideError::BadRequest("Unsupported mood filter.".into()));
+    }
+    if params
+        .limit
+        .is_some_and(|limit| !(1..=MAX_LIMIT).contains(&limit))
+    {
+        return Err(BSideError::BadRequest(
+            "limit must be between 1 and 50.".into(),
+        ));
+    }
 
-    let limit = params
-        .get("limit")
-        .and_then(|value| value.parse::<i64>().ok());
-
-    let albums = get_fresh_picks(&state.db, user_id, mood, limit).await?;
+    let albums = get_fresh_picks(&state.db, user_id, mood, params.limit).await?;
 
     Ok(Json(albums))
 }

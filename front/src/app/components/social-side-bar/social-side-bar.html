@@ -6,6 +6,8 @@
         <input
           type="text"
           [(ngModel)]="searchQuery"
+          minlength="2"
+          maxlength="100"
           placeholder="Search a user"
           class="min-w-0 flex-1 bg-transparent font-raleway text-sm font-bold text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none"
           (input)="onSearchInput($event)"

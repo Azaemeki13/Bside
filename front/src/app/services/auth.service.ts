@@ -24,7 +24,6 @@ export class AuthService {
             tap(response => {
                 localStorage.setItem('auth_token', response.token);
                 this.currentUser.set(response.user);
-                console.log("Login Successful, token saved on the cookies.");
             })
         );
     }
@@ -42,7 +41,6 @@ export class AuthService {
             this.http.get<UserProfile>(`${this.apiUrl}/users/me`).subscribe({
                 next: (user) => {
                     this.currentUser.set(user);
-                    console.log("Profile loaded:", user.username);
                 },
                 error: (err) => {
                     console.error("Failed to load profile:", err);

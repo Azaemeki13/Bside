@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environment';
 import { TAGS } from '../tag-list';
 import { AlbumService } from '../../services/album.service';
+import { PresignedUploadService } from '../../services/presigned-upload.service';
 
 interface AlbumResponse {
   id: string;
@@ -43,6 +44,7 @@ export class UploadSingleForm {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
   private readonly albumService = inject(AlbumService);
+  private readonly presignedUpload = inject(PresignedUploadService);
   private readonly apiUrl = environment.apiUrl;
 
   readonly tagOptions = TAGS.filter((tag) => tag !== 'All');
@@ -58,12 +60,14 @@ export class UploadSingleForm {
   uploadStep: UploadStep = 'idle';
   album: AlbumResponse | null = null;
   albumMessage = '';
+  uploadProgress = 0;
 
   get canUploadSong(): boolean {
     return Boolean(
       this.songTitle.trim() &&
-        this.singleTag.trim() &&
-        this.songFile &&
+        [...this.songTitle.trim()].length <= 120 &&
+        this.tagOptions.some((tag) => tag === this.singleTag) &&
+        this.songFile && this.songFile.size <= 200 * 1024 * 1024 &&
         this.uploadStep !== 'creating-album' &&
         this.uploadStep !== 'creating-song' &&
         this.uploadStep !== 'uploading-file' &&
@@ -79,6 +83,12 @@ export class UploadSingleForm {
     const format = this.getAudioFormat(this.songFile);
     if (!format) {
       this.songError = 'Only WAV and FLAC files are accepted.';
+      this.songFile = null;
+      return;
+    }
+    if (this.songFile.size > 200 * 1024 * 1024) {
+      this.songError = 'Audio file must be under 200MB.';
+      this.songFile = null;
       return;
     }
 
@@ -97,6 +107,7 @@ export class UploadSingleForm {
 
     if (this.singleCover && !this.isCoverImage(this.singleCover)) {
       this.songError = 'Single cover must be a PNG, JPEG, or WebP image.';
+      this.singleCover = null;
     } else if (this.singleCover && this.singleCover.size > 10 * 1024 * 1024) {
       this.songError = 'Single cover must be under 10MB.';
       this.singleCover = null;
@@ -126,7 +137,9 @@ export class UploadSingleForm {
     this.songError = '';
     this.songMessage = '';
 
-    if (!this.songFile || !this.songTitle.trim() || !this.singleTag.trim()) {
+    const title = this.songTitle.trim();
+    const durationSeconds = Math.ceil(this.songDurationSeconds ?? 180);
+    if (!this.songFile || !title || [...title].length > 120 || !this.tagOptions.some((tag) => tag === this.singleTag)) {
       this.songError = 'Choose an audio file, song title, and tag first.';
       return;
     }
@@ -136,14 +149,21 @@ export class UploadSingleForm {
       this.songError = 'Only WAV and FLAC files are accepted.';
       return;
     }
+    if (this.songFile.size > 200 * 1024 * 1024 || durationSeconds < 1 || durationSeconds > 21_600) {
+      this.songError = 'Audio must be under 200MB with a duration between 1 second and 6 hours.';
+      return;
+    }
 
     if (this.singleCover && !this.isCoverImage(this.singleCover)) {
       this.songError = 'Single cover must be a PNG, JPEG, or WebP image.';
       return;
     }
 
-    const title = this.songTitle.trim();
-    const durationSeconds = Math.ceil(this.songDurationSeconds ?? 180);
+    if (this.singleCover && this.singleCover.size > 10 * 1024 * 1024) {
+      this.songError = 'Single cover must be under 10MB.';
+      return;
+    }
+    this.uploadProgress = 0;
 
     try {
       this.uploadStep = 'creating-album';
@@ -171,6 +191,7 @@ export class UploadSingleForm {
     } catch (error) {
       this.songError = this.describeError(error, 'Upload failed.');
       this.uploadStep = 'idle';
+      this.uploadProgress = 0;
       await this.cleanUpFailedUpload();
     } finally {
       this.cdr.detectChanges();
@@ -214,15 +235,10 @@ export class UploadSingleForm {
     );
 
     this.uploadStep = 'uploading-file';
-    const uploadResponse = await fetch(songResponse.upload_url, {
-      method: 'PUT',
-      headers: { 'Content-Type': `audio/${format}` },
-      body: file,
+    await this.presignedUpload.upload(songResponse.upload_url, file, `audio/${format}`, (progress) => {
+      this.uploadProgress = progress.percent;
+      this.cdr.detectChanges();
     });
-
-    if (!uploadResponse.ok) {
-      throw new Error(`File upload failed for ${file.name} with status ${uploadResponse.status}.`);
-    }
 
     this.uploadStep = 'verifying';
     await firstValueFrom(this.http.put(`${this.apiUrl}/songs/${songResponse.song.id}/verify`, {}));

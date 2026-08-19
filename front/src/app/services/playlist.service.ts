@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, tap, throwError } from 'rxjs';
 import { environment } from '../../environment';
 import { AuthService } from './auth.service';
+import type { DailyMixResponse } from './daily-mix.service';
 
 export interface Playlist {
   id: string;
@@ -53,6 +54,7 @@ export class PlaylistService {
   playlists = signal<Playlist[]>([]);
   selectedPlaylist = signal<(Playlist & { songs?: PlaylistSongItem[] }) | null>(null);
   likedSongsSelected = signal<boolean>(false);
+  dailyMixSelected = signal<boolean>(false);
   likedSongIds = signal<Set<string>>(new Set<string>());
 
   loadPlaylists(): void {
@@ -133,6 +135,7 @@ export class PlaylistService {
   }
 
   selectLiked(): void {
+    this.dailyMixSelected.set(false);
     this.likedSongsSelected.set(true);
     this.getLikedSongs().subscribe({
       next: (playlist) => {
@@ -146,12 +149,43 @@ export class PlaylistService {
   select(playlist: Playlist): void {
     this.selectedPlaylist.set({ ...playlist, songs: [] });
     this.likedSongsSelected.set(false);
+    this.dailyMixSelected.set(false);
     this.refreshSelectedPlaylist(playlist.id);
   }
 
   selectDetailed(playlist: PlaylistDetailedResponse): void {
     this.selectedPlaylist.set(playlist);
     this.likedSongsSelected.set(false);
+    this.dailyMixSelected.set(false);
+  }
+
+  selectDailyMix(mix: DailyMixResponse): void {
+    const songs: PlaylistSongItem[] = mix.songs.map((song) => ({
+      link_id: `daily-mix-${song.song_id}`,
+      song_id: song.song_id,
+      title: song.title,
+      duration_seconds: song.duration_seconds,
+      position: song.position,
+      audio_url: song.audio_url,
+      status: 'Ready',
+      artist_id: song.artist_id,
+      artist_name: song.artist_name,
+      cover_url: song.cover_url,
+    }));
+    this.likedSongsSelected.set(false);
+    this.dailyMixSelected.set(true);
+    this.selectedPlaylist.set({
+      id: 'daily-mix',
+      title: 'Your Daily Mix',
+      description: `${mix.discovery_count} discoveries · ${mix.familiar_count} familiar · refreshes daily`,
+      owner_id: this.authService.currentUser()?.id ?? '',
+      owner_username: this.authService.currentUser()?.username ?? 'you',
+      total_duration: songs.reduce((total, song) => total + song.duration_seconds, 0),
+      song_count: songs.length,
+      is_public: false,
+      created_at: mix.generated_at,
+      songs,
+    });
   }
 
   selectedSongs(): PlaylistSongItem[] {

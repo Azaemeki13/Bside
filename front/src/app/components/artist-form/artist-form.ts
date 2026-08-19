@@ -25,13 +25,18 @@ export class ArtistForm {
   protected submitArtistRequest(): void {
     this.message = '';
     this.error = '';
-    if (!this.artistName.trim()) {
-      this.error = 'Artist name is required.';
+    const artistName = this.artistName.trim();
+    if ([...artistName].length < 1 || [...artistName].length > 100) {
+      this.error = 'Artist name must be between 1 and 100 characters.';
+      return;
+    }
+    if ([...this.bio.trim()].length > 2000) {
+      this.error = 'Bio cannot exceed 2000 characters.';
       return;
     }
     this.isSubmitting = true;
     this.artistRequests.create({
-      artist_name: this.artistName.trim(),
+      artist_name: artistName,
       bio: this.bio.trim() || undefined,
     }).subscribe({
       next: () => {
