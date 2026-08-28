@@ -1,0 +1,86 @@
+{
+  "generated_at_epoch": 1787944601,
+  "song_count": 8,
+  "songs": [
+    {
+      "song_id": "6c362eb3-06be-4539-a4ba-6ce73f33abb8",
+      "artist": "ABBA",
+      "album": "Voulez-Vous",
+      "title": "Gimme! Gimme! Gimme! (A Man After Midnight)",
+      "genre": "Pop",
+      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/ABBA - Gimme! Gimme! Gimme! (A Man After Midnight).mp3",
+      "uploaded_format": "wav",
+      "transcoded": true
+    },
+    {
+      "song_id": "a6dc2054-ced1-4810-85f4-78baf5ab5021",
+      "artist": "Alice Deejay",
+      "album": "Who Needs Guitars Anyway?",
+      "title": "Better Off Alone",
+      "genre": "Pop",
+      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Alice Deejay - Better Off Alone.mp3",
+      "uploaded_format": "wav",
+      "transcoded": true
+    },
+    {
+      "song_id": "ffab87e8-912f-4e9a-a0d4-ea00691c1547",
+      "artist": "Backstreet Boys",
+      "album": "ML Showcase",
+      "title": "Everybody",
+      "genre": "Pop",
+      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Backstreet Boys - Everybody.mp3",
+      "uploaded_format": "wav",
+      "transcoded": true
+    },
+    {
+      "song_id": "ef11df43-ba56-4e72-baba-c40ae20eef59",
+      "artist": "Black Eyed Peas",
+      "album": "THE E.N.D. (THE ENERGY NEVER DIES) [Deluxe Version]",
+      "title": "I Gotta Feeling",
+      "genre": "Pop",
+      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Black Eyed Peas - I Gotta Feeling.mp3",
+      "uploaded_format": "wav",
+      "transcoded": true
+    },
+    {
+      "song_id": "864d64f1-fc2c-4034-a12a-13a411c856d9",
+      "artist": "Britney Spears",
+      "album": "Circus (Deluxe Version)",
+      "title": "Womanizer",
+      "genre": "Pop",
+      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Britney Spears - Womanizer.mp3",
+      "uploaded_format": "wav",
+      "transcoded": true
+    },
+    {
+      "song_id": "b76d43ac-f6b5-4ea2-a3d7-7d55cffb7935",
+      "artist": "Britney Spears",
+      "album": "Oops!... I Did It Again",
+      "title": "Oops!...I Did It Again",
+      "genre": "Pop",
+      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Britney Spears - Oops!...I Did It Again.mp3",
+      "uploaded_format": "wav",
+      "transcoded": true
+    },
+    {
+      "song_id": "924276d3-fb49-4974-aac0-6392e83b8fc3",
+      "artist": "Caesars",
+      "album": "Love For The Streets",
+      "title": "Jerk It Out",
+      "genre": "Pop",
+      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Caesars - Jerk It Out.mp3",
+      "uploaded_format": "wav",
+      "transcoded": true
+    },
+    {
+      "song_id": "6710496b-01a8-49ea-a390-0e78cb17008e",
+      "artist": "Justin Timberlake",
+      "album": "CAN'T STOP THE FEELING! (from DreamWorks Animation's \"TROLLS\")",
+      "title": "CANT STOP THE FEELING!",
+      "genre": "Pop",
+      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Justin Timberlake - CANT STOP THE FEELING!.mp3",
+      "uploaded_format": "wav",
+      "transcoded": true
+    }
+  ]
+}
