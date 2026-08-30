@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-6">
   <div class="flex flex-nowrap gap-3 overflow-x-auto pb-4">
     @if (showDailyMix()) {
-      <a [routerLink]="['/bside_app/library']" [queryParams]="{ dailyMix: 1 }"
+      <a [routerLink]="['/bside_app/library/daily-mix']"
          class="group relative flex h-40 w-40 flex-shrink-0 flex-col justify-between overflow-hidden rounded-2xl border-2 border-[#FF5500] bg-gradient-to-br from-[#FF5500] via-[#7A2D32] to-[#431E3A] p-4 duration-300 hover:-translate-y-0.5"
          aria-label="Open Your Daily Mix in the library">
         <lucide-icon [img]="dailyMixIcon" class="h-8 w-8 text-[#FFE6DB]"></lucide-icon>

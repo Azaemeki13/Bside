@@ -2,7 +2,8 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Music } from 'lucide-angular';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ArrowLeft, LucideAngularModule, Music } from 'lucide-angular';
 import { catchError, finalize, forkJoin, interval, map, of, Subscription } from 'rxjs';
 import {
   ChatMessage,
@@ -19,6 +20,7 @@ import { SocialSideBar } from '../../components/social-side-bar/social-side-bar'
 import { SocialShareCard } from '../../components/social-share-card/social-share-card';
 import { SocialChat } from '../../components/social-chat/social-chat';
 import { PlaylistService } from '../../services/playlist.service';
+import { ResponsiveLayoutService } from '../../services/responsive-layout.service';
 
 interface SharedSongCard {
   message: ChatMessage;
@@ -38,11 +40,15 @@ export class BsideSocial implements OnInit, OnDestroy {
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly platformId = inject(PLATFORM_ID);
 	private readonly cdr = inject(ChangeDetectorRef);
+	private readonly route = inject(ActivatedRoute);
+	private readonly router = inject(Router);
+	protected readonly responsiveLayout = inject(ResponsiveLayoutService);
 
 	protected readonly connectionState = this.chatService.connectionState;
 	protected readonly currentUser = this.authService.currentUser;
 
 	protected readonly musicIcon = Music;
+	protected readonly arrowLeft = ArrowLeft;
 
 	protected conversations: ConversationListItem[] = [];
 	protected users: ChatUser[] = [];
@@ -75,6 +81,13 @@ export class BsideSocial implements OnInit, OnDestroy {
 	protected isSelectedConversationUserOnline: boolean | null = null;
 	private statusPollSubscription: Subscription | null = null;
 	private socialDataPollSubscription: Subscription | null = null;
+	private routeUserSubscription: Subscription | null = null;
+	private messageLoadSubscription: Subscription | null = null;
+	private messageLoadRequestId = 0;
+
+	protected get isChatRoute(): boolean {
+		return !!this.route.snapshot.paramMap.get('userId');
+	}
 
 
   ngOnInit(): void {
@@ -88,8 +101,11 @@ export class BsideSocial implements OnInit, OnDestroy {
     this.listenToWebSocketMessages();
     this.loadConversations();
     this.loadUsers();
-    this.loadFriends();
-    this.loadFriendRequests();
+	this.loadFriends();
+	this.loadFriendRequests();
+	this.route.paramMap
+		.pipe(takeUntilDestroyed(this.destroyRef))
+		.subscribe((params) => this.openConversationFromRoute(params.get('userId')));
 	this.socialDataPollSubscription = interval(15000).subscribe(() => this.refreshSocialData(true));
 	}
 
@@ -97,6 +113,8 @@ export class BsideSocial implements OnInit, OnDestroy {
 		this.chatService.disconnect();
 		this.statusPollSubscription?.unsubscribe();
 		this.socialDataPollSubscription?.unsubscribe();
+		this.routeUserSubscription?.unsubscribe();
+		this.messageLoadSubscription?.unsubscribe();
 	}
 
   	protected loadFriends(): void {
@@ -185,7 +203,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 			.subscribe({
 			next: () => {
 				this.refreshSocialData();
-				this.startConversationWithUser({
+				this.openUserConversation({
 					id: request.requester_id,
 					username: request.requester_username,
 					display_name: request.requester_display_name,
@@ -255,7 +273,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 		const user = this.users.find((user) => user.id === otherUserId);
 
 		if (user) {
-			this.startConversationWithUser(user);
+			this.openUserConversation(user);
 			return;
 		}
 
@@ -264,7 +282,7 @@ export class BsideSocial implements OnInit, OnDestroy {
 				this.users = this.users.some((item) => item.id === acceptedFriend.id)
 					? this.users
 					: [...this.users, acceptedFriend];
-				this.startConversationWithUser(acceptedFriend);
+				this.openUserConversation(acceptedFriend);
 				this.cdr.detectChanges();
 			},
 			error: () => this.loadConversations(),
@@ -281,6 +299,9 @@ export class BsideSocial implements OnInit, OnDestroy {
 			this.messages = [];
 			this.statusPollSubscription?.unsubscribe();
 			this.isSelectedConversationUserOnline = null;
+			if (this.isChatRoute) {
+				void this.router.navigate(['/bside_app/social']);
+			}
 		}
 
 		this.receivedSongCards = this.receivedSongCards.filter(
@@ -419,7 +440,7 @@ export class BsideSocial implements OnInit, OnDestroy {
         (conversation) => conversation.other_user_id === card.conversation.other_user_id
       ) ?? card.conversation;
 
-    this.selectConversation(conversation);
+    this.openConversation(conversation);
   }
 
   protected trackSongCardById(_: number, card: SharedSongCard): string {
@@ -453,6 +474,45 @@ export class BsideSocial implements OnInit, OnDestroy {
     this.loadMessages(conversation.other_user_id);
     this.markSelectedConversationAsRead(conversation.other_user_id);
     this.watchOnlineStatus(conversation.other_user_id);
+  }
+
+  protected openConversation(conversation: ConversationListItem): void {
+    void this.router.navigate(['/bside_app/social/chat', conversation.other_user_id]);
+  }
+
+  protected openUserConversation(user: ChatUser): void {
+    void this.router.navigate(['/bside_app/social/chat', user.id]);
+  }
+
+  protected backToSocial(): void {
+    void this.router.navigate(['/bside_app/social']);
+  }
+
+  private openConversationFromRoute(userId: string | null): void {
+    this.routeUserSubscription?.unsubscribe();
+
+    if (!userId) {
+      this.messageLoadRequestId += 1;
+      this.messageLoadSubscription?.unsubscribe();
+      this.messageLoadSubscription = null;
+      this.isLoadingMessages = false;
+      this.selectedConversation = null;
+      this.messages = [];
+      this.statusPollSubscription?.unsubscribe();
+      this.isSelectedConversationUserOnline = null;
+      return;
+    }
+
+    const conversation = this.conversations.find((item) => item.other_user_id === userId);
+    if (conversation) {
+      this.selectConversation(conversation);
+      return;
+    }
+
+    this.routeUserSubscription = this.chatService.getUser(userId).subscribe({
+      next: (user) => this.selectConversation(this.upsertConversationForUser(user)),
+      error: () => void this.router.navigate(['/bside_app/social']),
+    });
   }
 
   protected startConversationWithUser(user: ChatUser): void {
@@ -501,26 +561,34 @@ export class BsideSocial implements OnInit, OnDestroy {
   }
 
   protected loadMessages(otherUserId: string): void {
+    const requestId = ++this.messageLoadRequestId;
+    this.messageLoadSubscription?.unsubscribe();
     this.isLoadingMessages = true;
     this.errorMessage = '';
 
-    this.chatService
+    this.messageLoadSubscription = this.chatService
       .getConversationMessages(otherUserId)
       .pipe(
         finalize(() => {
+          if (this.messageLoadRequestId !== requestId) return;
+
           this.isLoadingMessages = false;
+          this.messageLoadSubscription = null;
           this.cdr.detectChanges();
         })
       )
       .subscribe({
         next: (messages) => {
+          if (this.selectedConversation?.other_user_id !== otherUserId) return;
           this.messages = messages;
         },
         error: (error) => {
+          if (this.selectedConversation?.other_user_id !== otherUserId) return;
           console.error('Failed to load messages:', error);
           this.errorMessage = 'Failed to load messages.';
         },
       });
+
   }
 
   protected sendMessage(content: string): void {

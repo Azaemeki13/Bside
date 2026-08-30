@@ -1,10 +1,9 @@
-import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, inject, OnInit, output, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Plus, Search, X, ImagePlus } from 'lucide-angular';
 import { HeartCard } from '../heart-card/heart-card';
 import { PlaylistService, Playlist } from '../../services/playlist.service';
-import { DailyMixService } from '../../services/daily-mix.service';
 
 @Component({
   selector: 'app-playlist-mosaic',
@@ -13,13 +12,16 @@ import { DailyMixService } from '../../services/daily-mix.service';
   styleUrl: './playlist-mosaic.scss',
 })
 export class PlaylistMosaic implements OnInit {
+  readonly likedSelected = output<void>();
+  readonly dailyMixSelected = output<void>();
+  readonly playlistSelected = output<Playlist>();
+
   protected readonly plus = Plus;
   protected readonly search = Search;
   protected readonly x = X;
   protected readonly imagePlus = ImagePlus;
 
   protected playlistService = inject(PlaylistService);
-  private readonly dailyMixService = inject(DailyMixService);
   private platformId = inject(PLATFORM_ID);
 
   searchOpen = false;
@@ -51,14 +53,11 @@ export class PlaylistMosaic implements OnInit {
   }
 
   selectPlaylist(playlist: Playlist): void {
-    this.playlistService.select(playlist);
+    this.playlistSelected.emit(playlist);
   }
 
   selectDailyMix(): void {
-    this.dailyMixService.getToday().subscribe({
-      next: (mix) => this.playlistService.selectDailyMix(mix),
-      error: () => this.playlistService.selectedPlaylist.set(null),
-    });
+    this.dailyMixSelected.emit();
   }
 
   closeCreateDialog(): void {

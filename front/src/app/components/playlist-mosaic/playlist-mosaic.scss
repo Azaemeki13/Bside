@@ -1,0 +1,21 @@
+.playlist-create-dialog {
+  max-height: calc(100vh - 1.5rem);
+}
+
+@supports (height: 100dvh) {
+  .playlist-create-dialog {
+    max-height: calc(100dvh - 1.5rem);
+  }
+}
+
+@media (min-width: 640px) {
+  .playlist-create-dialog {
+    max-height: calc(100vh - 2.5rem);
+  }
+
+  @supports (height: 100dvh) {
+    .playlist-create-dialog {
+      max-height: calc(100dvh - 2.5rem);
+    }
+  }
+}

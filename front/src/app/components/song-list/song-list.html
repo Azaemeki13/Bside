@@ -155,38 +155,38 @@
         </div>
       </div>
 
-      <div class="flex flex-col items-center gap-2 p-4 shrink-0 lg:items-end">
+      <div class="flex shrink-0 items-center gap-3 border-t border-[#FFE6DB]/10 p-3 lg:flex-col lg:items-end lg:gap-2 lg:border-t-0 lg:p-4">
         @if (playlistService.likedSongsSelected()) {
-          <div class="w-full max-w-[21rem] aspect-square rounded-[0.625rem] bg-[#FF5500] flex items-center justify-center">
-            <lucide-icon [img]="heart" class="w-[6.5rem] h-[6.5rem] text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
+          <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-[0.625rem] bg-[#FF5500] lg:h-auto lg:w-full lg:max-w-[21rem] lg:aspect-square">
+            <lucide-icon [img]="heart" class="h-9 w-9 fill-[#FFE6DB] text-[#FFE6DB] lg:h-[6.5rem] lg:w-[6.5rem]"></lucide-icon>
           </div>
-          <div class="w-full max-w-[21rem] flex flex-col gap-1">
-            <h2 class="font-climate-crisis text-[#FFE6DB] text-2xl truncate">Liked Songs</h2>
-            <p class="font-raleway text-[#FFE6DB]/70 text-sm font-bold truncate">Your liked songs</p>
-            <div class="flex items-center gap-3 mt-2">
-              <button (click)="playPlaylist()" class="cursor-pointer flex items-center justify-center w-10 h-10 rounded-full bg-[#FF5500] hover:bg-[#FF7733] duration-200 shadow-lg" aria-label="Play liked songs">
+          <div class="flex min-w-0 flex-1 flex-col gap-0.5 lg:w-full lg:max-w-[21rem] lg:flex-none lg:gap-1">
+            <h2 class="truncate font-climate-crisis text-xl text-[#FFE6DB] lg:text-2xl">Liked Songs</h2>
+            <p class="truncate font-raleway text-xs font-bold text-[#FFE6DB]/70 lg:text-sm">Your liked songs</p>
+            <div class="mt-1 flex items-center gap-3 lg:mt-2">
+              <button (click)="playPlaylist()" class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#FF5500] shadow-lg duration-200 hover:bg-[#FF7733] lg:h-10 lg:w-10" aria-label="Play liked songs">
                 @if (audio.shuffleEnabled()) {
-                  <lucide-icon [img]="shuffle" class="w-5 h-5 text-[#FFE6DB]"></lucide-icon>
+                  <lucide-icon [img]="shuffle" class="h-4 w-4 text-[#FFE6DB] lg:h-5 lg:w-5"></lucide-icon>
                 } @else {
-                  <lucide-icon [img]="play" class="w-5 h-5 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
+                  <lucide-icon [img]="play" class="h-4 w-4 fill-[#FFE6DB] text-[#FFE6DB] lg:h-5 lg:w-5"></lucide-icon>
                 }
               </button>
             </div>
           </div>
         } @else if (playlistService.selectedPlaylist(); as playlist) {
-          <div class="w-full max-w-[21rem] aspect-square rounded-[0.625rem] overflow-hidden border border-[#FFE6DB]/15">
+          <div class="h-20 w-20 shrink-0 overflow-hidden rounded-[0.625rem] border border-[#FFE6DB]/15 lg:h-auto lg:w-full lg:max-w-[21rem] lg:aspect-square">
             @if (playlist.cover_url) {
               <img [src]="coverUrl(playlist.cover_url)" alt="cover" class="w-full h-full object-cover" />
             } @else {
               <div class="w-full h-full bg-[#FFE6DB]/10 backdrop-blur-sm glass-card flex items-center justify-center">
-                <span class="font-raleway font-bold text-[#FFE6DB] text-lg text-center px-4">{{ playlist.title }}</span>
+                <span class="px-2 text-center font-raleway text-xs font-bold text-[#FFE6DB] lg:px-4 lg:text-lg">{{ playlist.title }}</span>
               </div>
             }
           </div>
-          <div class="w-full max-w-[21rem] flex flex-col gap-1">
-            <h2 class="font-climate-crisis text-[#FFE6DB] text-2xl truncate">{{ playlist.title }}</h2>
+          <div class="flex min-w-0 flex-1 flex-col gap-0.5 lg:w-full lg:max-w-[21rem] lg:flex-none lg:gap-1">
+            <h2 class="truncate font-climate-crisis text-xl text-[#FFE6DB] lg:text-2xl">{{ playlist.title }}</h2>
             @if (playlist.description) {
-              <p class="font-raleway text-[#FFE6DB]/70 text-sm font-bold truncate">{{ playlist.description }}</p>
+              <p class="truncate font-raleway text-xs font-bold text-[#FFE6DB]/70 lg:text-sm">{{ playlist.description }}</p>
             }
             @if (playlistService.dailyMixSelected()) {
               <p class="font-raleway text-[#FFE6DB]/50 text-xs">Made for you · refreshed daily</p>
@@ -204,12 +204,12 @@
                 @if (playlist.song_count) { {{ playlist.song_count }} songs }
               </p>
             }
-            <div class="flex items-center gap-3 mt-2">
-              <button (click)="playPlaylist()" class="cursor-pointer flex items-center justify-center w-10 h-10 rounded-full bg-[#FF5500] hover:bg-[#FF7733] duration-200 shadow-lg" aria-label="Play playlist">
+            <div class="mt-1 flex items-center gap-3 lg:mt-2">
+              <button (click)="playPlaylist()" class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#FF5500] shadow-lg duration-200 hover:bg-[#FF7733] lg:h-10 lg:w-10" aria-label="Play playlist">
                 @if (audio.shuffleEnabled()) {
-                  <lucide-icon [img]="shuffle" class="w-5 h-5 text-[#FFE6DB]"></lucide-icon>
+                  <lucide-icon [img]="shuffle" class="h-4 w-4 text-[#FFE6DB] lg:h-5 lg:w-5"></lucide-icon>
                 } @else {
-                  <lucide-icon [img]="play" class="w-5 h-5 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
+                  <lucide-icon [img]="play" class="h-4 w-4 fill-[#FFE6DB] text-[#FFE6DB] lg:h-5 lg:w-5"></lucide-icon>
                 }
               </button>
               @if (!playlistService.dailyMixSelected()) {

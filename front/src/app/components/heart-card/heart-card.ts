@@ -1,6 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, output } from '@angular/core';
 import { LucideAngularModule, Heart } from 'lucide-angular';
-import { PlaylistService } from '../../services/playlist.service';
 
 @Component({
   selector: 'app-heart-card',
@@ -10,9 +9,9 @@ import { PlaylistService } from '../../services/playlist.service';
 })
 export class HeartCard {
   protected readonly heart = Heart;
-  private playlistService = inject(PlaylistService);
+  readonly selected = output<void>();
 
   select(): void {
-    this.playlistService.selectLiked();
+    this.selected.emit();
   }
 }

@@ -15,7 +15,7 @@ Supported layouts
    Missing values (and album/genre) are filled from ffprobe metadata when
    available. Files without an artist in either place use --fallback-artist.
 
-2) Legacy album folders:
+2) Album folders:
 
     songs/
       Album Name/
@@ -24,7 +24,8 @@ Supported layouts
         01 - First Track.wav
         02 - Second Track.flac
 
-   Use --artist-name to upload every legacy album folder under one artist.
+   Artist and album names are read from embedded metadata. Use --artist-name
+   only when all folders should be forced under one artist.
 
 B-Side currently accepts WAV/FLAC uploads only. MP3 files are therefore valid
 *input* for this script, but are transparently transcoded to WAV with ffmpeg
@@ -70,6 +71,13 @@ TAG_NAMES = ("tag.txt", "genre.txt")
 DEFAULT_DURATION_SECONDS = 180
 DEFAULT_GENRE = "Pop"
 DEFAULT_FLAT_ALBUM = "ML Showcase"
+GENRE_ALIASES = {
+    "alternative & indie": "Indie",
+    "hardcore hip hop": "Hip-Hop",
+    "hip hop": "Hip-Hop",
+    "hip-hop/rap": "Hip-Hop",
+    "rap": "Hip-Hop",
+}
 
 
 @dataclass(frozen=True)
@@ -124,10 +132,14 @@ def find_tag(album_dir: Path, default_genre: str) -> str:
     return default_genre
 
 
+def normalize_genre(value: str) -> str:
+    return GENRE_ALIASES.get(value.strip().casefold(), value.strip())
+
+
 def find_cover(album_dir: Path) -> Path | None:
-    for name in COVER_NAMES:
-        candidate = album_dir / name
-        if candidate.is_file():
+    supported = {name.casefold() for name in COVER_NAMES}
+    for candidate in album_dir.iterdir():
+        if candidate.is_file() and candidate.name.casefold() in supported:
             return candidate
     return None
 
@@ -157,7 +169,7 @@ def ffprobe_info(path: Path) -> tuple[float | None, dict[str, str]]:
         "-v",
         "error",
         "-show_entries",
-        "format=duration:format_tags=artist,title,album,genre",
+        "format=duration:format_tags=artist,album_artist,title,album,genre,track",
         "-of",
         "json",
         str(path),
@@ -227,8 +239,6 @@ def discover_flat_tracks(root: Path, args: argparse.Namespace) -> list[TrackInpu
 
 
 def discover_legacy_tracks(root: Path, args: argparse.Namespace) -> list[TrackInput]:
-    if not args.artist_name:
-        return []
     tracks: list[TrackInput] = []
     for album_dir in sorted((item for item in root.iterdir() if item.is_dir()), key=natural_key):
         songs = sorted(
@@ -237,21 +247,64 @@ def discover_legacy_tracks(root: Path, args: argparse.Namespace) -> list[TrackIn
         )
         if not songs:
             continue
-        genre = find_tag(album_dir, args.default_genre)
+        probed = [(path, *ffprobe_info(path)) for path in songs]
+        album_artist = args.artist_name or next(
+            (
+                tags.get("album_artist") or tags.get("artist")
+                for _, _, tags in probed
+                if tags.get("album_artist") or tags.get("artist")
+            ),
+            None,
+        )
+        if not album_artist:
+            raise SystemExit(
+                f"Cannot determine album artist for {album_dir}. Add embedded metadata or pass --artist-name."
+            )
+        album_title = next(
+            (tags.get("album") for _, _, tags in probed if tags.get("album")),
+            album_dir.name.strip(),
+        )
+        embedded_genre = next((tags.get("genre") for _, _, tags in probed if tags.get("genre")), None)
+        genre = normalize_genre(find_tag(album_dir, embedded_genre or args.default_genre))
         cover = find_cover(album_dir)
-        for path in songs:
-            probed_duration, tags = ffprobe_info(path)
-            tracks.append(
-                TrackInput(
-                    source=path,
-                    artist=args.artist_name.strip(),
-                    album=album_dir.name,
-                    title=(tags.get("title") or clean_track_stem(path)).strip(),
-                    genre=genre,
-                    cover=cover,
-                    duration_seconds=duration_seconds(path, probed_duration),
+        if not cover:
+            raise SystemExit(f"Missing cover image in album folder: {album_dir}")
+
+        candidates: list[tuple[TrackInput, dict[str, str]]] = []
+        for path, probed_duration, tags in probed:
+            candidates.append(
+                (
+                    TrackInput(
+                        source=path,
+                        artist=album_artist.strip(),
+                        album=album_title.strip(),
+                        title=(tags.get("title") or clean_track_stem(path)).strip(),
+                        genre=genre,
+                        cover=cover,
+                        duration_seconds=duration_seconds(path, probed_duration),
+                    ),
+                    tags,
                 )
             )
+
+        unique: dict[str, tuple[TrackInput, dict[str, str]]] = {}
+        for candidate, tags in candidates:
+            identity = candidate.title
+            track_artist = tags.get("artist", "")
+            if track_artist and track_artist.casefold() != album_artist.casefold():
+                identity = f"{track_artist} - {identity}"
+            identity = re.sub(r"[^\w]+", "", identity.casefold())
+            current = unique.get(identity)
+            score = sum(bool(tags.get(key)) for key in ("title", "track", "genre", "album_artist"))
+            current_score = (
+                sum(bool(current[1].get(key)) for key in ("title", "track", "genre", "album_artist"))
+                if current
+                else -1
+            )
+            if score > current_score:
+                unique[identity] = (candidate, tags)
+
+        tracks.extend(candidate for candidate, _ in unique.values())
     return tracks
 
 
@@ -266,8 +319,7 @@ def discover_tracks(root: Path, args: argparse.Namespace) -> list[TrackInput]:
     tracks = flat + legacy
     if not tracks:
         expected = ", ".join(sorted(INPUT_AUDIO_EXTENSIONS))
-        hint = " For album folders, also pass --artist-name." if any(p.is_dir() for p in root.iterdir()) else ""
-        raise SystemExit(f"No uploadable audio files ({expected}) found in {root}.{hint}")
+        raise SystemExit(f"No uploadable audio files ({expected}) found in {root}.")
     return tracks
 
 
@@ -596,7 +648,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--artist-name",
-        help="Legacy album-folder mode: put every album folder under this artist.",
+        help="Album-folder override: put every album folder under this artist instead of using embedded metadata.",
     )
     parser.add_argument(
         "--fallback-artist",

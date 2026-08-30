@@ -1,4 +1,4 @@
-<section class="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col gap-6 py-6 text-[#FFE6DB]">
+<section class="mx-auto flex min-h-full w-full max-w-6xl flex-col gap-4 py-3 text-[#FFE6DB] lg:h-full lg:min-h-0 lg:gap-6 lg:py-6">
   @if (isLoading) {
     <p class="font-raleway text-sm text-[#FFE6DB]/70">Loading album...</p>
   }
@@ -8,23 +8,23 @@
   }
 
   @if (album; as currentAlbum) {
-    <header class="flex flex-col gap-5 border-b border-[#FFE6DB]/15 pb-6 sm:flex-row sm:items-end">
+    <header class="relative flex items-end gap-4 border-b border-[#FFE6DB]/15 pb-4 sm:gap-5 lg:pb-6">
       <img
-        class="h-52 w-52 shrink-0 rounded-md object-cover"
+        class="h-28 w-28 shrink-0 rounded-md object-cover sm:h-40 sm:w-40 lg:h-52 lg:w-52"
         [src]="coverUrl(currentAlbum.cover_url)"
-        alt=""
+        [alt]="currentAlbum.title + ' album cover'"
       />
 
-      <div class="min-w-0 flex-1">
+      <div class="min-w-0 flex-1 pr-8 lg:pr-0">
         <p class="font-raleway text-xs font-bold uppercase tracking-wide text-[#FFE6DB]/60">
           Album
         </p>
 
-        <h1 class="break-words font-climate-crisis text-4xl font-bold leading-tight">
+        <h1 class="break-words font-climate-crisis text-2xl font-bold leading-tight sm:text-3xl lg:text-4xl">
           {{ currentAlbum.title }}
         </h1>
 
-        <p class="mt-2 font-raleway text-sm text-[#FFE6DB]/70">
+        <p class="mt-1 font-raleway text-xs text-[#FFE6DB]/70 sm:mt-2 sm:text-sm">
           <a
             class="underline-offset-4 hover:underline"
             [routerLink]="['/bside_app/artist', currentAlbum.artist_id]">
@@ -38,7 +38,7 @@
     <button
       type="button"
       (click)="deleteAlbum()"
-      class="cursor-pointer self-start sm:self-end"
+      class="absolute right-0 top-0 cursor-pointer lg:static lg:self-end"
       aria-label="Delete album">
       <lucide-icon
         [img]="trash2"
@@ -55,21 +55,19 @@
       <p class="font-raleway text-sm text-red-300">{{ deleteError }}</p>
     }
 
-    <div class="flex min-h-0 flex-1 flex-col">
-      <div class="grid border-b border-[#FFE6DB]/20 pb-2 font-raleway text-sm font-medium text-[#FFE6DB]/70"
-           style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem 2.5rem 2.5rem">
+    <div class="flex flex-col lg:min-h-0 lg:flex-1">
+      <div class="grid grid-cols-[2rem_minmax(0,1fr)_2.5rem_2.5rem] border-b border-[#FFE6DB]/20 pb-2 font-raleway text-sm font-medium text-[#FFE6DB]/70 sm:grid-cols-[2.5rem_minmax(0,2fr)_5rem_2.5rem_2.5rem]">
         <span>#</span>
         <span>Title</span>
-        <lucide-icon [img]="timer" class="w-4 h-4 text-[#FFE6DB]/50 justify-self-end"></lucide-icon>
+        <lucide-icon [img]="timer" class="hidden h-4 w-4 justify-self-end text-[#FFE6DB]/50 sm:block"></lucide-icon>
         <span></span>
         <span></span>
       </div>
 
-      <div class="min-h-0 flex-1 overflow-y-auto py-2">
+      <div class="py-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
         @for (song of currentAlbum.songs; let i = $index; track song.id) {
-          <div class="cursor-pointer grid w-full items-center rounded-md py-3 text-left font-raleway hover:bg-[#FFE6DB]/5"
+          <div class="grid w-full cursor-pointer grid-cols-[2rem_minmax(0,1fr)_2.5rem_2.5rem] items-center rounded-md py-3 text-left font-raleway hover:bg-[#FFE6DB]/5 sm:grid-cols-[2.5rem_minmax(0,2fr)_5rem_2.5rem_2.5rem]"
                [class.bg-[#FFE6DB]/5]="activeSongId === song.id"
-               style="grid-template-columns: 2.5rem minmax(0,2fr) 5rem 2.5rem 2.5rem"
                role="button"
                tabindex="0"
                (click)="play(song)"
@@ -79,7 +77,7 @@
               <span class="block truncate text-sm font-semibold text-[#FFE6DB]">{{ song.title }}</span>
               <span class="block truncate text-xs text-[#FFE6DB]/50">{{ currentAlbum.artist_name }}</span>
             </span>
-            <span class="text-right text-sm text-[#FFE6DB]/50">{{ formatDuration(song.duration_seconds) }}</span>
+            <span class="hidden text-right text-sm text-[#FFE6DB]/50 sm:block">{{ formatDuration(song.duration_seconds) }}</span>
             <span class="flex justify-end">
               <button type="button"
                       class="cursor-pointer flex h-8 w-8 items-center justify-center rounded-full hover:bg-[#FFE6DB]/10"

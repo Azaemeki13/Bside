@@ -1,86 +1,1106 @@
 {
-  "generated_at_epoch": 1787944601,
-  "song_count": 8,
+  "generated_at_epoch": 1788100601,
+  "song_count": 110,
   "songs": [
     {
-      "song_id": "6c362eb3-06be-4539-a4ba-6ce73f33abb8",
-      "artist": "ABBA",
-      "album": "Voulez-Vous",
-      "title": "Gimme! Gimme! Gimme! (A Man After Midnight)",
-      "genre": "Pop",
-      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/ABBA - Gimme! Gimme! Gimme! (A Man After Midnight).mp3",
-      "uploaded_format": "wav",
-      "transcoded": true
+      "song_id": "39d539db-d632-42a6-ac1c-cec06608f2b4",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "Point De Départ",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/01 - Hugo TSR - Point De Départ.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
     },
     {
-      "song_id": "a6dc2054-ced1-4810-85f4-78baf5ab5021",
-      "artist": "Alice Deejay",
-      "album": "Who Needs Guitars Anyway?",
-      "title": "Better Off Alone",
-      "genre": "Pop",
-      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Alice Deejay - Better Off Alone.mp3",
-      "uploaded_format": "wav",
-      "transcoded": true
+      "song_id": "1d63c38b-14ee-43e4-b23b-f9de5e55bc40",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "Ugotrip",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/02 - Hugo TSR - Ugotrip.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
     },
     {
-      "song_id": "ffab87e8-912f-4e9a-a0d4-ea00691c1547",
-      "artist": "Backstreet Boys",
-      "album": "ML Showcase",
-      "title": "Everybody",
-      "genre": "Pop",
-      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Backstreet Boys - Everybody.mp3",
-      "uploaded_format": "wav",
-      "transcoded": true
+      "song_id": "5d4ebf94-3c6c-4368-9280-f8d65baf536d",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "Alors Dites Pas",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/03 - Alors Dites Pas.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
     },
     {
-      "song_id": "ef11df43-ba56-4e72-baba-c40ae20eef59",
-      "artist": "Black Eyed Peas",
-      "album": "THE E.N.D. (THE ENERGY NEVER DIES) [Deluxe Version]",
-      "title": "I Gotta Feeling",
-      "genre": "Pop",
-      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Black Eyed Peas - I Gotta Feeling.mp3",
-      "uploaded_format": "wav",
-      "transcoded": true
+      "song_id": "02a23a2e-a4bf-46e8-af3d-80ef1edddb83",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "Coma Artificiel",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/04 - Coma Artificiel.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
     },
     {
-      "song_id": "864d64f1-fc2c-4034-a12a-13a411c856d9",
-      "artist": "Britney Spears",
-      "album": "Circus (Deluxe Version)",
-      "title": "Womanizer",
-      "genre": "Pop",
-      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Britney Spears - Womanizer.mp3",
-      "uploaded_format": "wav",
-      "transcoded": true
+      "song_id": "9697761a-09c0-4244-bcef-4be061c1a323",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "Fenêtre Sur Rue",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/05 - Fenêtre Sur Rue.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
     },
     {
-      "song_id": "b76d43ac-f6b5-4ea2-a3d7-7d55cffb7935",
-      "artist": "Britney Spears",
-      "album": "Oops!... I Did It Again",
-      "title": "Oops!...I Did It Again",
-      "genre": "Pop",
-      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Britney Spears - Oops!...I Did It Again.mp3",
-      "uploaded_format": "wav",
-      "transcoded": true
+      "song_id": "22a058c0-c76a-459f-899d-4ef231595dd6",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "La Ligne Verte",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/06 - Hugo TSR - La Ligne Verte.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
     },
     {
-      "song_id": "924276d3-fb49-4974-aac0-6392e83b8fc3",
-      "artist": "Caesars",
-      "album": "Love For The Streets",
-      "title": "Jerk It Out",
-      "genre": "Pop",
-      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Caesars - Jerk It Out.mp3",
-      "uploaded_format": "wav",
-      "transcoded": true
+      "song_id": "e63c7def-5ec1-441c-9089-1fb80d6d24bf",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "Eldorado",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/07 - Eldorado.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
     },
     {
-      "song_id": "6710496b-01a8-49ea-a390-0e78cb17008e",
-      "artist": "Justin Timberlake",
-      "album": "CAN'T STOP THE FEELING! (from DreamWorks Animation's \"TROLLS\")",
-      "title": "CANT STOP THE FEELING!",
-      "genre": "Pop",
-      "source_file": "/mnt/c/Users/24561/OneDrive/桌面/code/42commoncore/Bside/demo-songs/Justin Timberlake - CANT STOP THE FEELING!.mp3",
-      "uploaded_format": "wav",
-      "transcoded": true
+      "song_id": "87b009e4-2fbd-45cc-b53e-b096ec938f90",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "Interlude",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/08 - Hugo TSR - Interlude.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "a6e9efde-6c4d-491c-9459-3e8445d80c0a",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "Dojo",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/09 - Dojo.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "5cfb336f-2604-4f3e-8558-76d176ecc8ba",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "Piège à Loup",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/10 - Hugo TSR - Piège à Loup.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "3d662a56-cb9f-4572-af79-79dd0d329488",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "Intact",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/11 - Hugo TSR - Intact.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "017c5845-f317-4ad4-83d9-971f415212b6",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "Dégradation",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/12 - Dégradation.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "81beba2e-7a70-4f67-9c97-7723253faa1b",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "Old Boy",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/13 - Hugo TSR - Old Boy.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "f8c2c799-09be-4eb7-9977-0d92069ac5bb",
+      "artist": "Hugo TSR",
+      "album": "Fenêtre Sur Rue",
+      "title": "Point Final",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ Fenêtre Sur Rue/14 - Hugo TSR - Point Final.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "0beda0d0-111e-4fa0-89ce-fc02abccd96a",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Intro Expérimentale",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/01 - Hugo TSR - Intro Expérimentale.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "7670a516-edcf-4495-b412-e02bf1e8d314",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Qui Sera Sur Le Trône ?",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/02 - Hugo TSR - Qui Sera Sur Le Trône -.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "5227a007-77ef-4558-b130-4a622dd1d24b",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Maniement Du Mic",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/03 - Hugo TSR - Maniement Du Mic.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "11742286-c65f-4583-bbb6-06b65e022c52",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Jungle Urbaine",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/04 - Hugo TSR - Jungle Urbaine.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "ed2cfad8-92b7-4eb7-b6d4-e3ed6f215603",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Je Suis Pas D'humeur",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/05 - Hugo TSR - Je Suis Pas D'humeur.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "583c17ef-8730-4554-8a61-0c9bb463b349",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Faut Pas S'en Faire",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/06 - Hugo TSR - Faut Pas S'en Faire.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "0cc73f74-9cec-40ea-a888-70ff24810a55",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Un Pavé Dans La Marre",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/07 - Hugo TSR - Un Pavé Dans La Marre.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "a19bb848-487e-4adc-86d1-d6e800454dbc",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Fair Play Prod",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/08 - Hugo TSR - Fair Play Prod.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "cc8d6e85-43b8-444d-97d8-fec060d16fcb",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Interlude",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/09 - Hugo TSR - Interlude.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "c2f0a02c-9e8a-4087-b240-ca17d9217cf3",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Pas Le Temps D'attendre",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/10 - Hugo TSR - Pas Le Temps D'attendre.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "585457d6-d44b-42c7-97b9-fbaf78e5e641",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Freestyle D'attente",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/11 - Hugo TSR - Freestyle D'attente.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "aed2da2a-5475-4bba-869f-310c4103accb",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "L'habitude De La Biture",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/12 - Hugo TSR - L'habitude De La Biture.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "780e4390-41f9-464e-9918-94a133b73db1",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Les 7 Péchés",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/13 - Hugo TSR - Les 7 Péchés.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "22b69d69-a6c9-4f72-927d-36254749b20c",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "On Paiera Pas Pour Pera",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/14 - Hugo TSR - On Paiera Pas Pour Pera.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "db08b1cc-ec8b-47bd-b43c-4b35c169f370",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "L'effet Boule De Nerfs",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/15 - Hugo TSR - L'effet Boule De Nerfs.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "7bff6867-ccc7-485f-ad23-ff86873c9e6c",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Pays De Mon Enfance",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/16 - Hugo TSR - Pays De Mon Enfance.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "59c4c908-e567-47b5-a2a3-5d86d02742e8",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Le Cœur Y Est",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/17 - Hugo TSR - Le Cœur Y Est.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "95666cbd-6fda-4479-8b96-f72ae733fee9",
+      "artist": "Hugo TSR",
+      "album": "La Salle D'attente",
+      "title": "Punchliners",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/ La Salle D'attente/18 - Hugo TSR - Punchliners.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "e384b093-811d-42ee-bfe4-7a879e3630c8",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "Honeymoon",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/1. Honeymoon.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "ac600647-5476-4006-8c39-f155448d0c6c",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "Music To Watch Boys To",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/2. Music To Watch Boys To.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "88d69961-9980-4bfd-b5c9-21fe744533ff",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "Terrence Loves You",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/3. Terrence Loves You.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "2560935a-aa3b-4a01-b119-cfdc3730f39d",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "God Knows I Tried",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/4. God Knows I Tried.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "1b580063-e17f-403e-9371-032a1c5f2d40",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "High By The Beach",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/5. High By The Beach.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "09186b09-f32e-4885-afcf-0a6fb1493466",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "Freak",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/6. Freak.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "97ef9a48-005b-4de1-89f2-0fedf1b8ff6a",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "Art Deco",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/7. Art Deco.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "b08aa177-dffa-4d28-b67b-8458e15f00c3",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "Burnt Norton (Interlude)",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/8. Burnt Norton (Interlude).flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "07cf2532-fbfc-4d9a-ae94-2b931088a0a1",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "Religion",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/9. Religion.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "094e14aa-c60c-4534-be71-e84b677b6e37",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "Salvatore",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/10. Salvatore.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "f2fcbf7a-ba6c-4639-88d1-ace25a0552de",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "The Blackest Day",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/11. The Blackest Day.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "4f995f6d-63cf-49b1-9a60-11adb6a75cb7",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "24",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/12. 24.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "1a3e2a0f-1da6-4e77-a813-dee20d840786",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "Swan Song",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/13. Swan Song.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "41b30b62-9074-40e8-807c-f2054cd8e732",
+      "artist": "Lana Del Rey",
+      "album": "Honeymoon",
+      "title": "Don't Let Me Be Misunderstood",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Honeymoon/14. Don't Let Me Be Misunderstood.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "79969508-9624-4881-b98f-268bdf6bc594",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "Love",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/1. Love.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "156342fc-38f1-46b5-b41d-a17b8b478692",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "Lust for Life",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/2. Lust for Life.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "972aa6a2-e61e-4cb1-ac56-172da0a55787",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "13 Beaches",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/3. 13 Beaches.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "a7ca64a2-900b-480c-a8df-46da789022e3",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "Cherry",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/4. Cherry.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "e5eea5ed-2cd5-4132-ac4c-af850bc965af",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "White Mustang",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/5. White Mustang.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "0e7649c6-6a31-402e-8ba5-b28a22672bb0",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "Summer Bummer",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/6. Summer Bummer.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "2fa8f37f-8c86-4684-9d79-dc7f18116cea",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "Groupie Love",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/7. Groupie Love.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "4d19846f-e6da-467a-a118-9c21bee6bc0c",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "In My Feelings",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/8. In My Feelings.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "3bd44529-e50e-4df6-b05b-77474b5edfc0",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "Coachella ‐ Woodstock in My Mind",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/9. Coachella ‐ Woodstock in My Mind.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "25525f28-1821-477d-bc42-ddeaa2420793",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "God Bless America ‐ And All the Beautiful Women in It",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/10. God Bless America ‐ And All the Beautiful Women in It.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "7b64132e-43b3-4e2b-b72a-1c3255a94a1a",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "When the World Was at War We Kept Dancing",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/11. When the World Was at War We Kept Dancing.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "753d5c30-a59d-47d7-8a91-040924189092",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "Beautiful People Beautiful Problems",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/12. Beautiful People Beautiful Problems.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "86946bc6-71c9-41fd-b238-ac76418ebf28",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "Tomorrow Never Came",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/13. Tomorrow Never Came.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "6d543f15-fcb4-4ae0-bf61-f436bbe0e501",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "Heroin",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/14. Heroin.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "2f9f032e-6ecb-4679-996b-eddef4e418b4",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "Change",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/15. Change.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "9d19902f-b443-4f6a-af7a-2aa7e2edb2b7",
+      "artist": "Lana Del Rey",
+      "album": "Lust for Life",
+      "title": "Get Free",
+      "genre": "Indie",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Lust for Life/16. Get Free.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "9773c953-28c0-4c2e-a807-747cc9b0099f",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "Humanoïde",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/01 - Humanoïde.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "973a5ac9-814a-4507-aea4-c1463e35e94b",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "Mauvaise graine",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/02 - Mauvaise graine.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "ed7e2665-87b6-48cc-b9b4-d1c0dc7c2297",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "Squa",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/03 - Squa.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "35e05e27-9821-4308-bbd6-789cf6c9f6a3",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "Réalité augmentée",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/04 - Réalité augmentée.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "67f3a0e3-b845-4c43-bd63-64d44efa03de",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "Avant tu riais (feat. Clara Luciani)",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/05 - Avant tu riais feat. Clara Lucciani.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "0912fecd-9237-43fe-ae36-f08d8fcaf6a2",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "Esquimaux (feat. Nepal)",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/06 - Esquimaux feat. Nepal.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "b803e55a-60bd-42fc-b2a3-4ef60cdde87e",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "O.D (feat. Murkage Dave)",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/07 - O.D. feat. Murkage Dave.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "5df10a32-9751-47fd-bd89-b4b061b92d17",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "Vinyle (feat. Alpha Wann)",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/08 - Vinyle feat. Alpha Wann.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "c5541a3b-15d9-4b49-850c-95420ca5aa9d",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "Saturne (feat. Sneazzy & S.Pri Noir)",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/09 - Saturne feat. Sneazzy & S.Pri Noir.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "38bb2183-9f57-487f-80cb-620511c67b8a",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "Galatée",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/10 - Galatée.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "52904bd0-d891-4b8a-9b2f-afb7df4cfa9e",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "Le regard des gens (feat. Nemir, 2Zer, M.Ekra & Doum'S)",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/11 - La regard des gens feat. Nemir, 2Zer, Mekra & Doums.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "1ee30ced-3043-4146-8ae7-ab0bf273127f",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "Programmé",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/12 - Programmé.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "8d99348c-1b19-43ce-ae77-811414c1f335",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "Besoin de sens (feat. Framal & Jazzy Bazz)",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/13 - Besoin de Sens feat. Framal & Jazzy Bazz.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "567a4117-ddf3-43f6-9450-5f4e963070e3",
+      "artist": "Nekfeu",
+      "album": "Cyborg",
+      "title": "Nekketsu (feat. Crystal Kay)",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Cyborg (2016)/14 - Nekketsu feat. Crystal Kay.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "a1398aa8-8e4e-4fda-a1dd-12019721a5c9",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Acacia",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/01 - Acacia.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "c53db0eb-28dc-45f4-9604-0edf327f8b94",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Megadose",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/02 - Megadose.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "5a9bca78-ee46-4353-a922-443e65319018",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Si j'arrêtais",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/03 - Si j'arretais.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "08ac6196-b909-4742-9780-2a0bbf87a031",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Je t'aime",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/04 - Je t'aime.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "5efe0b9b-ce71-4d88-896e-42f67e9a5222",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Totem",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/05 - Totem.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "8df1e054-424a-4c80-b1a7-4f628e946c66",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "L.D.S",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/06 - L.D.S.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "d94780d8-b5eb-46d7-8323-7e6915571294",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Ma meilleure amie",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/07 - Ma meilleure amie.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "97c8fb9b-4248-4cda-b3a0-69f01a89d355",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Neo",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/08 - Neo.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "b00cffc2-0ec7-4de8-ad93-5b00ab8458ec",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Lezarman",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/09 - Lezarman.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "8b148375-8e78-4020-bf26-f686c5e0bea1",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Blanc",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/10 - Blanc.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "015b4bf6-174d-4dc1-aa3f-9cdabdc9331d",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Eurotrap",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/11 - Eurotrap.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "8c46b290-c540-4e42-849d-9a6a1a49e230",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Petite chatte",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/12 - Petite chatte.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "9a0c1b14-97f6-4370-81fd-d0aa5cfce104",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Vitrine",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/13 - Vitrine.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "75029809-3073-4f6f-836e-2b8c929ce03c",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Strip",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/14 - Strip.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "d0bf8793-236b-407e-87b6-6e371c4157e2",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Kid Cudi",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/15 - Kid Cudi.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "cf3666d1-1c02-421d-b3f8-25f28e243419",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Libellule",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/16 - Libellule.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "6aafcb77-2e45-4f70-a720-69204fd80b9f",
+      "artist": "Vald",
+      "album": "Agartha",
+      "title": "Dernier verre",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - Agartha [2017]/17 - Dernier verre.flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "ab74cb77-21f4-4920-8cb3-13094ff145e6",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Primitif",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/01 - Vald - Primitif [Ovaground].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "72cda763-83cd-4003-889f-ef136f8f46b4",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Seum",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/02 - Vald - Seum [Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "33c70c28-9a3a-4c7c-9ef6-cf93deccb1b6",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "DQTP",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/03 - Vald - DQTP [Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "59d0bfd8-cef8-4c0b-bba1-34367ba3b81a",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Possédé",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/04 - Vald - Possédé [Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "181ccd5a-290e-4aad-b5d2-b967bb33cfff",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Chépakichui",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/05 - Vald - Chépakichui [Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "e72fc513-d292-4680-bb8a-352cfb7a09a7",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Résidus",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/06 - Vald - Résidus [Ditty Beatz & Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "c4856bc4-bb20-4658-9fc8-c306b21a2c67",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "J'entertain",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/07 - Vald - J'entertain [Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "a42439fb-1ebf-46e7-a078-ff3bf9db6a7c",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Rituel",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/08 - Vald feat. Sirius - Rituel [Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "a6953790-b4f9-4908-ab03-55427fade2c7",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Désaccordé",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/09 - Vald - Désaccordé [Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "0d769974-2078-4596-ac47-ba50164f477a",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Gris",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/10 - Vald - Gris [Sirius].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "2eec642f-ce79-4fa2-bb95-eecfd1770eff",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Réflexions basses",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/11 - Vald - Réflexions basses [Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "6cb71619-c92c-4243-b4d9-8ce808e27c45",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Offshore",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/12 - Vald feat. Suikon Blaz AD - Offshore [Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "80fc17dc-d5ac-49a0-bd8e-4f97733d8ce1",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Ne me déteste pas",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/13 - Vald - Ne me déteste pas [Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "b52ed908-fb11-422e-9a9f-ca2e90a85e18",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Rockin Chair",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/14 - Vald - Rockin Chair [Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "d98289de-66d2-4ee1-9c4f-af25232e4b1f",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Dragon",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/15 - Vald feat. Sofiane - Dragon [Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "37d22c98-fb3e-4b37-ab4f-74cd42c8c85c",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Deviens génial",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/16 - Vald - Deviens génial [Martin Bresso & Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
+    },
+    {
+      "song_id": "fe91b681-82f4-40e7-9df8-def0068f5c8f",
+      "artist": "Vald",
+      "album": "XEU",
+      "title": "Trophée",
+      "genre": "Hip-Hop",
+      "source_file": "/home/xoppy/Documents/Bside/scripts/songs/Vald - XEU/17 - Vald - Trophée [Seezy].flac",
+      "uploaded_format": "flac",
+      "transcoded": false
     }
   ]
 }

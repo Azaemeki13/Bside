@@ -10,6 +10,30 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Server
   },
   {
+    path: 'bside_app/library',
+    renderMode: RenderMode.Client
+  },
+  {
+    path: 'bside_app/library/liked',
+    renderMode: RenderMode.Client
+  },
+  {
+    path: 'bside_app/library/daily-mix',
+    renderMode: RenderMode.Client
+  },
+  {
+    path: 'bside_app/library/playlist/:playlistId',
+    renderMode: RenderMode.Client
+  },
+  {
+    path: 'bside_app/social',
+    renderMode: RenderMode.Client
+  },
+  {
+    path: 'bside_app/social/chat/:userId',
+    renderMode: RenderMode.Client
+  },
+  {
     path: '**',
     renderMode: RenderMode.Prerender
   }
