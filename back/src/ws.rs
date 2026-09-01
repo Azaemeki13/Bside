@@ -104,6 +104,32 @@ enum ServerWsMessage {
     FriendRemoved { by_user_id: Uuid },
 }
 
+async fn are_accepted_friends(
+    state: &AppState,
+    user_a: Uuid,
+    user_b: Uuid,
+) -> Result<bool, sqlx::Error> {
+    let are_friends = sqlx::query_scalar::<_, bool>(
+        r#"
+        SELECT EXISTS (
+            SELECT 1
+            FROM friendships
+            WHERE status = 'accepted'
+              AND (
+                    (requester_id = $1 AND addressee_id = $2)
+                 OR (requester_id = $2 AND addressee_id = $1)
+              )
+        )
+        "#,
+    )
+    .bind(user_a)
+    .bind(user_b)
+    .fetch_one(&state.db)
+    .await?;
+
+    Ok(are_friends)
+}
+
 async fn find_shareable_song(
     state: &AppState,
     song_id: Uuid,
@@ -300,6 +326,46 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid, visibl
                                     .await;
 
                                 continue;
+                            }
+                            match are_accepted_friends(&state_for_receive, user_id, to_user_id)
+                                .await
+                            {
+                                Ok(true) => {
+                                    // The users are accepted friends, continue normally.
+                                }
+
+                                Ok(false) => {
+                                    let invalid_message = ServerWsMessage::InvalidMessage {
+                                        message: "You can only send messages to accepted friends."
+                                            .to_string(),
+                                    };
+
+                                    send_server_message(
+                                        &state_for_receive,
+                                        user_id,
+                                        &invalid_message,
+                                    )
+                                    .await;
+
+                                    continue;
+                                }
+
+                                Err(error) => {
+                                    println!("Failed to verify friendship status: {error}");
+
+                                    let invalid_message = ServerWsMessage::InvalidMessage {
+                                        message: "Failed to verify friendship status.".to_string(),
+                                    };
+
+                                    send_server_message(
+                                        &state_for_receive,
+                                        user_id,
+                                        &invalid_message,
+                                    )
+                                    .await;
+
+                                    continue;
+                                }
                             }
 
                             let content = content.trim().to_string();
