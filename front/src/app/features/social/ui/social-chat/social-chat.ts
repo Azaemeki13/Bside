@@ -55,7 +55,7 @@ export class SocialChat implements OnChanges {
   submitMessage(): void {
     const content = this.draftMessage.trim();
 
-    if (!content || [...content].length > 2000) return;
+    if (!this.isFriend || !content || [...content].length > 2000) return;
 
     this.messageSent.emit(content);
     this.draftMessage = '';

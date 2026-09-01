@@ -135,6 +135,13 @@ export class ChatSocketService {
         tag: `chat-${message.from_user_id}`,
       });
     }
+
+    if (message.type === 'friend_request_received') {
+      this.preferences.notify('New friend request on B-SIDE', {
+        body: 'You received a new friend request.',
+        tag: `friend-request-${message.friendship_id}`,
+      });
+    }
     this.messagesSubject.next(message);
   }
 
