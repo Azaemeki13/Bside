@@ -1,17 +1,22 @@
-import { Component, Output, EventEmitter, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, Output, EventEmitter, Input, inject } from '@angular/core';
 import { ChevronRight, LucideAngularModule } from 'lucide-angular';
 import { PreferencesService } from '../../services/preferences.service';
+
+type SettingsSection = 'profile' | 'activity' | 'artist';
 
 @Component({
   selector: 'app-settings-side-bar',
   standalone: true,
-  imports: [LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './settings-side-bar.html',
   styleUrl: './settings-side-bar.scss',
 })
 export class SettingsSideBar {
   protected readonly chevronRight = ChevronRight;
   protected readonly preferences = inject(PreferencesService);
+
+  @Input() selectedSection: SettingsSection | null = null;
 
   @Output() openArtistForm = new EventEmitter<void>();
   @Output() openProfile = new EventEmitter<void>();

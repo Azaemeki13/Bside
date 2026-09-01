@@ -1,4 +1,4 @@
-<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="mx-auto flex min-w-0 w-full max-w-[28rem] flex-col items-center gap-6 rounded-3xl border border-[#FFE6DB]/15 bg-[#FFE6DB]/10 p-8 text-center backdrop-blur-sm glass-card">
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form mx-auto flex min-w-0 w-full max-w-[28rem] flex-col items-center gap-6 rounded-3xl border border-[#FFE6DB]/15 bg-[#FFE6DB]/10 p-8 text-center backdrop-blur-sm glass-card">
 	<h1 class="max-w-[7ch] font-climate-crisis text-[2.5rem] text-[#FFE6DB]">SIGN UP</h1>
     <div class="flex w-full max-w-[24rem] items-center gap-3 rounded-full border border-[#FFE6DB] bg-transparent px-4 py-3">
 		<lucide-icon [img]="userRound" class="w-5 h-5 text-[#FFE6DB]/70"></lucide-icon>
@@ -28,7 +28,7 @@
         <span class="text-md text-[#FFE6DB]">or</span>
         <div class="flex-1 border-t border-2 border-[#FFE6DB]/20"></div>
     </div>
-	<a href="/api/auth/google/signup" class="inline-flex items-center justify-center">
-	<img src="assets/signup.svg" alt="Continue with Google" />
+	<a href="/api/auth/google/signup" class="inline-flex max-w-full items-center justify-center">
+	<img class="auth-google-button" src="assets/signup.svg" alt="Continue with Google" />
 	</a>
 </form>

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
+import { LucideAngularModule, RefreshCw } from 'lucide-angular';
 import { AuthService } from '../../services/auth.service';
 import { AdminService } from '../../services/admin.service';
 import { UserProfile } from '../../models/auth.model';
@@ -7,11 +8,12 @@ import { displayName } from '../../models/chat.model';
 
 @Component({
   selector: 'app-admin-users',
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './admin-users.html',
   styleUrl: './admin-users.scss',
 })
 export class AdminUsers implements OnInit {
+  protected readonly refreshIcon = RefreshCw;
   private readonly admin = inject(AdminService);
   private readonly authService = inject(AuthService);
 

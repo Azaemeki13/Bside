@@ -1,7 +1,7 @@
-<div class="flex flex-row items-center gap-4 pb-6">
+<div class="flex flex-col items-start gap-4 pb-6 sm:flex-row sm:items-center">
     <button
         type="button"
-        class="relative h-[10rem] w-[10rem] shrink-0 cursor-pointer rounded-full disabled:cursor-not-allowed"
+        class="relative h-[7.5rem] w-[7.5rem] shrink-0 cursor-pointer rounded-full disabled:cursor-not-allowed sm:h-[10rem] sm:w-[10rem]"
         [disabled]="isUploadingAvatar()"
         (click)="triggerAvatarUpload()"
     >
@@ -24,14 +24,14 @@
     />
     <div class="flex min-w-0 flex-col gap-2">
         @if (isEditingName()) {
-            <div class="flex items-center gap-2">
+            <div class="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
                 <input
                     type="text"
                     [ngModel]="nameInput()"
                     (ngModelChange)="nameInput.set($event)"
                     maxlength="50"
                     placeholder="Display name"
-                    class="rounded-full border border-[#FFE6DB] bg-transparent px-4 py-2 font-raleway font-bold text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none"
+                    class="min-w-0 rounded-full border border-[#FFE6DB] bg-transparent px-4 py-2 font-raleway font-bold text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none"
                 />
                 <button
                     type="button"
@@ -52,7 +52,7 @@
             </div>
         } @else {
             <div class="flex flex-col items-start gap-1">
-                <span class="block max-w-full truncate font-climate-crisis text-[2.5rem] text-[#FFE6DB]">{{ effectiveName() }}</span>
+                <span class="block max-w-full truncate font-climate-crisis text-[1.75rem] text-[#FFE6DB] sm:text-[2.5rem]">{{ effectiveName() }}</span>
                 <button
                     type="button"
                     class="flex items-center gap-1 font-raleway text-sm font-bold text-[#FF5500] underline cursor-pointer"

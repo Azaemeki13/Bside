@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
+import { LucideAngularModule, RefreshCw } from 'lucide-angular';
 import { ArtistRequest, ArtistRequestService } from '../../services/artist-request.service';
 
 @Component({
   selector: 'app-admin-artist-requests',
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './admin-artist-requests.html',
   styleUrl: './admin-artist-requests.scss',
 })
 export class AdminArtistRequests implements OnInit {
+  protected readonly refreshIcon = RefreshCw;
   private readonly requests = inject(ArtistRequestService);
 
   pending: ArtistRequest[] = [];

@@ -1,4 +1,4 @@
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mx-auto flex min-w-0 w-full max-w-[28rem] flex-col items-center gap-6 rounded-3xl border border-[#FFE6DB]/15 bg-[#FFE6DB]/10 p-8 text-center backdrop-blur-sm glass-card">
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form mx-auto flex min-w-0 w-full max-w-[28rem] flex-col items-center gap-6 rounded-3xl border border-[#FFE6DB]/15 bg-[#FFE6DB]/10 p-8 text-center backdrop-blur-sm glass-card">
     
     <h1 class="max-w-[7ch] font-climate-crisis text-[2.5rem] text-[#FFE6DB]">WELCOME BACK!</h1>
     
@@ -33,8 +33,8 @@
         <div class="flex-1 border-t border-2 border-[#FFE6DB]/20"></div>
     </div>
     
-    <a href="/api/auth/google/login" class="inline-flex items-center justify-center transition-transform hover:scale-105">
-        <img src="assets/signin.svg" alt="Continue with Google" />
+    <a href="/api/auth/google/login" class="inline-flex max-w-full items-center justify-center transition-transform hover:scale-105">
+        <img class="auth-google-button" src="assets/signin.svg" alt="Continue with Google" />
     </a>
 
 </form>
