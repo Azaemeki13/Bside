@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { SignForm } from '../components/sign-form/sign-form';
+import { SignForm } from '../core/auth/sign-form/sign-form';
 
 @Component({
   selector: 'app-signup',

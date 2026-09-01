@@ -2,7 +2,7 @@ import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
-import { LoginForm } from '../components/login-form/login-form';
+import { LoginForm } from '../core/auth/login-form/login-form';
 
 @Component({
   selector: 'app-login',

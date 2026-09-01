@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NavButton } from '../../components/nav-button/nav-button';
+import { NavButton } from '../../core/layout/nav-button/nav-button';
 
 @Component({
   selector: 'app-header',
