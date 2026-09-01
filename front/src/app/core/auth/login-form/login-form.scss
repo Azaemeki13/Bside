@@ -1,0 +1,37 @@
+:host {
+  display: block;
+}
+
+.auth-google-button {
+  display: block;
+  height: auto;
+  max-width: min(16rem, 100%);
+}
+
+@media (max-width: 640px), (max-height: 700px) {
+  .auth-form {
+    gap: 1rem;
+    padding: 1.25rem;
+    border-radius: 1.25rem;
+  }
+
+  .auth-form h1 {
+    font-size: 1.9rem;
+    line-height: 1.05;
+  }
+}
+
+@media (max-height: 620px) {
+  .auth-form {
+    gap: 0.75rem;
+    padding-block: 1rem;
+  }
+
+  .auth-form h1 {
+    font-size: 1.65rem;
+  }
+
+  .auth-google-button {
+    max-width: min(13.5rem, 100%);
+  }
+}

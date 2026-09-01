@@ -1,0 +1,89 @@
+<div class="flex flex-col items-start gap-4 pb-6 sm:flex-row sm:items-center">
+    <button
+        type="button"
+        class="relative h-[7.5rem] w-[7.5rem] shrink-0 cursor-pointer rounded-full disabled:cursor-not-allowed sm:h-[10rem] sm:w-[10rem]"
+        [disabled]="isUploadingAvatar()"
+        (click)="triggerAvatarUpload()"
+    >
+        <img
+        class="h-full w-full rounded-full object-cover"
+        [src]="avatarUrl()"
+        alt="Profile picture"
+        referrerpolicy="no-referrer"
+        />
+        <span class="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 font-raleway text-sm font-bold text-[#FFE6DB] opacity-0 transition-opacity hover:opacity-100">
+            {{ isUploadingAvatar() ? 'Uploading...' : 'Change photo' }}
+        </span>
+    </button>
+    <input
+        #avatarInput
+        type="file"
+        accept="image/png,image/jpeg"
+        class="hidden"
+        (change)="onAvatarSelected($event)"
+    />
+    <div class="flex min-w-0 flex-col gap-2">
+        @if (isEditingName()) {
+            <div class="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+                <input
+                    type="text"
+                    [ngModel]="nameInput()"
+                    (ngModelChange)="nameInput.set($event)"
+                    maxlength="50"
+                    placeholder="Display name"
+                    class="min-w-0 rounded-full border border-[#FFE6DB] bg-transparent px-4 py-2 font-raleway font-bold text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none"
+                />
+                <button
+                    type="button"
+                    class="rounded-full bg-[#FF5500] px-4 py-2 font-raleway font-bold text-[#FFE6DB] disabled:cursor-not-allowed disabled:opacity-50"
+                    [disabled]="isSavingName()"
+                    (click)="saveDisplayName()"
+                >
+                    {{ isSavingName() ? 'Saving...' : 'Save' }}
+                </button>
+                <button
+                    type="button"
+                    class="rounded-full border border-[#FFE6DB]/40 px-4 py-2 font-raleway font-bold text-[#FFE6DB]"
+                    [disabled]="isSavingName()"
+                    (click)="cancelEditingName()"
+                >
+                    Cancel
+                </button>
+            </div>
+        } @else {
+            <div class="flex flex-col items-start gap-1">
+                <span class="block max-w-full truncate font-climate-crisis text-[1.75rem] text-[#FFE6DB] sm:text-[2.5rem]">{{ effectiveName() }}</span>
+                <button
+                    type="button"
+                    class="flex items-center gap-1 font-raleway text-sm font-bold text-[#FF5500] underline cursor-pointer"
+                    (click)="startEditingName()"
+                >
+                    <lucide-icon [img]="squarePen" class="w-4 h-4"></lucide-icon>
+                    Edit
+                </button>
+            </div>
+        }
+        @if (errorMessage()) {
+            <p class="font-raleway text-sm font-bold text-red-500">{{ errorMessage() }}</p>
+        }
+    </div>
+</div>
+<div>
+    <p class="font-raleway font-bold text-[#FFE6DB] text-[1rem]">Your playlist(s)</p>
+    <div class="grid grid-cols-3 gap-2 pt-2 sm:grid-cols-5 md:grid-cols-7">
+        @for (playlist of playlistService.playlists(); track playlist.id) {
+            <button (click)="selectPlaylist(playlist)" class="rounded-[0.625rem] cursor-pointer min-w-0 w-full">
+                <div class="w-full aspect-square rounded-[calc(0.625rem-2px)] overflow-hidden">
+            @if (playlist.cover_url) {
+              <img [src]="playlist.cover_url" alt="cover" class="w-full h-full object-cover" />
+            } @else {
+              <div class="w-full h-full bg-[#FFE6DB]/10 flex items-center justify-center backdrop-blur-sm glass-card">
+                <span class="font-raleway font-bold text-[#FFE6DB] text-xs text-center px-2">{{ playlist.title }}</span>
+              </div>
+                }
+            </div>
+            <p class="font-raleway text-[1rem] text-[#FFE6DB] font-bold truncate text-left">{{ playlist.title }}</p>
+            <p class="font-raleway text-[0.75rem] text-[#FFE6DB]/60 font-medium truncate text-left">By {{ playlist.owner_id === authService.currentUser()?.id ? 'you' : (playlist.owner_username ?? 'unknown') }} | {{ playlist.song_count }} tracks</p>            </button>
+        }
+    </div>
+</div>

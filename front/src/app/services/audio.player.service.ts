@@ -1,46 +1,20 @@
 import { isPlatformBrowser } from "@angular/common"
-import { HttpClient } from "@angular/common/http"
 import { Injectable, PLATFORM_ID, computed, effect, inject, signal } from "@angular/core"
 import { Howl } from "howler"
-import { Observable, Subscription } from "rxjs"
-import { environment } from "../../environment"
+import { Subscription } from "rxjs"
 import { VolumeService } from "./volume.service"
 import { AuthService } from "./auth.service"
-
-type PlaybackInteractionType = 'play' | 'complete' | 'skip' | 'replay';
-
-export type AudioFormat = 'flac' | 'wav';
-
-export type AudioTrack = {
-    id: string;
-    title: string;
-    artist: string;
-    artistId?: string;
-    src: string;
-    format: AudioFormat;
-    coverUrl?: string;
-}
-
-export type QueueEntry = {
-    id: string;
-    title: string;
-    artist: string;
-    artistId?: string;
-    format: AudioFormat;
-    coverUrl?: string;
-    onRequestUrl: () => Observable<{ url: string }>;
-};
-
-export type RepeatMode = 'off' | 'all' | 'one';
+import { AudioAnalyticsService } from "../features/audio/data-access/audio-analytics.service"
+import type { AudioTrack, QueueEntry, RepeatMode } from "../features/audio/models/audio.models"
 
 @Injectable({ providedIn: 'root'})
+/** Owns the global playback queue and keeps Howler state in sync with the UI. */
 export class AudioPlayerService {
     private readonly platformId = inject(PLATFORM_ID);
     private readonly volumeService = inject(VolumeService);
     private readonly isBrowser = isPlatformBrowser(this.platformId);
     private readonly authService = inject(AuthService);
-    private readonly http = inject(HttpClient);
-    private readonly apiUrl = environment.apiUrl;
+    private readonly analytics = inject(AudioAnalyticsService);
 
     private sound?: Howl;
     private progressTimer?: number;
@@ -83,6 +57,7 @@ export class AudioPlayerService {
     readonly hasPrevious = computed(() => this.queueIndex() > 0);
 
     constructor() {
+        // Browser-only effects keep SSR away from Howler, storage, and timer APIs.
         if (!this.isBrowser)
             return;
 
@@ -95,6 +70,7 @@ export class AudioPlayerService {
     }
 
     setQueue(entries: QueueEntry[], startIndex = 0): void {
+        // Replacing the queue also starts the requested entry as one deliberate action.
         this.queue = entries;
         this.queueLength.set(entries.length);
         this.playIndex(startIndex);
@@ -139,6 +115,7 @@ export class AudioPlayerService {
     }
 
     stop(): void {
+        // Invalidate pending URL requests before releasing the active Howler instance.
         this.recordSkipIfUnfinished();
 
         this.loadToken++;
@@ -160,6 +137,7 @@ export class AudioPlayerService {
     }
 
     private resetSession(): void {
+        // Logging out must leave no playback state or previous-user queue behind.
         this.stop();
         this.queue = [];
         this.queueIndex.set(-1);
@@ -212,6 +190,7 @@ export class AudioPlayerService {
         this.queueIndex.set(index);
 
         const entry = this.queue[index];
+        // The token prevents a slow response from replacing a newer track request.
         const token = ++this.loadToken;
         this.isLoading.set(true);
         this.error.set(null);
@@ -221,6 +200,7 @@ export class AudioPlayerService {
                 if (token !== this.loadToken)
                     return;
                 if (response.is_anonymous || response.url == 'Try me :)') {
+                    // The API uses this response to ask anonymous listeners to sign in.
                     this.isLoading.set(false);
                     this.stop();
                     this.authService.isTryMePopupOpen.set(true);
@@ -248,6 +228,7 @@ export class AudioPlayerService {
     }
 
     private loadTrack(track: AudioTrack, token: number): void {
+        // A fresh Howl owns every callback for this track and ignores stale callbacks.
         if (!this.isBrowser || token !== this.loadToken)
             return;
 
@@ -283,11 +264,11 @@ export class AudioPlayerService {
                 this.startProgressTimer();
 
                 if (!this.hasRecordedPlay) {
+                    // Record a play once per load, distinguishing an immediate replay.
                     this.hasRecordedPlay = true;
-                    const interactionType: PlaybackInteractionType =
-                        track.id === this.lastPlayedSongId ? 'replay' : 'play';
+                    const interactionType = track.id === this.lastPlayedSongId ? 'replay' : 'play';
                     this.lastPlayedSongId = track.id;
-                    this.recordInteraction(track.id, interactionType);
+                    this.analytics.record(track.id, interactionType);
                 }
             },
 
@@ -317,7 +298,8 @@ export class AudioPlayerService {
                 this.stopProgressTimer();
                 this.position.set(0);
                 this.hasReachedEnd = true;
-                this.recordInteraction(track.id, 'complete', Math.floor(this.duration()));
+                // Completion is recorded before repeat or queue advancement starts.
+                this.analytics.record(track.id, 'complete', Math.floor(this.duration()));
 
                 if (this.repeatMode() === 'one') {
                     this.playIndex(this.queueIndex());
@@ -349,6 +331,7 @@ export class AudioPlayerService {
     }
 
     private nextIndex(): number | null {
+        // Queue policy lives here so manual and automatic advancement behave alike.
         if (this.queue.length === 0)
             return null;
 
@@ -375,6 +358,7 @@ export class AudioPlayerService {
     }
 
     private startProgressTimer(): void {
+        // Howler does not expose reactive progress, so sample it while playback runs.
         this.stopProgressTimer();
 
         this.progressTimer = window.setInterval(() => {
@@ -399,6 +383,7 @@ export class AudioPlayerService {
     }
 
     private recordSkipIfUnfinished(): void {
+        // A stopped track counts as a skip only after audible progress was made.
         const track = this.currentTrack();
         if (!track || !this.hasRecordedPlay || this.hasReachedEnd)
             return;
@@ -407,16 +392,6 @@ export class AudioPlayerService {
         if (listenedSeconds <= 0)
             return;
 
-        this.recordInteraction(track.id, 'skip', listenedSeconds);
-    }
-
-    private recordInteraction(songId: string, interactionType: PlaybackInteractionType, listenedSeconds?: number): void {
-        if (!this.isBrowser)
-            return;
-
-        this.http.post(`${this.apiUrl}/songs/${songId}/interactions`, {
-            interaction_type: interactionType,
-            listened_seconds: listenedSeconds,
-        }).subscribe({ error: () => { /* best-effort tracking, ignore failures */ } });
+        this.analytics.record(track.id, 'skip', listenedSeconds);
     }
 }

@@ -15,4 +15,6 @@ songs/
 
 Supported audio files: `.wav`, `.flac`.
 Supported cover files: `cover.png`, `cover.jpg`, `cover.jpeg`, `cover.webp`.
-Use `tag.txt` or `genre.txt` for the album tag/genre.
+Artist, album, title, genre, and duration are read from embedded audio metadata.
+Use `tag.txt` or `genre.txt` to override the album genre. Cover filename matching
+is case-insensitive. Duplicate tracks with equivalent tagged titles are skipped.

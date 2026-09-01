@@ -1,0 +1,10 @@
+<nav class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[#0C060C] px-4 py-4 sm:flex sm:justify-between sm:gap-4 sm:py-6 sm:pl-0 sm:pr-6">
+  @if (showGreeting) {
+	<h1 class="min-w-0 truncate font-climate-crisis text-[clamp(1.5rem,3.5vw,3rem)] text-[#FFE6DB] sm:flex-1">Hi, {{ greetingName }} </h1>
+    <app-search-bar class="col-span-2 row-start-2 block min-w-0 sm:order-2 sm:shrink-0"></app-search-bar>
+    <app-profile-card [user]="user" class="col-start-2 row-start-1 shrink-0 sm:order-3"></app-profile-card>
+  } @else {
+    <app-search-bar class="col-start-1 row-start-1 block min-w-0 sm:order-2 sm:ml-auto sm:shrink-0"></app-search-bar>
+    <app-profile-card [user]="user" class="col-start-2 row-start-1 shrink-0 sm:order-3"></app-profile-card>
+  }
+</nav>

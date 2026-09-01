@@ -1,0 +1,72 @@
+<div class="h-full bg-[#1F0E1C] rounded-[1.563rem] flex flex-col">
+  <div class="flex h-14 items-center justify-between rounded-t-[1.563rem] bg-[#1F0E1C] p-3 lg:h-[4.5rem] lg:p-4">
+    @if (!searchOpen) {
+      <button (click)="isCreateOpen = true" class="flex cursor-pointer items-center gap-2 rounded-full border-2 border-[#FFE6DB] px-3 py-1.5 md:py-2">
+        <lucide-icon [img]="plus" class="h-6 w-6 text-[#FFE6DB] lg:h-[2rem] lg:w-[2rem]"></lucide-icon>
+        <span class="font-raleway font-semibold text-[#FFE6DB]">Create</span>
+      </button>
+      <button class="cursor-pointer" (click)="searchOpen = true">
+        <lucide-icon [img]="search" class="h-6 w-6 text-[#FFE6DB] lg:h-[2rem] lg:w-[2rem]"></lucide-icon>
+      </button>
+    } @else {
+      <div class="flex w-full items-center gap-3 rounded-full border-2 border-[#FFE6DB] bg-transparent px-4 py-3">
+        <lucide-icon [img]="search" class="w-5 h-5 text-[#FFE6DB] stroke-2"></lucide-icon>
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search in your library" class="font-raleway font-bold flex-1 bg-transparent text-sm text-[#FFE6DB] placeholder:text-[#FFE6DB]/50 focus:outline-none">
+        <button (click)="closeSearch()" class="cursor-pointer">
+          <lucide-icon [img]="x" class="w-5 h-5 text-[#FFE6DB]/70"></lucide-icon>
+        </button>
+      </div>
+    }
+  </div>
+  <div class="flex-1 overflow-y-auto p-3 pt-0 lg:p-4 lg:pt-0">
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(5rem,1fr))] gap-2">
+      <app-heart-card (selected)="likedSelected.emit()"></app-heart-card>
+      <button type="button" (click)="selectDailyMix()" aria-label="Open Your Daily Mix"
+              class="rounded-[0.625rem] border-2 border-transparent hover:border-[#FF5500] duration-300 cursor-pointer">
+        <span class="flex w-full aspect-square flex-col items-center justify-center gap-1 rounded-[calc(0.625rem-2px)] bg-gradient-to-br from-[#FF5500] to-[#431E3A] px-2 text-center">
+          <span class="text-2xl" aria-hidden="true">✦</span>
+          <span class="font-raleway text-xs font-black text-[#FFE6DB]">Your Daily Mix</span>
+        </span>
+      </button>
+      @for (playlist of filteredPlaylists; track playlist.id) {
+        <button (click)="selectPlaylist(playlist)" class="rounded-[0.625rem] border-2 border-transparent hover:border-[#FF5500] duration-300 cursor-pointer">
+          <div class="w-full aspect-square rounded-[calc(0.625rem-2px)] overflow-hidden">
+            @if (playlist.cover_url) {
+              <img [src]="playlist.cover_url" alt="cover" class="w-full h-full object-cover" />
+            } @else {
+              <div class="w-full h-full bg-[#FFE6DB]/10 flex items-center justify-center backdrop-blur-sm glass-card">
+                <span class="font-raleway font-bold text-[#FFE6DB] text-xs text-center px-2">{{ playlist.title }}</span>
+              </div>
+            }
+          </div>
+        </button>
+      }
+    </div>
+  </div>
+</div>
+
+@if (isCreateOpen) {
+  <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FFE6DB]/10 p-3 text-center backdrop-blur-sm glass-card sm:p-5" role="dialog" aria-modal="true" aria-label="Create playlist" (click)="closeCreateDialog()">
+    <div class="playlist-create-dialog w-full max-w-md overflow-y-auto rounded-[1.5rem] bg-[#1F0E1C] p-4 sm:max-w-xl sm:rounded-[3.125rem] sm:p-5" (click)="$event.stopPropagation()">
+      <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-stretch">
+        <button type="button" (click)="coverInput.click()" class="group relative aspect-square h-32 w-32 shrink-0 cursor-pointer overflow-hidden rounded-[0.625rem] bg-[#FFE6DB] sm:h-[15rem] sm:w-[15rem]">
+          @if (coverPreview) {
+            <img [src]="coverPreview" alt="Cover preview" class="w-full h-full object-cover" />
+          } @else {
+            <div class="flex flex-col items-center justify-center h-full gap-2 text-[#1F0E1C]">
+              <lucide-icon [img]="imagePlus" class="w-8 h-8"></lucide-icon>
+              <span class="font-raleway font-semibold text-sm">Add cover</span>
+            </div>
+          }
+        </button>
+        <input #coverInput type="file" accept="image/png,image/jpeg,image/webp" class="hidden" (change)="onCoverSelected($event)">
+        <div class="flex w-full min-w-0 flex-col justify-center gap-4">
+          @if (coverError) { <p class="text-sm text-red-400" role="alert">{{ coverError }}</p> }
+          <input type="text" [(ngModel)]="playlistName" maxlength="100" placeholder="Playlist name" class="w-full rounded-[0.625rem] bg-[#FFE6DB] px-4 py-3 font-raleway text-sm font-bold text-[#1F0E1C] focus:outline-none">
+          <input type="text" [(ngModel)]="playlistDescription" maxlength="1000" placeholder="Playlist description" class="w-full rounded-[0.625rem] bg-[#FFE6DB] px-4 py-3 font-raleway text-sm font-bold text-[#1F0E1C] focus:outline-none">
+          <button type="button" class="w-full cursor-pointer rounded-full bg-[#FF5500] px-4 py-2 font-raleway text-[1rem] font-medium text-[#FFE6DB] disabled:cursor-not-allowed disabled:opacity-50" [disabled]="!playlistName.trim() || playlistName.trim().length > 100 || playlistDescription.trim().length > 1000" (click)="confirmCreate()">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

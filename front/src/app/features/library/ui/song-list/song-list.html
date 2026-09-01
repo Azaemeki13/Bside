@@ -1,0 +1,230 @@
+<div class="h-full bg-[#1F0E1C] rounded-[1.563rem] flex flex-col overflow-hidden">
+  @if (playlistService.likedSongsSelected() || playlistService.selectedPlaylist()) {
+    <div class="flex flex-col lg:flex-row flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
+      <div class="flex flex-col flex-1 min-w-0 p-4 lg:overflow-hidden">
+
+        <div class="grid border-b border-[#FFE6DB]/20 pb-2 font-raleway text-sm font-medium text-[#FFE6DB]/70"
+             style="grid-template-columns: 2rem 2.5rem minmax(0,1fr) 5rem 2.5rem 2.5rem">
+          <span>#</span>
+          <span></span>
+          <span>Title</span>
+          <lucide-icon [img]="timer" class="w-4 h-4 text-[#FFE6DB]/50 justify-self-end"></lucide-icon>
+          <span></span>
+          <span></span>
+        </div>
+
+        <div class="flex-1 overflow-y-auto pb-4">
+          @if (playlistService.selectedSongs().length === 0) {
+            <div class="flex h-full w-full flex-col items-center justify-center gap-3 px-8 pt-8 text-center">
+              <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#FFE6DB]/10">
+                <lucide-icon [img]="playlistService.likedSongsSelected() ? heart : listMusic" class="h-7 w-7 text-[#FFE6DB]/60 stroke-[1.75]"></lucide-icon>
+              </div>
+              <p class="font-raleway text-sm font-semibold text-[#FFE6DB]/60">
+                @if (playlistService.likedSongsSelected()) {
+                  You haven't liked any songs yet.
+                } @else {
+                  This playlist has no songs yet.
+                }
+              </p>
+            </div>
+          } @else {
+            @for (song of playlistService.selectedSongs(); track song.link_id) {
+              <div class="cursor-pointer grid items-center py-2 rounded-lg hover:bg-[#FFE6DB]/5 duration-200"
+                   style="grid-template-columns: 2rem 2.5rem minmax(0,1fr) 5rem 2.5rem 2.5rem"
+                   role="button"
+                   (click)="playSong(song)"
+                   (keydown.enter)="playSong(song)">
+
+                @if (isCurrentSong(song)) {
+                  <span class="flex items-center justify-center">
+                    <lucide-icon [img]="audioLines" class="w-4 h-4 text-[#FF5500]"></lucide-icon>
+                  </span>
+                } @else {
+                  <span class="font-raleway text-[#FFE6DB]/50 text-sm group-hover:hidden">{{ song.position }}</span>
+                  <button type="button"
+                          class="hidden group-hover:flex items-center justify-center cursor-pointer"
+                          (click)="playSong(song); $event.stopPropagation()">
+                    <lucide-icon [img]="play" class="w-4 h-4 text-[#FFE6DB] fill-[#FFE6DB]"></lucide-icon>
+                  </button>
+                }
+
+                <div class="w-9 h-9 rounded shrink-0 overflow-hidden bg-[#FFE6DB]/10">
+                  @if (song.cover_url) {
+                    <img [src]="coverUrl(song.cover_url)" alt="cover" class="w-full h-full object-cover" />
+                  } @else {
+                    <div class="w-full h-full flex items-center justify-center">
+                      <span class="text-[#FFE6DB]/30 text-xs">♪</span>
+                    </div>
+                  }
+                </div>
+
+                <div class="min-w-0 pl-3 pr-4">
+                  <p class="font-raleway font-semibold text-sm truncate"
+                     [ngClass]="isCurrentSong(song) ? 'text-[#FF5500]' : 'text-[#FFE6DB]'">{{ song.title }}</p>
+                  <p class="font-raleway text-[#FFE6DB]/50 text-xs truncate">{{ song.artist_name }}</p>
+                </div>
+
+                <span class="font-raleway text-[#FFE6DB]/50 text-sm justify-self-end">{{ formatDuration(song.duration_seconds) }}</span>
+
+                <span class="flex justify-end">
+                  <button type="button"
+                          class="cursor-pointer flex h-8 w-8 items-center justify-center rounded-full hover:bg-[#FFE6DB]/10"
+                          [attr.aria-label]="playlistService.isLiked(song.song_id) ? 'Unlike song' : 'Like song'"
+                          [attr.aria-pressed]="playlistService.isLiked(song.song_id)"
+                          (click)="toggleLike($event, song)">
+                    <lucide-icon
+                      [img]="heart"
+                      [class]="playlistService.isLiked(song.song_id) ? 'h-4 w-4 text-[#FF5500] fill-[#FF5500]' : 'h-4 w-4 text-[#FFE6DB]/50'"
+                      [strokeWidth]="playlistService.isLiked(song.song_id) ? 0 : 1.75">
+                    </lucide-icon>
+                  </button>
+                </span>
+
+                <span class="relative flex justify-end">
+                  <button type="button"
+                          class="cursor-pointer flex h-8 w-8 items-center justify-center rounded-full text-[#FFE6DB]/50 hover:bg-[#FFE6DB]/10 hover:text-[#FFE6DB]"
+                          aria-label="Song options"
+                          (click)="toggleSongMenu($event, song)">
+                    <lucide-icon [img]="ellipsisVertical" class="h-4 w-4"></lucide-icon>
+                  </button>
+
+                  @if (openMenuLinkId === song.link_id) {
+                    <span class="absolute right-0 top-9 z-20 min-w-44 rounded-md bg-[#431E3A] p-2 shadow-2xl">
+                      <button type="button"
+                              class="w-full rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10 cursor-pointer"
+                              [routerLink]="['/bside_app/artist', song.artist_id]"
+                              (click)="$event.stopPropagation(); openMenuLinkId = ''">
+                        Go to artist page
+                      </button>
+                      <button type="button"
+                              class="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10 cursor-pointer"
+                              (click)="openShareMenu($event, song)">
+                        Share
+                      </button>
+                      @if (!playlistService.likedSongsSelected() && !playlistService.dailyMixSelected()) {
+                        <button type="button"
+                                class="w-full rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10 cursor-pointer"
+                                (click)="removeSong(song); $event.stopPropagation()">
+                          Remove from playlist
+                        </button>
+                      }
+                    </span>
+                  }
+
+                  @if (shareMenuLinkId === song.link_id) {
+                    <span class="absolute right-0 top-9 z-30 flex max-h-64 w-56 flex-col overflow-hidden rounded-md bg-[#431E3A] p-2 shadow-2xl" (click)="$event.stopPropagation()">
+                      <span class="flex items-center justify-between border-b border-[#FFE6DB]/10 px-3 py-2">
+                        <span class="font-raleway text-xs font-bold uppercase text-[#FFE6DB]/50">Share with a friend</span>
+                        <button type="button" aria-label="Close share menu" (click)="closeShareMenu($event)">
+                          <span class="font-raleway text-xs text-[#FFE6DB]/50 hover:text-[#FFE6DB]">✕</span>
+                        </button>
+                      </span>
+
+                      <span class="flex-1 overflow-y-auto p-1">
+                        @if (isLoadingFriends) {
+                          <span class="block px-3 py-2 font-raleway text-xs text-[#FFE6DB]/50">Loading friends...</span>
+                        } @else if (shareFeedback) {
+                          <span class="block px-3 py-2 font-raleway text-xs font-semibold text-[#FF5500]">{{ shareFeedback }}</span>
+                        } @else if (friends.length === 0) {
+                          <span class="block px-3 py-2 font-raleway text-xs text-[#FFE6DB]/50">Add friends to share songs.</span>
+                        } @else {
+                          @for (friend of friends; track friend.user_id) {
+                            <button type="button"
+                                    class="flex w-full items-center gap-2 rounded px-2 py-2 text-left hover:bg-[#FFE6DB]/10"
+                                    (click)="shareSong($event, song, friend)">
+                              <span class="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
+                                @if (friend.avatar_url) {
+                                  <img [src]="friend.avatar_url" [alt]="friend.username" class="h-full w-full object-cover" />
+                                } @else {
+                                  <span class="font-raleway text-[0.65rem] font-bold text-[#FFE6DB]">
+                                    {{ friend.username.slice(0, 2).toUpperCase() }}
+                                  </span>
+                                }
+                              </span>
+                              <span class="truncate font-raleway text-sm font-semibold text-[#FFE6DB]">{{ friend.username }}</span>
+                            </button>
+                          }
+                        }
+                      </span>
+                    </span>
+                  }
+                </span>
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <div class="flex shrink-0 items-center gap-3 border-t border-[#FFE6DB]/10 p-3 lg:flex-col lg:items-end lg:gap-2 lg:border-t-0 lg:p-4">
+        @if (playlistService.likedSongsSelected()) {
+          <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-[0.625rem] bg-[#FF5500] lg:h-auto lg:w-full lg:max-w-[21rem] lg:aspect-square">
+            <lucide-icon [img]="heart" class="h-9 w-9 fill-[#FFE6DB] text-[#FFE6DB] lg:h-[6.5rem] lg:w-[6.5rem]"></lucide-icon>
+          </div>
+          <div class="flex min-w-0 flex-1 flex-col gap-0.5 lg:w-full lg:max-w-[21rem] lg:flex-none lg:gap-1">
+            <h2 class="truncate font-climate-crisis text-xl text-[#FFE6DB] lg:text-2xl">Liked Songs</h2>
+            <p class="truncate font-raleway text-xs font-bold text-[#FFE6DB]/70 lg:text-sm">Your liked songs</p>
+            <div class="mt-1 flex items-center gap-3 lg:mt-2">
+              <button (click)="playPlaylist()" class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#FF5500] shadow-lg duration-200 hover:bg-[#FF7733] lg:h-10 lg:w-10" aria-label="Play liked songs">
+                @if (audio.shuffleEnabled()) {
+                  <lucide-icon [img]="shuffle" class="h-4 w-4 text-[#FFE6DB] lg:h-5 lg:w-5"></lucide-icon>
+                } @else {
+                  <lucide-icon [img]="play" class="h-4 w-4 fill-[#FFE6DB] text-[#FFE6DB] lg:h-5 lg:w-5"></lucide-icon>
+                }
+              </button>
+            </div>
+          </div>
+        } @else if (playlistService.selectedPlaylist(); as playlist) {
+          <div class="h-20 w-20 shrink-0 overflow-hidden rounded-[0.625rem] border border-[#FFE6DB]/15 lg:h-auto lg:w-full lg:max-w-[21rem] lg:aspect-square">
+            @if (playlist.cover_url) {
+              <img [src]="coverUrl(playlist.cover_url)" alt="cover" class="w-full h-full object-cover" />
+            } @else {
+              <div class="w-full h-full bg-[#FFE6DB]/10 backdrop-blur-sm glass-card flex items-center justify-center">
+                <span class="px-2 text-center font-raleway text-xs font-bold text-[#FFE6DB] lg:px-4 lg:text-lg">{{ playlist.title }}</span>
+              </div>
+            }
+          </div>
+          <div class="flex min-w-0 flex-1 flex-col gap-0.5 lg:w-full lg:max-w-[21rem] lg:flex-none lg:gap-1">
+            <h2 class="truncate font-climate-crisis text-xl text-[#FFE6DB] lg:text-2xl">{{ playlist.title }}</h2>
+            @if (playlist.description) {
+              <p class="truncate font-raleway text-xs font-bold text-[#FFE6DB]/70 lg:text-sm">{{ playlist.description }}</p>
+            }
+            @if (playlistService.dailyMixSelected()) {
+              <p class="font-raleway text-[#FFE6DB]/50 text-xs">Made for you · refreshed daily</p>
+            } @else {
+              <p class="font-raleway text-[#FFE6DB]/50 text-xs">
+                Created by
+                <span class="text-[#FF5500]">{{ playlist.owner_username ?? authService.currentUser()?.username ?? 'unknown' }}</span>
+                {{ playlist.created_at | date:'dd/MM/yyyy' }}
+              </p>
+            }
+            @if (playlist.total_duration || playlist.song_count) {
+              <p class="font-raleway text-[#FFE6DB]/50 text-xs">
+                @if (playlist.total_duration) { {{ formatTotalDuration(playlist.total_duration) }} }
+                @if (playlist.total_duration && playlist.song_count) { | }
+                @if (playlist.song_count) { {{ playlist.song_count }} songs }
+              </p>
+            }
+            <div class="mt-1 flex items-center gap-3 lg:mt-2">
+              <button (click)="playPlaylist()" class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#FF5500] shadow-lg duration-200 hover:bg-[#FF7733] lg:h-10 lg:w-10" aria-label="Play playlist">
+                @if (audio.shuffleEnabled()) {
+                  <lucide-icon [img]="shuffle" class="h-4 w-4 text-[#FFE6DB] lg:h-5 lg:w-5"></lucide-icon>
+                } @else {
+                  <lucide-icon [img]="play" class="h-4 w-4 fill-[#FFE6DB] text-[#FFE6DB] lg:h-5 lg:w-5"></lucide-icon>
+                }
+              </button>
+              @if (!playlistService.dailyMixSelected()) {
+                <button (click)="deletePlaylist()" class="cursor-pointer" aria-label="Delete playlist">
+                  <lucide-icon [img]="trash2" class="w-[1.5rem] h-[1.5rem] text-[#FFE6DB]/50 hover:text-[#FF5500] duration-300"></lucide-icon>
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="flex-1 flex items-center justify-center">
+      <p class="font-raleway text-[#FFE6DB]/50 text-sm">Select a playlist to see its content.</p>
+    </div>
+  }
+</div>

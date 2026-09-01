@@ -1,0 +1,19 @@
+@if (link) {
+  <a
+    [href]="isExternal ? link : null"
+    [routerLink]="!isExternal ? link : null"
+    [target]="isExternal ? '_blank' : '_self'"
+    class="inline-block cursor-pointer rounded-full px-4 py-2 font-raleway no-underline sm:px-6"
+    [ngClass]="[variantClass, fontSize, fontStyle]"
+  >
+    {{ label }}
+  </a>
+} @else {
+  <button
+    [attr.type]="type"
+    class="inline-block cursor-pointer rounded-full px-4 py-2 font-raleway sm:px-6"
+    [ngClass]="[variantClass, fontSize, fontStyle]"
+  >
+    {{ label }}
+  </button>
+}

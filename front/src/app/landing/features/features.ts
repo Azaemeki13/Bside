@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FeaturesStack } from '../../components/features-stack/features-stack';
+import { FeaturesStack } from '../features-stack/features-stack';
 import { CircleDollarSign, LucideAngularModule, MessageCircle, BadgeCheck, Puzzle } from 'lucide-angular';
 
 @Component({

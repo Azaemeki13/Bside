@@ -1,0 +1,10 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+@media (min-width: 1024px) {
+  :host {
+    height: 100%;
+  }
+}

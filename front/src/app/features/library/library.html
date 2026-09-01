@@ -1,0 +1,28 @@
+@if (responsiveLayout.isCompactLibrary()) {
+  @if (isDetailRoute) {
+    <div class="flex min-h-full flex-col gap-3 pb-3">
+      <button type="button" (click)="backToLibrary()" class="flex w-fit cursor-pointer items-center gap-2 rounded-full border border-[#FFE6DB]/30 px-3 py-2 font-raleway text-sm font-bold text-[#FFE6DB]" aria-label="Back to library">
+        <lucide-icon [img]="arrowLeft" class="h-4 w-4"></lucide-icon>
+        Back to library
+      </button>
+      <app-song-list class="block min-h-[32rem] min-w-0 flex-1 overflow-hidden"></app-song-list>
+    </div>
+  } @else {
+    <app-playlist-mosaic
+      class="block min-h-[32rem] min-w-0 overflow-hidden pb-3"
+      (likedSelected)="selectLiked()"
+      (dailyMixSelected)="selectDailyMix()"
+      (playlistSelected)="selectPlaylist($event)">
+    </app-playlist-mosaic>
+  }
+} @else {
+  <div class="grid h-full grid-cols-[20rem_1fr] gap-4 overflow-hidden">
+    <app-playlist-mosaic
+      class="min-h-0 min-w-0 overflow-hidden"
+      (likedSelected)="selectLiked()"
+      (dailyMixSelected)="selectDailyMix()"
+      (playlistSelected)="selectPlaylist($event)">
+    </app-playlist-mosaic>
+    <app-song-list class="min-h-0 min-w-0 overflow-hidden"></app-song-list>
+  </div>
+}

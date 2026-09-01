@@ -1,0 +1,81 @@
+<section class="mx-auto flex h-full min-h-0 w-full max-w-5xl flex-col gap-4 overflow-y-auto py-4 text-[#FFE6DB] sm:py-6">
+  <div class="flex shrink-0 flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="min-w-0">
+      <h1 class="max-w-full break-words font-climate-crisis text-[1.75rem] leading-tight font-bold sm:text-4xl">USERS</h1>
+      <p class="font-raleway text-sm mt-1 text-[#FFE6DB]/60">Ban or unban users.</p>
+    </div>
+    <button class="flex shrink-0 cursor-pointer items-center gap-2 rounded-full border border-[#FFE6DB]/30 px-4 py-2 font-raleway text-sm font-bold text-[#FFE6DB] hover:bg-[#FFE6DB]/10 disabled:cursor-not-allowed disabled:opacity-50" type="button" [disabled]="isLoading" (click)="load()">
+      <lucide-icon [img]="refreshIcon" class="h-4 w-4"></lucide-icon>
+      Refresh
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <p class="font-raleway text-sm text-[#FFE6DB]/70">Loading users...</p>
+  }
+  @if (message) {
+    <p class="font-raleway text-sm text-green-300">{{ message }}</p>
+  }
+  @if (error) {
+    <p class="font-raleway text-sm text-red-300">{{ error }}</p>
+  }
+
+  <div class="flex min-h-0 flex-col gap-3">
+    @for (user of users; track user.id) {
+      <article class="rounded-lg bg-[#1F0E1C] p-4 sm:p-5">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <div class="min-w-0">
+            <h2 class="flex flex-wrap items-center gap-2 break-words font-raleway text-lg font-bold sm:text-xl">
+              {{ nameFor(user) }}
+              @if (user.is_banned) {
+                <span class="rounded-full bg-red-500/20 px-2 py-1 font-raleway text-xs font-semibold text-red-300">Banned</span>
+              }
+            </h2>
+            <p class="break-words font-raleway text-sm text-[#FFE6DB]/60">{{ user.username }} | {{ user.email }} | {{ user.role }}</p>
+          </div>
+          <div class="flex w-full shrink-0 flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+            @if (isSelf(user)) {
+              <span class="font-raleway text-sm text-[#FFE6DB]/40">This is you</span>
+            } @else {
+              @if (isAdmin) {
+                <select
+                  class="min-w-0 flex-1 cursor-pointer rounded-full bg-[#1F0E1C] border border-[#FFE6DB]/30 px-3 py-2 font-raleway text-sm text-[#FFE6DB] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                  [disabled]="actingUserId === user.id"
+                  [value]="user.role"
+                  (change)="changeRole(user, $any($event.target).value)"
+                >
+                  @for (role of roles; track role) {
+                    <option [value]="role">{{ role }}</option>
+                  }
+                </select>
+              }
+              <button
+                class="min-w-[5rem] flex-1 cursor-pointer rounded-full px-4 py-2 font-raleway font-bold disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                [class]="user.is_banned ? 'bg-[#FFE6DB] text-[#1F0E1C]' : 'bg-[#FF5500] text-[#FFE6DB]'"
+                type="button"
+                [disabled]="actingUserId === user.id"
+                (click)="toggleBan(user)"
+              >
+                {{ user.is_banned ? 'Unban' : 'Ban' }}
+              </button>
+              @if (isAdmin) {
+                <button
+                  class="min-w-[5rem] flex-1 cursor-pointer rounded-full bg-red-500/20 px-4 py-2 font-raleway font-bold text-red-300 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                  type="button"
+                  [disabled]="actingUserId === user.id"
+                  (click)="deleteUser(user)"
+                >
+                  Delete
+                </button>
+              }
+            }
+          </div>
+        </div>
+      </article>
+    } @empty {
+      @if (!isLoading) {
+        <p class="font-raleway text-sm text-[#FFE6DB]/60">No users found.</p>
+      }
+    }
+  </div>
+</section>

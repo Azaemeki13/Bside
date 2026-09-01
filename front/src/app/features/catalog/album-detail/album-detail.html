@@ -1,0 +1,237 @@
+<section class="mx-auto flex min-h-full w-full max-w-6xl flex-col gap-4 py-3 text-[#FFE6DB] lg:h-full lg:min-h-0 lg:gap-6 lg:py-6">
+  @if (isLoading) {
+    <p class="font-raleway text-sm text-[#FFE6DB]/70">Loading album...</p>
+  }
+
+  @if (error) {
+    <p class="font-raleway text-sm text-red-300">{{ error }}</p>
+  }
+
+  @if (album; as currentAlbum) {
+    <header class="relative flex items-end gap-4 border-b border-[#FFE6DB]/15 pb-4 sm:gap-5 lg:pb-6">
+      <img
+        class="h-28 w-28 shrink-0 rounded-md object-cover sm:h-40 sm:w-40 lg:h-52 lg:w-52"
+        [src]="coverUrl(currentAlbum.cover_url)"
+        [alt]="currentAlbum.title + ' album cover'"
+      />
+
+      <div class="min-w-0 flex-1 pr-8 lg:pr-0">
+        <p class="font-raleway text-xs font-bold uppercase tracking-wide text-[#FFE6DB]/60">
+          Album
+        </p>
+
+        <h1 class="break-words font-climate-crisis text-2xl font-bold leading-tight sm:text-3xl lg:text-4xl">
+          {{ currentAlbum.title }}
+        </h1>
+
+        <p class="mt-1 font-raleway text-xs text-[#FFE6DB]/70 sm:mt-2 sm:text-sm">
+          <a
+            class="underline-offset-4 hover:underline"
+            [routerLink]="['/bside_app/artist', currentAlbum.artist_id]">
+            {{ currentAlbum.artist_name }}
+          </a>
+          | {{ currentAlbum.genre }} | {{ currentAlbum.songs.length }} songs
+        </p>
+      </div>
+
+    @if (canDeleteCatalog) {
+    <button
+      type="button"
+      (click)="deleteAlbum()"
+      class="absolute right-0 top-0 cursor-pointer lg:static lg:self-end"
+      aria-label="Delete album">
+      <lucide-icon
+        [img]="trash2"
+        class="h-6 w-6 text-[#FFE6DB]/50 duration-300 hover:text-[#FF5500]">
+      </lucide-icon>
+    </button>
+  }
+</header>
+
+    @if (playbackError) {
+      <p class="font-raleway text-sm text-red-300">{{ playbackError }}</p>
+    }
+    @if (deleteError) {
+      <p class="font-raleway text-sm text-red-300">{{ deleteError }}</p>
+    }
+
+    <div class="flex flex-col lg:min-h-0 lg:flex-1">
+      <div class="grid grid-cols-[2rem_minmax(0,1fr)_2.5rem_2.5rem] border-b border-[#FFE6DB]/20 pb-2 font-raleway text-sm font-medium text-[#FFE6DB]/70 sm:grid-cols-[2.5rem_minmax(0,2fr)_5rem_2.5rem_2.5rem]">
+        <span>#</span>
+        <span>Title</span>
+        <lucide-icon [img]="timer" class="hidden h-4 w-4 justify-self-end text-[#FFE6DB]/50 sm:block"></lucide-icon>
+        <span></span>
+        <span></span>
+      </div>
+
+      <div class="py-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+        @for (song of currentAlbum.songs; let i = $index; track song.id) {
+          <div class="grid w-full cursor-pointer grid-cols-[2rem_minmax(0,1fr)_2.5rem_2.5rem] items-center rounded-md py-3 text-left font-raleway hover:bg-[#FFE6DB]/5 sm:grid-cols-[2.5rem_minmax(0,2fr)_5rem_2.5rem_2.5rem]"
+               [class.bg-[#FFE6DB]/5]="activeSongId === song.id"
+               role="button"
+               tabindex="0"
+               (click)="play(song)"
+               (keydown.enter)="play(song)">
+            <span class="text-sm text-[#FFE6DB]/50">{{ i + 1 }}</span>
+            <span class="min-w-0 pr-4">
+              <span class="block truncate text-sm font-semibold text-[#FFE6DB]">{{ song.title }}</span>
+              <span class="block truncate text-xs text-[#FFE6DB]/50">{{ currentAlbum.artist_name }}</span>
+            </span>
+            <span class="hidden text-right text-sm text-[#FFE6DB]/50 sm:block">{{ formatDuration(song.duration_seconds) }}</span>
+            <span class="flex justify-end">
+              <button type="button"
+                      class="cursor-pointer flex h-8 w-8 items-center justify-center rounded-full hover:bg-[#FFE6DB]/10"
+                      [attr.aria-label]="playlistService.isLiked(song.id) ? 'Unlike song' : 'Like song'"
+                      [attr.aria-pressed]="playlistService.isLiked(song.id)"
+                      (click)="toggleLike($event, song)">
+                <lucide-icon
+                  [img]="heart"
+                  [class]="playlistService.isLiked(song.id) ? 'h-4 w-4 text-[#FF5500] fill-[#FF5500]' : 'h-4 w-4 text-[#FFE6DB]/50'"
+                  [strokeWidth]="playlistService.isLiked(song.id) ? 0 : 1.75">
+                </lucide-icon>
+              </button>
+            </span>
+            <span class="relative flex justify-end">
+              <button type="button"
+                      class="cursor-pointer flex h-8 w-8 items-center justify-center rounded-full text-[#FFE6DB]/50 hover:bg-[#FFE6DB]/10 hover:text-[#FFE6DB]"
+                      aria-label="Song options"
+                      (click)="toggleSongMenu($event, song)">
+                <lucide-icon [img]="ellipsisVertical" class="h-4 w-4"></lucide-icon>
+              </button>
+
+              @if (openMenuSongId === song.id) {
+                <span class="absolute right-0 top-9 z-20 min-w-40 rounded-md bg-[#431E3A] p-2 shadow-2xl">
+                  <button type="button"
+                          class="w-full rounded px-3 py-2 text-left text-sm font-semibold cursor-pointer text-[#FFE6DB] hover:bg-[#FFE6DB]/10"
+                          [routerLink]="['/bside_app/artist', currentAlbum.artist_id]"
+                          (click)="$event.stopPropagation(); openMenuSongId = ''">
+                    Go to artist page
+                  </button>
+                  <button type="button"
+                          class="w-full rounded px-3 py-2 text-left text-sm font-semibold cursor-pointer text-[#FFE6DB] hover:bg-[#FFE6DB]/10"
+                          (click)="openAddToPlaylistDialog($event, song)">
+                    Add to playlist
+                  </button>
+                  <button type="button"
+                          class="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm font-semibold text-[#FFE6DB] hover:bg-[#FFE6DB]/10 cursor-pointer"
+                          (click)="openShareMenu($event, song)">
+                    Share
+                  </button>
+                  @if (canDeleteCatalog) {
+                    <button type="button"
+                            class="w-full rounded px-3 py-2 text-left text-sm font-semibold cursor-pointer text-red-300 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+                            [disabled]="deletingSongId === song.id"
+                            (click)="deleteSong($event, song)">
+                      {{ deletingSongId === song.id ? 'Deleting…' : 'Delete song' }}
+                    </button>
+                  }
+                </span>
+              }
+
+              @if (shareMenuSongId === song.id) {
+                <span class="absolute right-0 top-9 z-30 flex max-h-64 w-56 flex-col overflow-hidden rounded-md bg-[#431E3A] p-2 shadow-2xl" (click)="$event.stopPropagation()">
+                  <span class="flex items-center justify-between border-b border-[#FFE6DB]/10 px-3 py-2">
+                    <span class="font-raleway text-xs font-bold uppercase text-[#FFE6DB]/50">Share with a friend</span>
+                    <button type="button" aria-label="Close share menu" (click)="closeShareMenu($event)">
+                      <span class="font-raleway text-xs text-[#FFE6DB]/50 hover:text-[#FFE6DB]">✕</span>
+                    </button>
+                  </span>
+
+                  <span class="flex-1 overflow-y-auto p-1">
+                    @if (isLoadingFriends) {
+                      <span class="block px-3 py-2 font-raleway text-xs text-[#FFE6DB]/50">Loading friends...</span>
+                    } @else if (shareFeedback) {
+                      <span class="block px-3 py-2 font-raleway text-xs font-semibold text-[#FF5500]">{{ shareFeedback }}</span>
+                    } @else if (friends.length === 0) {
+                      <span class="block px-3 py-2 font-raleway text-xs text-[#FFE6DB]/50">Add friends to share songs.</span>
+                    } @else {
+                      @for (friend of friends; track friend.user_id) {
+                        <button type="button"
+                                class="flex w-full items-center gap-2 rounded px-2 py-2 text-left hover:bg-[#FFE6DB]/10"
+                                (click)="shareSong($event, song, friend)">
+                          <span class="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFE6DB]/10">
+                            @if (friend.avatar_url) {
+                              <img [src]="friend.avatar_url" [alt]="friend.username" class="h-full w-full object-cover" />
+                            } @else {
+                              <span class="font-raleway text-[0.65rem] font-bold text-[#FFE6DB]">
+                                {{ friend.username.slice(0, 2).toUpperCase() }}
+                              </span>
+                            }
+                          </span>
+                          <span class="truncate font-raleway text-sm font-semibold text-[#FFE6DB]">{{ friend.username }}</span>
+                        </button>
+                      }
+                    }
+                  </span>
+                </span>
+              }
+            </span>
+          </div>
+        } @empty {
+          <div class="flex h-full w-full flex-col items-center justify-center gap-3 px-8 py-8 text-center">
+            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#FFE6DB]/10">
+              <lucide-icon [img]="disc3" class="h-7 w-7 text-[#FFE6DB]/60 stroke-[1.75]"></lucide-icon>
+            </div>
+            <p class="font-raleway text-sm font-semibold text-[#FFE6DB]/60">
+              This album has no songs yet.
+            </p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</section>
+
+@if (isPlaylistDialogOpen && selectedSong) {
+  <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-[#1F0E1C]/70 p-5 backdrop-blur-sm"
+       role="dialog"
+       aria-modal="true"
+       aria-label="Add song to playlist"
+       (click)="closePlaylistDialog()">
+    <div class="w-full max-w-md rounded-lg border border-[#FFE6DB]/10 bg-[#1F0E1C] p-5 text-[#FFE6DB] shadow-xl"
+         (click)="$event.stopPropagation()">
+      <div class="mb-4 flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <h2 class="font-raleway text-lg font-bold">Add to playlist</h2>
+          <p class="truncate font-raleway text-sm text-[#FFE6DB]/60">{{ selectedSong.title }}</p>
+        </div>
+        <button type="button" class="shrink-0 rounded-full p-1 text-[#FFE6DB]/60 hover:bg-[#FFE6DB]/10 hover:text-[#FFE6DB]" (click)="closePlaylistDialog()">
+          <lucide-icon [img]="x" class="h-5 w-5"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="max-h-56 overflow-y-auto rounded-md border border-[#FFE6DB]/10">
+        @for (playlist of playlistService.playlists(); track playlist.id) {
+          <button type="button"
+                  class="flex w-full items-center justify-between gap-3 border-b border-[#FFE6DB]/10 px-3 py-3 text-left last:border-b-0 hover:bg-[#FFE6DB]/10 disabled:opacity-50"
+                  [disabled]="isAddingToPlaylist"
+                  (click)="addSelectedSongToPlaylist(playlist)">
+            <span class="min-w-0 truncate font-raleway text-sm font-semibold">{{ playlist.title }}</span>
+            <span class="shrink-0 font-raleway text-xs text-[#FFE6DB]/50">{{ playlist.song_count ?? 0 }} songs</span>
+          </button>
+        } @empty {
+          <p class="px-3 py-4 font-raleway text-sm text-[#FFE6DB]/60">No playlists yet.</p>
+        }
+      </div>
+
+      <div class="mt-4 flex gap-2">
+        <input type="text"
+               class="min-w-0 flex-1 rounded-md bg-[#FFE6DB] px-3 py-2 font-raleway text-sm font-semibold text-[#1F0E1C] outline-none"
+               placeholder="New playlist name"
+               maxlength="100"
+               [(ngModel)]="newPlaylistName"
+               [disabled]="isAddingToPlaylist">
+        <button type="button"
+                class="rounded-full bg-[#FF5500] px-4 py-2 font-raleway text-sm font-bold text-[#FFE6DB] disabled:cursor-not-allowed disabled:opacity-50"
+                [disabled]="isAddingToPlaylist || !newPlaylistName.trim() || newPlaylistName.trim().length > 100"
+                (click)="createPlaylistWithSelectedSong()">
+          Create
+        </button>
+      </div>
+
+      @if (playlistActionError) {
+        <p class="mt-3 font-raleway text-sm text-red-300">{{ playlistActionError }}</p>
+      }
+    </div>
+  </div>
+}
