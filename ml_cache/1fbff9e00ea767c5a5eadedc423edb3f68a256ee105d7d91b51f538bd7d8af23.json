@@ -1,0 +1,28 @@
+{
+  "key": "1fbff9e00ea767c5a5eadedc423edb3f68a256ee105d7d91b51f538bd7d8af23",
+  "source_relpath": "Daft Punk/Discovery/1-06 Nightvision.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "Nightvision",
+  "duration_seconds": 104,
+  "dsp_analysis": {
+    "tempo_bpm": 81.52,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.77,
+    "energy": 0.338,
+    "accousticness": 0.18,
+    "valence": 0.344,
+    "mood": "sad",
+    "mood_probability": 0.992
+  },
+  "normalized_vector": [
+    0.1793478260869565,
+    0.7696153521537781,
+    0.3383873999118805,
+    0.18022245168685913,
+    0.3437507152557373,
+    0.9922970533370972
+  ]
+}

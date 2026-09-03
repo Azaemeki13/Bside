@@ -1,0 +1,28 @@
+{
+  "key": "a92fca8d609dc5dd1bd97a7d19a0d0e1d27a2ef9211b7792982f61169873018e",
+  "source_relpath": "Djo/Decide/1-11 Go For It.flac",
+  "artist": "Djo",
+  "album": "Decide",
+  "title": "Go For It",
+  "duration_seconds": 181,
+  "dsp_analysis": {
+    "tempo_bpm": 85.23,
+    "harmonic_key": "A#"
+  },
+  "ml_features": {
+    "danceability": 0.852,
+    "energy": 0.583,
+    "accousticness": 0.187,
+    "valence": 0.594,
+    "mood": "sad",
+    "mood_probability": 0.732
+  },
+  "normalized_vector": [
+    0.2102272727272728,
+    0.8516484498977661,
+    0.582766592502594,
+    0.18706630170345306,
+    0.5940959453582764,
+    0.7319527864456177
+  ]
+}

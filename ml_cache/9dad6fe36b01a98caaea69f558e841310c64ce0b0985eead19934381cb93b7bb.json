@@ -1,0 +1,28 @@
+{
+  "key": "9dad6fe36b01a98caaea69f558e841310c64ce0b0985eead19934381cb93b7bb",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/08 - The Righteous & The Wicked.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "The Righteous & The Wicked",
+  "duration_seconds": 248,
+  "dsp_analysis": {
+    "tempo_bpm": 81.52,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.517,
+    "energy": 0.624,
+    "accousticness": 0.059,
+    "valence": 0.538,
+    "mood": "sad",
+    "mood_probability": 0.617
+  },
+  "normalized_vector": [
+    0.1793478260869565,
+    0.5174688100814819,
+    0.6236353516578674,
+    0.05866868421435356,
+    0.5376762747764587,
+    0.6171839833259583
+  ]
+}

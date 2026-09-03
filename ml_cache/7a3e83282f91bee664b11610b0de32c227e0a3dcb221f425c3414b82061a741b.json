@@ -1,0 +1,28 @@
+{
+  "key": "7a3e83282f91bee664b11610b0de32c227e0a3dcb221f425c3414b82061a741b",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-15 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 14 in E Flat Minor. Allegro.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 14 in E Flat Minor. Allegro",
+  "duration_seconds": 31,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "A#"
+  },
+  "ml_features": {
+    "danceability": 0.149,
+    "energy": 0.392,
+    "accousticness": 0.666,
+    "valence": 0.4,
+    "mood": "relaxed",
+    "mood_probability": 0.961
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.14862240850925446,
+    0.3919405937194824,
+    0.6663079261779785,
+    0.39997851848602295,
+    0.960740327835083
+  ]
+}

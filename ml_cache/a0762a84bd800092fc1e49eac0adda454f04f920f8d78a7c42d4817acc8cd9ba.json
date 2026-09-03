@@ -1,0 +1,28 @@
+{
+  "key": "a0762a84bd800092fc1e49eac0adda454f04f920f8d78a7c42d4817acc8cd9ba",
+  "source_relpath": "ACDC/Iron Man II/1-11 Have a Drink on Me.flac",
+  "artist": "ACDC",
+  "album": "Iron Man II",
+  "title": "Have a Drink on Me",
+  "duration_seconds": 239,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.613,
+    "energy": 0.511,
+    "accousticness": 0.018,
+    "valence": 0.651,
+    "mood": "aggressive",
+    "mood_probability": 0.941
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.6132653951644897,
+    0.5105935335159302,
+    0.017835544422268867,
+    0.6512868404388428,
+    0.9411078095436096
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "1d5a7c5f6ce07b77b4c70449d60557e17b3d54debf3651f4c96e36e590ff0d7c",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-26 Waltzes, Op. 70  Chopin Waltzes, Op. 70 No. 1 in G-Flat Major.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Waltzes, Op. 70  Chopin Waltzes, Op. 70 No. 1 in G-Flat Major",
+  "duration_seconds": 103,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.14,
+    "energy": 0.403,
+    "accousticness": 0.559,
+    "valence": 0.441,
+    "mood": "sad",
+    "mood_probability": 0.977
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.13994315266609192,
+    0.40253281593322754,
+    0.5588364601135254,
+    0.4411158561706543,
+    0.9773374199867249
+  ]
+}

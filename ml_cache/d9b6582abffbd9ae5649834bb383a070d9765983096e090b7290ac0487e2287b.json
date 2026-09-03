@@ -1,0 +1,28 @@
+{
+  "key": "d9b6582abffbd9ae5649834bb383a070d9765983096e090b7290ac0487e2287b",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/17 - They're Red Hot.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "They're Red Hot",
+  "duration_seconds": 72,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.853,
+    "energy": 0.624,
+    "accousticness": 0.006,
+    "valence": 0.556,
+    "mood": "aggressive",
+    "mood_probability": 0.794
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.8529709577560425,
+    0.6241745352745056,
+    0.006010988727211952,
+    0.556354284286499,
+    0.7943185567855835
+  ]
+}

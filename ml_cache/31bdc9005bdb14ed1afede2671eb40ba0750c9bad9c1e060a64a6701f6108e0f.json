@@ -1,0 +1,28 @@
+{
+  "key": "31bdc9005bdb14ed1afede2671eb40ba0750c9bad9c1e060a64a6701f6108e0f",
+  "source_relpath": "Daft Punk/Alive/1-05 Around the World Harder, Better, Faster, Stronger.flac",
+  "artist": "Daft Punk",
+  "album": "Alive",
+  "title": "Around the World Harder, Better, Faster, Stronger",
+  "duration_seconds": 343,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.959,
+    "energy": 0.538,
+    "accousticness": 0.044,
+    "valence": 0.649,
+    "mood": "electronic",
+    "mood_probability": 0.818
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.9588138461112976,
+    0.537638247013092,
+    0.04432721436023712,
+    0.648609459400177,
+    0.8177949786186218
+  ]
+}

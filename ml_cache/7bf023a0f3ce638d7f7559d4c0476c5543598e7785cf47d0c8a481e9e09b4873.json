@@ -1,0 +1,28 @@
+{
+  "key": "7bf023a0f3ce638d7f7559d4c0476c5543598e7785cf47d0c8a481e9e09b4873",
+  "source_relpath": "Taylor Swift/Red/04 - Taylor Swift - I Knew You Were Trouble.flac",
+  "artist": "Taylor Swift",
+  "album": "Red",
+  "title": "I Knew You Were Trouble",
+  "duration_seconds": 218,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.911,
+    "energy": 0.606,
+    "accousticness": 0.085,
+    "valence": 0.656,
+    "mood": "happy",
+    "mood_probability": 0.771
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.9111025333404541,
+    0.6064735651016235,
+    0.08497607707977295,
+    0.6563957929611206,
+    0.7710501551628113
+  ]
+}

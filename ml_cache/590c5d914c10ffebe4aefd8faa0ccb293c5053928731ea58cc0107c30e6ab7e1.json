@@ -1,0 +1,28 @@
+{
+  "key": "590c5d914c10ffebe4aefd8faa0ccb293c5053928731ea58cc0107c30e6ab7e1",
+  "source_relpath": "Daft Punk/Discovery/1-12 Short Circuit.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "Short Circuit",
+  "duration_seconds": 207,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.811,
+    "energy": 0.559,
+    "accousticness": 0.35,
+    "valence": 0.575,
+    "mood": "sad",
+    "mood_probability": 0.629
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.811264157295227,
+    0.558631181716919,
+    0.35005608201026917,
+    0.5751359462738037,
+    0.6289198398590088
+  ]
+}

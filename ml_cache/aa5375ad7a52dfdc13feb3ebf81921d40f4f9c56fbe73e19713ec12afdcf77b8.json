@@ -1,0 +1,28 @@
+{
+  "key": "aa5375ad7a52dfdc13feb3ebf81921d40f4f9c56fbe73e19713ec12afdcf77b8",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-12 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 11 in B Major. Vivace.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 11 in B Major. Vivace",
+  "duration_seconds": 40,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.161,
+    "energy": 0.39,
+    "accousticness": 0.623,
+    "valence": 0.409,
+    "mood": "sad",
+    "mood_probability": 0.995
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.16108286380767822,
+    0.3898703455924988,
+    0.6227839589118958,
+    0.4088716506958008,
+    0.9949888586997986
+  ]
+}

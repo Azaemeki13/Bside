@@ -1,0 +1,28 @@
+{
+  "key": "5883686b35d41836abefaeeddbdb1fa9bc5815794e7515b05495634bd053e803",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-04 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 3 in G Major. Vivace.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 3 in G Major. Vivace",
+  "duration_seconds": 57,
+  "dsp_analysis": {
+    "tempo_bpm": 78.12,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.147,
+    "energy": 0.443,
+    "accousticness": 0.666,
+    "valence": 0.451,
+    "mood": "sad",
+    "mood_probability": 0.976
+  },
+  "normalized_vector": [
+    0.15104166666666666,
+    0.14722563326358795,
+    0.4427729845046997,
+    0.6658646464347839,
+    0.45139527320861816,
+    0.9755746126174927
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "2594b9350acc621cab98912ff23e540ed816c5103a68adb2ca08b27d3acbd47b",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/13 - Apache Rose Peacock.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "Apache Rose Peacock",
+  "duration_seconds": 282,
+  "dsp_analysis": {
+    "tempo_bpm": 93.75,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.791,
+    "energy": 0.649,
+    "accousticness": 0.023,
+    "valence": 0.623,
+    "mood": "happy",
+    "mood_probability": 0.723
+  },
+  "normalized_vector": [
+    0.28125,
+    0.7914945483207703,
+    0.6488948464393616,
+    0.023449311032891273,
+    0.6227818131446838,
+    0.7229228019714355
+  ]
+}

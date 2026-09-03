@@ -1,0 +1,28 @@
+{
+  "key": "bb1d48540e19b1c81c07a5310b6c605d2fc2273f8d20c9e91c58e0c5ca48503c",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/02 - If You Have To Ask.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "If You Have To Ask",
+  "duration_seconds": 217,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "G#"
+  },
+  "ml_features": {
+    "danceability": 0.878,
+    "energy": 0.625,
+    "accousticness": 0.025,
+    "valence": 0.617,
+    "mood": "happy",
+    "mood_probability": 0.704
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.8777893781661987,
+    0.6253019571304321,
+    0.025305304676294327,
+    0.6172084212303162,
+    0.7042711973190308
+  ]
+}

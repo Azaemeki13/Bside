@@ -1,0 +1,28 @@
+{
+  "key": "578df9297f5e922d39725951b4c767251c7236d1c13b5b96a587e6f6b88e1569",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-13 Pilot.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Pilot",
+  "duration_seconds": 137,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.533,
+    "energy": 0.256,
+    "accousticness": 0.231,
+    "valence": 0.328,
+    "mood": "relaxed",
+    "mood_probability": 0.902
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.5330333709716797,
+    0.25609275698661804,
+    0.23114678263664246,
+    0.3283626139163971,
+    0.9019362926483154
+  ]
+}

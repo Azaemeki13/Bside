@@ -1,0 +1,28 @@
+{
+  "key": "99a37747e891f2433cabaf9a65df2c14cb6297cdfdec550f702244f18fee51f7",
+  "source_relpath": "Daft Punk/Random Access Memories/2-06 Doin’ It Right.flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Doin’ It Right",
+  "duration_seconds": 251,
+  "dsp_analysis": {
+    "tempo_bpm": 89.29,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.985,
+    "energy": 0.539,
+    "accousticness": 0.064,
+    "valence": 0.568,
+    "mood": "happy",
+    "mood_probability": 0.679
+  },
+  "normalized_vector": [
+    0.2440476190476191,
+    0.9849259853363037,
+    0.5392586588859558,
+    0.0643857941031456,
+    0.5684585571289062,
+    0.6790866255760193
+  ]
+}

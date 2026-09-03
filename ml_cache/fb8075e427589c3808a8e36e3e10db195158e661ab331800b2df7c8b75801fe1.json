@@ -1,0 +1,28 @@
+{
+  "key": "fb8075e427589c3808a8e36e3e10db195158e661ab331800b2df7c8b75801fe1",
+  "source_relpath": "ACDC/Iron Man II/1-10 Hell Ain't a Bad Place to Be.flac",
+  "artist": "ACDC",
+  "album": "Iron Man II",
+  "title": "Hell Ain't a Bad Place to Be",
+  "duration_seconds": 254,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.826,
+    "energy": 0.595,
+    "accousticness": 0.035,
+    "valence": 0.69,
+    "mood": "aggressive",
+    "mood_probability": 0.809
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.8260920643806458,
+    0.5947884321212769,
+    0.03535730019211769,
+    0.6904728412628174,
+    0.8088666200637817
+  ]
+}

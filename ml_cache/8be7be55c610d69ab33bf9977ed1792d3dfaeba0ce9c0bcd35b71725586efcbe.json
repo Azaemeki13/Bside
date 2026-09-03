@@ -1,0 +1,28 @@
+{
+  "key": "8be7be55c610d69ab33bf9977ed1792d3dfaeba0ce9c0bcd35b71725586efcbe",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-29 Nocturnes, Op. 9  Chopin Nocturnes, Op. 9 No. 2 in E-Flat Major. Andante.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Nocturnes, Op. 9  Chopin Nocturnes, Op. 9 No. 2 in E-Flat Major. Andante",
+  "duration_seconds": 248,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.121,
+    "energy": 0.342,
+    "accousticness": 0.727,
+    "valence": 0.368,
+    "mood": "sad",
+    "mood_probability": 0.976
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.12100475281476974,
+    0.342372328042984,
+    0.7265766263008118,
+    0.3678625822067261,
+    0.9760701656341553
+  ]
+}

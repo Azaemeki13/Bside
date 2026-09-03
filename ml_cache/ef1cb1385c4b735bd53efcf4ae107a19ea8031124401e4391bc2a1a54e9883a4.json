@@ -1,0 +1,28 @@
+{
+  "key": "ef1cb1385c4b735bd53efcf4ae107a19ea8031124401e4391bc2a1a54e9883a4",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-10 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 9 in E Major. Largo.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 9 in E Major. Largo",
+  "duration_seconds": 118,
+  "dsp_analysis": {
+    "tempo_bpm": 78.12,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.138,
+    "energy": 0.299,
+    "accousticness": 0.773,
+    "valence": 0.325,
+    "mood": "sad",
+    "mood_probability": 0.988
+  },
+  "normalized_vector": [
+    0.15104166666666666,
+    0.13802848756313324,
+    0.29877790808677673,
+    0.7730640769004822,
+    0.3251723349094391,
+    0.9879224896430969
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "c6bf3897f3628ce12f37d105c00ed0262a6eba92787f6147af295bcb3bfe8d0f",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-22 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 21 in B Flat Major. Cantabile.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 21 in B Flat Major. Cantabile",
+  "duration_seconds": 133,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.151,
+    "energy": 0.333,
+    "accousticness": 0.71,
+    "valence": 0.366,
+    "mood": "sad",
+    "mood_probability": 0.989
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.15136216580867767,
+    0.3327382206916809,
+    0.709881603717804,
+    0.3660754859447479,
+    0.9886916875839233
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "7720dff89f097a71ebb55bda2df470f09fb0105fd7c571d1b548a17b2a754af9",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-16 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 15 in D Flat Major. Sostenuto Raindrop.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 15 in D Flat Major. Sostenuto Raindrop",
+  "duration_seconds": 380,
+  "dsp_analysis": {
+    "tempo_bpm": 64.66,
+    "harmonic_key": "G#"
+  },
+  "ml_features": {
+    "danceability": 0.155,
+    "energy": 0.327,
+    "accousticness": 0.61,
+    "valence": 0.348,
+    "mood": "sad",
+    "mood_probability": 0.992
+  },
+  "normalized_vector": [
+    0.03879310344827592,
+    0.15521423518657684,
+    0.3271545469760895,
+    0.6104627251625061,
+    0.347927063703537,
+    0.9922887682914734
+  ]
+}

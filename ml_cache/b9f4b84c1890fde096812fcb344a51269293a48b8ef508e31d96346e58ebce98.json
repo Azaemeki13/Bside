@@ -1,0 +1,28 @@
+{
+  "key": "b9f4b84c1890fde096812fcb344a51269293a48b8ef508e31d96346e58ebce98",
+  "source_relpath": "Artic Monkeys/AM/04 - Arabella.flac",
+  "artist": "Artic Monkeys",
+  "album": "AM",
+  "title": "Arabella",
+  "duration_seconds": 207,
+  "dsp_analysis": {
+    "tempo_bpm": 89.29,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.983,
+    "energy": 0.557,
+    "accousticness": 0.021,
+    "valence": 0.632,
+    "mood": "party",
+    "mood_probability": 0.673
+  },
+  "normalized_vector": [
+    0.2440476190476191,
+    0.9828038811683655,
+    0.5567108392715454,
+    0.021252280101180077,
+    0.6323658227920532,
+    0.6730865836143494
+  ]
+}

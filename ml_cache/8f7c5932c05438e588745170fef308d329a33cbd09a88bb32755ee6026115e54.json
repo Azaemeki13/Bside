@@ -1,0 +1,28 @@
+{
+  "key": "8f7c5932c05438e588745170fef308d329a33cbd09a88bb32755ee6026115e54",
+  "source_relpath": "Daft Punk/Random Access Memories/3-05 GL (early take).flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "GL (early take)",
+  "duration_seconds": 33,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.649,
+    "energy": 0.505,
+    "accousticness": 0.719,
+    "valence": 0.452,
+    "mood": "sad",
+    "mood_probability": 0.957
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.6489181518554688,
+    0.5050868988037109,
+    0.7190521955490112,
+    0.45150554180145264,
+    0.9568344950675964
+  ]
+}

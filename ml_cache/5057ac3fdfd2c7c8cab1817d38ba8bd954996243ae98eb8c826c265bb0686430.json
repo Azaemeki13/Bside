@@ -1,0 +1,28 @@
+{
+  "key": "5057ac3fdfd2c7c8cab1817d38ba8bd954996243ae98eb8c826c265bb0686430",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/1-01 - Ludovico Einaudi - Corale.flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Corale",
+  "duration_seconds": 125,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.203,
+    "energy": 0.275,
+    "accousticness": 0.52,
+    "valence": 0.307,
+    "mood": "sad",
+    "mood_probability": 0.981
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.20280323922634125,
+    0.27502644062042236,
+    0.5202717781066895,
+    0.3070862591266632,
+    0.980949878692627
+  ]
+}

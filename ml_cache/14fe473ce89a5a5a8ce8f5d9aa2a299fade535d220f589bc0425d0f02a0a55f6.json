@@ -1,0 +1,28 @@
+{
+  "key": "14fe473ce89a5a5a8ce8f5d9aa2a299fade535d220f589bc0425d0f02a0a55f6",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-02 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 1 in C Major. Agitato.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 1 in C Major. Agitato",
+  "duration_seconds": 36,
+  "dsp_analysis": {
+    "tempo_bpm": 75.0,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.153,
+    "energy": 0.376,
+    "accousticness": 0.657,
+    "valence": 0.405,
+    "mood": "sad",
+    "mood_probability": 0.986
+  },
+  "normalized_vector": [
+    0.125,
+    0.15306474268436432,
+    0.3757690191268921,
+    0.6573018431663513,
+    0.4053533673286438,
+    0.9858167767524719
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "384758fd054a199ec0229d908537c77faab5350b9f3556498910cef1e5a69c44",
+  "source_relpath": "Djo/The Crux/1-07 Who You Are.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Who You Are",
+  "duration_seconds": 230,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "D"
+  },
+  "ml_features": {
+    "danceability": 0.436,
+    "energy": 0.456,
+    "accousticness": 0.683,
+    "valence": 0.419,
+    "mood": "sad",
+    "mood_probability": 0.952
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.43554115295410156,
+    0.45605409145355225,
+    0.6829860210418701,
+    0.418615460395813,
+    0.9518322944641113
+  ]
+}

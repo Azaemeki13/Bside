@@ -1,0 +1,28 @@
+{
+  "key": "f603fbec6bad833f4b082d995064d1ff0577e1c993c7589a8d893890b75941ea",
+  "source_relpath": "Daft Punk/Random Access Memories/3-02 Horizon (Japan CD).flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Horizon (Japan CD)",
+  "duration_seconds": 263,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.466,
+    "energy": 0.379,
+    "accousticness": 0.546,
+    "valence": 0.378,
+    "mood": "sad",
+    "mood_probability": 0.986
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.46599286794662476,
+    0.37946373224258423,
+    0.5459150671958923,
+    0.3781549334526062,
+    0.9857196807861328
+  ]
+}

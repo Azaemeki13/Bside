@@ -1,0 +1,28 @@
+{
+  "key": "63b986d6d20a01f1bf7fc3d566b85a9db2e8650c6df65db2e374c746912ac93a",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/06 - I Could Have Lied.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "I Could Have Lied",
+  "duration_seconds": 244,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.543,
+    "energy": 0.518,
+    "accousticness": 0.492,
+    "valence": 0.481,
+    "mood": "sad",
+    "mood_probability": 0.894
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.542998731136322,
+    0.5179551839828491,
+    0.49209752678871155,
+    0.48124170303344727,
+    0.8935732245445251
+  ]
+}

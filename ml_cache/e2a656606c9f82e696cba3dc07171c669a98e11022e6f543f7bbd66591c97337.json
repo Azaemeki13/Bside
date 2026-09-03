@@ -1,0 +1,28 @@
+{
+  "key": "e2a656606c9f82e696cba3dc07171c669a98e11022e6f543f7bbd66591c97337",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-34 Waltzes, Op. 34  Chopin Waltzes, Op. 34 No. 1 in A-Flat Major. Vivace.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Waltzes, Op. 34  Chopin Waltzes, Op. 34 No. 1 in A-Flat Major. Vivace",
+  "duration_seconds": 321,
+  "dsp_analysis": {
+    "tempo_bpm": 93.75,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.117,
+    "energy": 0.401,
+    "accousticness": 0.717,
+    "valence": 0.42,
+    "mood": "sad",
+    "mood_probability": 0.975
+  },
+  "normalized_vector": [
+    0.28125,
+    0.11741665750741959,
+    0.4010149836540222,
+    0.7167142629623413,
+    0.4203662872314453,
+    0.9747616648674011
+  ]
+}

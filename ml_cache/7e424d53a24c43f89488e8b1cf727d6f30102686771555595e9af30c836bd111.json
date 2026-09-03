@@ -1,0 +1,28 @@
+{
+  "key": "7e424d53a24c43f89488e8b1cf727d6f30102686771555595e9af30c836bd111",
+  "source_relpath": "Daft Punk/Random Access Memories/3-07 LYTD (vocoder tests).flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "LYTD (vocoder tests)",
+  "duration_seconds": 128,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "A#"
+  },
+  "ml_features": {
+    "danceability": 0.972,
+    "energy": 0.647,
+    "accousticness": 0.132,
+    "valence": 0.559,
+    "mood": "sad",
+    "mood_probability": 0.849
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.9717749953269958,
+    0.6467755436897278,
+    0.13175591826438904,
+    0.559177577495575,
+    0.8486154079437256
+  ]
+}

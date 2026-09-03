@@ -1,0 +1,28 @@
+{
+  "key": "29cbfc8fac4637e0cc8c599da714fd8643dca534b506436711843eb5594a6fc1",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-23 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 22 in G Minor. Molto agitato.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 22 in G Minor. Molto agitato",
+  "duration_seconds": 48,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.089,
+    "energy": 0.492,
+    "accousticness": 0.684,
+    "valence": 0.467,
+    "mood": "relaxed",
+    "mood_probability": 0.935
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.08861413598060608,
+    0.4916209578514099,
+    0.684087336063385,
+    0.4665507674217224,
+    0.9349405765533447
+  ]
+}

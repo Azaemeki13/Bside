@@ -1,0 +1,28 @@
+{
+  "key": "3b3028c1cbb4a6b9006252a12ff2cff1589e9d994311a8f8cfcf672cdd9f8e94",
+  "source_relpath": "Daft Punk/Random Access Memories/3-06 Prime (2012 unfinished).flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Prime (2012 unfinished)",
+  "duration_seconds": 286,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.568,
+    "energy": 0.532,
+    "accousticness": 0.412,
+    "valence": 0.509,
+    "mood": "sad",
+    "mood_probability": 0.832
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.5680618286132812,
+    0.5322572588920593,
+    0.4119633734226227,
+    0.5092765688896179,
+    0.8316514492034912
+  ]
+}

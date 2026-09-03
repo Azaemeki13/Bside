@@ -1,0 +1,28 @@
+{
+  "key": "4f96d0bc6c3ec134239c57ef6e20dc5b9d1a079de5c7bfe74e6a0a49ad9d00a9",
+  "source_relpath": "Djo/The Crux/2-10 Golden Line.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Golden Line",
+  "duration_seconds": 202,
+  "dsp_analysis": {
+    "tempo_bpm": 72.12,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.384,
+    "energy": 0.42,
+    "accousticness": 0.672,
+    "valence": 0.415,
+    "mood": "sad",
+    "mood_probability": 0.932
+  },
+  "normalized_vector": [
+    0.10096153846153845,
+    0.38371700048446655,
+    0.4197174310684204,
+    0.672217607498169,
+    0.4149622917175293,
+    0.9316031336784363
+  ]
+}

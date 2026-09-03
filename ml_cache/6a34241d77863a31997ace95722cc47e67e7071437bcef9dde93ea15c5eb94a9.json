@@ -1,0 +1,28 @@
+{
+  "key": "6a34241d77863a31997ace95722cc47e67e7071437bcef9dde93ea15c5eb94a9",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/2-03 - Ludovico Einaudi - Experience (Starkey Remix).flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Experience (Starkey Remix)",
+  "duration_seconds": 343,
+  "dsp_analysis": {
+    "tempo_bpm": 75.0,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.717,
+    "energy": 0.482,
+    "accousticness": 0.263,
+    "valence": 0.527,
+    "mood": "sad",
+    "mood_probability": 0.751
+  },
+  "normalized_vector": [
+    0.125,
+    0.7167813777923584,
+    0.4823598861694336,
+    0.2634807527065277,
+    0.5269141793251038,
+    0.7507482171058655
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "83ac8002b5500fa9a6394356c8fd8b555cf708d3e4cb03be48ca1a7c09e6c531",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-18 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 17 in A Flat Major. Allegretto.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 17 in A Flat Major. Allegretto",
+  "duration_seconds": 235,
+  "dsp_analysis": {
+    "tempo_bpm": 170.45,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.143,
+    "energy": 0.321,
+    "accousticness": 0.748,
+    "valence": 0.356,
+    "mood": "sad",
+    "mood_probability": 0.994
+  },
+  "normalized_vector": [
+    0.9204545454545455,
+    0.14253674447536469,
+    0.3213965594768524,
+    0.7484200596809387,
+    0.3562767803668976,
+    0.994081437587738
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "c97807963941279e481e4f7375314d60a975a452580ca9585c81da29a08017ed",
+  "source_relpath": "David Guetta/Nothing But the Beat/05 - David Guetta - Without You (feat. Usher).flac",
+  "artist": "David Guetta",
+  "album": "Nothing But the Beat",
+  "title": "Without You (feat. Usher)",
+  "duration_seconds": 208,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.512,
+    "energy": 0.58,
+    "accousticness": 0.374,
+    "valence": 0.611,
+    "mood": "happy",
+    "mood_probability": 0.778
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.5122724771499634,
+    0.5802891850471497,
+    0.37363362312316895,
+    0.6105556488037109,
+    0.7782811522483826
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "1b335401faecde422aa1e93240530a570a0c0664107f546014ea84cb05db3f73",
+  "source_relpath": "Artic Monkeys/AM/01 - Do I wanna know.flac",
+  "artist": "Artic Monkeys",
+  "album": "AM",
+  "title": "Do I wanna know",
+  "duration_seconds": 272,
+  "dsp_analysis": {
+    "tempo_bpm": 85.23,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.846,
+    "energy": 0.448,
+    "accousticness": 0.07,
+    "valence": 0.501,
+    "mood": "sad",
+    "mood_probability": 0.802
+  },
+  "normalized_vector": [
+    0.2102272727272728,
+    0.8462482690811157,
+    0.4483441114425659,
+    0.06992360204458237,
+    0.5005443096160889,
+    0.8024583458900452
+  ]
+}

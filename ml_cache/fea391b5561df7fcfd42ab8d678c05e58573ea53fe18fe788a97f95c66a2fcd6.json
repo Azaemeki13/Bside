@@ -1,0 +1,28 @@
+{
+  "key": "fea391b5561df7fcfd42ab8d678c05e58573ea53fe18fe788a97f95c66a2fcd6",
+  "source_relpath": "Djo/The Crux/1-03 Mr. Mountebank.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Mr. Mountebank",
+  "duration_seconds": 311,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.93,
+    "energy": 0.598,
+    "accousticness": 0.112,
+    "valence": 0.622,
+    "mood": "happy",
+    "mood_probability": 0.731
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.9297799468040466,
+    0.5975592136383057,
+    0.11190284043550491,
+    0.6222843527793884,
+    0.7305733561515808
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "76dd2a216b953f4e5dab642aa7831fabae114ea3b9c0f4d77271cd7d12b3c3f7",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/01 - The Power Of Equality.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "The Power Of Equality",
+  "duration_seconds": 244,
+  "dsp_analysis": {
+    "tempo_bpm": 104.17,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.8,
+    "energy": 0.703,
+    "accousticness": 0.005,
+    "valence": 0.55,
+    "mood": "aggressive",
+    "mood_probability": 0.828
+  },
+  "normalized_vector": [
+    0.3680555555555556,
+    0.800212562084198,
+    0.7034862637519836,
+    0.0045923395082354546,
+    0.5497884750366211,
+    0.8277628421783447
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "4a372026712cdf7fee69c355f8f6726c88b2eff3fc5999cb50840f4b93cc65f8",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-37 Chopin Waltz in A-Flat Major, Op. 42.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Chopin Waltz in A-Flat Major, Op. 42",
+  "duration_seconds": 240,
+  "dsp_analysis": {
+    "tempo_bpm": 104.17,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.125,
+    "energy": 0.448,
+    "accousticness": 0.656,
+    "valence": 0.476,
+    "mood": "sad",
+    "mood_probability": 0.952
+  },
+  "normalized_vector": [
+    0.3680555555555556,
+    0.12508073449134827,
+    0.4481324553489685,
+    0.6555712819099426,
+    0.4758531451225281,
+    0.9520099759101868
+  ]
+}

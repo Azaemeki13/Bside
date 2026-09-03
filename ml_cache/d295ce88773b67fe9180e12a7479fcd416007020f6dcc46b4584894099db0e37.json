@@ -1,0 +1,28 @@
+{
+  "key": "d295ce88773b67fe9180e12a7479fcd416007020f6dcc46b4584894099db0e37",
+  "source_relpath": "ACDC/Iron Man II/1-05 Back In Black.flac",
+  "artist": "ACDC",
+  "album": "Iron Man II",
+  "title": "Back In Black",
+  "duration_seconds": 256,
+  "dsp_analysis": {
+    "tempo_bpm": 93.75,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.645,
+    "energy": 0.54,
+    "accousticness": 0.001,
+    "valence": 0.679,
+    "mood": "aggressive",
+    "mood_probability": 0.943
+  },
+  "normalized_vector": [
+    0.28125,
+    0.6449916958808899,
+    0.5397178530693054,
+    0.0007188639719970524,
+    0.678857147693634,
+    0.9426007270812988
+  ]
+}

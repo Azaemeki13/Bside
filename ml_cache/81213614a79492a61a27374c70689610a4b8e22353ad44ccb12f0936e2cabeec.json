@@ -1,0 +1,28 @@
+{
+  "key": "81213614a79492a61a27374c70689610a4b8e22353ad44ccb12f0936e2cabeec",
+  "source_relpath": "Daft Punk/Random Access Memories/3-01 Horizon Ouverture.flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Horizon Ouverture",
+  "duration_seconds": 128,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.187,
+    "energy": 0.369,
+    "accousticness": 0.539,
+    "valence": 0.357,
+    "mood": "sad",
+    "mood_probability": 0.939
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.18699586391448975,
+    0.36899304389953613,
+    0.5387355089187622,
+    0.3565933108329773,
+    0.9394086003303528
+  ]
+}

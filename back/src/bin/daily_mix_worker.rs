@@ -1,7 +1,26 @@
 use bside::daily_mix::generate_missing_daily_mixes;
-use chrono::{Duration as ChronoDuration, Utc};
+use bside::preferences::refresh_all_user_preferences;
+use chrono::{Duration as ChronoDuration, NaiveDate, Utc};
 use sqlx::postgres::PgPoolOptions;
 use std::{env, time::Duration};
+
+/// Parse an optional `--date YYYY-MM-DD` / `--date=YYYY-MM-DD` argument. When
+/// present the worker builds mixes for that calendar date instead of "today"
+/// and exits after one pass (useful for replaying / demoing consecutive nights).
+fn parse_date_arg() -> Option<NaiveDate> {
+    let mut args = env::args();
+    while let Some(arg) = args.next() {
+        if let Some(value) = arg.strip_prefix("--date=") {
+            return NaiveDate::parse_from_str(value, "%Y-%m-%d").ok();
+        }
+        if arg == "--date" {
+            return args
+                .next()
+                .and_then(|value| NaiveDate::parse_from_str(&value, "%Y-%m-%d").ok());
+        }
+    }
+    None
+}
 
 #[tokio::main]
 async fn main() {
@@ -12,11 +31,22 @@ async fn main() {
         .connect(&database_url)
         .await
         .expect("Daily Mix worker could not connect to PostgreSQL");
-    let run_once = env::args().any(|argument| argument == "--once");
+    let date_override = parse_date_arg();
+    let run_once = date_override.is_some() || env::args().any(|argument| argument == "--once");
 
     loop {
         let now = Utc::now();
-        let date = now.date_naive();
+        let date = date_override.unwrap_or_else(|| now.date_naive());
+
+        // Bring every user's preference vector up to date before ranking, so the
+        // overnight mix reflects the latest like/play/skip history.
+        match refresh_all_user_preferences(&pool).await {
+            Ok((recomputed, cleared)) => println!(
+                "Daily Mix worker refreshed preference vectors for {date}: {recomputed} recomputed, {cleared} cleared"
+            ),
+            Err(error) => eprintln!("Preference refresh failed for {date}: {error}"),
+        }
+
         match generate_missing_daily_mixes(&pool, date).await {
             Ok(count) => {
                 println!("Daily Mix worker generated {count} mix(es) for {date}");

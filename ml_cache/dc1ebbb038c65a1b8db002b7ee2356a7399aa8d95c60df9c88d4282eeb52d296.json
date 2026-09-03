@@ -1,0 +1,28 @@
+{
+  "key": "dc1ebbb038c65a1b8db002b7ee2356a7399aa8d95c60df9c88d4282eeb52d296",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-42 Chopin Waltz in E-Flat Major, KK IVa No. 14.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Chopin Waltz in E-Flat Major, KK IVa No. 14",
+  "duration_seconds": 153,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.132,
+    "energy": 0.438,
+    "accousticness": 0.674,
+    "valence": 0.439,
+    "mood": "sad",
+    "mood_probability": 0.97
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.13156388700008392,
+    0.4378008246421814,
+    0.6736039519309998,
+    0.43874239921569824,
+    0.9696849584579468
+  ]
+}

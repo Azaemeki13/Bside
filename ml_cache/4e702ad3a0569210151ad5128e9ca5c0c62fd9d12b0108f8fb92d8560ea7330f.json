@@ -1,0 +1,28 @@
+{
+  "key": "4e702ad3a0569210151ad5128e9ca5c0c62fd9d12b0108f8fb92d8560ea7330f",
+  "source_relpath": "Artic Monkeys/AM/02 - R U Mine.flac",
+  "artist": "Artic Monkeys",
+  "album": "AM",
+  "title": "R U Mine",
+  "duration_seconds": 202,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.886,
+    "energy": 0.544,
+    "accousticness": 0.063,
+    "valence": 0.596,
+    "mood": "aggressive",
+    "mood_probability": 0.886
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.8863304257392883,
+    0.5438008904457092,
+    0.06280653923749924,
+    0.5957855582237244,
+    0.8863893151283264
+  ]
+}

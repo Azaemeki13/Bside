@@ -1,0 +1,28 @@
+{
+  "key": "3a0342607438073cbb7edf64208920f2c7cf6310f39e122527c963d4e17f417f",
+  "source_relpath": "Gigi Perrez/Sailor's Song - EP/1-01 Sailor Song.flac",
+  "artist": "Gigi Perrez",
+  "album": "Sailor's Song - EP",
+  "title": "Sailor Song",
+  "duration_seconds": 212,
+  "dsp_analysis": {
+    "tempo_bpm": 93.75,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.208,
+    "energy": 0.456,
+    "accousticness": 0.572,
+    "valence": 0.482,
+    "mood": "sad",
+    "mood_probability": 0.89
+  },
+  "normalized_vector": [
+    0.28125,
+    0.20805704593658447,
+    0.4555513858795166,
+    0.5715470910072327,
+    0.4821926951408386,
+    0.8904373049736023
+  ]
+}

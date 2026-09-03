@@ -1,0 +1,28 @@
+{
+  "key": "490e39628ebb534161d9c4560028d77a83d09cbf127e7b777bbb993c90314f87",
+  "source_relpath": "Taylor Swift/Red/16 - Taylor Swift - Begin Again.flac",
+  "artist": "Taylor Swift",
+  "album": "Red",
+  "title": "Begin Again",
+  "duration_seconds": 238,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "D"
+  },
+  "ml_features": {
+    "danceability": 0.387,
+    "energy": 0.524,
+    "accousticness": 0.591,
+    "valence": 0.524,
+    "mood": "sad",
+    "mood_probability": 0.957
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.3871275782585144,
+    0.5242105722427368,
+    0.5914790630340576,
+    0.5242387056350708,
+    0.9571758508682251
+  ]
+}

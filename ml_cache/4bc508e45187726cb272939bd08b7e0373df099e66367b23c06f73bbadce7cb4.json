@@ -1,0 +1,28 @@
+{
+  "key": "4bc508e45187726cb272939bd08b7e0373df099e66367b23c06f73bbadce7cb4",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-38 Waltzes, Op. 69  Chopin Waltzes, Op. 69 No. 1 in A-Flat Major.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Waltzes, Op. 69  Chopin Waltzes, Op. 69 No. 1 in A-Flat Major",
+  "duration_seconds": 194,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.128,
+    "energy": 0.376,
+    "accousticness": 0.729,
+    "valence": 0.412,
+    "mood": "sad",
+    "mood_probability": 0.995
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.12817923724651337,
+    0.37617582082748413,
+    0.7291634678840637,
+    0.4120437502861023,
+    0.994585394859314
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "2bb1f456ecd3ae4af3ed1992e68070a471e7305c366758b09c8766191deac7a0",
+  "source_relpath": "Daft Punk/Alive/1-02 Touch It Technologic.flac",
+  "artist": "Daft Punk",
+  "album": "Alive",
+  "title": "Touch It Technologic",
+  "duration_seconds": 330,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.946,
+    "energy": 0.513,
+    "accousticness": 0.005,
+    "valence": 0.596,
+    "mood": "electronic",
+    "mood_probability": 0.762
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.9459633827209473,
+    0.5125465393066406,
+    0.004614705219864845,
+    0.5955122709274292,
+    0.7624768614768982
+  ]
+}

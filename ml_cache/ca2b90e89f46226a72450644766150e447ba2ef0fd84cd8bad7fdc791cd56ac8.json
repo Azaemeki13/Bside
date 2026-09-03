@@ -1,0 +1,28 @@
+{
+  "key": "ca2b90e89f46226a72450644766150e447ba2ef0fd84cd8bad7fdc791cd56ac8",
+  "source_relpath": "Djo/Decide/1-04 Fool.flac",
+  "artist": "Djo",
+  "album": "Decide",
+  "title": "Fool",
+  "duration_seconds": 115,
+  "dsp_analysis": {
+    "tempo_bpm": 85.23,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.968,
+    "energy": 0.65,
+    "accousticness": 0.048,
+    "valence": 0.634,
+    "mood": "sad",
+    "mood_probability": 0.826
+  },
+  "normalized_vector": [
+    0.2102272727272728,
+    0.9677534699440002,
+    0.6501643061637878,
+    0.04812513291835785,
+    0.6335989236831665,
+    0.8258355855941772
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "5a7e08cb41e50d2e1c6c45677d54fbfff2b1c41d5d5e6bbdead8f7747d8ba946",
+  "source_relpath": "ACDC/Iron Man II/1-07 If You Want Blood (You've Got It).flac",
+  "artist": "ACDC",
+  "album": "Iron Man II",
+  "title": "If You Want Blood (You've Got It)",
+  "duration_seconds": 274,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.554,
+    "energy": 0.538,
+    "accousticness": 0.009,
+    "valence": 0.704,
+    "mood": "aggressive",
+    "mood_probability": 0.957
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.5535649657249451,
+    0.5383007526397705,
+    0.008624115958809853,
+    0.7035911679267883,
+    0.956916868686676
+  ]
+}

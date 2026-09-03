@@ -1,0 +1,28 @@
+{
+  "key": "db416f23544c5414c4888a63d2a29b4c3f142718d7adb9aace35c517e6602873",
+  "source_relpath": "ACDC/Iron Man II/1-09 T.N.T..flac",
+  "artist": "ACDC",
+  "album": "Iron Man II",
+  "title": "T.N.T.",
+  "duration_seconds": 214,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.745,
+    "energy": 0.534,
+    "accousticness": 0.052,
+    "valence": 0.653,
+    "mood": "aggressive",
+    "mood_probability": 0.77
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.7448570132255554,
+    0.5339468717575073,
+    0.05188495293259621,
+    0.6529786586761475,
+    0.7704890370368958
+  ]
+}

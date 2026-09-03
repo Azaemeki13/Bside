@@ -1,0 +1,28 @@
+{
+  "key": "d908fabe70dd050fd91f80dcd94c1a00546750cfaa1f278d183b06129575e44c",
+  "source_relpath": "Daft Punk/Discovery/1-01 One More Time.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "One More Time",
+  "duration_seconds": 320,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "D"
+  },
+  "ml_features": {
+    "danceability": 0.669,
+    "energy": 0.589,
+    "accousticness": 0.306,
+    "valence": 0.584,
+    "mood": "sad",
+    "mood_probability": 0.626
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.6694054007530212,
+    0.5891886949539185,
+    0.3062451481819153,
+    0.5835902690887451,
+    0.6263794302940369
+  ]
+}

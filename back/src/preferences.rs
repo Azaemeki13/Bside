@@ -264,6 +264,32 @@ pub async fn refresh_user_preference(
     Ok(preference_vector)
 }
 
+/// Recompute and persist the preference vector for every non-banned user.
+///
+/// The per-interaction refresh in the handlers keeps a user's vector current
+/// while they are active. This batch pass is what the Daily Mix worker runs each
+/// night before building mixes, so vectors also move for users whose history
+/// changed without hitting those handlers - seed/batch-loaded interactions, or
+/// anything that landed while the worker was down.
+///
+/// Returns `(recomputed, cleared)`: users given a fresh vector, and users whose
+/// vector was removed because they no longer have any weighted history.
+pub async fn refresh_all_user_preferences(db: &PgPool) -> Result<(u64, u64), sqlx::Error> {
+    let user_ids = sqlx::query_scalar::<_, Uuid>("SELECT id FROM users WHERE NOT is_banned")
+        .fetch_all(db)
+        .await?;
+
+    let mut recomputed = 0u64;
+    let mut cleared = 0u64;
+    for user_id in user_ids {
+        match refresh_user_preference(db, user_id).await? {
+            Some(_) => recomputed += 1,
+            None => cleared += 1,
+        }
+    }
+    Ok((recomputed, cleared))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

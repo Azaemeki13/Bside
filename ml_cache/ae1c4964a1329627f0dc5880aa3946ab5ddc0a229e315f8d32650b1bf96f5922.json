@@ -1,0 +1,28 @@
+{
+  "key": "ae1c4964a1329627f0dc5880aa3946ab5ddc0a229e315f8d32650b1bf96f5922",
+  "source_relpath": "Artic Monkeys/AM/03 - One for the Road.flac",
+  "artist": "Artic Monkeys",
+  "album": "AM",
+  "title": "One for the Road",
+  "duration_seconds": 206,
+  "dsp_analysis": {
+    "tempo_bpm": 89.29,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.936,
+    "energy": 0.522,
+    "accousticness": 0.022,
+    "valence": 0.565,
+    "mood": "sad",
+    "mood_probability": 0.696
+  },
+  "normalized_vector": [
+    0.2440476190476191,
+    0.936468780040741,
+    0.5223206281661987,
+    0.02237604930996895,
+    0.5649291276931763,
+    0.6962649822235107
+  ]
+}

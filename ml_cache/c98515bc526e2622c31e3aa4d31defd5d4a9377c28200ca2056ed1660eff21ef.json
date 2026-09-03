@@ -1,0 +1,28 @@
+{
+  "key": "c98515bc526e2622c31e3aa4d31defd5d4a9377c28200ca2056ed1660eff21ef",
+  "source_relpath": "Djo/The Crux/2-07 Fly.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Fly",
+  "duration_seconds": 325,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "D"
+  },
+  "ml_features": {
+    "danceability": 0.61,
+    "energy": 0.435,
+    "accousticness": 0.56,
+    "valence": 0.451,
+    "mood": "sad",
+    "mood_probability": 0.914
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.6099555492401123,
+    0.4345948100090027,
+    0.5601896047592163,
+    0.4510900378227234,
+    0.9139804840087891
+  ]
+}

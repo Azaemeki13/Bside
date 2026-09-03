@@ -1,0 +1,28 @@
+{
+  "key": "cf8e68daadfbdde39b191adcdf9f44afa6459ebf9a91ed0d0bcff9a1b66612c3",
+  "source_relpath": "Djo/Decide/1-08 Climax.flac",
+  "artist": "Djo",
+  "album": "Decide",
+  "title": "Climax",
+  "duration_seconds": 236,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.957,
+    "energy": 0.591,
+    "accousticness": 0.252,
+    "valence": 0.514,
+    "mood": "sad",
+    "mood_probability": 0.925
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.9572104811668396,
+    0.5911789536476135,
+    0.2518705725669861,
+    0.5141898393630981,
+    0.9252597093582153
+  ]
+}

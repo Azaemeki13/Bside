@@ -1,0 +1,28 @@
+{
+  "key": "436940226d2b66cbafa4b6f68e6adb93598ae5d81e0811a1f586ae66dc48b820",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-28 Waltzes, Op. 70  Chopin Waltzes, Op. 70 No. 3 in D-Flat Major.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Waltzes, Op. 70  Chopin Waltzes, Op. 70 No. 3 in D-Flat Major",
+  "duration_seconds": 157,
+  "dsp_analysis": {
+    "tempo_bpm": 187.5,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.142,
+    "energy": 0.418,
+    "accousticness": 0.726,
+    "valence": 0.426,
+    "mood": "sad",
+    "mood_probability": 0.989
+  },
+  "normalized_vector": [
+    1.0,
+    0.14245595037937164,
+    0.4181986451148987,
+    0.7257940769195557,
+    0.42598921060562134,
+    0.988704264163971
+  ]
+}

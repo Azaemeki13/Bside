@@ -1,0 +1,28 @@
+{
+  "key": "1c5d948759ceb5abcbfaa0fc8546f57def7fbf6c316b309170261d5b8ca97de8",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-39 Waltzes, Op. 69  Chopin Waltzes, Op. 69 No. 2 in B Minor.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Waltzes, Op. 69  Chopin Waltzes, Op. 69 No. 2 in B Minor",
+  "duration_seconds": 209,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.148,
+    "energy": 0.403,
+    "accousticness": 0.57,
+    "valence": 0.424,
+    "mood": "sad",
+    "mood_probability": 0.994
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.1477828472852707,
+    0.40298348665237427,
+    0.569702684879303,
+    0.4239475727081299,
+    0.9938971400260925
+  ]
+}

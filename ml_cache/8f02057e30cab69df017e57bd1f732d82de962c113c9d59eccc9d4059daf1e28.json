@@ -1,0 +1,28 @@
+{
+  "key": "8f02057e30cab69df017e57bd1f732d82de962c113c9d59eccc9d4059daf1e28",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-31 Waltzes, Op. 64  Chopin Waltzes, Op. 64 No. 2 in C-Sharp Minor. Tempo giusto.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Waltzes, Op. 64  Chopin Waltzes, Op. 64 No. 2 in C-Sharp Minor. Tempo giusto",
+  "duration_seconds": 220,
+  "dsp_analysis": {
+    "tempo_bpm": 104.17,
+    "harmonic_key": "G#"
+  },
+  "ml_features": {
+    "danceability": 0.157,
+    "energy": 0.414,
+    "accousticness": 0.59,
+    "valence": 0.43,
+    "mood": "sad",
+    "mood_probability": 0.993
+  },
+  "normalized_vector": [
+    0.3680555555555556,
+    0.1570739448070526,
+    0.4135391116142273,
+    0.5899388790130615,
+    0.42975813150405884,
+    0.9929816126823425
+  ]
+}

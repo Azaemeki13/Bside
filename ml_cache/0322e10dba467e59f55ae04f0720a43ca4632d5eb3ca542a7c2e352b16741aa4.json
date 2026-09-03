@@ -1,0 +1,28 @@
+{
+  "key": "0322e10dba467e59f55ae04f0720a43ca4632d5eb3ca542a7c2e352b16741aa4",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-17 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 16 in B Flat Minor. Presto con fuoco.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 16 in B Flat Minor. Presto con fuoco",
+  "duration_seconds": 76,
+  "dsp_analysis": {
+    "tempo_bpm": 85.23,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.112,
+    "energy": 0.471,
+    "accousticness": 0.652,
+    "valence": 0.504,
+    "mood": "relaxed",
+    "mood_probability": 0.893
+  },
+  "normalized_vector": [
+    0.2102272727272728,
+    0.11182743310928345,
+    0.470969021320343,
+    0.6518507599830627,
+    0.5042639374732971,
+    0.8931334614753723
+  ]
+}

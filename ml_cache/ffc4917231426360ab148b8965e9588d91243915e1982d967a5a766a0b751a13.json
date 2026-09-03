@@ -1,0 +1,28 @@
+{
+  "key": "ffc4917231426360ab148b8965e9588d91243915e1982d967a5a766a0b751a13",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-21 All the Best Memories Are Hers.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "All the Best Memories Are Hers",
+  "duration_seconds": 202,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.214,
+    "energy": 0.298,
+    "accousticness": 0.572,
+    "valence": 0.316,
+    "mood": "sad",
+    "mood_probability": 0.968
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.21371141076087952,
+    0.29833510518074036,
+    0.5718603730201721,
+    0.31557151675224304,
+    0.9679939150810242
+  ]
+}

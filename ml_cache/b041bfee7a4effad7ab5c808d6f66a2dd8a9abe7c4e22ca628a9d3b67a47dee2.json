@@ -1,0 +1,28 @@
+{
+  "key": "b041bfee7a4effad7ab5c808d6f66a2dd8a9abe7c4e22ca628a9d3b67a47dee2",
+  "source_relpath": "Taylor Swift/Red/15 - Taylor Swift - Starlight.flac",
+  "artist": "Taylor Swift",
+  "album": "Red",
+  "title": "Starlight",
+  "duration_seconds": 218,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.837,
+    "energy": 0.659,
+    "accousticness": 0.278,
+    "valence": 0.66,
+    "mood": "happy",
+    "mood_probability": 0.777
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.836739182472229,
+    0.6594228148460388,
+    0.27779263257980347,
+    0.6603637337684631,
+    0.7772418856620789
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "657158d10b4f466729649de1fc9ecee3326c37825c856832a688a380bd8ef3ad",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-14 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 13 in F Sharp Minor. Lento.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 13 in F Sharp Minor. Lento",
+  "duration_seconds": 175,
+  "dsp_analysis": {
+    "tempo_bpm": 81.52,
+    "harmonic_key": "A#"
+  },
+  "ml_features": {
+    "danceability": 0.155,
+    "energy": 0.305,
+    "accousticness": 0.703,
+    "valence": 0.357,
+    "mood": "sad",
+    "mood_probability": 0.992
+  },
+  "normalized_vector": [
+    0.1793478260869565,
+    0.15453067421913147,
+    0.3054872453212738,
+    0.7029770612716675,
+    0.3573400378227234,
+    0.9921099543571472
+  ]
+}

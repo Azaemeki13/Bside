@@ -1,0 +1,28 @@
+{
+  "key": "9056ed99b9346f16a4313caad38b4c0b8ce0b8f11b2d9376fa287b060c2f9007",
+  "source_relpath": "Taylor Swift/Red/03 - Taylor Swift - Treacherous.flac",
+  "artist": "Taylor Swift",
+  "album": "Red",
+  "title": "Treacherous",
+  "duration_seconds": 241,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "D"
+  },
+  "ml_features": {
+    "danceability": 0.522,
+    "energy": 0.509,
+    "accousticness": 0.417,
+    "valence": 0.531,
+    "mood": "sad",
+    "mood_probability": 0.886
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.5222779512405396,
+    0.5085971355438232,
+    0.4170646667480469,
+    0.5311241149902344,
+    0.8859399557113647
+  ]
+}

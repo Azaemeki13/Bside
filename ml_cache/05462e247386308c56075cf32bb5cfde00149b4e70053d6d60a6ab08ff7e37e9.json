@@ -1,0 +1,28 @@
+{
+  "key": "05462e247386308c56075cf32bb5cfde00149b4e70053d6d60a6ab08ff7e37e9",
+  "source_relpath": "Daft Punk/Random Access Memories/2-03 Beyond.flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Beyond",
+  "duration_seconds": 290,
+  "dsp_analysis": {
+    "tempo_bpm": 104.17,
+    "harmonic_key": "G#"
+  },
+  "ml_features": {
+    "danceability": 0.719,
+    "energy": 0.533,
+    "accousticness": 0.719,
+    "valence": 0.475,
+    "mood": "sad",
+    "mood_probability": 0.901
+  },
+  "normalized_vector": [
+    0.3680555555555556,
+    0.7191723585128784,
+    0.5329661965370178,
+    0.7185274362564087,
+    0.47468066215515137,
+    0.9009259343147278
+  ]
+}

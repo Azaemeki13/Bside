@@ -1,0 +1,28 @@
+{
+  "key": "a972475e45d7f162cf8c0ae4dce1af13dbb7a7e8d6f7327cdd886b6bcdf628c9",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/1-13 - Ludovico Einaudi - Underwood.flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Underwood",
+  "duration_seconds": 253,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.173,
+    "energy": 0.295,
+    "accousticness": 0.435,
+    "valence": 0.331,
+    "mood": "sad",
+    "mood_probability": 0.998
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.17284388840198517,
+    0.2951395511627197,
+    0.4348333775997162,
+    0.3313412666320801,
+    0.9981752634048462
+  ]
+}

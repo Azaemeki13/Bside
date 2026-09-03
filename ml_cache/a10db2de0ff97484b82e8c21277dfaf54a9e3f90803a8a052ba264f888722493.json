@@ -1,0 +1,28 @@
+{
+  "key": "a10db2de0ff97484b82e8c21277dfaf54a9e3f90803a8a052ba264f888722493",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-17 Hijack.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Hijack",
+  "duration_seconds": 333,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.464,
+    "energy": 0.286,
+    "accousticness": 0.318,
+    "valence": 0.35,
+    "mood": "relaxed",
+    "mood_probability": 0.785
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.464114785194397,
+    0.2858485281467438,
+    0.3182002604007721,
+    0.34997645020484924,
+    0.7851338386535645
+  ]
+}

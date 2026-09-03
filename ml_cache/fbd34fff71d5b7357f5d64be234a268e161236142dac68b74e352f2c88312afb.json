@@ -1,0 +1,28 @@
+{
+  "key": "fbd34fff71d5b7357f5d64be234a268e161236142dac68b74e352f2c88312afb",
+  "source_relpath": "Djo/The Crux/1-05 It's Over.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "It's Over",
+  "duration_seconds": 207,
+  "dsp_analysis": {
+    "tempo_bpm": 78.12,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.602,
+    "energy": 0.436,
+    "accousticness": 0.695,
+    "valence": 0.41,
+    "mood": "sad",
+    "mood_probability": 0.958
+  },
+  "normalized_vector": [
+    0.15104166666666666,
+    0.6016107201576233,
+    0.4359678030014038,
+    0.6954545974731445,
+    0.41016584634780884,
+    0.9575557112693787
+  ]
+}

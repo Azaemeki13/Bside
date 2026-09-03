@@ -1,0 +1,28 @@
+{
+  "key": "2d95c6850844eb10ae6beec3fefdfc249e1bd807dcba5a12b703cf23938d083b",
+  "source_relpath": "Daft Punk/Discovery/1-10 Voyager.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "Voyager",
+  "duration_seconds": 228,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.924,
+    "energy": 0.595,
+    "accousticness": 0.089,
+    "valence": 0.583,
+    "mood": "electronic",
+    "mood_probability": 0.833
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.9243499636650085,
+    0.5947808027267456,
+    0.08937819302082062,
+    0.5834550857543945,
+    0.8328868746757507
+  ]
+}

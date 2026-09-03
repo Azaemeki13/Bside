@@ -1,0 +1,28 @@
+{
+  "key": "7871a50f906edef1033129ba8cc74efdd0421c6c0aeccfaaf466691c015f126e",
+  "source_relpath": "Daft Punk/Discovery/1-13 Face to Face.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "Face to Face",
+  "duration_seconds": 240,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "G#"
+  },
+  "ml_features": {
+    "danceability": 0.995,
+    "energy": 0.676,
+    "accousticness": 0.001,
+    "valence": 0.636,
+    "mood": "electronic",
+    "mood_probability": 0.632
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.995095431804657,
+    0.6761465072631836,
+    0.0006789897452108562,
+    0.635848879814148,
+    0.6318376660346985
+  ]
+}

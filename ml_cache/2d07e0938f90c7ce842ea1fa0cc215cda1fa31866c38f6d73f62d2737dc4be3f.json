@@ -1,0 +1,28 @@
+{
+  "key": "2d07e0938f90c7ce842ea1fa0cc215cda1fa31866c38f6d73f62d2737dc4be3f",
+  "source_relpath": "Daft Punk/Random Access Memories/3-09 Touch (2021 epilogue).flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Touch (2021 epilogue)",
+  "duration_seconds": 180,
+  "dsp_analysis": {
+    "tempo_bpm": 89.29,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.526,
+    "energy": 0.418,
+    "accousticness": 0.463,
+    "valence": 0.436,
+    "mood": "sad",
+    "mood_probability": 0.921
+  },
+  "normalized_vector": [
+    0.2440476190476191,
+    0.5263804197311401,
+    0.41757118701934814,
+    0.4628898501396179,
+    0.4364544153213501,
+    0.9209893941879272
+  ]
+}

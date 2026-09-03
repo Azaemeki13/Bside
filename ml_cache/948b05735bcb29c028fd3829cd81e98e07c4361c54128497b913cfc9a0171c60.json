@@ -1,0 +1,28 @@
+{
+  "key": "948b05735bcb29c028fd3829cd81e98e07c4361c54128497b913cfc9a0171c60",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-24 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 23 in F Major. Moderato.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 23 in F Major. Moderato",
+  "duration_seconds": 47,
+  "dsp_analysis": {
+    "tempo_bpm": 187.5,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.159,
+    "energy": 0.457,
+    "accousticness": 0.609,
+    "valence": 0.464,
+    "mood": "sad",
+    "mood_probability": 0.962
+  },
+  "normalized_vector": [
+    1.0,
+    0.1587987244129181,
+    0.45729124546051025,
+    0.6089962124824524,
+    0.46350938081741333,
+    0.9619358777999878
+  ]
+}

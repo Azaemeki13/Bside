@@ -1,0 +1,28 @@
+{
+  "key": "eb67886fefc77cc8f66f7d2427a1b7057a668fd35472b7cad09a75eb8ca99bb8",
+  "source_relpath": "Djo/The Crux/1-04 Carry The Name.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Carry The Name",
+  "duration_seconds": 147,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.886,
+    "energy": 0.527,
+    "accousticness": 0.451,
+    "valence": 0.504,
+    "mood": "sad",
+    "mood_probability": 0.916
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.886207640171051,
+    0.5272244215011597,
+    0.4514598250389099,
+    0.5037348866462708,
+    0.916289210319519
+  ]
+}

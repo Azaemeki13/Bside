@@ -1,0 +1,28 @@
+{
+  "key": "ca9ef91e167eb534fe6f0c20d7b0d6cc44aa329f675d8623fde6972be038a87b",
+  "source_relpath": "ACDC/Iron Man II/1-13 Let There Be Rock.flac",
+  "artist": "ACDC",
+  "album": "Iron Man II",
+  "title": "Let There Be Rock",
+  "duration_seconds": 366,
+  "dsp_analysis": {
+    "tempo_bpm": 187.5,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.887,
+    "energy": 0.609,
+    "accousticness": 0.028,
+    "valence": 0.701,
+    "mood": "aggressive",
+    "mood_probability": 0.815
+  },
+  "normalized_vector": [
+    1.0,
+    0.8874725699424744,
+    0.6090231537818909,
+    0.02757313661277294,
+    0.7006428241729736,
+    0.8146035671234131
+  ]
+}

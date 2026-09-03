@@ -1,0 +1,28 @@
+{
+  "key": "61095f39a51856585f9ce615e0cc70b25fc1f1e5edfe5dfc38c2b6fdf49ae51c",
+  "source_relpath": "Artic Monkeys/AM/11 - Knee Socks.flac",
+  "artist": "Artic Monkeys",
+  "album": "AM",
+  "title": "Knee Socks",
+  "duration_seconds": 258,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.904,
+    "energy": 0.534,
+    "accousticness": 0.064,
+    "valence": 0.534,
+    "mood": "sad",
+    "mood_probability": 0.753
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.9044363498687744,
+    0.5339075326919556,
+    0.06383801251649857,
+    0.5344804525375366,
+    0.753300666809082
+  ]
+}

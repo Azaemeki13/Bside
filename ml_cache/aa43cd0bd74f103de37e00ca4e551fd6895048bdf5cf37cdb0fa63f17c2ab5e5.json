@@ -1,0 +1,28 @@
+{
+  "key": "aa43cd0bd74f103de37e00ca4e551fd6895048bdf5cf37cdb0fa63f17c2ab5e5",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/1-09 - Ludovico Einaudi - Two Trees.flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Two Trees",
+  "duration_seconds": 386,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.191,
+    "energy": 0.316,
+    "accousticness": 0.444,
+    "valence": 0.344,
+    "mood": "sad",
+    "mood_probability": 0.993
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.1905103623867035,
+    0.31597939133644104,
+    0.4440068006515503,
+    0.343744695186615,
+    0.9933992028236389
+  ]
+}

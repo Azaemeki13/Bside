@@ -1,0 +1,28 @@
+{
+  "key": "22206fb62dc29983b7fa09ffa946263ac8ec746ff01cc1ee9a5d68e19fa7c15a",
+  "source_relpath": "Daft Punk/Random Access Memories/3-04 Infinity Repeating (2013 demo).flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Infinity Repeating (2013 demo)",
+  "duration_seconds": 239,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "G#"
+  },
+  "ml_features": {
+    "danceability": 0.951,
+    "energy": 0.5,
+    "accousticness": 0.49,
+    "valence": 0.524,
+    "mood": "sad",
+    "mood_probability": 0.854
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.9510206580162048,
+    0.5001180171966553,
+    0.49006929993629456,
+    0.5239323973655701,
+    0.8544871211051941
+  ]
+}

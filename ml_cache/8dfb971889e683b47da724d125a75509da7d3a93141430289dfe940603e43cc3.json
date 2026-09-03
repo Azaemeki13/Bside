@@ -1,0 +1,28 @@
+{
+  "key": "8dfb971889e683b47da724d125a75509da7d3a93141430289dfe940603e43cc3",
+  "source_relpath": "Artic Monkeys/AM/12 - I wanna be yours.flac",
+  "artist": "Artic Monkeys",
+  "album": "AM",
+  "title": "I wanna be yours",
+  "duration_seconds": 184,
+  "dsp_analysis": {
+    "tempo_bpm": 66.96,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.735,
+    "energy": 0.399,
+    "accousticness": 0.225,
+    "valence": 0.453,
+    "mood": "sad",
+    "mood_probability": 0.897
+  },
+  "normalized_vector": [
+    0.05803571428571423,
+    0.7346112728118896,
+    0.39854395389556885,
+    0.22470030188560486,
+    0.45326530933380127,
+    0.8973034620285034
+  ]
+}

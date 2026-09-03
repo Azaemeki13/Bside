@@ -1,0 +1,28 @@
+{
+  "key": "14dc4715a19203898eb52483e6d7de7e51d8c957f66205138d977eb2f34fec82",
+  "source_relpath": "David Guetta/Nothing But the Beat/06 - David Guetta - Nothing Really Matters (feat. will.i.am) [Explicit].flac",
+  "artist": "David Guetta",
+  "album": "Nothing But the Beat",
+  "title": "Nothing Really Matters (feat. will.i.am) [Explicit]",
+  "duration_seconds": 220,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.775,
+    "energy": 0.665,
+    "accousticness": 0.193,
+    "valence": 0.642,
+    "mood": "happy",
+    "mood_probability": 0.752
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.7754685878753662,
+    0.6650673747062683,
+    0.1931309700012207,
+    0.6420901417732239,
+    0.7519431114196777
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "8b75ca42f3b4489e744cbe6eb64675b84797d94e132a37c400df1d58ab643e50",
+  "source_relpath": "Artic Monkeys/AM/06 - No.1 Party Anthem.flac",
+  "artist": "Artic Monkeys",
+  "album": "AM",
+  "title": "No.1 Party Anthem",
+  "duration_seconds": 243,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.86,
+    "energy": 0.427,
+    "accousticness": 0.328,
+    "valence": 0.47,
+    "mood": "sad",
+    "mood_probability": 0.877
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.860122561454773,
+    0.4273134469985962,
+    0.3280150890350342,
+    0.470475435256958,
+    0.8767709732055664
+  ]
+}

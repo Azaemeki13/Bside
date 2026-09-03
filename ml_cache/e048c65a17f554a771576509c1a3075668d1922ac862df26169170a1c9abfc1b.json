@@ -1,0 +1,28 @@
+{
+  "key": "e048c65a17f554a771576509c1a3075668d1922ac862df26169170a1c9abfc1b",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-06 Wallace.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Wallace",
+  "duration_seconds": 324,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.515,
+    "energy": 0.277,
+    "accousticness": 0.448,
+    "valence": 0.311,
+    "mood": "relaxed",
+    "mood_probability": 0.91
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.5153632164001465,
+    0.2774639427661896,
+    0.4477868676185608,
+    0.3113292157649994,
+    0.909591794013977
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "5ce534757f9198bcb8124c74c23162cc01d8484509a872fbc8ba40e42ab6a1b1",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-19 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 18 in C Minor. Molto allegro.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 18 in C Minor. Molto allegro",
+  "duration_seconds": 60,
+  "dsp_analysis": {
+    "tempo_bpm": 208.33,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.096,
+    "energy": 0.444,
+    "accousticness": 0.712,
+    "valence": 0.444,
+    "mood": "sad",
+    "mood_probability": 0.901
+  },
+  "normalized_vector": [
+    1.0,
+    0.0960000678896904,
+    0.4435245394706726,
+    0.7117703557014465,
+    0.44430673122406006,
+    0.9011436700820923
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "44f60b89279856880faa47322c80178a952f5bfaa4619297d31f935d703cce33",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-30 Waltzes, Op. 64  Chopin Waltzes, Op. 64 No. 1 in D-Flat Major. Molto vivace Minute.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Waltzes, Op. 64  Chopin Waltzes, Op. 64 No. 1 in D-Flat Major. Molto vivace Minute",
+  "duration_seconds": 115,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "G#"
+  },
+  "ml_features": {
+    "danceability": 0.142,
+    "energy": 0.438,
+    "accousticness": 0.636,
+    "valence": 0.485,
+    "mood": "sad",
+    "mood_probability": 0.972
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.1417187601327896,
+    0.4381709694862366,
+    0.6355695724487305,
+    0.4848424792289734,
+    0.9722540974617004
+  ]
+}

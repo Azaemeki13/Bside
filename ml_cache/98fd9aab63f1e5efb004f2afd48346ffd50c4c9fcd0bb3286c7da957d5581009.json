@@ -1,0 +1,28 @@
+{
+  "key": "98fd9aab63f1e5efb004f2afd48346ffd50c4c9fcd0bb3286c7da957d5581009",
+  "source_relpath": "David Guetta/Nothing But the Beat/10 - David Guetta - Lunar (feat. Afrojack).flac",
+  "artist": "David Guetta",
+  "album": "Nothing But the Beat",
+  "title": "Lunar (feat. Afrojack)",
+  "duration_seconds": 317,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.831,
+    "energy": 0.647,
+    "accousticness": 0.101,
+    "valence": 0.711,
+    "mood": "happy",
+    "mood_probability": 0.768
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.830691397190094,
+    0.6474588513374329,
+    0.10061366856098175,
+    0.7109711766242981,
+    0.7677116394042969
+  ]
+}

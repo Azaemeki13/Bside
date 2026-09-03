@@ -1,0 +1,28 @@
+{
+  "key": "4d4a69131715997fc1af6ba888c3d8e110ed7dd719ec98ffbde93c6bbc9274c1",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/1-06 - Ludovico Einaudi - Run.flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Run",
+  "duration_seconds": 332,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.141,
+    "energy": 0.416,
+    "accousticness": 0.56,
+    "valence": 0.409,
+    "mood": "sad",
+    "mood_probability": 0.966
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.14133445918560028,
+    0.4160383939743042,
+    0.5599989295005798,
+    0.4093552827835083,
+    0.966422438621521
+  ]
+}

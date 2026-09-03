@@ -1,0 +1,28 @@
+{
+  "key": "2f598e8772439a6cad425dc2454874640e5bdcba1a6df819e83cdc5864d5346a",
+  "source_relpath": "Daft Punk/Random Access Memories/1-04 Within.flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Within",
+  "duration_seconds": 229,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "A#"
+  },
+  "ml_features": {
+    "danceability": 0.447,
+    "energy": 0.376,
+    "accousticness": 0.841,
+    "valence": 0.369,
+    "mood": "sad",
+    "mood_probability": 0.994
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.4465183913707733,
+    0.37640124559402466,
+    0.8414085507392883,
+    0.3691304922103882,
+    0.9942305684089661
+  ]
+}

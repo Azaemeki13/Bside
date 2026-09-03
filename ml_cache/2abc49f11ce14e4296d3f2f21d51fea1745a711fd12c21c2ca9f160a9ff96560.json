@@ -1,0 +1,28 @@
+{
+  "key": "2abc49f11ce14e4296d3f2f21d51fea1745a711fd12c21c2ca9f160a9ff96560",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-01 2049.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "2049",
+  "duration_seconds": 218,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.514,
+    "energy": 0.268,
+    "accousticness": 0.279,
+    "valence": 0.308,
+    "mood": "relaxed",
+    "mood_probability": 0.928
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.5136963725090027,
+    0.26808997988700867,
+    0.27852663397789,
+    0.3083733022212982,
+    0.928487241268158
+  ]
+}

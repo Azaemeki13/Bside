@@ -1,0 +1,28 @@
+{
+  "key": "8e27022f2cad2523a7d71494eeaf8cf518f60031a01935ebde5a4c70001d7cc0",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-09 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 8 in F Sharp Minor. Molto agitato.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 8 in F Sharp Minor. Molto agitato",
+  "duration_seconds": 119,
+  "dsp_analysis": {
+    "tempo_bpm": 85.23,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.142,
+    "energy": 0.382,
+    "accousticness": 0.668,
+    "valence": 0.406,
+    "mood": "sad",
+    "mood_probability": 0.974
+  },
+  "normalized_vector": [
+    0.2102272727272728,
+    0.1424238234758377,
+    0.3819054961204529,
+    0.6682178974151611,
+    0.40629833936691284,
+    0.9741116166114807
+  ]
+}

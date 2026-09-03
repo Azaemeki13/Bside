@@ -1,0 +1,28 @@
+{
+  "key": "1fe6111b26b3af01109d274a85dcc869076063c5058e9393c3795d47b059603c",
+  "source_relpath": "Djo/Decide/1-01 Runner.flac",
+  "artist": "Djo",
+  "album": "Decide",
+  "title": "Runner",
+  "duration_seconds": 259,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "G#"
+  },
+  "ml_features": {
+    "danceability": 0.893,
+    "energy": 0.669,
+    "accousticness": 0.107,
+    "valence": 0.662,
+    "mood": "electronic",
+    "mood_probability": 0.758
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.8931770324707031,
+    0.6692405343055725,
+    0.10676604509353638,
+    0.6615629196166992,
+    0.7578304409980774
+  ]
+}

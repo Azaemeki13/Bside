@@ -1,0 +1,28 @@
+{
+  "key": "675557a6040fb6ebc988653ef602038dd69ad847862c1bbf4da04508d627a00a",
+  "source_relpath": "ACDC/Iron Man II/1-15 Highway to Hell.flac",
+  "artist": "ACDC",
+  "album": "Iron Man II",
+  "title": "Highway to Hell",
+  "duration_seconds": 209,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.66,
+    "energy": 0.512,
+    "accousticness": 0.031,
+    "valence": 0.692,
+    "mood": "aggressive",
+    "mood_probability": 0.897
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.660133957862854,
+    0.5122303366661072,
+    0.03129644691944122,
+    0.6919316053390503,
+    0.8971560001373291
+  ]
+}

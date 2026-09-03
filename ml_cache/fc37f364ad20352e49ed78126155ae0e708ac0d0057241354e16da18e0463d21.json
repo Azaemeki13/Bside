@@ -1,0 +1,28 @@
+{
+  "key": "fc37f364ad20352e49ed78126155ae0e708ac0d0057241354e16da18e0463d21",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-20 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 19 in E Flat Major. Vivace.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 19 in E Flat Major. Vivace",
+  "duration_seconds": 86,
+  "dsp_analysis": {
+    "tempo_bpm": 170.45,
+    "harmonic_key": "A#"
+  },
+  "ml_features": {
+    "danceability": 0.125,
+    "energy": 0.425,
+    "accousticness": 0.686,
+    "valence": 0.437,
+    "mood": "sad",
+    "mood_probability": 0.971
+  },
+  "normalized_vector": [
+    0.9204545454545455,
+    0.12466482073068619,
+    0.4254348874092102,
+    0.6858468055725098,
+    0.43704932928085327,
+    0.9712623953819275
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "cc66d692ad9b521620586740b020679ab9c7389078b21aae37651860a6f5623f",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/1-12 - Ludovico Einaudi - Einaudi_ Experience.flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Einaudi_ Experience",
+  "duration_seconds": 315,
+  "dsp_analysis": {
+    "tempo_bpm": 93.75,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.115,
+    "energy": 0.408,
+    "accousticness": 0.648,
+    "valence": 0.427,
+    "mood": "sad",
+    "mood_probability": 0.956
+  },
+  "normalized_vector": [
+    0.28125,
+    0.11518850177526474,
+    0.4083701968193054,
+    0.647935152053833,
+    0.42718935012817383,
+    0.9558238983154297
+  ]
+}

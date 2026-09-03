@@ -1,0 +1,28 @@
+{
+  "key": "82b8c3a9fbb04fd9df28527e36d78f74a3f76fe5f31c5a26a84b57a35040c614",
+  "source_relpath": "Daft Punk/Random Access Memories/2-02 Get Lucky.flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Get Lucky",
+  "duration_seconds": 370,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.943,
+    "energy": 0.697,
+    "accousticness": 0.123,
+    "valence": 0.644,
+    "mood": "happy",
+    "mood_probability": 0.754
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.9430508613586426,
+    0.6974356174468994,
+    0.12281525880098343,
+    0.6443045139312744,
+    0.7541527152061462
+  ]
+}

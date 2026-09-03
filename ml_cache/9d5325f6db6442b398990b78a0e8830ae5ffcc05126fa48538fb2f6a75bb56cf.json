@@ -1,0 +1,28 @@
+{
+  "key": "9d5325f6db6442b398990b78a0e8830ae5ffcc05126fa48538fb2f6a75bb56cf",
+  "source_relpath": "Daft Punk/Random Access Memories/1-01 Give Life Back to Music.flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Give Life Back to Music",
+  "duration_seconds": 275,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.883,
+    "energy": 0.661,
+    "accousticness": 0.035,
+    "valence": 0.601,
+    "mood": "sad",
+    "mood_probability": 0.62
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.8829454183578491,
+    0.6611108183860779,
+    0.03482971340417862,
+    0.6013524532318115,
+    0.6204977631568909
+  ]
+}

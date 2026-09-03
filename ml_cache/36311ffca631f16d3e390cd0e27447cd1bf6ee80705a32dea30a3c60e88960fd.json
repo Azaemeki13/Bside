@@ -1,0 +1,28 @@
+{
+  "key": "36311ffca631f16d3e390cd0e27447cd1bf6ee80705a32dea30a3c60e88960fd",
+  "source_relpath": "Taylor Swift/Red/14 - Taylor Swift - Everything Has Changed (feat. Ed Sheeran).flac",
+  "artist": "Taylor Swift",
+  "album": "Red",
+  "title": "Everything Has Changed (feat. Ed Sheeran)",
+  "duration_seconds": 244,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "A#"
+  },
+  "ml_features": {
+    "danceability": 0.596,
+    "energy": 0.59,
+    "accousticness": 0.437,
+    "valence": 0.574,
+    "mood": "sad",
+    "mood_probability": 0.818
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.5960119366645813,
+    0.5895336866378784,
+    0.43741005659103394,
+    0.5744747519493103,
+    0.8180568218231201
+  ]
+}

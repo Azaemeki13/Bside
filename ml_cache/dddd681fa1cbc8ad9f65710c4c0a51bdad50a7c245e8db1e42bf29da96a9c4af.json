@@ -1,0 +1,28 @@
+{
+  "key": "dddd681fa1cbc8ad9f65710c4c0a51bdad50a7c245e8db1e42bf29da96a9c4af",
+  "source_relpath": "Taylor Swift/Red/09 - Taylor Swift - Stay Stay Stay.flac",
+  "artist": "Taylor Swift",
+  "album": "Red",
+  "title": "Stay Stay Stay",
+  "duration_seconds": 205,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.618,
+    "energy": 0.658,
+    "accousticness": 0.411,
+    "valence": 0.666,
+    "mood": "sad",
+    "mood_probability": 0.824
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.6175767183303833,
+    0.6582658886909485,
+    0.41112542152404785,
+    0.6662600636482239,
+    0.8244799375534058
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "58f9da78a53f8278b1b14f28ff6c6a0b4dc870fdf1e327d0a9f2b25a7e7b40c0",
+  "source_relpath": "Daft Punk/Discovery/1-11 Veridis Quo.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "Veridis Quo",
+  "duration_seconds": 345,
+  "dsp_analysis": {
+    "tempo_bpm": 104.17,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.832,
+    "energy": 0.522,
+    "accousticness": 0.211,
+    "valence": 0.504,
+    "mood": "relaxed",
+    "mood_probability": 0.888
+  },
+  "normalized_vector": [
+    0.3680555555555556,
+    0.8317350745201111,
+    0.5223397016525269,
+    0.21114453673362732,
+    0.5042890906333923,
+    0.8882017731666565
+  ]
+}

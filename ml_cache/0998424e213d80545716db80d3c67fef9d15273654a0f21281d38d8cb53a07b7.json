@@ -1,0 +1,28 @@
+{
+  "key": "0998424e213d80545716db80d3c67fef9d15273654a0f21281d38d8cb53a07b7",
+  "source_relpath": "Daft Punk/Random Access Memories/3-03 GLBTM (studio outtakes).flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "GLBTM (studio outtakes)",
+  "duration_seconds": 382,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.887,
+    "energy": 0.608,
+    "accousticness": 0.103,
+    "valence": 0.549,
+    "mood": "sad",
+    "mood_probability": 0.839
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.8873027563095093,
+    0.607664942741394,
+    0.10331027209758759,
+    0.5493810176849365,
+    0.8392884731292725
+  ]
+}

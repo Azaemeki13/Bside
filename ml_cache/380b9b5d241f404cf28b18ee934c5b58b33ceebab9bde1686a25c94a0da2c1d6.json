@@ -1,0 +1,28 @@
+{
+  "key": "380b9b5d241f404cf28b18ee934c5b58b33ceebab9bde1686a25c94a0da2c1d6",
+  "source_relpath": "Daft Punk/Random Access Memories/1-03 Giorgio by Moroder.flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Giorgio by Moroder",
+  "duration_seconds": 545,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.889,
+    "energy": 0.555,
+    "accousticness": 0.185,
+    "valence": 0.566,
+    "mood": "electronic",
+    "mood_probability": 0.699
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.889144241809845,
+    0.5554444789886475,
+    0.18540970981121063,
+    0.5664499998092651,
+    0.698841392993927
+  ]
+}

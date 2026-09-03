@@ -116,6 +116,42 @@ def natural_key(path: Path) -> list[int | str]:
     return [int(part) if part.isdigit() else part.lower() for part in re.split(r"(\d+)", path.name)]
 
 
+_TREE_TRACK_NUM_DISC = re.compile(r"^\s*\d+[\s._-]+\d+\s+(.+)$")
+_TREE_TRACK_NUM = re.compile(r"^\s*\d+\s*[-.\s]+\s*(.+)$")
+
+
+def tree_metadata(path: Path, root: Path, album_dir: Path) -> tuple[str, str, str]:
+    """Best-effort ``(artist, album, title)`` from an ``Artist/Album/NN Title``
+    tree, used when the audio files carry no readable embedded tags (e.g. no
+    ffprobe available). Mirrors ml_engine/src/batch_analyze.derive_metadata so
+    the uploaded rows line up with the offline analysis index.
+    """
+    parts = album_dir.relative_to(root).parts
+    if len(parts) >= 2:
+        artist, album = parts[0], parts[1]
+    elif len(parts) == 1:
+        artist, album = parts[0], parts[0]
+    else:
+        artist, album = "Unknown Artist", album_dir.name
+
+    stem = path.stem
+    for pattern in (_TREE_TRACK_NUM_DISC, _TREE_TRACK_NUM):
+        match = pattern.match(stem)
+        if match:
+            title = match.group(1).strip()
+            break
+    else:
+        title = stem.strip()
+    # Filenames like "1-01 - Artist - Title" leave a dangling separator once the
+    # track number is gone.
+    title = re.sub(r"^[\s\-–—.]+", "", title).strip()
+    if " - " in title:
+        head, tail = title.split(" - ", 1)
+        if head.strip().casefold() == artist.strip().casefold():
+            title = tail.strip()
+    return artist.strip(), album.strip(), title or stem
+
+
 def read_text_file(path: Path) -> str | None:
     try:
         value = path.read_text(encoding="utf-8").strip()
@@ -238,9 +274,22 @@ def discover_flat_tracks(root: Path, args: argparse.Namespace) -> list[TrackInpu
     return tracks
 
 
+def _album_dirs(root: Path) -> list[Path]:
+    """Every directory that *directly* contains audio, at any depth below root.
+
+    Handles both a flat ``root/<album>/*.flac`` layout and an
+    ``root/<artist>/<album>/*.flac`` library tree.
+    """
+    found: set[Path] = set()
+    for path in root.rglob("*"):
+        if path.is_file() and path.suffix.lower() in INPUT_AUDIO_EXTENSIONS:
+            found.add(path.parent)
+    return sorted(found, key=natural_key)
+
+
 def discover_legacy_tracks(root: Path, args: argparse.Namespace) -> list[TrackInput]:
     tracks: list[TrackInput] = []
-    for album_dir in sorted((item for item in root.iterdir() if item.is_dir()), key=natural_key):
+    for album_dir in _album_dirs(root):
         songs = sorted(
             (item for item in album_dir.iterdir() if item.is_file() and item.suffix.lower() in INPUT_AUDIO_EXTENSIONS),
             key=natural_key,
@@ -248,6 +297,7 @@ def discover_legacy_tracks(root: Path, args: argparse.Namespace) -> list[TrackIn
         if not songs:
             continue
         probed = [(path, *ffprobe_info(path)) for path in songs]
+        tree_artist, tree_album, _ = tree_metadata(songs[0], root, album_dir)
         album_artist = args.artist_name or next(
             (
                 tags.get("album_artist") or tags.get("artist")
@@ -255,20 +305,24 @@ def discover_legacy_tracks(root: Path, args: argparse.Namespace) -> list[TrackIn
                 if tags.get("album_artist") or tags.get("artist")
             ),
             None,
-        )
+        ) or tree_artist
         if not album_artist:
             raise SystemExit(
                 f"Cannot determine album artist for {album_dir}. Add embedded metadata or pass --artist-name."
             )
         album_title = next(
             (tags.get("album") for _, _, tags in probed if tags.get("album")),
-            album_dir.name.strip(),
+            tree_album or album_dir.name.strip(),
         )
         embedded_genre = next((tags.get("genre") for _, _, tags in probed if tags.get("genre")), None)
         genre = normalize_genre(find_tag(album_dir, embedded_genre or args.default_genre))
-        cover = find_cover(album_dir)
+        fallback_cover = args.default_cover if args.default_cover and args.default_cover.is_file() else None
+        cover = find_cover(album_dir) or fallback_cover
         if not cover:
-            raise SystemExit(f"Missing cover image in album folder: {album_dir}")
+            raise SystemExit(
+                f"Missing cover image in album folder: {album_dir} "
+                "(add cover.jpg or pass --default-cover)."
+            )
 
         candidates: list[tuple[TrackInput, dict[str, str]]] = []
         for path, probed_duration, tags in probed:
@@ -278,7 +332,11 @@ def discover_legacy_tracks(root: Path, args: argparse.Namespace) -> list[TrackIn
                         source=path,
                         artist=album_artist.strip(),
                         album=album_title.strip(),
-                        title=(tags.get("title") or clean_track_stem(path)).strip(),
+                        title=(
+                            tags.get("title")
+                            or tree_metadata(path, root, album_dir)[2]
+                            or clean_track_stem(path)
+                        ).strip(),
                         genre=genre,
                         cover=cover,
                         duration_seconds=duration_seconds(path, probed_duration),
@@ -664,6 +722,13 @@ def parse_args() -> argparse.Namespace:
         "--default-genre",
         default=DEFAULT_GENRE,
         help=f"Genre used when no metadata/tag.txt exists. Default: {DEFAULT_GENRE}",
+    )
+    parser.add_argument(
+        "--default-cover",
+        type=Path,
+        default=Path(__file__).resolve().parent / "defaults" / "default_cover.jpg",
+        help="Cover image used for album folders that have no cover.* file. "
+        "Default: scripts/defaults/default_cover.jpg",
     )
     parser.add_argument("--token", help="Admin JWT auth token. Alternatively set BSIDE_TOKEN.")
     parser.add_argument("--token-file", help="Path to a file containing the admin JWT auth token.")

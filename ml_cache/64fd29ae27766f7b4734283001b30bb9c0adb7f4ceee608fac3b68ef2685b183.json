@@ -1,0 +1,28 @@
+{
+  "key": "64fd29ae27766f7b4734283001b30bb9c0adb7f4ceee608fac3b68ef2685b183",
+  "source_relpath": "Taylor Swift/Red/13 - Taylor Swift - The Lucky One.flac",
+  "artist": "Taylor Swift",
+  "album": "Red",
+  "title": "The Lucky One",
+  "duration_seconds": 240,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.927,
+    "energy": 0.578,
+    "accousticness": 0.299,
+    "valence": 0.629,
+    "mood": "sad",
+    "mood_probability": 0.902
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.926506519317627,
+    0.5776813626289368,
+    0.2994680404663086,
+    0.6292487382888794,
+    0.9016706347465515
+  ]
+}

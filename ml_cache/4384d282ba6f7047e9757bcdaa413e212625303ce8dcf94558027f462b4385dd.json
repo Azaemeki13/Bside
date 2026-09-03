@@ -1,0 +1,28 @@
+{
+  "key": "4384d282ba6f7047e9757bcdaa413e212625303ce8dcf94558027f462b4385dd",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-16 One For My Baby (And One More For The Road).flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "One For My Baby (And One More For The Road)",
+  "duration_seconds": 264,
+  "dsp_analysis": {
+    "tempo_bpm": 170.45,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.062,
+    "energy": 0.304,
+    "accousticness": 0.812,
+    "valence": 0.382,
+    "mood": "sad",
+    "mood_probability": 0.988
+  },
+  "normalized_vector": [
+    0.9204545454545455,
+    0.06201484426856041,
+    0.30361270904541016,
+    0.8118783831596375,
+    0.38163304328918457,
+    0.9880126714706421
+  ]
+}

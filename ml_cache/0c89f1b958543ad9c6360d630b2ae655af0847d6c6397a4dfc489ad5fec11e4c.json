@@ -1,0 +1,28 @@
+{
+  "key": "0c89f1b958543ad9c6360d630b2ae655af0847d6c6397a4dfc489ad5fec11e4c",
+  "source_relpath": "Djo/The Crux/1-10 They Don't Know What's Right.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "They Don't Know What's Right",
+  "duration_seconds": 176,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.981,
+    "energy": 0.65,
+    "accousticness": 0.002,
+    "valence": 0.733,
+    "mood": "party",
+    "mood_probability": 0.856
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.9805771708488464,
+    0.6498807072639465,
+    0.0021908979397267103,
+    0.7334495186805725,
+    0.855513334274292
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "85ee56784fbaf6e3310b00459d0a467aeeaa008d926b53dc9397af7c96851da5",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/1-11 - Ludovico Einaudi - Waterways.flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Waterways",
+  "duration_seconds": 258,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.354,
+    "energy": 0.273,
+    "accousticness": 0.61,
+    "valence": 0.299,
+    "mood": "sad",
+    "mood_probability": 0.969
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.35376617312431335,
+    0.272733598947525,
+    0.6095983982086182,
+    0.2992382347583771,
+    0.968937873840332
+  ]
+}

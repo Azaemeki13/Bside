@@ -1,0 +1,28 @@
+{
+  "key": "d48edb8bedfc2774f6fb53b4e8763ff7ce93517521565ab3a203ce2f2b7258ce",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/1-08 - Ludovico Einaudi - Orbits.flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Orbits",
+  "duration_seconds": 177,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.435,
+    "energy": 0.388,
+    "accousticness": 0.588,
+    "valence": 0.385,
+    "mood": "sad",
+    "mood_probability": 0.945
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.43459945917129517,
+    0.38795989751815796,
+    0.5877313017845154,
+    0.3850021958351135,
+    0.9452412724494934
+  ]
+}

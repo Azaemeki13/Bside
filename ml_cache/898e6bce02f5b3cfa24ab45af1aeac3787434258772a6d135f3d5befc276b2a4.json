@@ -1,0 +1,28 @@
+{
+  "key": "898e6bce02f5b3cfa24ab45af1aeac3787434258772a6d135f3d5befc276b2a4",
+  "source_relpath": "David Guetta/Nothing But the Beat/03 - David Guetta - Turn Me On (feat. Nicki Minaj).flac",
+  "artist": "David Guetta",
+  "album": "Nothing But the Beat",
+  "title": "Turn Me On (feat. Nicki Minaj)",
+  "duration_seconds": 200,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.872,
+    "energy": 0.633,
+    "accousticness": 0.095,
+    "valence": 0.72,
+    "mood": "happy",
+    "mood_probability": 0.85
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.8716005682945251,
+    0.6331464648246765,
+    0.09476031363010406,
+    0.7200865745544434,
+    0.8497908711433411
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "155c3373b817cde8f2263a84bca3a0ebd662768549162ba153fc323acf51c3e9",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-13 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 12 in G Sharp Minor. Presto.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 12 in G Sharp Minor. Presto",
+  "duration_seconds": 89,
+  "dsp_analysis": {
+    "tempo_bpm": 72.12,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.099,
+    "energy": 0.456,
+    "accousticness": 0.71,
+    "valence": 0.439,
+    "mood": "relaxed",
+    "mood_probability": 0.928
+  },
+  "normalized_vector": [
+    0.10096153846153845,
+    0.09914007037878036,
+    0.455998957157135,
+    0.7102687954902649,
+    0.43909573554992676,
+    0.928076446056366
+  ]
+}

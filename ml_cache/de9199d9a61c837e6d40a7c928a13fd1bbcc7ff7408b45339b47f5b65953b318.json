@@ -1,0 +1,28 @@
+{
+  "key": "de9199d9a61c837e6d40a7c928a13fd1bbcc7ff7408b45339b47f5b65953b318",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/05 - Suck My Kiss.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "Suck My Kiss",
+  "duration_seconds": 217,
+  "dsp_analysis": {
+    "tempo_bpm": 104.17,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.56,
+    "energy": 0.677,
+    "accousticness": 0.001,
+    "valence": 0.59,
+    "mood": "aggressive",
+    "mood_probability": 0.94
+  },
+  "normalized_vector": [
+    0.3680555555555556,
+    0.5598675608634949,
+    0.6765393614768982,
+    0.0013621714897453785,
+    0.5902273058891296,
+    0.9396059513092041
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "bb1208aca49b9abe2e733627e248ad8b60a0df2214a8154fe2b14fe50830ad96",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/2-02 - Ludovico Einaudi - Time Lapse (Dot Major Remix).flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Time Lapse (Dot Major Remix)",
+  "duration_seconds": 351,
+  "dsp_analysis": {
+    "tempo_bpm": 133.93,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.733,
+    "energy": 0.482,
+    "accousticness": 0.213,
+    "valence": 0.537,
+    "mood": "electronic",
+    "mood_probability": 0.733
+  },
+  "normalized_vector": [
+    0.6160714285714285,
+    0.7326717972755432,
+    0.48237794637680054,
+    0.2131364345550537,
+    0.5365810394287109,
+    0.7334831953048706
+  ]
+}

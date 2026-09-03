@@ -1,0 +1,28 @@
+{
+  "key": "b3b4231807f3e8b8e7954f6addd5f673de18dece9ae4b31308d22568055cea95",
+  "source_relpath": "Daft Punk/Alive/1-01 Robot Rock Oh Yeah.flac",
+  "artist": "Daft Punk",
+  "album": "Alive",
+  "title": "Robot Rock Oh Yeah",
+  "duration_seconds": 388,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "D"
+  },
+  "ml_features": {
+    "danceability": 0.82,
+    "energy": 0.459,
+    "accousticness": 0.027,
+    "valence": 0.53,
+    "mood": "aggressive",
+    "mood_probability": 0.823
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.8196755051612854,
+    0.4590502977371216,
+    0.027112243697047234,
+    0.5295681357383728,
+    0.82338547706604
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "4ac224e3be3b5b151550374545d22984e780deef4b7d2b00adc489e8aec8bdbe",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/1-05 - Ludovico Einaudi - Discovery At Night.flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Discovery At Night",
+  "duration_seconds": 266,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.14,
+    "energy": 0.317,
+    "accousticness": 0.672,
+    "valence": 0.343,
+    "mood": "sad",
+    "mood_probability": 0.995
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.13999144732952118,
+    0.3169272541999817,
+    0.6716623902320862,
+    0.3432331383228302,
+    0.9947695136070251
+  ]
+}

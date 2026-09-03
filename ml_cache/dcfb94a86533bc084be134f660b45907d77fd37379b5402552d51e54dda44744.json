@@ -1,0 +1,28 @@
+{
+  "key": "dcfb94a86533bc084be134f660b45907d77fd37379b5402552d51e54dda44744",
+  "source_relpath": "Daft Punk/Random Access Memories/2-07 Contact.flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Contact",
+  "duration_seconds": 384,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.675,
+    "energy": 0.481,
+    "accousticness": 0.253,
+    "valence": 0.595,
+    "mood": "aggressive",
+    "mood_probability": 0.636
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.6754075288772583,
+    0.4811277985572815,
+    0.25315600633621216,
+    0.5946422219276428,
+    0.6358130574226379
+  ]
+}

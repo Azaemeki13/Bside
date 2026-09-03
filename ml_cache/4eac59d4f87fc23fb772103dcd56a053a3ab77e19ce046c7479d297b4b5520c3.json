@@ -1,0 +1,28 @@
+{
+  "key": "4eac59d4f87fc23fb772103dcd56a053a3ab77e19ce046c7479d297b4b5520c3",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/1-02 - Ludovico Einaudi - Time Lapse.flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Time Lapse",
+  "duration_seconds": 331,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.236,
+    "energy": 0.309,
+    "accousticness": 0.654,
+    "valence": 0.333,
+    "mood": "sad",
+    "mood_probability": 0.981
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.2362464815378189,
+    0.3091491460800171,
+    0.6543272733688354,
+    0.33344486355781555,
+    0.9811273217201233
+  ]
+}

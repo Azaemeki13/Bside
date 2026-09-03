@@ -1,0 +1,28 @@
+{
+  "key": "92db47990b3a743356bfd9a382bd8533cd40c23708d4eb1d736289629fc9e29e",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/09 - Give It Away.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "Give It Away",
+  "duration_seconds": 283,
+  "dsp_analysis": {
+    "tempo_bpm": 187.5,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.839,
+    "energy": 0.68,
+    "accousticness": 0.01,
+    "valence": 0.626,
+    "mood": "aggressive",
+    "mood_probability": 0.861
+  },
+  "normalized_vector": [
+    1.0,
+    0.8394200801849365,
+    0.6800059080123901,
+    0.009805232286453247,
+    0.6257123351097107,
+    0.8614089488983154
+  ]
+}

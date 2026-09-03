@@ -1,0 +1,28 @@
+{
+  "key": "f1461d987dea95b0cfac6dfcc8e0e979976a4fb0cc97c0b128b6f1289c78aa43",
+  "source_relpath": "Artic Monkeys/AM/09 - Why'd you only call me when you're high.flac",
+  "artist": "Artic Monkeys",
+  "album": "AM",
+  "title": "Why'd you only call me when you're high",
+  "duration_seconds": 161,
+  "dsp_analysis": {
+    "tempo_bpm": 93.75,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.992,
+    "energy": 0.595,
+    "accousticness": 0.003,
+    "valence": 0.587,
+    "mood": "party",
+    "mood_probability": 0.731
+  },
+  "normalized_vector": [
+    0.28125,
+    0.9921871423721313,
+    0.5953860878944397,
+    0.002614844823256135,
+    0.586569607257843,
+    0.7311808466911316
+  ]
+}

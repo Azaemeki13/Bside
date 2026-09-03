@@ -1,0 +1,28 @@
+{
+  "key": "a1e3cfb9147f891dcbb6c182c6f1fa88775268cfccc975df4a28bd578677f893",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-07 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 6 in B Minor. Lento assai.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 6 in B Minor. Lento assai",
+  "duration_seconds": 130,
+  "dsp_analysis": {
+    "tempo_bpm": 89.29,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.178,
+    "energy": 0.298,
+    "accousticness": 0.649,
+    "valence": 0.333,
+    "mood": "sad",
+    "mood_probability": 0.998
+  },
+  "normalized_vector": [
+    0.2440476190476191,
+    0.17776447534561157,
+    0.29758283495903015,
+    0.6493598818778992,
+    0.3331928551197052,
+    0.998225748538971
+  ]
+}

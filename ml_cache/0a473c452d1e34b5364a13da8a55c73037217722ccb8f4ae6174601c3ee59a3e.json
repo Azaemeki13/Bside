@@ -1,0 +1,28 @@
+{
+  "key": "0a473c452d1e34b5364a13da8a55c73037217722ccb8f4ae6174601c3ee59a3e",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-04 Summer Wind.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Summer Wind",
+  "duration_seconds": 175,
+  "dsp_analysis": {
+    "tempo_bpm": 89.29,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.12,
+    "energy": 0.451,
+    "accousticness": 0.613,
+    "valence": 0.492,
+    "mood": "sad",
+    "mood_probability": 0.925
+  },
+  "normalized_vector": [
+    0.2440476190476191,
+    0.12018904834985733,
+    0.4511488676071167,
+    0.613400936126709,
+    0.4919799566268921,
+    0.9249725341796875
+  ]
+}

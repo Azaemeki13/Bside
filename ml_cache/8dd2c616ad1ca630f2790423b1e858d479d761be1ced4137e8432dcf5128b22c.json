@@ -1,0 +1,28 @@
+{
+  "key": "8dd2c616ad1ca630f2790423b1e858d479d761be1ced4137e8432dcf5128b22c",
+  "source_relpath": "David Guetta/Nothing But the Beat/11 - David Guetta - Night of Your Life (feat. Jennifer Hudson).flac",
+  "artist": "David Guetta",
+  "album": "Nothing But the Beat",
+  "title": "Night of Your Life (feat. Jennifer Hudson)",
+  "duration_seconds": 222,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "A#"
+  },
+  "ml_features": {
+    "danceability": 0.908,
+    "energy": 0.693,
+    "accousticness": 0.031,
+    "valence": 0.697,
+    "mood": "happy",
+    "mood_probability": 0.822
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.9077247381210327,
+    0.6927540898323059,
+    0.030765503644943237,
+    0.6966517567634583,
+    0.8221980929374695
+  ]
+}

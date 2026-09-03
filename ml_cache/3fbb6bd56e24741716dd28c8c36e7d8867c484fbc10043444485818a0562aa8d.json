@@ -1,0 +1,28 @@
+{
+  "key": "3fbb6bd56e24741716dd28c8c36e7d8867c484fbc10043444485818a0562aa8d",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-01 Chopin Waltz in A Minor, KK IVb No. 11.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Chopin Waltz in A Minor, KK IVb No. 11",
+  "duration_seconds": 119,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.18,
+    "energy": 0.376,
+    "accousticness": 0.418,
+    "valence": 0.389,
+    "mood": "sad",
+    "mood_probability": 0.998
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.17963804304599762,
+    0.3762873411178589,
+    0.41818127036094666,
+    0.3891701102256775,
+    0.997712254524231
+  ]
+}

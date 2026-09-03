@@ -1,0 +1,28 @@
+{
+  "key": "0c08757c48c7a1ebc175bb45213e1f5b5115f8a37b102fc8b0f5a15345b41054",
+  "source_relpath": "Artic Monkeys/AM/08 - Fireside.flac",
+  "artist": "Artic Monkeys",
+  "album": "AM",
+  "title": "Fireside",
+  "duration_seconds": 181,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.965,
+    "energy": 0.573,
+    "accousticness": 0.023,
+    "valence": 0.605,
+    "mood": "aggressive",
+    "mood_probability": 0.914
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.9650334119796753,
+    0.5725089907646179,
+    0.023378891870379448,
+    0.6046915054321289,
+    0.9143186807632446
+  ]
+}

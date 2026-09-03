@@ -1,0 +1,28 @@
+{
+  "key": "3076c249275b7ddce8c0462e85c45f51fd291e7ab6f9c4f8749b33512e802009",
+  "source_relpath": "Taylor Swift/Red/11 - Taylor Swift - Holy Ground.flac",
+  "artist": "Taylor Swift",
+  "album": "Red",
+  "title": "Holy Ground",
+  "duration_seconds": 202,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.828,
+    "energy": 0.548,
+    "accousticness": 0.126,
+    "valence": 0.635,
+    "mood": "sad",
+    "mood_probability": 0.777
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.8282561302185059,
+    0.54818195104599,
+    0.12649419903755188,
+    0.6354323625564575,
+    0.7774993777275085
+  ]
+}

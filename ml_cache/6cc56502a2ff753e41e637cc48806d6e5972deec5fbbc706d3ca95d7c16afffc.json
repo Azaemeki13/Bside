@@ -1,0 +1,28 @@
+{
+  "key": "6cc56502a2ff753e41e637cc48806d6e5972deec5fbbc706d3ca95d7c16afffc",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-10 Furnace.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Furnace",
+  "duration_seconds": 222,
+  "dsp_analysis": {
+    "tempo_bpm": 104.17,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.572,
+    "energy": 0.263,
+    "accousticness": 0.377,
+    "valence": 0.299,
+    "mood": "relaxed",
+    "mood_probability": 0.93
+  },
+  "normalized_vector": [
+    0.3680555555555556,
+    0.5720612406730652,
+    0.26322823762893677,
+    0.3771738111972809,
+    0.2988758385181427,
+    0.9302943348884583
+  ]
+}

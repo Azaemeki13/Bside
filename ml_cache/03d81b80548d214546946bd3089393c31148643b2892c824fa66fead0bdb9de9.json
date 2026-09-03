@@ -1,0 +1,28 @@
+{
+  "key": "03d81b80548d214546946bd3089393c31148643b2892c824fa66fead0bdb9de9",
+  "source_relpath": "ACDC/Iron Man II/1-14 War Machine.flac",
+  "artist": "ACDC",
+  "album": "Iron Man II",
+  "title": "War Machine",
+  "duration_seconds": 190,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.983,
+    "energy": 0.622,
+    "accousticness": 0.011,
+    "valence": 0.628,
+    "mood": "aggressive",
+    "mood_probability": 0.868
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.9825509786605835,
+    0.6222741007804871,
+    0.010557032190263271,
+    0.6281159520149231,
+    0.8680387735366821
+  ]
+}

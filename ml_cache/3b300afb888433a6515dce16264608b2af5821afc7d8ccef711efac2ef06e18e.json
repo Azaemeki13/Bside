@@ -1,0 +1,28 @@
+{
+  "key": "3b300afb888433a6515dce16264608b2af5821afc7d8ccef711efac2ef06e18e",
+  "source_relpath": "Daft Punk/Alive/1-08 One More Time Aerodynamic.flac",
+  "artist": "Daft Punk",
+  "album": "Alive",
+  "title": "One More Time Aerodynamic",
+  "duration_seconds": 371,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.851,
+    "energy": 0.573,
+    "accousticness": 0.139,
+    "valence": 0.609,
+    "mood": "electronic",
+    "mood_probability": 0.727
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.850552499294281,
+    0.5733011364936829,
+    0.13923615217208862,
+    0.6092754006385803,
+    0.7271276712417603
+  ]
+}

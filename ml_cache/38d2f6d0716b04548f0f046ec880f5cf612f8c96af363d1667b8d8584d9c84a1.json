@@ -1,0 +1,28 @@
+{
+  "key": "38d2f6d0716b04548f0f046ec880f5cf612f8c96af363d1667b8d8584d9c84a1",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-45 Chopin Nocturne in C-Sharp Minor, KK IVa No. 16.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Chopin Nocturne in C-Sharp Minor, KK IVa No. 16",
+  "duration_seconds": 254,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.177,
+    "energy": 0.346,
+    "accousticness": 0.52,
+    "valence": 0.37,
+    "mood": "sad",
+    "mood_probability": 0.997
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.17669233679771423,
+    0.3457944095134735,
+    0.5195556282997131,
+    0.3698168992996216,
+    0.9967132210731506
+  ]
+}

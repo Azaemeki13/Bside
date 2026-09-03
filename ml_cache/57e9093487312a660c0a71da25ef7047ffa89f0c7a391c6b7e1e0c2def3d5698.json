@@ -1,0 +1,28 @@
+{
+  "key": "57e9093487312a660c0a71da25ef7047ffa89f0c7a391c6b7e1e0c2def3d5698",
+  "source_relpath": "Djo/The Crux/2-12 Crux.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Crux",
+  "duration_seconds": 223,
+  "dsp_analysis": {
+    "tempo_bpm": 78.12,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.567,
+    "energy": 0.416,
+    "accousticness": 0.647,
+    "valence": 0.435,
+    "mood": "sad",
+    "mood_probability": 0.927
+  },
+  "normalized_vector": [
+    0.15104166666666666,
+    0.5671783089637756,
+    0.41550248861312866,
+    0.6473321914672852,
+    0.4353508949279785,
+    0.9271224141120911
+  ]
+}

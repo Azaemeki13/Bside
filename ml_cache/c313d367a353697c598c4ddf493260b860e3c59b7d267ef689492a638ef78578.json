@@ -1,0 +1,28 @@
+{
+  "key": "c313d367a353697c598c4ddf493260b860e3c59b7d267ef689492a638ef78578",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/2-01 - Ludovico Einaudi - Circles (based on Ludovico Einaudi _Experience_).flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Circles (based on Ludovico Einaudi _Experience_)",
+  "duration_seconds": 238,
+  "dsp_analysis": {
+    "tempo_bpm": 93.75,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.202,
+    "energy": 0.314,
+    "accousticness": 0.749,
+    "valence": 0.398,
+    "mood": "sad",
+    "mood_probability": 0.96
+  },
+  "normalized_vector": [
+    0.28125,
+    0.20222094655036926,
+    0.3138761818408966,
+    0.7492420077323914,
+    0.3983924984931946,
+    0.9601892232894897
+  ]
+}

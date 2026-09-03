@@ -1,0 +1,28 @@
+{
+  "key": "f866b8f591f1384e184f2cef9c080e10c5fa1d2c1e9beb540eefd7cb2d1c3903",
+  "source_relpath": "Daft Punk/Alive/1-11 Da Funk Daftendirekt.flac",
+  "artist": "Daft Punk",
+  "album": "Alive",
+  "title": "Da Funk Daftendirekt",
+  "duration_seconds": 397,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.92,
+    "energy": 0.514,
+    "accousticness": 0.037,
+    "valence": 0.597,
+    "mood": "electronic",
+    "mood_probability": 0.833
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.9204942584037781,
+    0.514201283454895,
+    0.036668114364147186,
+    0.5965584516525269,
+    0.8326760530471802
+  ]
+}

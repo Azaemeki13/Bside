@@ -1,0 +1,28 @@
+{
+  "key": "73f354d7548bd46cc076ac44f87eb95457ff39d27f89f559d58fb03a1b8e5358",
+  "source_relpath": "Taylor Swift/Red/08 - Taylor Swift - We Are Never Ever Getting Back Together.flac",
+  "artist": "Taylor Swift",
+  "album": "Red",
+  "title": "We Are Never Ever Getting Back Together",
+  "duration_seconds": 192,
+  "dsp_analysis": {
+    "tempo_bpm": 85.23,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.99,
+    "energy": 0.577,
+    "accousticness": 0.012,
+    "valence": 0.64,
+    "mood": "happy",
+    "mood_probability": 0.757
+  },
+  "normalized_vector": [
+    0.2102272727272728,
+    0.9901366233825684,
+    0.5772127509117126,
+    0.0124655244871974,
+    0.6398672461509705,
+    0.7571443915367126
+  ]
+}

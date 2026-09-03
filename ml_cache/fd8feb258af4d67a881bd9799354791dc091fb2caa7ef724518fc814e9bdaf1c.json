@@ -1,0 +1,28 @@
+{
+  "key": "fd8feb258af4d67a881bd9799354791dc091fb2caa7ef724518fc814e9bdaf1c",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/11 - Under The Bridge.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "Under The Bridge",
+  "duration_seconds": 264,
+  "dsp_analysis": {
+    "tempo_bpm": 85.23,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.373,
+    "energy": 0.476,
+    "accousticness": 0.587,
+    "valence": 0.503,
+    "mood": "sad",
+    "mood_probability": 0.87
+  },
+  "normalized_vector": [
+    0.2102272727272728,
+    0.37330150604248047,
+    0.4756951928138733,
+    0.5867102146148682,
+    0.503014326095581,
+    0.8703243136405945
+  ]
+}

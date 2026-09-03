@@ -1,0 +1,28 @@
+{
+  "key": "35a180449969f3844e7ab446fc09d9a5c3de89559a2f6822c677d00b922b7ccd",
+  "source_relpath": "Daft Punk/Alive/1-06 Burnin' Too Long.flac",
+  "artist": "Daft Punk",
+  "album": "Alive",
+  "title": "Burnin' Too Long",
+  "duration_seconds": 432,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.889,
+    "energy": 0.482,
+    "accousticness": 0.07,
+    "valence": 0.556,
+    "mood": "electronic",
+    "mood_probability": 0.728
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.8888618350028992,
+    0.4823952913284302,
+    0.06978476792573929,
+    0.5559434294700623,
+    0.7281181216239929
+  ]
+}

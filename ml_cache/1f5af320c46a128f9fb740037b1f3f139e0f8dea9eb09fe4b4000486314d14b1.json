@@ -1,0 +1,28 @@
+{
+  "key": "1f5af320c46a128f9fb740037b1f3f139e0f8dea9eb09fe4b4000486314d14b1",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-43 Chopin Waltz in E Major, KK IVa No. 12.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Chopin Waltz in E Major, KK IVa No. 12",
+  "duration_seconds": 134,
+  "dsp_analysis": {
+    "tempo_bpm": 208.33,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.124,
+    "energy": 0.404,
+    "accousticness": 0.683,
+    "valence": 0.42,
+    "mood": "sad",
+    "mood_probability": 0.991
+  },
+  "normalized_vector": [
+    1.0,
+    0.12369156628847122,
+    0.40424901247024536,
+    0.6830086708068848,
+    0.419975221157074,
+    0.9906508326530457
+  ]
+}

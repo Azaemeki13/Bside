@@ -1,0 +1,28 @@
+{
+  "key": "a0154525aac95798d6051c2625e31ff4eb223d1c9d14c0c94ba85adc74b875f3",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/2-04 - Ludovico Einaudi - Walk (Starkey Remix).flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Walk (Starkey Remix)",
+  "duration_seconds": 237,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "A#"
+  },
+  "ml_features": {
+    "danceability": 0.788,
+    "energy": 0.511,
+    "accousticness": 0.266,
+    "valence": 0.523,
+    "mood": "sad",
+    "mood_probability": 0.857
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.7881534695625305,
+    0.511269748210907,
+    0.26615437865257263,
+    0.5232967138290405,
+    0.8569038510322571
+  ]
+}

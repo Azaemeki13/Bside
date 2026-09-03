@@ -1,0 +1,28 @@
+{
+  "key": "82f8866d0b263993c72f3a40d4118688ee278d9ac1bb3b0e9ed9c243027e0479",
+  "source_relpath": "Daft Punk/Discovery/1-02 Aerodynamic.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "Aerodynamic",
+  "duration_seconds": 213,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.795,
+    "energy": 0.57,
+    "accousticness": 0.211,
+    "valence": 0.579,
+    "mood": "electronic",
+    "mood_probability": 0.757
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.7947016358375549,
+    0.569938063621521,
+    0.21076782047748566,
+    0.5786693692207336,
+    0.7568152546882629
+  ]
+}

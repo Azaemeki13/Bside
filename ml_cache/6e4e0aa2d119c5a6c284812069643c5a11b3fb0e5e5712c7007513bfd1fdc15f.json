@@ -1,0 +1,28 @@
+{
+  "key": "6e4e0aa2d119c5a6c284812069643c5a11b3fb0e5e5712c7007513bfd1fdc15f",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-36 Waltzes, Op. 34  Chopin Waltzes, Op. 34 No. 3 in F Major. Vivace.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Waltzes, Op. 34  Chopin Waltzes, Op. 34 No. 3 in F Major. Vivace",
+  "duration_seconds": 136,
+  "dsp_analysis": {
+    "tempo_bpm": 104.17,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.142,
+    "energy": 0.449,
+    "accousticness": 0.618,
+    "valence": 0.46,
+    "mood": "sad",
+    "mood_probability": 0.951
+  },
+  "normalized_vector": [
+    0.3680555555555556,
+    0.1420089453458786,
+    0.44915735721588135,
+    0.6181120872497559,
+    0.4602293372154236,
+    0.9510834813117981
+  ]
+}

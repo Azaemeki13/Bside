@@ -1,0 +1,28 @@
+{
+  "key": "2e2a69eb9cdef95268f52797723ffccb5ccc06d4b7170531b8a989635679774a",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-22 Tears in the Rain.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Tears in the Rain",
+  "duration_seconds": 131,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.387,
+    "energy": 0.345,
+    "accousticness": 0.587,
+    "valence": 0.312,
+    "mood": "sad",
+    "mood_probability": 0.952
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.38680627942085266,
+    0.3445514440536499,
+    0.5867934823036194,
+    0.3118864893913269,
+    0.952110230922699
+  ]
+}

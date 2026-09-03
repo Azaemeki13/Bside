@@ -1,0 +1,28 @@
+{
+  "key": "e7b220eb73e5c3267d7d6d14a546eea69609d67f5e0e9b265fd9995849308025",
+  "source_relpath": "Taylor Swift/Red/05 - Taylor Swift - All Too Well.flac",
+  "artist": "Taylor Swift",
+  "album": "Red",
+  "title": "All Too Well",
+  "duration_seconds": 328,
+  "dsp_analysis": {
+    "tempo_bpm": 93.75,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.541,
+    "energy": 0.52,
+    "accousticness": 0.484,
+    "valence": 0.543,
+    "mood": "sad",
+    "mood_probability": 0.758
+  },
+  "normalized_vector": [
+    0.28125,
+    0.5411201119422913,
+    0.5195074677467346,
+    0.4844227135181427,
+    0.5430424213409424,
+    0.7582588195800781
+  ]
+}

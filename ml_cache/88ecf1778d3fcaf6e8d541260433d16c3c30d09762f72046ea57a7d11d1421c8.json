@@ -1,0 +1,28 @@
+{
+  "key": "88ecf1778d3fcaf6e8d541260433d16c3c30d09762f72046ea57a7d11d1421c8",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-12 Joi.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Joi",
+  "duration_seconds": 232,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.384,
+    "energy": 0.302,
+    "accousticness": 0.491,
+    "valence": 0.3,
+    "mood": "sad",
+    "mood_probability": 0.929
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.38361409306526184,
+    0.30214622616767883,
+    0.4913666844367981,
+    0.29998695850372314,
+    0.9290421009063721
+  ]
+}

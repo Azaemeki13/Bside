@@ -1,0 +1,28 @@
+{
+  "key": "fc25c29c8a4dd88fad742c3f1cd949a7ddb9b5268034628808351a8736e7b02e",
+  "source_relpath": "Djo/The Crux/2-09 Gap Tooth Smile.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Gap Tooth Smile",
+  "duration_seconds": 179,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.938,
+    "energy": 0.594,
+    "accousticness": 0.038,
+    "valence": 0.621,
+    "mood": "happy",
+    "mood_probability": 0.778
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.9384149312973022,
+    0.5940492153167725,
+    0.03835313767194748,
+    0.621425211429596,
+    0.7782542109489441
+  ]
+}

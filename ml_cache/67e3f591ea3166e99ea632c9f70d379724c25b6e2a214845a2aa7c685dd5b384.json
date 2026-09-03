@@ -1,0 +1,28 @@
+{
+  "key": "67e3f591ea3166e99ea632c9f70d379724c25b6e2a214845a2aa7c685dd5b384",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/1-10 - Ludovico Einaudi - Newton's Cradle.flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Newton's Cradle",
+  "duration_seconds": 473,
+  "dsp_analysis": {
+    "tempo_bpm": 133.93,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.306,
+    "energy": 0.401,
+    "accousticness": 0.557,
+    "valence": 0.428,
+    "mood": "sad",
+    "mood_probability": 0.934
+  },
+  "normalized_vector": [
+    0.6160714285714285,
+    0.3057011365890503,
+    0.4009873867034912,
+    0.5573064088821411,
+    0.42773932218551636,
+    0.9343051910400391
+  ]
+}

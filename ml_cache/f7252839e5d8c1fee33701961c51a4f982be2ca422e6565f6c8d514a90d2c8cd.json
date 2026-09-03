@@ -1,0 +1,28 @@
+{
+  "key": "f7252839e5d8c1fee33701961c51a4f982be2ca422e6565f6c8d514a90d2c8cd",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-03 Flight to LAPD.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Flight to LAPD",
+  "duration_seconds": 108,
+  "dsp_analysis": {
+    "tempo_bpm": 89.29,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.793,
+    "energy": 0.336,
+    "accousticness": 0.124,
+    "valence": 0.408,
+    "mood": "relaxed",
+    "mood_probability": 0.83
+  },
+  "normalized_vector": [
+    0.2440476190476191,
+    0.7925776839256287,
+    0.3364766538143158,
+    0.12448670715093613,
+    0.40801095962524414,
+    0.8300492763519287
+  ]
+}

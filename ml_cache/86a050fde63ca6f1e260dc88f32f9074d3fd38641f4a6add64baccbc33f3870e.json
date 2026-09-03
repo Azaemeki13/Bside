@@ -1,0 +1,28 @@
+{
+  "key": "86a050fde63ca6f1e260dc88f32f9074d3fd38641f4a6add64baccbc33f3870e",
+  "source_relpath": "David Guetta/Nothing But the Beat/13 - David Guetta - Titanium (feat. Sia).flac",
+  "artist": "David Guetta",
+  "album": "Nothing But the Beat",
+  "title": "Titanium (feat. Sia)",
+  "duration_seconds": 245,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.677,
+    "energy": 0.614,
+    "accousticness": 0.114,
+    "valence": 0.688,
+    "mood": "happy",
+    "mood_probability": 0.77
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.6774845123291016,
+    0.614197313785553,
+    0.11401843279600143,
+    0.6879445910453796,
+    0.7703677415847778
+  ]
+}

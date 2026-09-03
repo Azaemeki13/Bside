@@ -1,0 +1,28 @@
+{
+  "key": "83f8fb6730cd6d0b48de33df253f66501cdbbcf93a4111e1a3319842a3b5b8e9",
+  "source_relpath": "Djo/The Crux/1-02 Love Can't Break The Spell.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Love Can't Break The Spell",
+  "duration_seconds": 290,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.63,
+    "energy": 0.474,
+    "accousticness": 0.656,
+    "valence": 0.424,
+    "mood": "sad",
+    "mood_probability": 0.967
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.6301258206367493,
+    0.47367966175079346,
+    0.6558545231819153,
+    0.4239822030067444,
+    0.9666447639465332
+  ]
+}

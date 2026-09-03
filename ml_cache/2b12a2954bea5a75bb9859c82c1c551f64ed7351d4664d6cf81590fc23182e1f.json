@@ -1,0 +1,28 @@
+{
+  "key": "2b12a2954bea5a75bb9859c82c1c551f64ed7351d4664d6cf81590fc23182e1f",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/04 - Funky Monks.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "Funky Monks",
+  "duration_seconds": 323,
+  "dsp_analysis": {
+    "tempo_bpm": 89.29,
+    "harmonic_key": "D"
+  },
+  "ml_features": {
+    "danceability": 0.779,
+    "energy": 0.608,
+    "accousticness": 0.005,
+    "valence": 0.599,
+    "mood": "sad",
+    "mood_probability": 0.646
+  },
+  "normalized_vector": [
+    0.2440476190476191,
+    0.778645396232605,
+    0.6083881258964539,
+    0.004949531517922878,
+    0.5992674827575684,
+    0.6456992030143738
+  ]
+}

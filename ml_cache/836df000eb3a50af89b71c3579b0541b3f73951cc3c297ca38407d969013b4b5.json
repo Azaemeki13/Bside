@@ -1,0 +1,28 @@
+{
+  "key": "836df000eb3a50af89b71c3579b0541b3f73951cc3c297ca38407d969013b4b5",
+  "source_relpath": "Daft Punk/Discovery/1-03 Digital Love.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "Digital Love",
+  "duration_seconds": 301,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.723,
+    "energy": 0.601,
+    "accousticness": 0.307,
+    "valence": 0.575,
+    "mood": "sad",
+    "mood_probability": 0.705
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.7232509851455688,
+    0.6008548140525818,
+    0.30696210265159607,
+    0.5752530694007874,
+    0.7054656744003296
+  ]
+}

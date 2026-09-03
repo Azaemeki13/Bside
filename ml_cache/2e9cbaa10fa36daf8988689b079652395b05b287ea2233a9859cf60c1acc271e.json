@@ -1,0 +1,28 @@
+{
+  "key": "2e9cbaa10fa36daf8988689b079652395b05b287ea2233a9859cf60c1acc271e",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-23 Blade Runner.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Blade Runner",
+  "duration_seconds": 606,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.461,
+    "energy": 0.295,
+    "accousticness": 0.44,
+    "valence": 0.348,
+    "mood": "relaxed",
+    "mood_probability": 0.797
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.4608950912952423,
+    0.2952054440975189,
+    0.4400273263454437,
+    0.3477960526943207,
+    0.7968975305557251
+  ]
+}

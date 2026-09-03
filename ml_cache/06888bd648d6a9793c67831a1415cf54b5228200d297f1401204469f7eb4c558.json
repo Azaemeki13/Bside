@@ -1,0 +1,28 @@
+{
+  "key": "06888bd648d6a9793c67831a1415cf54b5228200d297f1401204469f7eb4c558",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-11 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 10 in C Sharp Minor. Molto allegro.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 10 in C Sharp Minor. Molto allegro",
+  "duration_seconds": 34,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.147,
+    "energy": 0.35,
+    "accousticness": 0.653,
+    "valence": 0.385,
+    "mood": "sad",
+    "mood_probability": 0.993
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.1468784660100937,
+    0.3503428101539612,
+    0.6530251502990723,
+    0.3850705027580261,
+    0.9928443431854248
+  ]
+}

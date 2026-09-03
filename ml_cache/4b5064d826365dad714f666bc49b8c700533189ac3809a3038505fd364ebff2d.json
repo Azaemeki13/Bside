@@ -1,0 +1,28 @@
+{
+  "key": "4b5064d826365dad714f666bc49b8c700533189ac3809a3038505fd364ebff2d",
+  "source_relpath": "ACDC/Iron Man II/1-04 Cold Hearted Man.flac",
+  "artist": "ACDC",
+  "album": "Iron Man II",
+  "title": "Cold Hearted Man",
+  "duration_seconds": 214,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.537,
+    "energy": 0.535,
+    "accousticness": 0.151,
+    "valence": 0.612,
+    "mood": "aggressive",
+    "mood_probability": 0.734
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.537123441696167,
+    0.5351346135139465,
+    0.1514454334974289,
+    0.6124493479728699,
+    0.7339922785758972
+  ]
+}

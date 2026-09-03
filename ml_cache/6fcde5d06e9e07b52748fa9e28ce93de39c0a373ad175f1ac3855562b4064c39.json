@@ -1,0 +1,28 @@
+{
+  "key": "6fcde5d06e9e07b52748fa9e28ce93de39c0a373ad175f1ac3855562b4064c39",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-15 Can't Help Falling in Love.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Can't Help Falling in Love",
+  "duration_seconds": 182,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.09,
+    "energy": 0.394,
+    "accousticness": 0.838,
+    "valence": 0.442,
+    "mood": "sad",
+    "mood_probability": 0.969
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.0903075560927391,
+    0.39420241117477417,
+    0.8377259969711304,
+    0.4415246844291687,
+    0.9687652587890625
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "e8812c8c0ab5ac2d8ccd860455ee55e959ee7d6a437f3e152dbbeeb6feccea70",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-46 Nocturne in G Minor.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Nocturne in G Minor",
+  "duration_seconds": 181,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "D"
+  },
+  "ml_features": {
+    "danceability": 0.161,
+    "energy": 0.281,
+    "accousticness": 0.677,
+    "valence": 0.322,
+    "mood": "sad",
+    "mood_probability": 0.982
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.16131211817264557,
+    0.2808721959590912,
+    0.6767560243606567,
+    0.32176491618156433,
+    0.9816634058952332
+  ]
+}

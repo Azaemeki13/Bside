@@ -1,0 +1,28 @@
+{
+  "key": "2f1dd8bf7e2785fa535bff9677498e31cd787734c0a5e3e28fa459f385637251",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-21 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 20 in C Minor. Largo.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 20 in C Minor. Largo",
+  "duration_seconds": 97,
+  "dsp_analysis": {
+    "tempo_bpm": 34.09,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.139,
+    "energy": 0.297,
+    "accousticness": 0.758,
+    "valence": 0.316,
+    "mood": "sad",
+    "mood_probability": 0.989
+  },
+  "normalized_vector": [
+    0.0,
+    0.1393643021583557,
+    0.2974682152271271,
+    0.7582983374595642,
+    0.31634649634361267,
+    0.989077627658844
+  ]
+}

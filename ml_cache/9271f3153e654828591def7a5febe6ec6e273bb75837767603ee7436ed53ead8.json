@@ -1,0 +1,28 @@
+{
+  "key": "9271f3153e654828591def7a5febe6ec6e273bb75837767603ee7436ed53ead8",
+  "source_relpath": "Djo/The Crux/2-01 Lonesome Is A State of Mind.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Lonesome Is A State of Mind",
+  "duration_seconds": 260,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "D"
+  },
+  "ml_features": {
+    "danceability": 0.594,
+    "energy": 0.518,
+    "accousticness": 0.505,
+    "valence": 0.518,
+    "mood": "sad",
+    "mood_probability": 0.886
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.5937389135360718,
+    0.5178776979446411,
+    0.5048672556877136,
+    0.517593502998352,
+    0.885741114616394
+  ]
+}

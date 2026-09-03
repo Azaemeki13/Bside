@@ -1,0 +1,28 @@
+{
+  "key": "71f41c45dda996922868cda9a7b2164bcdae59be0484acb425003a95839b7bd8",
+  "source_relpath": "Djo/The Crux/2-04 Potion.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Potion",
+  "duration_seconds": 168,
+  "dsp_analysis": {
+    "tempo_bpm": 81.52,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.78,
+    "energy": 0.567,
+    "accousticness": 0.546,
+    "valence": 0.505,
+    "mood": "sad",
+    "mood_probability": 0.913
+  },
+  "normalized_vector": [
+    0.1793478260869565,
+    0.7802631258964539,
+    0.5670077204704285,
+    0.5464548468589783,
+    0.5052466988563538,
+    0.9131121039390564
+  ]
+}

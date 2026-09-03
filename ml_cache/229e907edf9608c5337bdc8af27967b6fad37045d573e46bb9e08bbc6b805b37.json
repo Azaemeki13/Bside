@@ -1,0 +1,28 @@
+{
+  "key": "229e907edf9608c5337bdc8af27967b6fad37045d573e46bb9e08bbc6b805b37",
+  "source_relpath": "Djo/The Crux/1-09 Try Me.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Try Me",
+  "duration_seconds": 167,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.965,
+    "energy": 0.621,
+    "accousticness": 0.02,
+    "valence": 0.635,
+    "mood": "party",
+    "mood_probability": 0.785
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.9654504656791687,
+    0.6205427050590515,
+    0.020364776253700256,
+    0.6350865364074707,
+    0.7850303053855896
+  ]
+}

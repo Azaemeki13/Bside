@@ -1,0 +1,28 @@
+{
+  "key": "9e160de01341fb39be1ecb5e03b98814aa1106a4d713270461c6e34de3431fe5",
+  "source_relpath": "David Guetta/Nothing But the Beat/02 - David Guetta - Little Bad Girl (feat. Taio Cruz & Ludacris) [Explicit].flac",
+  "artist": "David Guetta",
+  "album": "Nothing But the Beat",
+  "title": "Little Bad Girl (feat. Taio Cruz & Ludacris) [Explicit]",
+  "duration_seconds": 192,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.845,
+    "energy": 0.628,
+    "accousticness": 0.074,
+    "valence": 0.708,
+    "mood": "happy",
+    "mood_probability": 0.869
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.8452412486076355,
+    0.6280943751335144,
+    0.07379637658596039,
+    0.7075446248054504,
+    0.869208812713623
+  ]
+}

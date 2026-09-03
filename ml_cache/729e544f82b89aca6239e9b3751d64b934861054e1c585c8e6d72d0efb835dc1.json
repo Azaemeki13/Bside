@@ -1,0 +1,28 @@
+{
+  "key": "729e544f82b89aca6239e9b3751d64b934861054e1c585c8e6d72d0efb835dc1",
+  "source_relpath": "Djo/Decide/1-13 Slither.flac",
+  "artist": "Djo",
+  "album": "Decide",
+  "title": "Slither",
+  "duration_seconds": 111,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.984,
+    "energy": 0.54,
+    "accousticness": 0.191,
+    "valence": 0.62,
+    "mood": "sad",
+    "mood_probability": 0.759
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.9843083024024963,
+    0.5398565530776978,
+    0.19058221578598022,
+    0.6195999383926392,
+    0.7591423392295837
+  ]
+}

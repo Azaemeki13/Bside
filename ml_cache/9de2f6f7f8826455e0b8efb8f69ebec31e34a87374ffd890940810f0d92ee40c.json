@@ -1,0 +1,28 @@
+{
+  "key": "9de2f6f7f8826455e0b8efb8f69ebec31e34a87374ffd890940810f0d92ee40c",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-08 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 7 in A Major. Andantino.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 7 in A Major. Andantino",
+  "duration_seconds": 42,
+  "dsp_analysis": {
+    "tempo_bpm": 85.23,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.192,
+    "energy": 0.317,
+    "accousticness": 0.579,
+    "valence": 0.345,
+    "mood": "sad",
+    "mood_probability": 0.999
+  },
+  "normalized_vector": [
+    0.2102272727272728,
+    0.19218578934669495,
+    0.31662195920944214,
+    0.5785917639732361,
+    0.34451529383659363,
+    0.9989640116691589
+  ]
+}

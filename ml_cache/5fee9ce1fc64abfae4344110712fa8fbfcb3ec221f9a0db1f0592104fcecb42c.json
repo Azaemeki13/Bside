@@ -1,0 +1,28 @@
+{
+  "key": "5fee9ce1fc64abfae4344110712fa8fbfcb3ec221f9a0db1f0592104fcecb42c",
+  "source_relpath": "Taylor Swift/Red/06 - Taylor Swift - 22.flac",
+  "artist": "Taylor Swift",
+  "album": "Red",
+  "title": "22",
+  "duration_seconds": 230,
+  "dsp_analysis": {
+    "tempo_bpm": 104.17,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.987,
+    "energy": 0.682,
+    "accousticness": 0.013,
+    "valence": 0.691,
+    "mood": "happy",
+    "mood_probability": 0.77
+  },
+  "normalized_vector": [
+    0.3680555555555556,
+    0.9872382879257202,
+    0.6816533803939819,
+    0.01280518714338541,
+    0.6908189654350281,
+    0.7699029445648193
+  ]
+}

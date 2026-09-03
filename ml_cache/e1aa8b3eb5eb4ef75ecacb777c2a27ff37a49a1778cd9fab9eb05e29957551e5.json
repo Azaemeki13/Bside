@@ -1,0 +1,28 @@
+{
+  "key": "e1aa8b3eb5eb4ef75ecacb777c2a27ff37a49a1778cd9fab9eb05e29957551e5",
+  "source_relpath": "Djo/Decide/1-03 Half Life.flac",
+  "artist": "Djo",
+  "album": "Decide",
+  "title": "Half Life",
+  "duration_seconds": 228,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.75,
+    "energy": 0.479,
+    "accousticness": 0.227,
+    "valence": 0.547,
+    "mood": "sad",
+    "mood_probability": 0.767
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.7499168515205383,
+    0.4787435531616211,
+    0.22668850421905518,
+    0.5466510653495789,
+    0.7670234441757202
+  ]
+}

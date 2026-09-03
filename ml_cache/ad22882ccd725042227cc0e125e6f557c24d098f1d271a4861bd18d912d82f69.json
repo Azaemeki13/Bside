@@ -1,0 +1,28 @@
+{
+  "key": "ad22882ccd725042227cc0e125e6f557c24d098f1d271a4861bd18d912d82f69",
+  "source_relpath": "David Guetta/Nothing But the Beat/07 - David Guetta - I Can Only Imagine (feat. Chris Brown & Lil Wayne).flac",
+  "artist": "David Guetta",
+  "album": "Nothing But the Beat",
+  "title": "I Can Only Imagine (feat. Chris Brown & Lil Wayne)",
+  "duration_seconds": 210,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.655,
+    "energy": 0.566,
+    "accousticness": 0.267,
+    "valence": 0.653,
+    "mood": "aggressive",
+    "mood_probability": 0.805
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.6553904414176941,
+    0.5659363269805908,
+    0.26694220304489136,
+    0.6531116962432861,
+    0.8049485683441162
+  ]
+}

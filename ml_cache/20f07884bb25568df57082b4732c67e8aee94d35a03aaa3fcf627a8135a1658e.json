@@ -1,0 +1,28 @@
+{
+  "key": "20f07884bb25568df57082b4732c67e8aee94d35a03aaa3fcf627a8135a1658e",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-25 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 24 in D Minor. Allegro appassionato.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 24 in D Minor. Allegro appassionato",
+  "duration_seconds": 164,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.088,
+    "energy": 0.385,
+    "accousticness": 0.702,
+    "valence": 0.377,
+    "mood": "sad",
+    "mood_probability": 0.954
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.08783559501171112,
+    0.3853868842124939,
+    0.7023186087608337,
+    0.37714946269989014,
+    0.9544876217842102
+  ]
+}

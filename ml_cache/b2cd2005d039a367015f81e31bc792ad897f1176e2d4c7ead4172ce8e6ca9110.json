@@ -1,0 +1,28 @@
+{
+  "key": "b2cd2005d039a367015f81e31bc792ad897f1176e2d4c7ead4172ce8e6ca9110",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-14 Suspicious Minds.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Suspicious Minds",
+  "duration_seconds": 263,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.423,
+    "energy": 0.59,
+    "accousticness": 0.405,
+    "valence": 0.553,
+    "mood": "sad",
+    "mood_probability": 0.819
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.42318421602249146,
+    0.5899449586868286,
+    0.4054918587207794,
+    0.5533794164657593,
+    0.818821132183075
+  ]
+}

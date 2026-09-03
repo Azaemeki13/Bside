@@ -1,0 +1,28 @@
+{
+  "key": "cdbfe8e9771e7305832ae83d749bebcf3943b6a3a283d5cd8c1feb9d98eecc77",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-03 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 2 in A Minor. Lento.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 2 in A Minor. Lento",
+  "duration_seconds": 165,
+  "dsp_analysis": {
+    "tempo_bpm": 78.12,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.204,
+    "energy": 0.275,
+    "accousticness": 0.573,
+    "valence": 0.323,
+    "mood": "sad",
+    "mood_probability": 0.99
+  },
+  "normalized_vector": [
+    0.15104166666666666,
+    0.20399972796440125,
+    0.2747206687927246,
+    0.5732632875442505,
+    0.32289960980415344,
+    0.9903460741043091
+  ]
+}

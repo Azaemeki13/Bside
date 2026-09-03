@@ -1,0 +1,28 @@
+{
+  "key": "e410ed39477aead2356d73b58747590d92932aca216c4c0dc019846916575852",
+  "source_relpath": "Daft Punk/Discovery/1-04 Harder, Better, Faster, Stronger.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "Harder, Better, Faster, Stronger",
+  "duration_seconds": 225,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.98,
+    "energy": 0.619,
+    "accousticness": 0.021,
+    "valence": 0.609,
+    "mood": "party",
+    "mood_probability": 0.763
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.9799780249595642,
+    0.6191925406455994,
+    0.02094707265496254,
+    0.6085153818130493,
+    0.7628691792488098
+  ]
+}

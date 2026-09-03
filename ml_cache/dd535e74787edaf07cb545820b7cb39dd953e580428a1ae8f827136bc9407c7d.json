@@ -1,0 +1,28 @@
+{
+  "key": "dd535e74787edaf07cb545820b7cb39dd953e580428a1ae8f827136bc9407c7d",
+  "source_relpath": "Djo/The Crux/2-02 Basic Being Basic.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Basic Being Basic",
+  "duration_seconds": 158,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.998,
+    "energy": 0.622,
+    "accousticness": 0.001,
+    "valence": 0.678,
+    "mood": "party",
+    "mood_probability": 0.903
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.998220682144165,
+    0.6215819120407104,
+    0.001340928953140974,
+    0.6778106093406677,
+    0.9034277200698853
+  ]
+}

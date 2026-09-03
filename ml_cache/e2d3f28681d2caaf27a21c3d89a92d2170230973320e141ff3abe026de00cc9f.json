@@ -1,0 +1,28 @@
+{
+  "key": "e2d3f28681d2caaf27a21c3d89a92d2170230973320e141ff3abe026de00cc9f",
+  "source_relpath": "Daft Punk/Alive/1-13 Human After All Together One More Time Music Sounds Better with You.flac",
+  "artist": "Daft Punk",
+  "album": "Alive",
+  "title": "Human After All Together One More Time Music Sounds Better with You",
+  "duration_seconds": 599,
+  "dsp_analysis": {
+    "tempo_bpm": 133.93,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.883,
+    "energy": 0.513,
+    "accousticness": 0.089,
+    "valence": 0.556,
+    "mood": "electronic",
+    "mood_probability": 0.759
+  },
+  "normalized_vector": [
+    0.6160714285714285,
+    0.8825573921203613,
+    0.5128834247589111,
+    0.08888275921344757,
+    0.5560306310653687,
+    0.7586531639099121
+  ]
+}

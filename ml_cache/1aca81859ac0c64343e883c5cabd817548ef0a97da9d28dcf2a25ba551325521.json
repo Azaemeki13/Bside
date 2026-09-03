@@ -1,0 +1,28 @@
+{
+  "key": "1aca81859ac0c64343e883c5cabd817548ef0a97da9d28dcf2a25ba551325521",
+  "source_relpath": "Taylor Swift/Red/02 - Taylor Swift - Red.flac",
+  "artist": "Taylor Swift",
+  "album": "Red",
+  "title": "Red",
+  "duration_seconds": 221,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.728,
+    "energy": 0.596,
+    "accousticness": 0.099,
+    "valence": 0.696,
+    "mood": "happy",
+    "mood_probability": 0.872
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.7281071543693542,
+    0.5958521366119385,
+    0.0989471822977066,
+    0.6957895755767822,
+    0.8715509176254272
+  ]
+}

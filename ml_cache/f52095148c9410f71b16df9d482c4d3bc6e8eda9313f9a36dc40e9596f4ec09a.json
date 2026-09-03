@@ -1,0 +1,28 @@
+{
+  "key": "f52095148c9410f71b16df9d482c4d3bc6e8eda9313f9a36dc40e9596f4ec09a",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-18 That's Why We Believe.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "That's Why We Believe",
+  "duration_seconds": 217,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.236,
+    "energy": 0.28,
+    "accousticness": 0.427,
+    "valence": 0.303,
+    "mood": "relaxed",
+    "mood_probability": 0.926
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.23595274984836578,
+    0.2803381085395813,
+    0.427163690328598,
+    0.30312207341194153,
+    0.9255520701408386
+  ]
+}

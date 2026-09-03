@@ -1,0 +1,28 @@
+{
+  "key": "1fb81208f522925177b64ef05dbac8c983ff196cc3ceea20716708f572baad07",
+  "source_relpath": "Daft Punk/Discovery/1-07 Superheroes.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "Superheroes",
+  "duration_seconds": 238,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.93,
+    "energy": 0.627,
+    "accousticness": 0.005,
+    "valence": 0.674,
+    "mood": "electronic",
+    "mood_probability": 0.858
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.9297674894332886,
+    0.6270119547843933,
+    0.004795563407242298,
+    0.6736435294151306,
+    0.8575819134712219
+  ]
+}

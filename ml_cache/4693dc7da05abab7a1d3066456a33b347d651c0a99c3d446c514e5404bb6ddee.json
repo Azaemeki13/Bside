@@ -1,0 +1,28 @@
+{
+  "key": "4693dc7da05abab7a1d3066456a33b347d651c0a99c3d446c514e5404bb6ddee",
+  "source_relpath": "ACDC/Iron Man II/1-03 Guns for Hire.flac",
+  "artist": "ACDC",
+  "album": "Iron Man II",
+  "title": "Guns for Hire",
+  "duration_seconds": 205,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.523,
+    "energy": 0.538,
+    "accousticness": 0.011,
+    "valence": 0.646,
+    "mood": "aggressive",
+    "mood_probability": 0.99
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.5233219861984253,
+    0.5376647710800171,
+    0.010576838627457619,
+    0.6459298133850098,
+    0.9900898933410645
+  ]
+}

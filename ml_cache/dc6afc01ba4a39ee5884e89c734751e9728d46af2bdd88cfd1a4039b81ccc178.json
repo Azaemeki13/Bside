@@ -1,0 +1,28 @@
+{
+  "key": "dc6afc01ba4a39ee5884e89c734751e9728d46af2bdd88cfd1a4039b81ccc178",
+  "source_relpath": "Daft Punk/Random Access Memories/2-01 Touch.flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Touch",
+  "duration_seconds": 499,
+  "dsp_analysis": {
+    "tempo_bpm": 93.75,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.429,
+    "energy": 0.422,
+    "accousticness": 0.667,
+    "valence": 0.443,
+    "mood": "sad",
+    "mood_probability": 0.892
+  },
+  "normalized_vector": [
+    0.28125,
+    0.42925649881362915,
+    0.42171919345855713,
+    0.6668173670768738,
+    0.4426954984664917,
+    0.891681432723999
+  ]
+}

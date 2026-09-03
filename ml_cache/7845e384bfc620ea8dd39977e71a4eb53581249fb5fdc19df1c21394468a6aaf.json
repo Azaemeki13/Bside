@@ -1,0 +1,28 @@
+{
+  "key": "7845e384bfc620ea8dd39977e71a4eb53581249fb5fdc19df1c21394468a6aaf",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-05 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 4 in E Minor. Largo.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 4 in E Minor. Largo",
+  "duration_seconds": 134,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.173,
+    "energy": 0.291,
+    "accousticness": 0.698,
+    "valence": 0.331,
+    "mood": "sad",
+    "mood_probability": 0.997
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.17274048924446106,
+    0.2910221815109253,
+    0.6983165144920349,
+    0.3307286202907562,
+    0.9968004822731018
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "81f8d50d6ef3783ef499dba2266766f98cd3a3540ff49ad7eefccdbd8c9be4a0",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-06 24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 5 in D Major. Molto allegro.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "24 Preludes, Op. 28  Chopin 24 Preludes, Op. 28 No. 5 in D Major. Molto allegro",
+  "duration_seconds": 40,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.154,
+    "energy": 0.466,
+    "accousticness": 0.69,
+    "valence": 0.449,
+    "mood": "sad",
+    "mood_probability": 0.967
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.153774231672287,
+    0.4655514359474182,
+    0.6896791458129883,
+    0.44905227422714233,
+    0.9668839573860168
+  ]
+}

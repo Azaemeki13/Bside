@@ -1,0 +1,28 @@
+{
+  "key": "e85eee6d50607037177459b74fb7d075a0b5f1961329ac54780b47e62ed7cc2e",
+  "source_relpath": "Djo/The Crux/2-05 Delete Ya.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Delete Ya",
+  "duration_seconds": 203,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.907,
+    "energy": 0.533,
+    "accousticness": 0.178,
+    "valence": 0.552,
+    "mood": "sad",
+    "mood_probability": 0.817
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.9065471291542053,
+    0.5333319306373596,
+    0.17772558331489563,
+    0.5524261593818665,
+    0.8169794082641602
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "8d05eec42fdf42145396203fe4e20a12ee932590a741fc6b5065e2f9b9c25a9e",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-20 Sea Wall.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Sea Wall",
+  "duration_seconds": 593,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.574,
+    "energy": 0.334,
+    "accousticness": 0.385,
+    "valence": 0.414,
+    "mood": "sad",
+    "mood_probability": 0.669
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.5743286609649658,
+    0.33442890644073486,
+    0.3851989507675171,
+    0.41372770071029663,
+    0.6687759160995483
+  ]
+}

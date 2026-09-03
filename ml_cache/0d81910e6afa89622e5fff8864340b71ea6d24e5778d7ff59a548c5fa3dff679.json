@@ -1,0 +1,28 @@
+{
+  "key": "0d81910e6afa89622e5fff8864340b71ea6d24e5778d7ff59a548c5fa3dff679",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-40 Chopin Waltz in A-Flat Major, KK IVa No. 13.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Chopin Waltz in A-Flat Major, KK IVa No. 13",
+  "duration_seconds": 78,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.149,
+    "energy": 0.512,
+    "accousticness": 0.624,
+    "valence": 0.547,
+    "mood": "sad",
+    "mood_probability": 0.922
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.14886803925037384,
+    0.5115160942077637,
+    0.6235544681549072,
+    0.5470936894416809,
+    0.9219768643379211
+  ]
+}

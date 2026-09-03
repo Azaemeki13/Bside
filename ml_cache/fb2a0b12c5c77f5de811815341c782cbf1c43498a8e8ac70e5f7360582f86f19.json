@@ -1,0 +1,28 @@
+{
+  "key": "fb2a0b12c5c77f5de811815341c782cbf1c43498a8e8ac70e5f7360582f86f19",
+  "source_relpath": "ACDC/Iron Man II/1-08 Evil Walks.flac",
+  "artist": "ACDC",
+  "album": "Iron Man II",
+  "title": "Evil Walks",
+  "duration_seconds": 264,
+  "dsp_analysis": {
+    "tempo_bpm": 104.17,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.644,
+    "energy": 0.466,
+    "accousticness": 0.021,
+    "valence": 0.579,
+    "mood": "aggressive",
+    "mood_probability": 0.982
+  },
+  "normalized_vector": [
+    0.3680555555555556,
+    0.6443164348602295,
+    0.4661886692047119,
+    0.021031523123383522,
+    0.5789716243743896,
+    0.9821930527687073
+  ]
+}

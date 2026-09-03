@@ -1,0 +1,28 @@
+{
+  "key": "bc87068f52ba52619bc49e762f6afdeef695e6cf5a1c35732ee13e91882531b4",
+  "source_relpath": "Daft Punk/Alive/1-04 Too Long Steam Machine.flac",
+  "artist": "Daft Punk",
+  "album": "Alive",
+  "title": "Too Long Steam Machine",
+  "duration_seconds": 422,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.915,
+    "energy": 0.516,
+    "accousticness": 0.059,
+    "valence": 0.604,
+    "mood": "electronic",
+    "mood_probability": 0.765
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.9154202938079834,
+    0.5159925818443298,
+    0.05866072326898575,
+    0.6035093069076538,
+    0.7649885416030884
+  ]
+}

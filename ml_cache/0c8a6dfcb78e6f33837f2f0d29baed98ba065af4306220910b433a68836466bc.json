@@ -1,0 +1,28 @@
+{
+  "key": "0c8a6dfcb78e6f33837f2f0d29baed98ba065af4306220910b433a68836466bc",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/2-05 - Ludovico Einaudi - Time Lapse (Steven Siegel Remix).flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Time Lapse (Steven Siegel Remix)",
+  "duration_seconds": 326,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "G#"
+  },
+  "ml_features": {
+    "danceability": 0.824,
+    "energy": 0.545,
+    "accousticness": 0.13,
+    "valence": 0.567,
+    "mood": "sad",
+    "mood_probability": 0.808
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.8237683773040771,
+    0.5449988842010498,
+    0.12970520555973053,
+    0.5667277574539185,
+    0.808366060256958
+  ]
+}

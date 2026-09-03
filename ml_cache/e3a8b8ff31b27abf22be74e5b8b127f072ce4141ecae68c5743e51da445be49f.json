@@ -1,0 +1,28 @@
+{
+  "key": "e3a8b8ff31b27abf22be74e5b8b127f072ce4141ecae68c5743e51da445be49f",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-19 Her Eyes Were Green.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Her Eyes Were Green",
+  "duration_seconds": 378,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "D"
+  },
+  "ml_features": {
+    "danceability": 0.353,
+    "energy": 0.27,
+    "accousticness": 0.428,
+    "valence": 0.289,
+    "mood": "relaxed",
+    "mood_probability": 0.937
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.3534316420555115,
+    0.2704453468322754,
+    0.4278695285320282,
+    0.28928834199905396,
+    0.9369170069694519
+  ]
+}

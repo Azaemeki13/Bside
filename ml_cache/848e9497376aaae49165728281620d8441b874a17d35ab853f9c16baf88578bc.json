@@ -1,0 +1,28 @@
+{
+  "key": "848e9497376aaae49165728281620d8441b874a17d35ab853f9c16baf88578bc",
+  "source_relpath": "Djo/Decide/1-05 On and On.flac",
+  "artist": "Djo",
+  "album": "Decide",
+  "title": "On and On",
+  "duration_seconds": 243,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.807,
+    "energy": 0.564,
+    "accousticness": 0.196,
+    "valence": 0.592,
+    "mood": "sad",
+    "mood_probability": 0.77
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.8069946765899658,
+    0.5642756819725037,
+    0.19585828483104706,
+    0.591636598110199,
+    0.76954585313797
+  ]
+}

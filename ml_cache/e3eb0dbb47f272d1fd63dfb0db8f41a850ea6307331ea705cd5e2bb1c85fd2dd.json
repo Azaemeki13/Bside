@@ -1,0 +1,28 @@
+{
+  "key": "e3eb0dbb47f272d1fd63dfb0db8f41a850ea6307331ea705cd5e2bb1c85fd2dd",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/12 - Naked In The Rain.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "Naked In The Rain",
+  "duration_seconds": 266,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "D"
+  },
+  "ml_features": {
+    "danceability": 0.706,
+    "energy": 0.671,
+    "accousticness": 0.013,
+    "valence": 0.54,
+    "mood": "aggressive",
+    "mood_probability": 0.834
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.7055351734161377,
+    0.6713995933532715,
+    0.012938335537910461,
+    0.5402535200119019,
+    0.8341924548149109
+  ]
+}

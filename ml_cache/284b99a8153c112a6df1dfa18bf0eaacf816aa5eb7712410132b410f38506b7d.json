@@ -1,0 +1,28 @@
+{
+  "key": "284b99a8153c112a6df1dfa18bf0eaacf816aa5eb7712410132b410f38506b7d",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/1-14 - Ludovico Einaudi - Burning.flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Burning",
+  "duration_seconds": 309,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.138,
+    "energy": 0.332,
+    "accousticness": 0.691,
+    "valence": 0.343,
+    "mood": "sad",
+    "mood_probability": 0.979
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.137764573097229,
+    0.33167073130607605,
+    0.6913254857063293,
+    0.3430818021297455,
+    0.9793801307678223
+  ]
+}

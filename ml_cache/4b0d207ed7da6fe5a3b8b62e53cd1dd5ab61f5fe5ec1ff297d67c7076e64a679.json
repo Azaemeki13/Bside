@@ -1,0 +1,28 @@
+{
+  "key": "4b0d207ed7da6fe5a3b8b62e53cd1dd5ab61f5fe5ec1ff297d67c7076e64a679",
+  "source_relpath": "Daft Punk/Alive/1-09 Aerodynamic Beats Gabrielle , Forget About the World.flac",
+  "artist": "Daft Punk",
+  "album": "Alive",
+  "title": "Aerodynamic Beats Gabrielle , Forget About the World",
+  "duration_seconds": 212,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.913,
+    "energy": 0.579,
+    "accousticness": 0.039,
+    "valence": 0.632,
+    "mood": "electronic",
+    "mood_probability": 0.895
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.9127671122550964,
+    0.5789562463760376,
+    0.03925473615527153,
+    0.632439374923706,
+    0.8945865035057068
+  ]
+}

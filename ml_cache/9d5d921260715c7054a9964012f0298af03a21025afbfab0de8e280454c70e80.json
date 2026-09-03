@@ -1,0 +1,28 @@
+{
+  "key": "9d5d921260715c7054a9964012f0298af03a21025afbfab0de8e280454c70e80",
+  "source_relpath": "ACDC/Iron Man II/1-12 The Razors Edge.flac",
+  "artist": "ACDC",
+  "album": "Iron Man II",
+  "title": "The Razors Edge",
+  "duration_seconds": 263,
+  "dsp_analysis": {
+    "tempo_bpm": 104.17,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.555,
+    "energy": 0.518,
+    "accousticness": 0.099,
+    "valence": 0.644,
+    "mood": "aggressive",
+    "mood_probability": 0.873
+  },
+  "normalized_vector": [
+    0.3680555555555556,
+    0.5550889372825623,
+    0.5182083249092102,
+    0.09857521206140518,
+    0.6440603137016296,
+    0.872710645198822
+  ]
+}

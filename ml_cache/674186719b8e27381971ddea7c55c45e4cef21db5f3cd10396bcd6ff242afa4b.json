@@ -1,0 +1,28 @@
+{
+  "key": "674186719b8e27381971ddea7c55c45e4cef21db5f3cd10396bcd6ff242afa4b",
+  "source_relpath": "ACDC/Iron Man II/1-01 Shoot to Thrill.flac",
+  "artist": "ACDC",
+  "album": "Iron Man II",
+  "title": "Shoot to Thrill",
+  "duration_seconds": 318,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.66,
+    "energy": 0.549,
+    "accousticness": 0.016,
+    "valence": 0.646,
+    "mood": "aggressive",
+    "mood_probability": 0.909
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.6600140333175659,
+    0.5491356253623962,
+    0.01601548306643963,
+    0.6458550095558167,
+    0.9086659550666809
+  ]
+}

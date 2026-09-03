@@ -1,0 +1,28 @@
+{
+  "key": "284ad863b9fa3840a2ca3db8d4706adadc30e1c9da691f4e3d09b9ae96626dd2",
+  "source_relpath": "Djo/Decide/1-02 Gloom.flac",
+  "artist": "Djo",
+  "album": "Decide",
+  "title": "Gloom",
+  "duration_seconds": 121,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.997,
+    "energy": 0.676,
+    "accousticness": 0.033,
+    "valence": 0.67,
+    "mood": "happy",
+    "mood_probability": 0.724
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.9967482686042786,
+    0.6761533617973328,
+    0.03334276005625725,
+    0.6700574159622192,
+    0.7236988544464111
+  ]
+}

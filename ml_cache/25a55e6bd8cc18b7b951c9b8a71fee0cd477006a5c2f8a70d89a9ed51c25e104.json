@@ -1,0 +1,28 @@
+{
+  "key": "25a55e6bd8cc18b7b951c9b8a71fee0cd477006a5c2f8a70d89a9ed51c25e104",
+  "source_relpath": "Daft Punk/Alive/1-07 Face to Face Short Circuit.flac",
+  "artist": "Daft Punk",
+  "album": "Alive",
+  "title": "Face to Face Short Circuit",
+  "duration_seconds": 295,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.902,
+    "energy": 0.453,
+    "accousticness": 0.117,
+    "valence": 0.509,
+    "mood": "electronic",
+    "mood_probability": 0.771
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.9022423028945923,
+    0.45321428775787354,
+    0.11743286997079849,
+    0.5091683268547058,
+    0.7712906002998352
+  ]
+}

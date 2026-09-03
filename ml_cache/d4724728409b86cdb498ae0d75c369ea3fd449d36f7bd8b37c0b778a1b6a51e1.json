@@ -1,0 +1,28 @@
+{
+  "key": "d4724728409b86cdb498ae0d75c369ea3fd449d36f7bd8b37c0b778a1b6a51e1",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/16 - Sir Psycho Sexy.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "Sir Psycho Sexy",
+  "duration_seconds": 497,
+  "dsp_analysis": {
+    "tempo_bpm": 78.12,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.631,
+    "energy": 0.605,
+    "accousticness": 0.091,
+    "valence": 0.562,
+    "mood": "sad",
+    "mood_probability": 0.654
+  },
+  "normalized_vector": [
+    0.15104166666666666,
+    0.6311978101730347,
+    0.6050270795822144,
+    0.09088211506605148,
+    0.5616568922996521,
+    0.6536635160446167
+  ]
+}

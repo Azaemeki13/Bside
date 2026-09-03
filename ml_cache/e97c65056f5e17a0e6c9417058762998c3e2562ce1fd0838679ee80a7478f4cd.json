@@ -1,0 +1,28 @@
+{
+  "key": "e97c65056f5e17a0e6c9417058762998c3e2562ce1fd0838679ee80a7478f4cd",
+  "source_relpath": "Djo/Decide/1-09 Change.flac",
+  "artist": "Djo",
+  "album": "Decide",
+  "title": "Change",
+  "duration_seconds": 178,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.914,
+    "energy": 0.646,
+    "accousticness": 0.121,
+    "valence": 0.647,
+    "mood": "electronic",
+    "mood_probability": 0.759
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.91368567943573,
+    0.6463257074356079,
+    0.1209411770105362,
+    0.647499144077301,
+    0.7591866850852966
+  ]
+}

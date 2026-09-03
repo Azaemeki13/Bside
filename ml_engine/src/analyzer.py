@@ -1,4 +1,6 @@
 import os
+import hashlib
+import json
 import tempfile
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -80,10 +82,50 @@ def _classify(audio_arr: np.ndarray, filename: str, positive_index: int) -> floa
     return float(np.mean(predictions[:, positive_index]))
 
 
-def compute_audio_features(file_path: str) -> dict:
+def signal_key(audio_arr: np.ndarray) -> str:
+    """Stable content hash of the decoded 16 kHz mono signal.
+
+    Independent of the container/codec the audio was delivered in, so a track
+    analyzed offline by ``batch_analyze.py`` and the same track later uploaded
+    through the real pipeline resolve to the same key.
+    """
+    return hashlib.sha256(
+        np.ascontiguousarray(audio_arr, dtype=np.float32).tobytes()
+    ).hexdigest()
+
+
+def _cached_features(audio_arr: np.ndarray) -> dict | None:
+    """Return a precomputed analysis for this signal when ``ML_RESULT_CACHE_DIR``
+    is set and holds a matching ``<signal_key>.json`` (written by
+    ``batch_analyze.py``). Lets a demo replay the full upload -> verify ->
+    /analyze -> callback pipeline with no model inference. No-op when unset."""
+    cache_dir = os.environ.get("ML_RESULT_CACHE_DIR")
+    if not cache_dir:
+        return None
+    cache_file = os.path.join(cache_dir, f"{signal_key(audio_arr)}.json")
+    if not os.path.isfile(cache_file):
+        return None
+    with open(cache_file, "r", encoding="utf-8") as handle:
+        cached = json.load(handle)
+    print(f"ML cache hit -> {cache_file}")
+    return {
+        "dsp_analysis": cached["dsp_analysis"],
+        "ml_features": cached["ml_features"],
+        "normalized_vector": cached["normalized_vector"],
+    }
+
+
+def compute_audio_features(file_path: str, audio_arr=None, sr=None) -> dict:
     try:
-        audio_arr, sr = librosa.load(file_path, sr=ESSENTIA_SAMPLE_RATE, mono=True)
+        if audio_arr is None:
+            audio_arr, sr = librosa.load(file_path, sr=ESSENTIA_SAMPLE_RATE, mono=True)
         audio_arr = audio_arr.astype(np.float32)
+        if sr is None:
+            sr = ESSENTIA_SAMPLE_RATE
+
+        cached = _cached_features(audio_arr)
+        if cached is not None:
+            return cached
 
         tempo, _ = librosa.beat.beat_track(y=audio_arr, sr=sr)
         bpm = float(tempo[0]) if isinstance(tempo, np.ndarray) else float(tempo)
@@ -157,16 +199,31 @@ async def async_download_and_analyze(track_id: str, object_key: str):
             }
             print(f"Finished analysis for {track_id}. Sending payload to Axum...", payload)
             rust_callback_url = "http://bside_rust_backend:8080/internal/songs/features"
-            response = requests.post(
-                rust_callback_url,
-                json=payload,
-                headers={"X-API-Key": os.environ.get("PUBLIC_API_KEY", "")},
-                timeout=10,
-            )
-            if response.status_code == 200:
-                print(f"Succes ! Song {track_id} was updated in Postgres via Axum.")
-            else:
-                print(f"Callback rejected by Axum with the following code  {response.status_code}: {response.text}")
+            headers = {"X-API-Key": os.environ.get("PUBLIC_API_KEY", "")}
+            max_attempts = 5
+            for attempt in range(1, max_attempts + 1):
+                response = requests.post(
+                    rust_callback_url, json=payload, headers=headers, timeout=10
+                )
+                if response.status_code == 200:
+                    print(f"Succes ! Song {track_id} was updated in Postgres via Axum.")
+                    break
+                # 429 (rate limit) and 5xx are transient - back off and retry so a
+                # burst of analyses (e.g. a batch re-index) doesn't drop results.
+                if response.status_code == 429 or response.status_code >= 500:
+                    if attempt < max_attempts:
+                        backoff = min(2 ** (attempt - 1), 8)
+                        print(
+                            f"Callback for {track_id} got {response.status_code}; "
+                            f"retry {attempt}/{max_attempts - 1} in {backoff}s"
+                        )
+                        await asyncio.sleep(backoff)
+                        continue
+                print(
+                    f"Callback rejected by Axum with the following code  "
+                    f"{response.status_code}: {response.text}"
+                )
+                break
 
         except Exception as e:
             print(f"Song background task failure {track_id}: {e}")

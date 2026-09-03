@@ -1,0 +1,28 @@
+{
+  "key": "5f9110988b6985bbc17e06a713094b2802c361f7ad50b4ff440ea349b10b9b3c",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-27 Waltzes, Op. 70  Chopin Waltzes, Op. 70 No. 2 in F Minor.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Waltzes, Op. 70  Chopin Waltzes, Op. 70 No. 2 in F Minor",
+  "duration_seconds": 106,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.143,
+    "energy": 0.392,
+    "accousticness": 0.66,
+    "valence": 0.42,
+    "mood": "sad",
+    "mood_probability": 0.993
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.14316898584365845,
+    0.3923903703689575,
+    0.6600407361984253,
+    0.4202214479446411,
+    0.9931342005729675
+  ]
+}

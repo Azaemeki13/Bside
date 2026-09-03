@@ -1,0 +1,28 @@
+{
+  "key": "3e2caa3b206c7a46a74d80a9abb15aa9cb58d06d5d006f01b0279d8c0bdf00a8",
+  "source_relpath": "Djo/The Crux/2-03 Link.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Link",
+  "duration_seconds": 195,
+  "dsp_analysis": {
+    "tempo_bpm": 78.12,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.985,
+    "energy": 0.639,
+    "accousticness": 0.09,
+    "valence": 0.617,
+    "mood": "party",
+    "mood_probability": 0.705
+  },
+  "normalized_vector": [
+    0.15104166666666666,
+    0.9854656457901001,
+    0.6388826370239258,
+    0.0899578258395195,
+    0.6168367266654968,
+    0.7050776481628418
+  ]
+}

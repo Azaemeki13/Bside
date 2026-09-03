@@ -1,0 +1,28 @@
+{
+  "key": "e22ee68bfa01b30a9804d51b23ffa223ea5775896c03c59d437720fc3e7891ca",
+  "source_relpath": "Daft Punk/Discovery/1-05 Crescendolls.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "Crescendolls",
+  "duration_seconds": 212,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "F"
+  },
+  "ml_features": {
+    "danceability": 0.994,
+    "energy": 0.704,
+    "accousticness": 0.0,
+    "valence": 0.66,
+    "mood": "electronic",
+    "mood_probability": 0.93
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.9943541288375854,
+    0.703903079032898,
+    0.0002197689318563789,
+    0.6603737473487854,
+    0.929542064666748
+  ]
+}

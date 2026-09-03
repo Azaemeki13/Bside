@@ -51,10 +51,15 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - MINI_IO_ENDPOINT=http://minio:9000
       - PUBLIC_API_KEY=${PUBLIC_API_KEY}
+      # Frozen analysis cache written by src/batch_analyze.py. When set, /analyze
+      # replays the precomputed result for a known signal instead of re-running
+      # the models (see analyzer._cached_features). Unset -> always live inference.
+      - ML_RESULT_CACHE_DIR=/cache
     depends_on:
       - minio
     volumes:
       - ./ml_engine:/app:Z
+      - ./ml_cache:/cache:Z
   backend:
     build:
       context: ./back

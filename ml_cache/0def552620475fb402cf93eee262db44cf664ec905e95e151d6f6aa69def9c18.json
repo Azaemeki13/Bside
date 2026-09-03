@@ -1,0 +1,28 @@
+{
+  "key": "0def552620475fb402cf93eee262db44cf664ec905e95e151d6f6aa69def9c18",
+  "source_relpath": "David Guetta/Nothing But the Beat/08 - David Guetta - Crank It Up (feat. Akon).flac",
+  "artist": "David Guetta",
+  "album": "Nothing But the Beat",
+  "title": "Crank It Up (feat. Akon)",
+  "duration_seconds": 193,
+  "dsp_analysis": {
+    "tempo_bpm": 64.66,
+    "harmonic_key": "F#"
+  },
+  "ml_features": {
+    "danceability": 0.93,
+    "energy": 0.656,
+    "accousticness": 0.045,
+    "valence": 0.69,
+    "mood": "party",
+    "mood_probability": 0.883
+  },
+  "normalized_vector": [
+    0.03879310344827592,
+    0.9297114014625549,
+    0.6556251645088196,
+    0.04529288038611412,
+    0.6903399229049683,
+    0.8828886151313782
+  ]
+}

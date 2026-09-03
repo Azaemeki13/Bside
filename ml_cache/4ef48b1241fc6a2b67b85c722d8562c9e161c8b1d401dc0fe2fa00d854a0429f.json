@@ -1,0 +1,28 @@
+{
+  "key": "4ef48b1241fc6a2b67b85c722d8562c9e161c8b1d401dc0fe2fa00d854a0429f",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/03 - Breaking The Girl.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "Breaking The Girl",
+  "duration_seconds": 295,
+  "dsp_analysis": {
+    "tempo_bpm": 89.29,
+    "harmonic_key": "G#"
+  },
+  "ml_features": {
+    "danceability": 0.471,
+    "energy": 0.566,
+    "accousticness": 0.44,
+    "valence": 0.557,
+    "mood": "happy",
+    "mood_probability": 0.681
+  },
+  "normalized_vector": [
+    0.2440476190476191,
+    0.47110527753829956,
+    0.5662777423858643,
+    0.4399634897708893,
+    0.5569121837615967,
+    0.6805009245872498
+  ]
+}

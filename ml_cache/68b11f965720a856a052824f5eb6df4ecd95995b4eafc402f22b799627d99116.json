@@ -1,0 +1,28 @@
+{
+  "key": "68b11f965720a856a052824f5eb6df4ecd95995b4eafc402f22b799627d99116",
+  "source_relpath": "Daft Punk/Discovery/1-09 Something About Us.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "Something About Us",
+  "duration_seconds": 233,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.867,
+    "energy": 0.536,
+    "accousticness": 0.332,
+    "valence": 0.496,
+    "mood": "sad",
+    "mood_probability": 0.919
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.8672577738761902,
+    0.5355290174484253,
+    0.3318990468978882,
+    0.4962646961212158,
+    0.9186065793037415
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "345b264340834b3fb0a45d281dcad5d0e698e7044697f55c6cf591ab93b7e229",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-33 Chopin Grande valse brillante in E-Flat Major, Op. 18.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Chopin Grande valse brillante in E-Flat Major, Op. 18",
+  "duration_seconds": 341,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.103,
+    "energy": 0.46,
+    "accousticness": 0.708,
+    "valence": 0.471,
+    "mood": "sad",
+    "mood_probability": 0.953
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.10303220897912979,
+    0.45952147245407104,
+    0.7078096270561218,
+    0.4707481861114502,
+    0.9534479379653931
+  ]
+}

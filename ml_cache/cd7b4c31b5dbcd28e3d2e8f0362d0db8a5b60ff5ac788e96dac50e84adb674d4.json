@@ -1,0 +1,28 @@
+{
+  "key": "cd7b4c31b5dbcd28e3d2e8f0362d0db8a5b60ff5ac788e96dac50e84adb674d4",
+  "source_relpath": "Djo/The Crux/2-08 Charlie's Garden.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Charlie's Garden",
+  "duration_seconds": 205,
+  "dsp_analysis": {
+    "tempo_bpm": 93.75,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.885,
+    "energy": 0.625,
+    "accousticness": 0.335,
+    "valence": 0.588,
+    "mood": "happy",
+    "mood_probability": 0.781
+  },
+  "normalized_vector": [
+    0.28125,
+    0.8847319483757019,
+    0.6253297924995422,
+    0.33533596992492676,
+    0.5875123143196106,
+    0.781435489654541
+  ]
+}

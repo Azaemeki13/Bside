@@ -1,0 +1,28 @@
+{
+  "key": "cfa67745c4e3163b5e27880534328f20f2ea0e689dc2d926b8b4dfcb171663ae",
+  "source_relpath": "Djo/The Crux/2-06 Egg.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Egg",
+  "duration_seconds": 276,
+  "dsp_analysis": {
+    "tempo_bpm": 104.17,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.65,
+    "energy": 0.497,
+    "accousticness": 0.434,
+    "valence": 0.514,
+    "mood": "sad",
+    "mood_probability": 0.859
+  },
+  "normalized_vector": [
+    0.3680555555555556,
+    0.6500979065895081,
+    0.49731767177581787,
+    0.4335311949253082,
+    0.5141016244888306,
+    0.8586393594741821
+  ]
+}

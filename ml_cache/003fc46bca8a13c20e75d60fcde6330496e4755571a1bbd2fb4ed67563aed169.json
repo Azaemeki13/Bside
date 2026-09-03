@@ -1,0 +1,28 @@
+{
+  "key": "003fc46bca8a13c20e75d60fcde6330496e4755571a1bbd2fb4ed67563aed169",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-09 Orphanage.flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Orphanage",
+  "duration_seconds": 74,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.544,
+    "energy": 0.262,
+    "accousticness": 0.323,
+    "valence": 0.294,
+    "mood": "relaxed",
+    "mood_probability": 0.934
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.5442807078361511,
+    0.2615898549556732,
+    0.3228239119052887,
+    0.29400932788848877,
+    0.9335916638374329
+  ]
+}

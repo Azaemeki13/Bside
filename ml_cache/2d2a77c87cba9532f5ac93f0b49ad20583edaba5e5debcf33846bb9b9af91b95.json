@@ -1,0 +1,28 @@
+{
+  "key": "2d2a77c87cba9532f5ac93f0b49ad20583edaba5e5debcf33846bb9b9af91b95",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/10 - Blood Sugar Sex Magik.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "Blood Sugar Sex Magik",
+  "duration_seconds": 271,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.441,
+    "energy": 0.642,
+    "accousticness": 0.018,
+    "valence": 0.497,
+    "mood": "aggressive",
+    "mood_probability": 0.695
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.4412704110145569,
+    0.6416402459144592,
+    0.01845979504287243,
+    0.4970967173576355,
+    0.6954200267791748
+  ]
+}

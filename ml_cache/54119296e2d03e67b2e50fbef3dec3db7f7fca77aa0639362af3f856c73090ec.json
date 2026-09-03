@@ -1,0 +1,28 @@
+{
+  "key": "54119296e2d03e67b2e50fbef3dec3db7f7fca77aa0639362af3f856c73090ec",
+  "source_relpath": "Daft Punk/Discovery/1-14 Too Long.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "Too Long",
+  "duration_seconds": 600,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.941,
+    "energy": 0.62,
+    "accousticness": 0.104,
+    "valence": 0.585,
+    "mood": "happy",
+    "mood_probability": 0.586
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.9406088590621948,
+    0.6195148825645447,
+    0.10434754937887192,
+    0.5848215818405151,
+    0.5856946706771851
+  ]
+}

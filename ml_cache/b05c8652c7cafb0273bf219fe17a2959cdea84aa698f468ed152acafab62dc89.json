@@ -1,0 +1,28 @@
+{
+  "key": "b05c8652c7cafb0273bf219fe17a2959cdea84aa698f468ed152acafab62dc89",
+  "source_relpath": "Djo/Decide/1-06 End of Beginning.flac",
+  "artist": "Djo",
+  "album": "Decide",
+  "title": "End of Beginning",
+  "duration_seconds": 159,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "D"
+  },
+  "ml_features": {
+    "danceability": 0.894,
+    "energy": 0.548,
+    "accousticness": 0.14,
+    "valence": 0.515,
+    "mood": "sad",
+    "mood_probability": 0.919
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.8944669961929321,
+    0.5479882955551147,
+    0.14009344577789307,
+    0.51500004529953,
+    0.9191908240318298
+  ]
+}

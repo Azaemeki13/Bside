@@ -1,0 +1,28 @@
+{
+  "key": "5348d2bdfc5d210a68012ed8ff36832ad21979a1d49a82f94ba72e339278a9ce",
+  "source_relpath": "Daft Punk/Random Access Memories/1-02 The Game of Love.flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "The Game of Love",
+  "duration_seconds": 322,
+  "dsp_analysis": {
+    "tempo_bpm": 89.29,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.623,
+    "energy": 0.49,
+    "accousticness": 0.753,
+    "valence": 0.451,
+    "mood": "sad",
+    "mood_probability": 0.903
+  },
+  "normalized_vector": [
+    0.2440476190476191,
+    0.6234509944915771,
+    0.4901267886161804,
+    0.7527748346328735,
+    0.4508853554725647,
+    0.9028475284576416
+  ]
+}

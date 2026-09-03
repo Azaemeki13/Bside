@@ -1,0 +1,28 @@
+{
+  "key": "58fb9d2e2265de2c5ee02b7db58f6000c258d6f0d1edd37ef84595338ab73610",
+  "source_relpath": "Djo/Decide/1-07 I Want Your Video.flac",
+  "artist": "Djo",
+  "album": "Decide",
+  "title": "I Want Your Video",
+  "duration_seconds": 128,
+  "dsp_analysis": {
+    "tempo_bpm": 104.17,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.998,
+    "energy": 0.691,
+    "accousticness": 0.07,
+    "valence": 0.622,
+    "mood": "sad",
+    "mood_probability": 0.83
+  },
+  "normalized_vector": [
+    0.3680555555555556,
+    0.9979465007781982,
+    0.6911211013793945,
+    0.06954077631235123,
+    0.6215993762016296,
+    0.8295537829399109
+  ]
+}

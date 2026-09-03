@@ -1,0 +1,28 @@
+{
+  "key": "3b923e10adcbd14ad26006d12d40bddb36efb3e4a88e01145c2127fed48062c4",
+  "source_relpath": "David Guetta/Nothing But the Beat/09 - Afrojack - I Just Wanna F. (feat. David Guetta) (feat. Timbaland & Dev) [Explicit].flac",
+  "artist": "David Guetta",
+  "album": "Nothing But the Beat",
+  "title": "Afrojack - I Just Wanna F. (feat. David Guetta) (feat. Timbaland & Dev) [Explicit]",
+  "duration_seconds": 203,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.991,
+    "energy": 0.566,
+    "accousticness": 0.011,
+    "valence": 0.732,
+    "mood": "party",
+    "mood_probability": 0.948
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.990740954875946,
+    0.5663045644760132,
+    0.010628686286509037,
+    0.7319364547729492,
+    0.9480990171432495
+  ]
+}

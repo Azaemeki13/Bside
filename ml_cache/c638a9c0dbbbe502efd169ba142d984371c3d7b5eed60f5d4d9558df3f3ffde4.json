@@ -1,0 +1,28 @@
+{
+  "key": "c638a9c0dbbbe502efd169ba142d984371c3d7b5eed60f5d4d9558df3f3ffde4",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/2-06 - Ludovico Einaudi - Discovery At Night (Lippok Remix).flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Discovery At Night (Lippok Remix)",
+  "duration_seconds": 379,
+  "dsp_analysis": {
+    "tempo_bpm": 62.5,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.772,
+    "energy": 0.383,
+    "accousticness": 0.228,
+    "valence": 0.416,
+    "mood": "sad",
+    "mood_probability": 0.836
+  },
+  "normalized_vector": [
+    0.020833333333333332,
+    0.7724007964134216,
+    0.38321369886398315,
+    0.22814859449863434,
+    0.41586118936538696,
+    0.8360944986343384
+  ]
+}

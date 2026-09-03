@@ -1,0 +1,28 @@
+{
+  "key": "8196e30f30a25a7f9459456d42de84f15375fc2e9e80b4b5f6ad8b87129b2e9f",
+  "source_relpath": "Daft Punk/Discovery/1-08 High Life.flac",
+  "artist": "Daft Punk",
+  "album": "Discovery",
+  "title": "High Life",
+  "duration_seconds": 202,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.937,
+    "energy": 0.668,
+    "accousticness": 0.003,
+    "valence": 0.613,
+    "mood": "party",
+    "mood_probability": 0.741
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.9372082352638245,
+    0.6682870984077454,
+    0.0030445847660303116,
+    0.6130630373954773,
+    0.7408847808837891
+  ]
+}

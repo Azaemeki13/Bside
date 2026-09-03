@@ -1,0 +1,28 @@
+{
+  "key": "3371e08339cc957260f91804b9471451df5d113523c69fe5b7e88b3a7201ae3b",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/1-03 - Ludovico Einaudi - Life.flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Life",
+  "duration_seconds": 263,
+  "dsp_analysis": {
+    "tempo_bpm": 93.75,
+    "harmonic_key": "A"
+  },
+  "ml_features": {
+    "danceability": 0.137,
+    "energy": 0.397,
+    "accousticness": 0.566,
+    "valence": 0.392,
+    "mood": "sad",
+    "mood_probability": 0.956
+  },
+  "normalized_vector": [
+    0.28125,
+    0.13701802492141724,
+    0.397499144077301,
+    0.5663016438484192,
+    0.39151960611343384,
+    0.9555486440658569
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "07bf21966c4966e7d235381c529743f37f3c7f6fdffcf0e97faa4af39877d1c0",
+  "source_relpath": "Djo/The Crux/1-11 Thich Nhat Hanh.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Thich Nhat Hanh",
+  "duration_seconds": 215,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "C"
+  },
+  "ml_features": {
+    "danceability": 0.851,
+    "energy": 0.386,
+    "accousticness": 0.589,
+    "valence": 0.354,
+    "mood": "sad",
+    "mood_probability": 0.941
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.8506861329078674,
+    0.38613176345825195,
+    0.5885356664657593,
+    0.3542267978191376,
+    0.940908670425415
+  ]
+}

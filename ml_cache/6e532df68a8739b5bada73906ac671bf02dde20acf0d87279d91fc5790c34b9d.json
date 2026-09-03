@@ -1,0 +1,28 @@
+{
+  "key": "6e532df68a8739b5bada73906ac671bf02dde20acf0d87279d91fc5790c34b9d",
+  "source_relpath": "Ludovico Einaudi/In a Time Lapse/2-07 - Ludovico Einaudi - Walk (Phaeleh Remix).flac",
+  "artist": "Ludovico Einaudi",
+  "album": "In a Time Lapse",
+  "title": "- Ludovico Einaudi - Walk (Phaeleh Remix)",
+  "duration_seconds": 308,
+  "dsp_analysis": {
+    "tempo_bpm": 93.75,
+    "harmonic_key": "A#"
+  },
+  "ml_features": {
+    "danceability": 0.801,
+    "energy": 0.41,
+    "accousticness": 0.19,
+    "valence": 0.395,
+    "mood": "sad",
+    "mood_probability": 0.971
+  },
+  "normalized_vector": [
+    0.28125,
+    0.800858199596405,
+    0.41012561321258545,
+    0.19029757380485535,
+    0.39526402950286865,
+    0.970757782459259
+  ]
+}

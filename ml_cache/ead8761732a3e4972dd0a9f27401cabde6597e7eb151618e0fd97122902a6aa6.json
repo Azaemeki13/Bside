@@ -1,0 +1,28 @@
+{
+  "key": "ead8761732a3e4972dd0a9f27401cabde6597e7eb151618e0fd97122902a6aa6",
+  "source_relpath": "Chopin/Chopin by Alice Sara/1-32 Waltzes, Op. 64  Chopin Waltzes, Op. 64 No. 3 in A-Flat Major. Moderato.flac",
+  "artist": "Chopin",
+  "album": "Chopin by Alice Sara",
+  "title": "Waltzes, Op. 64  Chopin Waltzes, Op. 64 No. 3 in A-Flat Major. Moderato",
+  "duration_seconds": 184,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "D#"
+  },
+  "ml_features": {
+    "danceability": 0.13,
+    "energy": 0.439,
+    "accousticness": 0.713,
+    "valence": 0.461,
+    "mood": "sad",
+    "mood_probability": 0.984
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.1303565502166748,
+    0.43904757499694824,
+    0.7127052545547485,
+    0.46129894256591797,
+    0.9840196967124939
+  ]
+}

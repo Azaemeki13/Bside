@@ -1,0 +1,28 @@
+{
+  "key": "70a1fcbbd146a0041424bf6bef105ae1f4cce74ad09d2982e8736a82e28e9f59",
+  "source_relpath": "Red Hot Chilli Peppers/Blood Sugar Sex Magic/15 - My Lovely Man.flac",
+  "artist": "Red Hot Chilli Peppers",
+  "album": "Blood Sugar Sex Magic",
+  "title": "My Lovely Man",
+  "duration_seconds": 279,
+  "dsp_analysis": {
+    "tempo_bpm": 117.19,
+    "harmonic_key": "E"
+  },
+  "ml_features": {
+    "danceability": 0.8,
+    "energy": 0.651,
+    "accousticness": 0.038,
+    "valence": 0.602,
+    "mood": "happy",
+    "mood_probability": 0.682
+  },
+  "normalized_vector": [
+    0.4765625,
+    0.8000727891921997,
+    0.6506655216217041,
+    0.03799128159880638,
+    0.6015475988388062,
+    0.6815841197967529
+  ]
+}

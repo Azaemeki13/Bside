@@ -1,0 +1,28 @@
+{
+  "key": "68cadccaf4add9683986fa3082d3b70904bc8fffa65b49e5b47b5f4389db3dfd",
+  "source_relpath": "Djo/The Crux/1-06 Purgatory Silverstar.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "Purgatory Silverstar",
+  "duration_seconds": 248,
+  "dsp_analysis": {
+    "tempo_bpm": 156.25,
+    "harmonic_key": "B"
+  },
+  "ml_features": {
+    "danceability": 0.728,
+    "energy": 0.52,
+    "accousticness": 0.517,
+    "valence": 0.492,
+    "mood": "sad",
+    "mood_probability": 0.857
+  },
+  "normalized_vector": [
+    0.8020833333333334,
+    0.727918803691864,
+    0.5195322632789612,
+    0.5173447728157043,
+    0.4921115040779114,
+    0.8568679094314575
+  ]
+}

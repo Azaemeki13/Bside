@@ -1,0 +1,28 @@
+{
+  "key": "6c2f3a51295f30f6380c4774ce82fb996b105d406d17a6d4b3db339da2618d83",
+  "source_relpath": "Djo/Decide/1-10 Is That All It Takes.flac",
+  "artist": "Djo",
+  "album": "Decide",
+  "title": "Is That All It Takes",
+  "duration_seconds": 21,
+  "dsp_analysis": {
+    "tempo_bpm": 187.5,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.9,
+    "energy": 0.799,
+    "accousticness": 0.479,
+    "valence": 0.684,
+    "mood": "happy",
+    "mood_probability": 0.935
+  },
+  "normalized_vector": [
+    1.0,
+    0.8998832106590271,
+    0.7993685603141785,
+    0.4792945086956024,
+    0.6842299699783325,
+    0.9352471232414246
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "430a0e9416f28463c8f8c9dbc99b2509395b993dc4ea4e6a31c3f783476d624d",
+  "source_relpath": "Daft Punk/Random Access Memories/1-06 Lose Yourself to Dance.flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Lose Yourself to Dance",
+  "duration_seconds": 354,
+  "dsp_analysis": {
+    "tempo_bpm": 98.68,
+    "harmonic_key": "C#"
+  },
+  "ml_features": {
+    "danceability": 0.977,
+    "energy": 0.688,
+    "accousticness": 0.002,
+    "valence": 0.658,
+    "mood": "happy",
+    "mood_probability": 0.78
+  },
+  "normalized_vector": [
+    0.32236842105263164,
+    0.9765986800193787,
+    0.6876627802848816,
+    0.002440153621137142,
+    0.6576262712478638,
+    0.7802841663360596
+  ]
+}

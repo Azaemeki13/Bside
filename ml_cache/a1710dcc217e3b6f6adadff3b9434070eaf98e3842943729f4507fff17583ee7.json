@@ -1,0 +1,28 @@
+{
+  "key": "a1710dcc217e3b6f6adadff3b9434070eaf98e3842943729f4507fff17583ee7",
+  "source_relpath": "Djo/The Crux/1-01 T. Rex Is Loud.flac",
+  "artist": "Djo",
+  "album": "The Crux",
+  "title": "T. Rex Is Loud",
+  "duration_seconds": 191,
+  "dsp_analysis": {
+    "tempo_bpm": 125.0,
+    "harmonic_key": "G"
+  },
+  "ml_features": {
+    "danceability": 0.878,
+    "energy": 0.663,
+    "accousticness": 0.257,
+    "valence": 0.61,
+    "mood": "sad",
+    "mood_probability": 0.795
+  },
+  "normalized_vector": [
+    0.5416666666666666,
+    0.8781064748764038,
+    0.6629326343536377,
+    0.2574877142906189,
+    0.6102776527404785,
+    0.7945592999458313
+  ]
+}

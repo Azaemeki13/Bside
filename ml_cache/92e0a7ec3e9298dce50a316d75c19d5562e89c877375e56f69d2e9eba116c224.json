@@ -1,0 +1,28 @@
+{
+  "key": "92e0a7ec3e9298dce50a316d75c19d5562e89c877375e56f69d2e9eba116c224",
+  "source_relpath": "Daft Punk/Random Access Memories/1-05 Instant Crush.flac",
+  "artist": "Daft Punk",
+  "album": "Random Access Memories",
+  "title": "Instant Crush",
+  "duration_seconds": 338,
+  "dsp_analysis": {
+    "tempo_bpm": 110.29,
+    "harmonic_key": "A#"
+  },
+  "ml_features": {
+    "danceability": 0.932,
+    "energy": 0.619,
+    "accousticness": 0.303,
+    "valence": 0.554,
+    "mood": "sad",
+    "mood_probability": 0.917
+  },
+  "normalized_vector": [
+    0.41911764705882354,
+    0.9324247241020203,
+    0.6188827157020569,
+    0.3027498424053192,
+    0.554129421710968,
+    0.9167442321777344
+  ]
+}

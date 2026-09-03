@@ -1,0 +1,28 @@
+{
+  "key": "08e815b643af2e4bbd6c25ff131e736a9247300d914855c40479926aa9784371",
+  "source_relpath": "Hans Zimmer/Blade Runner OST/1-24 Almost Human (from the Original Motion Picture Soundtrack Blade Runner 2049).flac",
+  "artist": "Hans Zimmer",
+  "album": "Blade Runner OST",
+  "title": "Almost Human (from the Original Motion Picture Soundtrack Blade Runner 2049)",
+  "duration_seconds": 202,
+  "dsp_analysis": {
+    "tempo_bpm": 144.23,
+    "harmonic_key": "G#"
+  },
+  "ml_features": {
+    "danceability": 0.605,
+    "energy": 0.441,
+    "accousticness": 0.343,
+    "valence": 0.491,
+    "mood": "sad",
+    "mood_probability": 0.891
+  },
+  "normalized_vector": [
+    0.7019230769230769,
+    0.6052529811859131,
+    0.44147032499313354,
+    0.34335678815841675,
+    0.4907573461532593,
+    0.8909708261489868
+  ]
+}
