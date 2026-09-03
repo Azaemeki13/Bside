@@ -19,7 +19,11 @@ export class ProfileCard {
   readonly user = input<UserProfile | null>(null);
 
   private readonly DEFAULT_AVATAR = 'https://upload.wikimedia.org/wikipedia/en/thumb/0/0a/Leon_Kennedy_%28Resident_Evil_Requiem%29.jpg/250px-Leon_Kennedy_%28Resident_Evil_Requiem%29.jpg';
-  protected readonly avatarUrl = computed(() => this.user()?.avatar_url ?? this.DEFAULT_AVATAR);
+  protected readonly avatarUrl = computed(() => {
+    const user = this.user();
+    if (!user) return null;
+    return user.avatar_url ?? this.DEFAULT_AVATAR;
+  });
 
   constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
 
