@@ -1,218 +1,167 @@
+*This project has been created as part of the 42 curriculum by chsauvag,*
+
 # B-Side
 
-A self-hosted music streaming platform: upload tracks, stream them, build
-playlists, follow friends and chat in real time, and get taste-based
-recommendations (per-track "Fresh Picks" and a nightly "Daily Mix") powered by
-an audio-analysis ML service.
+## Description
 
-The stack is a Rust/Axum API, an Angular frontend, PostgreSQL, S3-compatible
-object storage (MinIO), and a Python/FastAPI ML engine, all wired together with
-Docker Compose behind an nginx TLS gateway.
+B-Side is a music streaming platform built as our `ft_transcendence` project. Users can upload and stream music, build playlists, follow artists, interact socially with other users (friends, chat, profiles), and get personalized recommendations ("Daily Mix" / "Fresh Picks").
 
----
+Key features:
+- Streaming of songs, albums, and artist pages, with a persistent audio player.
+- Playlists (create, edit, add/remove songs).
+- Likes, recent plays, top spins, and a personalized "Daily Mix" / "Fresh Picks" recommendation feed.
+- Social features: friends system, direct messaging, user profiles with avatars.
+- Artist accounts and "become an artist" request/review workflow.
+- File upload (song files, avatars) via S3-compatible object storage.
+- Admin dashboard (user management, roles/bans, artist requests, analytics).
+- Public API with API-key authentication and rate limiting, documented via Swagger/OpenAPI.
+- Real-time features over WebSockets.
+- Authentication via email/password (Argon2-hashed, salted) and Google OAuth2.
 
-## Architecture
-
-```
-          ┌────────────┐   HTTPS    ┌────────────────┐
- browser ─▶│   nginx    │──/api/**──▶│  Rust backend  │  axum, :8080
-          │ TLS gateway │──/ws──────▶│  (bside)       │
-          │  :80 :443   │──/  ──────▶└──┬──────┬──────┘
-          └─────┬───────┘  Angular      │      │ fire-and-forget POST /analyze
-                │  frontend             │      ▼
-                │                       │   ┌──────────────┐
-   /bside-*  ───┘                       │   │  ML service  │  FastAPI, :8000
-   (presigned objects)                  │   │ (ml_engine)  │
-                                        ▼   └──┬────────┬──┘
-                                  ┌──────────┐ │        │ downloads track
-                                  │ Postgres │◀┘        ▼
-                                  └──────────┘      ┌───────┐
-                                        ▲           │ MinIO │  S3-compatible
-                            callback (X-API-Key)    └───────┘
-```
-
-A separate **`daily_mix_worker`** process (same `back/` crate, its own
-container) runs a nightly loop: recompute every user's taste vector from their
-play/like/skip history, then generate each user's Daily Mix playlist.
-
-For a full walkthrough of the backend — modules, request lifecycle, the ML round
-trip, the data layer — see [`back/ARCHITECTURE.md`](back/ARCHITECTURE.md).
-
-### Services
-
-| Service              | Container               | Role                                        |
-| -------------------- | ----------------------- | ------------------------------------------- |
-| `nginx`              | `bside_https_gateway`   | TLS termination, routing (`:80`, `:443`)    |
-| `frontend`           | `bside_frontend`        | Angular app (SSR), served via nginx         |
-| `backend`            | `bside_rust_backend`    | Rust/Axum HTTP + WebSocket API (`:8080`)    |
-| `daily-mix-worker`   | `bside_daily_mix_worker`| Nightly preference refresh + Daily Mix gen  |
-| `ml_service`         | `bside_ml_service`      | Audio analysis, produces track feature vectors |
-| `db`                 | `bside_db_dev`          | PostgreSQL 15 (loopback `:5432`)            |
-| `minio` / `minio-setup` | `bside_minio`        | Object storage for audio, covers, avatars   |
-| `adminer`            | `bside_adminer`         | DB web UI (loopback `:8081`)                |
-
-Only nginx (`80`/`443`), Postgres (`127.0.0.1:5432`) and Adminer
-(`127.0.0.1:8081`) are reachable from the host; everything else is private to
-the Compose network.
-
----
-
-## Quick start
+## Instructions
 
 ### Prerequisites
 
-- Docker + Docker Compose
-- GNU Make
-- [`sqlx-cli`](https://crates.io/crates/sqlx-cli) — `cargo install sqlx-cli --no-default-features --features native-tls,postgres` (used by `make migrate`; the backend container also applies migrations on startup)
+- Docker Engine and Docker Compose
+- Rust toolchain (`rustc` / `cargo`)
+- Node.js and `npm`
+- A local `.env` file created from `.env.example`
 
-### Run it
+### Environment configuration
 
-```bash
-cp .env.example .env
-# edit .env: set JWT_SECRET, PUBLIC_API_KEY (32+ chars), DB_PASSWORD,
-# ADMIN_* and, if you want Google login, OAUTH_ID / OAUTH_PW.
+Copy `.env.example` to `.env` and fill in the required values. The application configuration includes:
 
-make up            # build + start the stack, wait for the DB, run migrations
-```
+- PostgreSQL connection values (`DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_PORT`, `DATABASE_URL`)
+- backend secret values (`JWT_SECRET`, `PUBLIC_API_KEY`)
+- Google OAuth credentials (`OAUTH_ID`, `OAUTH_PW`, `G_AUTH_URL`, `G_TOKEN_URL`, `OAUTH_URL`)
+- MinIO / S3-compatible storage settings (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_ENDPOINT_URL`, `AWS_PUBLIC_ENDPOINT_URL`)
+- admin bootstrap values (`ADMIN_EMAIL`, `ADMIN_USERNAME`, `ADMIN_PASSWORD`)
+- SMTP credentials (`SMTP_USERNAME`, `SMTP_PASSWORD`)
 
-Then open **https://localhost** (self-signed cert — accept the warning once).
+### Running the project
 
-| URL                              | What                                  |
-| -------------------------------- | ------------------------------------- |
-| `https://localhost`              | The application                       |
-| `https://localhost/swagger-ui`   | Interactive API docs (generated)      |
-| `http://localhost:8081`          | Adminer (DB browser)                  |
+1. Create the runtime environment file:
+   - `cp .env.example .env`
+2. Fill in the required values in `.env`.
+3. Start the stack:
+   - `make up`
+   - or `docker compose up -d --build`
+4. If needed, run migrations manually:
+   - `make migrate`
+5. Watch service logs:
+   - `make logs`
+6. The app is served behind the project nginx gateway, with the local entrypoint at `https://localhost`.
+   - The local certificate is self-signed; accept it once in the browser on first use.
+   - Google OAuth is configured for the callback URL `https://localhost/api/auth/google/callback`.
 
-`make down` stops it; `make re` rebuilds from scratch; `make logs` tails
-everything. See `make` targets below.
+Notes from the repo setup:
+- PostgreSQL runs in a `db` container.
+- MinIO runs in a `minio` container and exposes the console on `http://localhost:9001`.
+- Adminer is available on `http://localhost:8081`.
+- The project includes a dedicated `daily_mix_worker` service for recommendation refreshes.
+- Public legal pages are routed at `/terms-of-service` and `/privacy-policy`.
 
----
+## Team Information
 
-## Test data
+| Login | Role(s) | Responsibilities |
+|-------|---------|-------------------|
+| chsauvag | Project Owner | Defined the product vision, prioritized features, and kept the project aligned with the intended user experience and scope. |
+| | | |
+| | | |
+| | | |
 
-`make up` gives you an empty catalogue plus the admin account from your `.env`.
-Load one of the seed sets for something to click on:
+## Project Management
 
-```bash
-# Social / chat demo (friends, requests, conversations, presence)
-docker exec -i bside_db_dev psql -U bside_admin -d bside_db < back/seeds/chat_seed.sql
-```
+- **Task organization**: Tasks were assigned based on each member's interests, skills, and areas they wanted to develop further.
+- **Communication channel**: Discord.
+- **Meeting cadence**: At least once every two weeks.
 
-Accounts created by `chat_seed.sql` (password `Password123!` for all):
+## Technical Stack
 
-| Email                       | Notes                                                     |
-| --------------------------- | -------------------------------------------------------- |
-| `luna.rivera@bside.local`   | Main account — friends, incoming/outgoing requests, conversations, unread messages, online/offline presence |
-| `alex.martin@bside.local`   |                                                          |
-| `maya.chen@bside.local`     |                                                          |
-| `noah.bernard@bside.local`  |                                                          |
-| `ethan.cole@bside.local`    |                                                          |
+- **Frontend**: Angular (with Server-Side Rendering), SCSS + Tailwind CSS
+- **Backend**: Rust
+- **Database**: PostgreSQL
+- **Authentication**: JWT, Argon2 password hashing, Google OAuth2
+- **File storage**: S3-compatible object storage via `aws-sdk-s3` / MinIO
+- **API documentation**: Swagger UI via `utoipa`
+- **Rate limiting**: `axum-governor`
+- **Other notable libraries/tools**:
+  -
 
-Other seeds: `full_seed.sql` (base users incl. admin, used by the ML showcase),
-`seed_preference_test.sql`, `seed_song_share_test.sql`.
+**Justification for major technical choices:**
+-
 
-Handy DB peek:
+## Database Schema
 
-```bash
-make db-shell        # psql shell into the running DB
-docker exec -it bside_db_dev psql -U bside_admin -d bside_db \
-  -c "SELECT id, username, email FROM users;"
-```
+The codebase is built around a relational model with the following core entities:
 
----
+- `users` and authentication/account metadata
+- `artists` and `albums`
+- `songs` with metadata, analysis state, and ML feature vectors
+- `playlists` and `playlist_songs`
+- `likes`, recent plays, and analytics counters
+- `friendships` / friend requests
+- `messages` / conversations for direct messaging
+- `artist_requests` for the artist onboarding workflow
+- `daily_mixes` and per-user recommendation state
+- moderation/admin records such as user bans and role management
 
-## ML recommendation showcase
+## Features List
 
-There's a reproducible demo of the recommendation system: a 249-track
-catalogue uploaded through the real upload → analyze → callback pipeline, 15
-listener personas with distinct tastes, and a proof that preference vectors
-drift every night as personas listen.
+| Feature | Description | Contributor(s) |
+|---------|--------------|-----------------|
+| Streaming & catalog (songs, albums, artists) | Music catalog browsing, artist/album pages, and playback endpoints for songs and audio URLs. | |
+| Playlists | CRUD for playlists and song membership, including a special liked-songs playlist flow. | |
+| Likes / recent plays / top spins | User interaction tracking and analytics for liked songs, plays, and popularity statistics. | |
+| Daily Mix / recommendations | Personalized recommendation generation and scheduled refresh jobs for daily mixes. | |
+| Social (friends, messaging, profiles) | Friend requests, friend list management, user profiles, and direct messaging with live WebSocket updates. | |
+| File upload (songs, avatars) | Upload handling with S3-compatible object storage and URLs for song/cover/avatar assets. | |
+| Admin panel (users, roles, bans, artist requests) | Moderation and admin routes for user management, role changes, bans, and artist request review. | |
+| Public API (with API key, rate limiting, Swagger docs) | Public API endpoints protected by API-key auth, with rate limiting and OpenAPI documentation. | |
+| Real-time features (WebSockets) | WebSocket event types for private messages, friend activity, and other live updates. | |
+| Authentication (email/password + Google OAuth) | Local account registration/login with Argon2 password hashing and Google OAuth callback flow. | |
+| Analytics dashboard | Read endpoints for recent plays, top spinning songs, and user activity analytics. | |
+| Search | Filtered and paginated search across songs, albums, artists, and playlists. | |
+| Privacy Policy / Terms of Service pages | Project includes endpoints and pages for privacy/legal content. | |
 
-```bash
-make showcase        # stack up → seed → catalogue → personas → verify Daily Mixes
-make showcase-drift  # replay the "vectors drift every night" proof
-```
+## Modules
 
-The catalogue audio is git-ignored (5.8 GB); a frozen analysis cache in
-`ml_cache/` lets the pipeline replay without a GPU. Full narrative in
-[`B-SIDE_ML_SHOWCASE.md`](B-SIDE_ML_SHOWCASE.md), operational steps in
-[`ML_SHOWCASE_RUNBOOK.md`](ML_SHOWCASE_RUNBOOK.md). The preference-weighting
-formula is in [`PREFERENCE_SYSTEM_README.md`](PREFERENCE_SYSTEM_README.md).
+| Module | Type | Points | Justification | Contributor(s) |
+|--------|------|--------|----------------|------------------|
+| Frontend + backend framework | Major | 2 | Angular frontend and Rust/Axum backend are implemented as the main application stack. | chsauvag, |
+| Real-time features via WebSockets | Major | 2 | The project includes live chat, presence, and friend-related real-time updates over WebSockets. | chsauvag, |
+| User interaction: chat + profile + friends | Major | 2 | Users can chat, manage friendships, view profiles, and see online presence. | chsauvag, |
+| Recommendation system using ML | Major | 2 | The backend integrates an ML audio-analysis service and generates personalized recommendations from user interaction and audio feature vectors. | |
+| Remote auth via OAuth 2.0 | Minor | 1 | Google OAuth 2.0 login is implemented and integrated with user creation/authentication. | |
+| Advanced permissions system | Major | 2 | Admin and moderator role checks are implemented for user management and restricted routes. | |
+| User activity analytics dashboard | Minor | 1 | User analytics for recent activity, likes, listening trends, and top songs are exposed and displayed. | |
 
----
+**Total points: 14**
 
-## Repository layout
+## Individual Contributions
 
-```
-back/           Rust/Axum API + daily_mix_worker binary (see back/ARCHITECTURE.md)
-  src/handlers/   one file per feature area (accounts, songs, playlists, social, …)
-  migrations/     sqlx migrations, applied on startup
-  seeds/          SQL seed sets
-front/          Angular 21 app (SSR), Tailwind
-ml_engine/      FastAPI audio-analysis service (librosa + Essentia MusiCNN)
-infra/nginx/    TLS gateway image + routing config
-infra/db_init/  Postgres bootstrap SQL
-scripts/        showcase tooling (upload, verify, night simulation) + MinIO setup
-ml_cache/       frozen ML analysis results for offline showcase replay
-docker-compose.yml        the stack
-docker-compose.gpu.yml    overlay: give ml_service the host GPU (make up-gpu)
-```
+### chsauvag
+- Came up with the original product idea and defined the overall vision for the project.
+- Designed the initial product direction and user experience through interface exploration and mockups in Figma.
+- Contributed heavily to the frontend implementation, working alongside adi-marc on the main UI and feature development.
+- Worked on frontend services, state management, data integration, and application logic to connect the interface to the backend.
+- Helped keep the project aligned with the intended user experience and overall product goals.
 
----
+## Challenges Faced
 
-## Local development
+### chsauvag
+- Working with languages and technologies that I did not know before, which meant learning a large part of the stack from scratch.
+- Over-scoping the project at the beginning, which created extra complexity and pressure later on.
+- Struggling with the responsibilities of the Product Owner role and finding the right balance between product decisions and technical reality.
+- Experiencing communication issues at the start of the project, which made early coordination and alignment harder.
 
-**Backend** — offline build (what Docker/CI does), from `back/`:
+## Resources
 
-```bash
-cd back
-SQLX_OFFLINE=true cargo build --bins
-SQLX_OFFLINE=true cargo test
-```
+- [Axum documentation](https://docs.rs/axum)
+- [SQLx documentation](https://docs.rs/sqlx)
+- [Angular documentation](https://angular.dev)
+- [utoipa (OpenAPI for Rust)](https://docs.rs/utoipa)
 
-If you add or change a `sqlx::query!`, regenerate the offline cache against a
-live DB and commit `back/.sqlx/`:
+### AI usage
 
-```bash
-export DATABASE_URL="postgres://bside_admin:<DB_PASSWORD>@localhost:5432/bside_db"
-cargo sqlx prepare -- --bin bside
-```
-
-**Frontend** — from `front/` (`npm install` first):
-
-```bash
-npm start        # ng serve on http://localhost:4200, proxies /api → :8080
-npm test         # Vitest
-npm run build
-```
-
-`front/src/proxy.conf.json` points the dev server at a backend on
-`localhost:8080`, so run `make up` (or at least the `db` + `backend` services)
-alongside `ng serve`.
-
----
-
-## Make targets
-
-| Target                | Effect                                                              |
-| --------------------- | ------------------------------------------------------------------ |
-| `make up` / `up-gpu`  | Build + start the stack (GPU variant for `ml_service`), wait for DB, migrate |
-| `make down`           | Stop containers                                                    |
-| `make re` / `re-gpu`  | `clean` then `up`                                                  |
-| `make clean`          | Down + remove volumes and locally built images                     |
-| `make logs` / `status`| Tail logs / list containers                                        |
-| `make migrate`        | `sqlx migrate run` against the local DB                            |
-| `make db-shell`       | psql shell into the DB container                                   |
-| `make db-reset`       | `sqlx database reset -y` (drops + recreates + migrates)            |
-| `make prepare`        | `sqlx prepare` (regenerate the offline query cache)               |
-| `make showcase*`      | ML recommendation showcase (see above and the run book)           |
-
----
-
-## More documentation
-
-- [`back/ARCHITECTURE.md`](back/ARCHITECTURE.md) — backend map: modules, request lifecycle, ML round trip, data layer
-- [`PROJECT_AUDIT.md`](PROJECT_AUDIT.md) — project audit against requirements
-- [`front-end_structure.md`](front-end_structure.md) — frontend architecture
-- [`module_tracking.md`](module_tracking.md) / [`changes.md`](changes.md) — progress notes
-- `https://localhost/swagger-ui` — the authoritative HTTP contract, generated from the handlers
+- [ ] *(describe which tasks AI was used for and which parts of the project it touched)*
