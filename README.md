@@ -1,191 +1,218 @@
-# Bside: Music Streaming Platform (Rust Architecture)
+# B-Side
 
-**Duration:** 6 Weeks
-**Team Size:** 4 Members (3 Core Developers + 1 QA/PM)
-**Target:** 14 Points
+A self-hosted music streaming platform: upload tracks, stream them, build
+playlists, follow friends and chat in real time, and get taste-based
+recommendations (per-track "Fresh Picks" and a nightly "Daily Mix") powered by
+an audio-analysis ML service.
 
----
-
-## 👥 Team Repartition (Balanced Loadout)
-
-| Member | Role | Responsibilities |
-| :--- | :--- | :--- |
-| **Developer 1** | **Rust Engine & ML** | Rust API (Axum), WebSocket Hub logic, Python FastAPI (ML Recommender). |
-| **Developer 2** | **UI, DB & DevOps** | PostgreSQL schema design (`.sql` migrations), Docker Compose, NGINX proxy, React/Vue visual layouts, CSS (Tailwind). |
-| **Developer 3** | **Client Engine** | Global State (Redux/Pinia), Audio streaming (`Howler.js`), API integration, WS Client logic. |
-| **Dummy 1** | **PM / QA** | Documentation (`README.md`), Privacy Policy, E2E Testing. |
+The stack is a Rust/Axum API, an Angular frontend, PostgreSQL, S3-compatible
+object storage (MinIO), and a Python/FastAPI ML engine, all wired together with
+Docker Compose behind an nginx TLS gateway.
 
 ---
 
-## 🚀 6-Week Sprint Protocol
+## Architecture
 
-### Week 1: Foundation & The Contract
-**Goal:** The DB is running, and the Rust server answers a basic HTTP ping.
+```
+          ┌────────────┐   HTTPS    ┌────────────────┐
+ browser ─▶│   nginx    │──/api/**──▶│  Rust backend  │  axum, :8080
+          │ TLS gateway │──/ws──────▶│  (bside)       │
+          │  :80 :443   │──/  ──────▶└──┬──────┬──────┘
+          └─────┬───────┘  Angular      │      │ fire-and-forget POST /analyze
+                │  frontend             │      ▼
+                │                       │   ┌──────────────┐
+   /bside-*  ───┘                       │   │  ML service  │  FastAPI, :8000
+   (presigned objects)                  │   │ (ml_engine)  │
+                                        ▼   └──┬────────┬──┘
+                                  ┌──────────┐ │        │ downloads track
+                                  │ Postgres │◀┘        ▼
+                                  └──────────┘      ┌───────┐
+                                        ▲           │ MinIO │  S3-compatible
+                            callback (X-API-Key)    └───────┘
+```
 
-**Developer 1 (Rust Engine):**
-- [x] Initialize Cargo workspace (`axum`, `tokio`, `sqlx`).
-- [x] Set up the basic HTTP router and CORS.
-- [x] Connect Rust to the PostgreSQL port provided by Dev 2.
+A separate **`daily_mix_worker`** process (same `back/` crate, its own
+container) runs a nightly loop: recompute every user's taste vector from their
+play/like/skip history, then generate each user's Daily Mix playlist.
 
-**Developer 2 (UI + Front):**
-- [ ] Landing page   
-- [ ] Components Part I
-- [ ] Figma UI Part I
+For a full walkthrough of the backend — modules, request lifecycle, the ML round
+trip, the data layer — see [`back/ARCHITECTURE.md`](back/ARCHITECTURE.md).
 
-**Developer 3 (Client Engine):**
-- [ ] Help Chlo
-- [ ] Inception
+### Services
 
----
+| Service              | Container               | Role                                        |
+| -------------------- | ----------------------- | ------------------------------------------- |
+| `nginx`              | `bside_https_gateway`   | TLS termination, routing (`:80`, `:443`)    |
+| `frontend`           | `bside_frontend`        | Angular app (SSR), served via nginx         |
+| `backend`            | `bside_rust_backend`    | Rust/Axum HTTP + WebSocket API (`:8080`)    |
+| `daily-mix-worker`   | `bside_daily_mix_worker`| Nightly preference refresh + Daily Mix gen  |
+| `ml_service`         | `bside_ml_service`      | Audio analysis, produces track feature vectors |
+| `db`                 | `bside_db_dev`          | PostgreSQL 15 (loopback `:5432`)            |
+| `minio` / `minio-setup` | `bside_minio`        | Object storage for audio, covers, avatars   |
+| `adminer`            | `bside_adminer`         | DB web UI (loopback `:8081`)                |
 
-### Week 2: Core Hardware (Uploads, Auth, & Streaming)
-**Goal:** Secure audio upload to S3 and playback.
-
-**Developer 1 (Rust Engine):**
-- [x] Implement JWT Auth logic in Rust.
-- [x] JWT Bouncer 
-- [x] Implement OAuth 2.0 flow.
-- [x] Implement AWS S3 Pre-Signed URL generation using `aws-sdk-s3`.
-- [x] Build `POST /tracks` endpoint using SQLx.
-
-**Developer 2 (UI, DB, DevOps):**
-- [ ] Component to think about 
-- [ ] Components Part II
-- [ ] Figma UI Part II
-
-**Developer 3 (Client Engine):**
-- [ ] Build the Audio Player component shell (no logic yet).
-- [ ] Implement `Howler.js` to stream the S3 URL.
-
----
-
-### Week 3: The Memory Bank (Profiles, Playlists, & Search)
-**Goal:** Users can manage data and organize music.
-
-**Developer 1 (Rust Engine):**
-- [x] Build Relational POST (artists albums, collabs all interconnected).
-- [x] Best practices to apply according to git.
-- [ ] CLI Tool to buld load songs from a directory
-- [x] Build Playlist CRUD operations in Rust.
-- [ ] Finish all CRUD + setup cronjobs to maintain DB and Minio
-- [x] Metadata Aggregation. Playlist response also includes total_duration and song_count.
-- [x] Build Advanced Search endpoint (`ILIKE` queries via SQLx).
-- [ ] Look if there is anything else to do related to the AI week 5.
-- [x] Redo for Artists ( think about friends aswell)
-
-**Developer 2 (UI, DB, DevOps):**
-- [ ] Component to think about 
-- [ ] Components Part III
-- [ ] Figma UI Part III
-
-**Developer 3 (Client Engine):**
-- [ ] Connect Profile/Search components to Rust APIs.
-- [ ] Implement the audio queue logic (auto-play next song).
-- [ ] Randomize + no repeat ? 
+Only nginx (`80`/`443`), Postgres (`127.0.0.1:5432`) and Adminer
+(`127.0.0.1:8081`) are reachable from the host; everything else is private to
+the Compose network.
 
 ---
 
-### Week 4: The Network (Real-Time Chat & Interactions)
-**Goal:** Satisfy the 42 User Interaction requirements using Rust WebSockets.
+## Quick start
 
-**Developer 1 (Rust Engine):**
-- [ ] Set up WebSocket route in Axum (`axum::extract::ws`).
-- [ ] Build an async state manager (e.g., `Arc<Mutex<HashMap>>`) to track connected users.
-- [ ] Route live messages and broadcast Online/Offline status.
+### Prerequisites
 
-**Developer 2 (UI, DB, DevOps):**
-- [ ] Build Friends List UI and Chat Window layout.
-- [ ] Update DB schema if necessary for Chat Histories.
+- Docker + Docker Compose
+- GNU Make
+- [`sqlx-cli`](https://crates.io/crates/sqlx-cli) — `cargo install sqlx-cli --no-default-features --features native-tls,postgres` (used by `make migrate`; the backend container also applies migrations on startup)
 
-**Developer 3 (Client Engine):**
-- [ ] Connect Frontend WebSocket client.
-- [ ] Wire up state to send/receive messages dynamically. (dev 1 mayb)
+### Run it
 
----
+```bash
+cp .env.example .env
+# edit .env: set JWT_SECRET, PUBLIC_API_KEY (32+ chars), DB_PASSWORD,
+# ADMIN_* and, if you want Google login, OAUTH_ID / OAUTH_PW.
 
-### Week 5: The Intelligence (Python ML & Analytics)
-**Goal:** Hit the AI requirement (2 points).
+make up            # build + start the stack, wait for the DB, run migrations
+```
 
-**Developer 1 (Rust Engine):**
-- [ ] Temporarily pivot to Python: Initialize FastAPI.
-- [ ] Write Collaborative Filtering algorithm (`scikit-learn`) reading from Postgres.
-- [ ] Ensure Rust API tracks "Play (>30s)" events via SQLx.
+Then open **https://localhost** (self-signed cert — accept the warning once).
 
-**Developer 2 (UI, DB, DevOps):**
-- [ ] Write `Dockerfile`s for the React app, Rust backend, and Python service.
-- [ ] Build Analytics Dashboard grid layout.
+| URL                              | What                                  |
+| -------------------------------- | ------------------------------------- |
+| `https://localhost`              | The application                       |
+| `https://localhost/swagger-ui`   | Interactive API docs (generated)      |
+| `http://localhost:8081`          | Adminer (DB browser)                  |
 
-**Developer 3 (Client Engine):**
-- [ ] Integrate charting library (Chart.js) with backend analytics endpoints.
-- [ ] Connect the "For You" page to the Python ML API.
+`make down` stops it; `make re` rebuilds from scratch; `make logs` tails
+everything. See `make` targets below.
 
 ---
 
-### Week 6: The Polish & Deployment
-**Goal:** Evaluate-ready according to 42 rules.
+## Test data
 
-**Developer 1 (Rust Engine):**
-- [ ] Hunt down any `.unwrap()` panics in Rust and handle errors gracefully.
-- [ ] Test WebSocket load limits.
+`make up` gives you an empty catalogue plus the admin account from your `.env`.
+Load one of the seed sets for something to click on:
 
-**Developer 2 (UI, DB, DevOps):**
-- [ ] Configure NGINX reverse proxy (`/api` $\to$ Rust, `/ml` $\to$ Python, `/` $\to$ React).
-- [ ] Test the full `docker compose up --build` pipeline.
-- [ ] Run Accessibility audits on the UI.
-
-**Developer 3 (Client Engine):**
-- [ ] Clean up console warnings and optimize React/Vue re-renders.
-
-**Dummy 1:**
-- [ ] Finalize `README.md`, Privacy Policy, and E2E Testing.
-
-
-**Things nice to have**:
-- Mobile View
-- Electron
-- Light theme
-- Machine learning that listens to song
-- Daily Mix
-- Stats 
-
-**Figma UI**: 
-
-**Components**:
-
-**CRUD Status:**
-
-| Entity | Create | Read | Update | Delete |
-| :--- | :---: | :---: | :---: | :---: |
-| **User** | ✅ | ✅ | ⏳ | ⏳ |
-| **Album** | ✅ | ⏳ | ⏳ | ⏳ |
-| **Playlist** | ✅ | ✅ | ✅ | ✅ |
-| **Song** | ✅ | ⏳ | ✅ (Verify) | ✅ |
-
-
-For read DB example:
-docker exec -it bside_db_dev sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT id, username, email FROM users;"'
-
-docker exec -it bside_db_dev psql -U bside_admin -d bside_db
-
-To get a complete local DB for testing the chat/social features:
-
-1. Run the migrations.
-2. Then run the seed file:
-
+```bash
+# Social / chat demo (friends, requests, conversations, presence)
 docker exec -i bside_db_dev psql -U bside_admin -d bside_db < back/seeds/chat_seed.sql
+```
 
-Test accounts:
+Accounts created by `chat_seed.sql` (password `Password123!` for all):
 
-luna.rivera@bside.local / Password123!        <- main account, with complete test data
-alex.martin@bside.local / Password123!
-maya.chen@bside.local / Password123!
-noah.bernard@bside.local / Password123!
-ethan.cole@bside.local / Password123!
+| Email                       | Notes                                                     |
+| --------------------------- | -------------------------------------------------------- |
+| `luna.rivera@bside.local`   | Main account — friends, incoming/outgoing requests, conversations, unread messages, online/offline presence |
+| `alex.martin@bside.local`   |                                                          |
+| `maya.chen@bside.local`     |                                                          |
+| `noah.bernard@bside.local`  |                                                          |
+| `ethan.cole@bside.local`    |                                                          |
 
-With Luna Rivera, you can test:
-- existing friends
-- incoming friend request
-- outgoing friend request
-- conversations
-- unread messages
-- online/offline status when another user opens the Social page
+Other seeds: `full_seed.sql` (base users incl. admin, used by the ML showcase),
+`seed_preference_test.sql`, `seed_song_share_test.sql`.
+
+Handy DB peek:
+
+```bash
+make db-shell        # psql shell into the running DB
+docker exec -it bside_db_dev psql -U bside_admin -d bside_db \
+  -c "SELECT id, username, email FROM users;"
+```
+
+---
+
+## ML recommendation showcase
+
+There's a reproducible demo of the recommendation system: a 249-track
+catalogue uploaded through the real upload → analyze → callback pipeline, 15
+listener personas with distinct tastes, and a proof that preference vectors
+drift every night as personas listen.
+
+```bash
+make showcase        # stack up → seed → catalogue → personas → verify Daily Mixes
+make showcase-drift  # replay the "vectors drift every night" proof
+```
+
+The catalogue audio is git-ignored (5.8 GB); a frozen analysis cache in
+`ml_cache/` lets the pipeline replay without a GPU. Full narrative in
+[`B-SIDE_ML_SHOWCASE.md`](B-SIDE_ML_SHOWCASE.md), operational steps in
+[`ML_SHOWCASE_RUNBOOK.md`](ML_SHOWCASE_RUNBOOK.md). The preference-weighting
+formula is in [`PREFERENCE_SYSTEM_README.md`](PREFERENCE_SYSTEM_README.md).
+
+---
+
+## Repository layout
+
+```
+back/           Rust/Axum API + daily_mix_worker binary (see back/ARCHITECTURE.md)
+  src/handlers/   one file per feature area (accounts, songs, playlists, social, …)
+  migrations/     sqlx migrations, applied on startup
+  seeds/          SQL seed sets
+front/          Angular 21 app (SSR), Tailwind
+ml_engine/      FastAPI audio-analysis service (librosa + Essentia MusiCNN)
+infra/nginx/    TLS gateway image + routing config
+infra/db_init/  Postgres bootstrap SQL
+scripts/        showcase tooling (upload, verify, night simulation) + MinIO setup
+ml_cache/       frozen ML analysis results for offline showcase replay
+docker-compose.yml        the stack
+docker-compose.gpu.yml    overlay: give ml_service the host GPU (make up-gpu)
+```
+
+---
+
+## Local development
+
+**Backend** — offline build (what Docker/CI does), from `back/`:
+
+```bash
+cd back
+SQLX_OFFLINE=true cargo build --bins
+SQLX_OFFLINE=true cargo test
+```
+
+If you add or change a `sqlx::query!`, regenerate the offline cache against a
+live DB and commit `back/.sqlx/`:
+
+```bash
+export DATABASE_URL="postgres://bside_admin:<DB_PASSWORD>@localhost:5432/bside_db"
+cargo sqlx prepare -- --bin bside
+```
+
+**Frontend** — from `front/` (`npm install` first):
+
+```bash
+npm start        # ng serve on http://localhost:4200, proxies /api → :8080
+npm test         # Vitest
+npm run build
+```
+
+`front/src/proxy.conf.json` points the dev server at a backend on
+`localhost:8080`, so run `make up` (or at least the `db` + `backend` services)
+alongside `ng serve`.
+
+---
+
+## Make targets
+
+| Target                | Effect                                                              |
+| --------------------- | ------------------------------------------------------------------ |
+| `make up` / `up-gpu`  | Build + start the stack (GPU variant for `ml_service`), wait for DB, migrate |
+| `make down`           | Stop containers                                                    |
+| `make re` / `re-gpu`  | `clean` then `up`                                                  |
+| `make clean`          | Down + remove volumes and locally built images                     |
+| `make logs` / `status`| Tail logs / list containers                                        |
+| `make migrate`        | `sqlx migrate run` against the local DB                            |
+| `make db-shell`       | psql shell into the DB container                                   |
+| `make db-reset`       | `sqlx database reset -y` (drops + recreates + migrates)            |
+| `make prepare`        | `sqlx prepare` (regenerate the offline query cache)               |
+| `make showcase*`      | ML recommendation showcase (see above and the run book)           |
+
+---
+
+## More documentation
+
+- [`back/ARCHITECTURE.md`](back/ARCHITECTURE.md) — backend map: modules, request lifecycle, ML round trip, data layer
+- [`PROJECT_AUDIT.md`](PROJECT_AUDIT.md) — project audit against requirements
+- [`front-end_structure.md`](front-end_structure.md) — frontend architecture
+- [`module_tracking.md`](module_tracking.md) / [`changes.md`](changes.md) — progress notes
+- `https://localhost/swagger-ui` — the authoritative HTTP contract, generated from the handlers
