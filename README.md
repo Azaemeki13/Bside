@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by chsauvag,*
+*This project has been created as part of the 42 curriculum by chsauvag, nacao*
 
 # B-Side
 
@@ -63,12 +63,12 @@ Notes from the repo setup:
 
 ## Team Information
 
-| Login | Role(s) | Responsibilities |
-|-------|---------|-------------------|
+| Login    | Role(s) | Responsibilities |
+|----------|---------|-------------------|
 | chsauvag | Project Owner | Defined the product vision, prioritized features, and kept the project aligned with the intended user experience and scope. |
-| | | |
-| | | |
-| | | |
+| nacao    | Full-stack Developer | Developed key backend and social features, worked on real-time messaging and recommendations, and contributed to frontend-backend integration. |
+|          | | |
+|          | | |
 
 ## Project Management
 
@@ -147,6 +147,14 @@ The codebase is built around a relational model with the following core entities
 - Worked on frontend services, state management, data integration, and application logic to connect the interface to the backend.
 - Helped keep the project aligned with the intended user experience and overall product goals.
 
+### nacao
+- Worked mainly on backend development, with a strong focus on the social and real-time features of the application.
+- Implemented direct messaging and real-time communication using WebSockets.
+- Contributed to the friendship system, including friend requests and friend management.
+- Worked on message persistence, conversation history, and read/unread message handling.
+- Contributed to the recommendation system by implementing user preference calculation based on listening interactions.
+- Worked on PostgreSQL migrations and SQLx integration for the features I developed.
+
 ## Challenges Faced
 
 ### chsauvag
@@ -154,6 +162,13 @@ The codebase is built around a relational model with the following core entities
 - Over-scoping the project at the beginning, which created extra complexity and pressure later on.
 - Struggling with the responsibilities of the Product Owner role and finding the right balance between product decisions and technical reality.
 - Experiencing communication issues at the start of the project, which made early coordination and alignment harder.
+
+### nacao
+- Learning Rust and Axum while implementing asynchronous and real-time features was one of the main challenges.
+- Managing WebSocket connections and keeping real-time messages synchronized with the database and frontend required careful handling. 
+- Working across both the backend and frontend made it important to keep API models, WebSocket payloads, and application state consistent. 
+- Designing the recommendation-related logic was challenging because different user interactions had to be translated into meaningful preference scores. 
+- Integrating several features developed by different team members also required regular coordination and adaptation as the project evolved.
 
 ## Resources
 
