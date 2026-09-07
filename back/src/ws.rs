@@ -102,6 +102,21 @@ enum ServerWsMessage {
 
     #[serde(rename = "friend_removed")]
     FriendRemoved { by_user_id: Uuid },
+
+    // Sent back to the *sender* after a message is persisted, so their other
+    // open sessions (a second browser/tab on the same account) render the
+    // message live instead of going stale until the next conversation reload.
+    #[serde(rename = "message_echo")]
+    MessageEcho {
+        message_id: Uuid,
+        to_user_id: Uuid,
+        content: String,
+        message_type: String,
+        song_id: Option<Uuid>,
+        shared_song: Option<SharedSong>,
+        status: String,
+        created_at: DateTime<Utc>,
+    },
 }
 
 async fn are_accepted_friends(
@@ -591,6 +606,26 @@ async fn handle_socket(socket: WebSocket, state: AppState, user_id: Uuid, visibl
                                     println!("Failed to update message status: {error}");
                                 }
                             }
+
+                            // Mirror the message to the sender's own sessions
+                            // (including this one, which dedupes it against its
+                            // optimistic placeholder by message id).
+                            let echo = ServerWsMessage::MessageEcho {
+                                message_id: saved_message.id,
+                                to_user_id,
+                                content: saved_message.content.clone(),
+                                message_type: saved_message.message_type.clone(),
+                                song_id: saved_message.song_id,
+                                shared_song: saved_message.shared_song.clone(),
+                                status: if delivered_connections == 0 {
+                                    saved_message.status.clone()
+                                } else {
+                                    "delivered".to_string()
+                                },
+                                created_at: saved_message.created_at,
+                            };
+
+                            send_server_message(&state_for_receive, user_id, &echo).await;
                         }
                         Err(error) => {
                             println!("Invalid WebSocket message from user {user_id}: {error}");

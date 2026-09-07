@@ -188,6 +188,32 @@ export class ConversationsStore implements OnDestroy {
     return true;
   }
 
+  /**
+   * Reconciles an echo of a message this account sent. The session that sent it
+   * swaps its optimistic placeholder for the saved message; a second session on
+   * the same account, which never held a placeholder, appends it live.
+   */
+  reconcileEcho(message: ChatMessage): void {
+    // Already reconciled (origin session that also received `message_saved`, or
+    // a repeated echo).
+    if (this.messages().some((existing) => existing.id === message.id)) return;
+
+    if (this.selectedConversation()?.other_user_id !== message.receiver_id) return;
+
+    const messages = this.messages();
+    for (let index = messages.length - 1; index >= 0; index--) {
+      const candidate = messages[index];
+      if (candidate.receiver_id === message.receiver_id && candidate.id.startsWith('local-')) {
+        this.messages.set(
+          messages.map((item, position) => (position === index ? message : item)),
+        );
+        return;
+      }
+    }
+
+    this.messages.update((current) => [...current, message]);
+  }
+
   /** Replaces the newest matching optimistic ID with the saved server ID. */
   acknowledge(toUserId: string, messageId: string, status: ChatMessage['status']): void {
     this.messages.update((messages) =>

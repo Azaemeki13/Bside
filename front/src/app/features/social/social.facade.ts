@@ -100,6 +100,9 @@ export class SocialFacade implements OnDestroy {
       case 'message_saved':
         this.handleMessageSaved(message);
         break;
+      case 'message_echo':
+        this.handleMessageEcho(message);
+        break;
       case 'user_offline':
       case 'invalid_message':
         this.error.set(message.message);
@@ -196,6 +199,32 @@ export class SocialFacade implements OnDestroy {
   ): void {
     // Replace the optimistic message id, then refresh conversation ordering.
     this.conversationsStore.acknowledge(message.to_user_id, message.message_id, message.status);
+    this.conversationsStore.loadConversations((msg) => this.error.set(msg));
+  }
+
+  private handleMessageEcho(
+    message: Extract<ServerWsMessage, { type: 'message_echo' }>
+  ): void {
+    // An echo of a message this account sent: the sending session dedupes it,
+    // any other open session on the same account renders it live.
+    const currentUser = this.authService.currentUser();
+    if (!currentUser) return;
+
+    const sent: ChatMessage = {
+      id: message.message_id,
+      sender_id: currentUser.id,
+      receiver_id: message.to_user_id,
+      content: message.content,
+      message_type: message.message_type ?? 'text',
+      song_id: message.song_id ?? null,
+      shared_song: message.shared_song ?? null,
+      status: message.status ?? 'sent',
+      created_at: message.created_at,
+      delivered_at: null,
+      read_at: null,
+    };
+
+    this.conversationsStore.reconcileEcho(sent);
     this.conversationsStore.loadConversations((msg) => this.error.set(msg));
   }
 

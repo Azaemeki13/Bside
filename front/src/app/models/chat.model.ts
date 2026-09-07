@@ -86,6 +86,20 @@ export type ServerWsMessage =
       message: string;
     }
   | {
+      // Echo of a message this account sent, delivered to all of its sessions.
+      type: 'message_echo';
+      message_id: string;
+      to_user_id: string;
+      content: string;
+
+      message_type: ChatMessageType;
+      song_id?: string | null;
+      shared_song?: SharedSong | null;
+
+      status: MessageStatus;
+      created_at: string;
+    }
+  | {
       type: 'user_offline';
       to_user_id: string;
       message: string;
