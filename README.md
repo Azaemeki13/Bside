@@ -157,7 +157,7 @@ The codebase is built around a relational model with the following core entities
 - Worked on PostgreSQL migrations and SQLx integration for the features I developed.
 
 ### adi-marc
-- Worked on all aspects of the front-end by implementing features from a visual mockup, adjusting already build sections and finding solutions for specific section layouts.
+- Worked on all aspects of the front-end by implementing features from a visual mockup, adjusting already built sections and finding solutions for specific section's layouts.
 - Designed and implemented the responsive features from an already built destkop MVP, restructured the desktop sections to adapt them to a mobile and tablet view.
 - Built part of the front-end logic by building the howler.js player and it's main functionalities. 
 - Fixed the connections with the various back-end API in collaboration with chsauvag.
