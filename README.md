@@ -90,7 +90,8 @@ Notes from the repo setup:
   -
 
 **Justification for major technical choices:**
--
+- Rust is a safe at compilation time language which makes it good for this project, if it compiles it will work. 
+It also has a very good hashing library and is getting more and more popular therefore the choice, also it's fun to be a rustacean ! :-) 
 
 ## Database Schema
 
