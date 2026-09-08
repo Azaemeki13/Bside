@@ -110,16 +110,16 @@ The codebase is built around a relational model with the following core entities
 
 | Feature | Description | Contributor(s) |
 |---------|--------------|-----------------|
-| Streaming & catalog (songs, albums, artists) | Music catalog browsing, artist/album pages, and playback endpoints for songs and audio URLs. | |
-| Playlists | CRUD for playlists and song membership, including a special liked-songs playlist flow. | |
-| Likes / recent plays / top spins | User interaction tracking and analytics for liked songs, plays, and popularity statistics. | |
+| Streaming & catalog (songs, albums, artists) | Music catalog browsing, artist/album pages, and playback endpoints for songs and audio URLs. | chsauvag |
+| Playlists | CRUD for playlists and song membership, including a special liked-songs playlist flow. | chsauvag |
+| Likes / recent plays / top spins | User interaction tracking and analytics for liked songs, plays, and popularity statistics. | chsauvag |
 | Daily Mix / recommendations | Personalized recommendation generation and scheduled refresh jobs for daily mixes. | |
-| Social (friends, messaging, profiles) | Friend requests, friend list management, user profiles, and direct messaging with live WebSocket updates. | |
+| Social (friends, messaging, profiles) | Friend requests, friend list management, user profiles, and direct messaging with live WebSocket updates. | chsauvag |
 | File upload (songs, avatars) | Upload handling with S3-compatible object storage and URLs for song/cover/avatar assets. | |
 | Admin panel (users, roles, bans, artist requests) | Moderation and admin routes for user management, role changes, bans, and artist request review. | |
 | Public API (with API key, rate limiting, Swagger docs) | Public API endpoints protected by API-key auth, with rate limiting and OpenAPI documentation. | |
 | Real-time features (WebSockets) | WebSocket event types for private messages, friend activity, and other live updates. | |
-| Authentication (email/password + Google OAuth) | Local account registration/login with Argon2 password hashing and Google OAuth callback flow. | |
+| Authentication (email/password + Google OAuth) | Local account registration/login with Argon2 password hashing and Google OAuth callback flow. | chsauvag |
 | Analytics dashboard | Read endpoints for recent plays, top spinning songs, and user activity analytics. | |
 | Search | Filtered and paginated search across songs, albums, artists, and playlists. | |
 | Privacy Policy / Terms of Service pages | Project includes endpoints and pages for privacy/legal content. | |
