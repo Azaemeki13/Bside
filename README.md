@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by chsauvag, nacao*
+*This project has been created as part of the 42 curriculum by chsauvag, nacao, adi-marc, cauffret and didimitr *
 
 # B-Side
 
@@ -67,8 +67,9 @@ Notes from the repo setup:
 |----------|---------|-------------------|
 | chsauvag | Project Owner | Defined the product vision, prioritized features, and kept the project aligned with the intended user experience and scope. |
 | nacao    | Full-stack Developer | Developed key backend and social features, worked on real-time messaging and recommendations, and contributed to frontend-backend integration. |
-|          | | |
-|          | | |
+| adi-marc | Front-end Developer | Developed part of the front-end architecture in accordance with chsauvag vision and initial structure, structured the mobile and responsive aspect of the application as well as the main features of the player. |
+| cauffret | Back-end Developer | Visualized and developed the main back-end architecture in Rust as well as the ML engine and the various connections between the server side services. |
+| didimitr | Back-end Developer | In charge of the ML engine in accordance with cauffret's architecture sketch for the taste algorithm and the daily-mix recomendations. |
 
 ## Project Management
 
@@ -155,6 +156,13 @@ The codebase is built around a relational model with the following core entities
 - Contributed to the recommendation system by implementing user preference calculation based on listening interactions.
 - Worked on PostgreSQL migrations and SQLx integration for the features I developed.
 
+### adi-marc
+- Worked on all aspects of the front-end by implementing features from a visual mockup, adjusting already build sections and finding solutions for specific section layouts.
+- Designed and implemented the responsive features from an already built destkop MVP, restructured the desktop sections to adapt them to a mobile and tablet view.
+- Built part of the front-end logic by building the howler.js player and it's main functionalities. 
+- Fixed the connections with the various back-end API in collaboration with chsauvag.
+- Advised various changes from the initial design concept to adapt the artistic vision without damagin the User Experience.
+
 ## Challenges Faced
 
 ### chsauvag
@@ -169,6 +177,12 @@ The codebase is built around a relational model with the following core entities
 - Working across both the backend and frontend made it important to keep API models, WebSocket payloads, and application state consistent. 
 - Designing the recommendation-related logic was challenging because different user interactions had to be translated into meaningful preference scores. 
 - Integrating several features developed by different team members also required regular coordination and adaptation as the project evolved.
+
+### adi-marc
+- Learning new frameworks and adapting them to a complex project from the beginning, as well as having multiple languages work with eachother.
+- Adapting the project to it's evolving vision, changing complete features or specific sections of the UI to comply with the evolution of the application.
+- Working with a partner on the same field (Front-end) and having to adapt the code with sections that weren't written by me.
+- Adapting a Desktop first UI to the mobile and tablet views without losing details or features.
 
 ## Resources
 
