@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by chsauvag, nacao, adi-marc, cauffret and didimitr *
+*This project has been created as part of the 42 curriculum by chsauvag, nacao, adi-marc, cauffret and didimitr*
 
 # B-Side
 
