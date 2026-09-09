@@ -87,7 +87,6 @@ Notes from the repo setup:
 - **API documentation**: Swagger UI via `utoipa`
 - **Rate limiting**: `axum-governor`
 - **Other notable libraries/tools**: essentia / fastAPI 
-  -
 
 **Justification for major technical choices:**
 - Rust is a safe at compilation time language which makes it good for this project, if it compiles it will work. 
