@@ -164,6 +164,13 @@ The codebase is built around a relational model with the following core entities
 - Fixed the connections with the various back-end APIs in collaboration with chsauvag.
 - Advised various changes from the initial design concept to adapt the artistic vision without damaging the User Experience.
 
+### didimitr
+- Built the Daily Mix generator: a persistent 20-track daily playlist mixing familiar favourites with fresh discovery picks.
+- Ranked tracks by cosine similarity to each user's preference vector, with per-artist and per-album diversity caps.
+- Built the scheduled daily_mix_worker that refreshes preference vectors nightly and regenerates missing mixes.
+- Developed the personalized "Fresh Picks" album recommendations, with ML mood filtering and a catalogue fallback.
+- Integrated the ML audio-analysis output into ranking and wired the Angular/Axum endpoints serving mixes.
+
 ## Challenges Faced
 
 ### chsauvag
@@ -184,6 +191,13 @@ The codebase is built around a relational model with the following core entities
 - Adapting the project to its evolving vision, changing complete features or specific sections of the UI to comply with the evolution of the application.
 - Working with a partner in the same field (front-end) and having to adapt the code to sections that weren't written by me.
 - Adapting a desktop-first UI to mobile and tablet views without losing details or features.
+
+### didimitr
+- Learning Rust, async SQLx, and audio-vector math at once while building a full recommendation feature from scratch.
+- Making Daily Mix generation idempotent so concurrent requests and the nightly worker never create duplicate or half-written mixes.
+- Keeping recommendations useful for brand-new users with no listening history, which required catalogue fallbacks at every ranking stage.
+- Tuning the discovery-versus-familiar balance and diversity caps so even a narrow catalogue still fills a complete 20-track mix.
+- Coordinating the preference-vector logic with cauffret and the audio feature-vector format with the Python ML service.
 
 ## Resources
 
