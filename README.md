@@ -65,10 +65,10 @@ Notes from the repo setup:
 
 | Login    | Role(s) | Responsibilities |
 |----------|---------|-------------------|
-| chsauvag | Project Owner | Defined the product vision, prioritized features, and kept the project aligned with the intended user experience and scope. |
+| chsauvag | Project Owner / Front-end Developer | Defined the product vision, prioritized features, and kept the project aligned with the intended user experience and scope. |
 | nacao    | Full-stack Developer | Developed key backend and social features, worked on real-time messaging and recommendations, and contributed to frontend-backend integration. |
-| adi-marc | Front-end Developer | Developed part of the front-end architecture in accordance with chsauvag vision and initial structure, structured the mobile and responsive aspect of the application as well as the main features of the player. |
-| cauffret | Back-end Developer | Visualized and developed the main back-end architecture in Rust as well as the ML engine and the various connections between the server side services. |
+| adi-marc | Project Manage / Front-end Developer | Developed part of the front-end architecture in accordance with chsauvag vision and initial structure, structured the mobile and responsive aspect of the application as well as the main features of the player. |
+| cauffret | Technical Lead / Back-end Developer | Visualized and developed the main back-end architecture in Rust as well as the ML engine and the various connections between the server side services. |
 | didimitr | Back-end Developer | In charge of the ML engine in accordance with cauffret's architecture sketch for the taste algorithm and the daily-mix recomendations. |
 
 ## Project Management
@@ -112,31 +112,31 @@ The codebase is built around a relational model with the following core entities
 
 | Feature | Description | Contributor(s) |
 |---------|--------------|-----------------|
-| Streaming & catalog (songs, albums, artists) | Music catalog browsing, artist/album pages, and playback endpoints for songs and audio URLs. | chsauvag |
-| Playlists | CRUD for playlists and song membership, including a special liked-songs playlist flow. | chsauvag |
+| Streaming & catalog (songs, albums, artists) | Music catalog browsing, artist/album pages, and playback endpoints for songs and audio URLs. | chsauvag / adi-marc |
+| Playlists | CRUD for playlists and song membership, including a special liked-songs playlist flow. | chsauvag / adi-marc |
 | Likes / recent plays / top spins | User interaction tracking and analytics for liked songs, plays, and popularity statistics. | chsauvag |
-| Daily Mix / recommendations | Personalized recommendation generation and scheduled refresh jobs for daily mixes. | |
-| Social (friends, messaging, profiles) | Friend requests, friend list management, user profiles, and direct messaging with live WebSocket updates. | chsauvag |
-| File upload (songs, avatars) | Upload handling with S3-compatible object storage and URLs for song/cover/avatar assets. | |
-| Admin panel (users, roles, bans, artist requests) | Moderation and admin routes for user management, role changes, bans, and artist request review. | |
-| Public API (with API key, rate limiting, Swagger docs) | Public API endpoints protected by API-key auth, with rate limiting and OpenAPI documentation. | |
-| Real-time features (WebSockets) | WebSocket event types for private messages, friend activity, and other live updates. | |
-| Authentication (email/password + Google OAuth) | Local account registration/login with Argon2 password hashing and Google OAuth callback flow. | chsauvag |
-| Analytics dashboard | Read endpoints for recent plays, top spinning songs, and user activity analytics. | |
-| Search | Filtered and paginated search across songs, albums, artists, and playlists. | |
-| Privacy Policy / Terms of Service pages | Project includes endpoints and pages for privacy/legal content. | |
+| Daily Mix / recommendations | Personalized recommendation generation and scheduled refresh jobs for daily mixes. | didimitr |
+| Social (friends, messaging, profiles) | Friend requests, friend list management, user profiles, and direct messaging with live WebSocket updates. | chsauvag / adi-marc |
+| File upload (songs, avatars) | Upload handling with S3-compatible object storage and URLs for song/cover/avatar assets. | cauffret |
+| Admin panel (users, roles, bans, artist requests) | Moderation and admin routes for user management, role changes, bans, and artist request review. | chsauvag / cauffret / adi-marc |
+| Public API (with API key, rate limiting, Swagger docs) | Public API endpoints protected by API-key auth, with rate limiting and OpenAPI documentation. | cauffret / nacao |
+| Real-time features (WebSockets) | WebSocket event types for private messages, friend activity, and other live updates. | cauffret / nacao |
+| Authentication (email/password + Google OAuth) | Local account registration/login with Argon2 password hashing and Google OAuth callback flow. | cauffret / chsauvag |
+| Analytics dashboard | Read endpoints for recent plays, top spinning songs, and user activity analytics. | chsauvag / cauffret / adi-marc |
+| Search | Filtered and paginated search across songs, albums, artists, and playlists. | cauffret / adi-marc / chsauvag |
+| Privacy Policy / Terms of Service pages | Project includes endpoints and pages for privacy/legal content. | adi-marc / cauffret |
 
 ## Modules
 
 | Module | Type | Points | Justification | Contributor(s) |
 |--------|------|--------|----------------|------------------|
-| Frontend + backend framework | Major | 2 | Angular frontend and Rust/Axum backend are implemented as the main application stack. | chsauvag, |
-| Real-time features via WebSockets | Major | 2 | The project includes live chat, presence, and friend-related real-time updates over WebSockets. | chsauvag, |
-| User interaction: chat + profile + friends | Major | 2 | Users can chat, manage friendships, view profiles, and see online presence. | chsauvag, |
-| Recommendation system using ML | Major | 2 | The backend integrates an ML audio-analysis service and generates personalized recommendations from user interaction and audio feature vectors. | |
-| Remote auth via OAuth 2.0 | Minor | 1 | Google OAuth 2.0 login is implemented and integrated with user creation/authentication. | |
-| Advanced permissions system | Major | 2 | Admin and moderator role checks are implemented for user management and restricted routes. | |
-| User activity analytics dashboard | Minor | 1 | User analytics for recent activity, likes, listening trends, and top songs are exposed and displayed. | |
+| Frontend + backend framework | Major | 2 | Angular frontend and Rust/Axum backend are implemented as the main application stack. | chsauvag / cauffret / adi-marc / nacao / didimitr |
+| Real-time features via WebSockets | Major | 2 | The project includes live chat, presence, and friend-related real-time updates over WebSockets. | chsauvag / cauffret / nacao |
+| User interaction: chat + profile + friends | Major | 2 | Users can chat, manage friendships, view profiles, and see online presence. | chsauvag / adi-marc |
+| Recommendation system using ML | Major | 2 | The backend integrates an ML audio-analysis service and generates personalized recommendations from user interaction and audio feature vectors. | cauffret / nacao / didimitr |
+| Remote auth via OAuth 2.0 | Minor | 1 | Google OAuth 2.0 login is implemented and integrated with user creation/authentication. | cauffret |
+| Advanced permissions system | Major | 2 | Admin and moderator role checks are implemented for user management and restricted routes. | cauffret / nacao |
+| User activity analytics dashboard | Minor | 1 | User analytics for recent activity, likes, listening trends, and top songs are exposed and displayed. | chsauvag / cauffret / adi-marc |
 
 **Total points: 14**
 
@@ -158,11 +158,11 @@ The codebase is built around a relational model with the following core entities
 - Worked on PostgreSQL migrations and SQLx integration for the features I developed.
 
 ### adi-marc
-- Worked on all aspects of the front-end by implementing features from a visual mockup, adjusting already built sections and finding solutions for specific section's layouts.
-- Designed and implemented the responsive features from an already built destkop MVP, restructured the desktop sections to adapt them to a mobile and tablet view.
-- Built part of the front-end logic by building the howler.js player and it's main functionalities. 
-- Fixed the connections with the various back-end API in collaboration with chsauvag.
-- Advised various changes from the initial design concept to adapt the artistic vision without damagin the User Experience.
+- Worked on all aspects of the front-end by implementing features from a visual mockup, adjusting already built sections and finding solutions for specific sections' layouts.
+- Designed and implemented the responsive features from an already built desktop MVP, restructured the desktop sections to adapt them to a mobile and tablet view.
+- Built part of the front-end logic by building the howler.js player and its main functionalities.
+- Fixed the connections with the various back-end APIs in collaboration with chsauvag.
+- Advised various changes from the initial design concept to adapt the artistic vision without damaging the User Experience.
 
 ## Challenges Faced
 
@@ -180,10 +180,10 @@ The codebase is built around a relational model with the following core entities
 - Integrating several features developed by different team members also required regular coordination and adaptation as the project evolved.
 
 ### adi-marc
-- Learning new frameworks and adapting them to a complex project from the beginning, as well as having multiple languages work with eachother.
-- Adapting the project to it's evolving vision, changing complete features or specific sections of the UI to comply with the evolution of the application.
-- Working with a partner on the same field (Front-end) and having to adapt the code with sections that weren't written by me.
-- Adapting a Desktop first UI to the mobile and tablet views without losing details or features.
+- Learning new frameworks and adapting them to a complex project from the beginning, as well as having multiple languages work with each other.
+- Adapting the project to its evolving vision, changing complete features or specific sections of the UI to comply with the evolution of the application.
+- Working with a partner in the same field (front-end) and having to adapt the code to sections that weren't written by me.
+- Adapting a desktop-first UI to mobile and tablet views without losing details or features.
 
 ## Resources
 
