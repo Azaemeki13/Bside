@@ -67,7 +67,7 @@ Notes from the repo setup:
 |----------|---------|-------------------|
 | chsauvag | Project Owner / Front-end Developer | Defined the product vision, prioritized features, and kept the project aligned with the intended user experience and scope. |
 | nacao    | Full-stack Developer | Developed key backend and social features, worked on real-time messaging and recommendations, and contributed to frontend-backend integration. |
-| adi-marc | Project Manage / Front-end Developer | Developed part of the front-end architecture in accordance with chsauvag vision and initial structure, structured the mobile and responsive aspect of the application as well as the main features of the player. |
+| adi-marc | Project Manager / Front-end Developer | Developed part of the front-end architecture in accordance with chsauvag vision and initial structure, structured the mobile and responsive aspect of the application as well as the main features of the player. |
 | cauffret | Technical Lead / Back-end Developer | Visualized and developed the main back-end architecture in Rust as well as the ML engine and the various connections between the server side services. |
 | didimitr | Back-end Developer | In charge of the ML engine in accordance with cauffret's architecture sketch for the taste algorithm and the daily-mix recomendations. |
 
